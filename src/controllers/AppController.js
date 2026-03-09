@@ -175,7 +175,7 @@ export class AppController {
                 // Health Check: Verificar si el proxy/servidor de Sofía está vivo
                 let isSofiaDown = false;
                 try {
-                    const testRes = await fetch('/sofia-api/trabajvsfaenas');
+                    const testRes = await fetch('/sofia-api/trabajosfaenas');
                     if (testRes.status === 502 || testRes.status === 504 || testRes.status === 500) {
                         isSofiaDown = true;
                     }

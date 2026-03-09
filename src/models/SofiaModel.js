@@ -33,6 +33,7 @@ export class SofiaImportModel {
 
     static importRows(rows) {
         this.REGISTROS.push(...rows);
+        console.log(`[SofiaImportModel] Imported ${rows.length} rows. Total: ${this.REGISTROS.length}`);
     }
 
     static parseCSV(csvText, defaultFinca) {
@@ -232,7 +233,8 @@ export class SofiaImportModel {
     }
 
     static applyFilters(data, filters = {}) {
-        return data.filter(r => {
+        console.log(`[SofiaImportModel] Applying filters:`, filters, `Data size: ${data.length}`);
+        const result = data.filter(r => {
             if (filters.finca && r.finca_original !== filters.finca) return false;
             if (filters.ciclo && r.ciclo !== filters.ciclo) return false;
             if (filters.predio && r.clasifica !== filters.predio) return false;
@@ -240,6 +242,8 @@ export class SofiaImportModel {
             if (filters.cuartel && r.cuartel !== filters.cuartel) return false;
             return true;
         });
+        console.log(`[SofiaImportModel] Filtered result: ${result.length} rows`);
+        return result;
     }
 
     static getResumen(filters = {}) {

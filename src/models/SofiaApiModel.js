@@ -42,7 +42,7 @@ export class SofiaApiModel {
         'El Espejo': '123450S8fgNhWDfKUNxnzFr7xb6DK1us2OqJK2'
     };
 
-    static BASE_URL = '/sofia-api/trabajvsfaenas';
+    static BASE_URL = '/sofia-api/trabajosfaenas';
 
     static getCycleRanges(ciclo) {
         // Ciclo Agrícola: 1 Mayo -> 30 Abril

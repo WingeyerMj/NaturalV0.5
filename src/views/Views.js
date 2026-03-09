@@ -2069,7 +2069,7 @@ export function renderSofiaResumen(resumen) {
           <div class="metric-card-icon green">📊</div>
           <span class="metric-badge up">Total</span>
         </div>
-        <div class="metric-value">${resumen.totalAplicaciones}</div>
+        <div class="metric-value">${resumen.totalApplications}</div>
         <div class="metric-label">Aplicaciones Totales</div>
       </div>
       <div class="metric-card">
