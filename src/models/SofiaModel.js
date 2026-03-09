@@ -289,10 +289,10 @@ export class SofiaImportModel {
             const clasifica = r.clasifica || 'Sin Clasifica';
             const key = `${clasifica}|${r.producto}|${r.finca}`;
             if (!groups[key]) groups[key] = { cuartel: clasifica, finca: r.finca, producto: r.producto, clasifica, pre: 0, pos: 0, real: 0 };
-            const tipo = (r.tipo_registro || '').toLowerCase();
-            if (tipo.includes('pre')) groups[key].pre += r.cantidad;
-            else if (tipo.includes('pos')) groups[key].pos += r.cantidad;
-            else groups[key].real += r.cantidad;
+            const tr = (r.tipo_registro || '').toLowerCase();
+            if (tr === 'presupuestado-pre') groups[key].pre += r.cantidad;
+            else if (tr === 'presupuestado-pos') groups[key].pos += r.cantidad;
+            else if (tr === 'real') groups[key].real += r.cantidad;
         });
 
         return Object.values(groups)

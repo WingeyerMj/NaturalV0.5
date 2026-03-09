@@ -855,15 +855,20 @@ export function renderCargaView(labores, fincas, predios, empleados) {
 // ── Informes (Reports) View ──
 export function renderInformesView() {
   return `
-    <div class="tabs" id="informes-tabs">
-      <button class="tab-btn active" data-tab="presupuesto">Ejecución Presupuestaria</button>
-      <button class="tab-btn" data-tab="labores">Labores de Campo</button>
-      <button class="tab-btn" data-tab="parametros">Parámetros</button>
-      <button class="tab-btn" data-tab="aplicaciones">📋 Aplicaciones Sofía</button>
-    </div>
-
-    <div id="informe-content">
-      <!-- Will be filled dynamically -->
+    <div class="informes-container">
+      <aside class="informes-nav" id="informes-tabs">
+        <div class="informes-nav-header">REPORTES</div>
+        <button class="tab-btn active" data-tab="presupuesto">📊 Ejecución</button>
+        <button class="tab-btn" data-tab="labores">🚜 Labores</button>
+        <button class="tab-btn" data-tab="parametros">⚙️ Parámetros</button>
+        <button class="tab-btn" data-tab="aplicaciones">📋 Aplicaciones</button>
+        <button class="tab-btn" data-tab="gastos">💰 Gastos</button>
+        <button class="tab-btn" data-tab="secaderos">☀️ Secaderos</button>
+      </aside>
+  
+      <div id="informe-content" class="informes-content">
+        <!-- Contenido dinámico -->
+      </div>
     </div>
   `;
 }
@@ -969,26 +974,60 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
   const cycles = ['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022'];
 
   return `
-    <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6);">
-      ${isAdmin ? `<!-- Budget Upload Zone -->
-      <div class="sofia-upload-zone" id="jornales-budget-upload" style="margin: 0; padding: var(--space-6); background: var(--bg-glass); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <div style="font-size: 2.5rem; margin-bottom: var(--space-2);">📄</div>
-        <h4 style="font-family: 'Outfit'; margin-bottom: var(--space-1);">Presupuesto de Jornales</h4>
-        <p style="font-size: var(--text-xs); margin-bottom: var(--space-4);">Carga el CSV de proyección</p>
-        <input type="file" id="input-budget-csv" accept=".csv" hidden />
-        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('input-budget-csv').click()">
-          Seleccionar CSV
-        </button>
-      </div>` : ''}
+    ${isAdmin ? `<!-- Budget Upload Zone -->
+    <div class="data-table-container animate-fade-in" id="jornales-budget-upload" style="margin-bottom: var(--space-6); padding: var(--space-4); background: var(--bg-glass); display: flex; align-items: center; gap: var(--space-4);">
+      <div style="font-size: 1.5rem;">📄</div>
+      <div style="flex: 1;">
+        <h4 style="font-family: 'Outfit'; margin: 0;">Presupuesto de Jornales</h4>
+        <p style="font-size: var(--text-xs); margin: 0; color: var(--text-tertiary);">Carga el CSV de proyección para comparar consumos reales vs proyectados.</p>
+      </div>
+      <input type="file" id="input-budget-csv" accept=".csv" hidden />
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('input-budget-csv').click()">
+        Seleccionar CSV
+      </button>
+    </div>` : ''}
 
-      <!-- Chart Container -->
-      <div class="data-table-container" style="margin: 0; padding: var(--space-6);">
-        <h4 style="font-family: 'Outfit'; margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+    <!-- Chart Container (Full Width) -->
+    <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-6); padding: var(--space-6);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+        <h4 style="font-family: 'Outfit'; margin: 0; display: flex; align-items: center; gap: var(--space-2);">
           📊 Distribución de Jornadas
         </h4>
-        <div style="height: 200px; position: relative;">
-          <canvas id="chart-jornadas-consumidas"></canvas>
+        <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+          <!-- Predios Propios Filter -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <select id="chart-filter-predio" class="form-select" style="font-size: 0.75rem; padding: 4px 8px; width: 180px; background: var(--bg-tertiary);">
+              <option value="">🏠 Todos los Predios</option>
+              <optgroup label="El Espejo">
+                <option value="FINCA:El Espejo">✨ Todo El Espejo</option>
+                <option value="EEI">El Espejo I</option>
+                <option value="EEII">El Espejo II</option>
+                <option value="EEIII">El Espejo III</option>
+              </optgroup>
+              <optgroup label="Fincas Viejas">
+                <option value="FINCA:Fincas Viejas">✨ Toda Fincas Viejas</option>
+                <option value="Camino Truncado">Camino Truncado</option>
+                <option value="Puente Alto">Puente Alto</option>
+                <option value="La Chimbera">La Chimbera</option>
+              </optgroup>
+            </select>
+          </div>
+          <!-- Faena Filter -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <select id="chart-filter-faena" class="form-select" style="font-size: 0.75rem; padding: 4px 8px; width: 150px; background: var(--bg-tertiary);">
+              <option value="">🚜 Todas las Faenas</option>
+            </select>
+          </div>
+          <!-- Labor Filter -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <select id="chart-filter-labor" class="form-select" style="font-size: 0.75rem; padding: 4px 8px; width: 150px; background: var(--bg-tertiary);">
+              <option value="">📝 Todas las Labores</option>
+            </select>
+          </div>
         </div>
+      </div>
+      <div style="height: 350px; position: relative;">
+        <canvas id="chart-jornadas-consumidas"></canvas>
       </div>
     </div>
 
@@ -2654,6 +2693,15 @@ export function renderAdminCrudView(config, data) {
                 </div>
               `;
     }
+    if (col.type === 'text-multi') {
+      return `
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                  <input type="text" id="admin-crud-${col.key}" class="form-input" style="padding-left: var(--space-4);" placeholder="Ej: Variedad A, Variedad B"${col.required ? ' required' : ''} />
+                  <small style="color: var(--text-tertiary); font-size: 0.75em; display: block; margin-top: 4px;">Puede ingresar múltiples valores separados por comas.</small>
+                </div>
+              `;
+    }
     return `
               <div class="form-group" style="margin-bottom: var(--space-4);">
                 <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
@@ -2673,6 +2721,130 @@ export function renderAdminCrudView(config, data) {
           </div>
         </form>
       </div>
+    </div>
+  `;
+}
+
+// ── Gastos View ──
+export function renderGastosView() {
+  return `
+    <div class="animate-fade-in">
+        <div class="sofia-filters" style="margin-bottom: var(--space-6);">
+            <div class="filter-group">
+                <label class="form-label">PERIODO</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Ciclo Actual (2025-2026)</option>
+                    <option>2024-2025</option>
+                    <option>2023-2024</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">FINCA</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Todas</option>
+                    <option>El Espejo</option>
+                    <option>Fincas Viejas</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">CATEGORÍA</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Todas</option>
+                    <option>Mano de Obra</option>
+                    <option>Insumos</option>
+                    <option>Energía/Riego</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-6); margin-bottom: var(--space-8);">
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon green">💸</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">TOTAL GASTOS ACUMULADOS</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">+0% vs ciclo anterior</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon amber">👤</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">MANO DE OBRA (DIRECTA)</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Gastos de personal en finca</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon purple">📦</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">INSUMOS Y PRODUCTOS</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Fertilizantes y fitosanitarios</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon blue">⚡</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">OTROS (ENERGÍA/RIEGO)</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Gasoil, Energía y Mantenimiento</p>
+            </div>
+        </div>
+
+        <div class="charts-row" style="margin-bottom: var(--space-8);">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <span class="chart-title">Evolución Mensual de Gastos</span>
+                </div>
+                <div style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-style: italic; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                    [ Gráfico de Gastos Históricos ]
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-header">
+                    <span class="chart-title">Distribución por Finca</span>
+                </div>
+                <div style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-style: italic; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                    [ Distribución de Gastos ]
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+// ── Secaderos View ──
+export function renderSecaderosView() {
+  return `
+    <div id="secaderos-view" class="view animate-fade-in" style="padding: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+          <h2>Disponibilidad de Secaderos</h2>
+          <div class="view-toggle">
+              <button class="toggle-btn active" id="btn-secadero-grid">Vista Cuadrícula</button>
+              <button class="toggle-btn" id="btn-secadero-gantt">Vista Gantt</button>
+          </div>
+      </div>
+
+      <section class="global-summary" id="secadero-stats" style="margin-bottom: 2rem;">
+          <!-- KPIs de secaderos inyectados -->
+      </section>
+
+      <section class="premium-card">
+          <div id="secadero-grid-container">
+              <h2 style="margin-bottom: 1.5rem;">Mapa de Estado: Playas y Sectores</h2>
+              <div id="secadero-grid" class="secadero-grid">
+                  <!-- Grid inyectado -->
+              </div>
+          </div>
+
+          <div id="secadero-gantt-container" style="display: none;">
+              <h2 style="margin-bottom: 1.5rem;">Cronograma de Secado (Gantt)</h2>
+              <div id="secadero-gantt" class="gantt-wrapper">
+                  <!-- Gantt inyectado -->
+              </div>
+          </div>
+      </section>
     </div>
   `;
 }

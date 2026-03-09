@@ -94,12 +94,34 @@ export class UserModel {
     }
   }
 
-  static add(userData) {
-    const newId = Math.max(...this.CACHE.map(u => u.id)) + 1;
-    const avatar = userData.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-    const newUser = { id: newId, ...userData, avatar, active: userData.active !== undefined ? userData.active : true };
-    this.CACHE.push(newUser);
-    return newUser;
+  static async add(userData) {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: userData.name,
+          email: userData.email,
+          password: userData.password || '123456' // Default if not provided
+        })
+      });
+      const data = await resp.json();
+
+      // If the user was added by an admin, we might want to auto-approve them 
+      // but let's stick to the registration flow first.
+      if (data.success && userData.active) {
+        // Auto approve if from admin crud
+        await this.approveUser(data.user_id || data.id);
+      }
+      return data;
+    } catch (e) {
+      console.warn('Backend reach error, using static fallback:', e);
+      const newId = Math.max(...this.CACHE.map(u => u.id), 0) + 1;
+      const avatar = userData.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      const newUser = { id: newId, ...userData, avatar, active: userData.active !== undefined ? userData.active : true };
+      this.CACHE.push(newUser);
+      return newUser;
+    }
   }
 
   static async register(name, email, password) {
@@ -602,7 +624,7 @@ export const ADMIN_TABLE_CONFIG = {
       { key: 'nombre', label: 'Nombre', type: 'text', required: true },
       { key: 'finca_id', label: 'Finca (ID)', type: 'number' },
       { key: 'superficie', label: 'Superficie (ha)', type: 'number' },
-      { key: 'variedad', label: 'Variedad', type: 'text' },
+      { key: 'variedad', label: 'Variedades', type: 'text-multi' },
       { key: 'tipo_suelo', label: 'Tipo de Suelo', type: 'text' },
       { key: 'notas', label: 'Notas', type: 'textarea' },
     ]
@@ -614,7 +636,7 @@ export const ADMIN_TABLE_CONFIG = {
       { key: 'numero', label: 'Nº de Cuartel', type: 'number', required: true },
       { key: 'predio_id', label: 'Predio (ID)', type: 'number' },
       { key: 'superficie', label: 'Superficie (ha)', type: 'number' },
-      { key: 'variedad', label: 'Variedad', type: 'text' },
+      { key: 'variedad', label: 'Variedades', type: 'text-multi' },
       { key: 'hileras', label: 'Hileras', type: 'number' },
       { key: 'plantas_por_hilera', label: 'Plantas/Hilera', type: 'number' },
       { key: 'sistema_conduccion', label: 'Sistema Conducción', type: 'text' },

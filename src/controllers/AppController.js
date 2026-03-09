@@ -3,6 +3,8 @@
  * NATURALFOOD - Controller Layer
  * Handles all business logic, routing, and user interactions
  * ═══════════════════════════════════════════════════════════
+ * VERSION: 1.0.2 - MENU UPDATE (GASTOS & SECADEROS)
+ * ═══════════════════════════════════════════════════════════
  */
 
 import { Chart, registerables } from 'chart.js';
@@ -31,8 +33,12 @@ import {
     renderInformeAplicaciones, renderSofiaResumen, renderSofiaFoliares,
     renderSofiaHerbicidas, renderFertilizacionComparativa, formatCurrency,
     renderHectareasPorPredio, renderEficienciaChartSection,
-    renderCosechaLevantadoTable, renderAdminCrudView, renderWorkLogView
+    renderCosechaLevantadoTable, renderAdminCrudView, renderWorkLogView,
+    renderGastosView, renderSecaderosView
 } from '../views/Views.js';
+
+import { SecaderosController } from './SecaderosController.js';
+import { JornalesBudgetModel } from '../models/JornalesBudgetModel.js';
 
 // ── Constants ──
 const VITE_API_URL = 'http://localhost:10000/api';
@@ -49,6 +55,8 @@ const ROLE_MENUS = {
                 { id: 'cosecha', label: 'Cosecha', icon: '🍇' },
                 { id: 'fincas', label: 'Fincas', icon: '🏡' },
                 { id: 'aplicaciones-sofia', label: 'Aplicaciones', icon: '🧪' },
+                { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
+                { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
             ]
         },
         {
@@ -89,6 +97,8 @@ const ROLE_MENUS = {
                 { id: 'cosecha', label: 'Cosecha', icon: '🍇' },
                 { id: 'fincas', label: 'Fincas', icon: '🏡' },
                 { id: 'aplicaciones-sofia', label: 'Aplicaciones', icon: '🧪' },
+                { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
+                { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
             ]
         },
     ],
@@ -99,6 +109,8 @@ const ROLE_MENUS = {
                 { id: 'cosecha', label: 'Cosecha', icon: '🍇' },
                 { id: 'fincas', label: 'Fincas', icon: '🏡' },
                 { id: 'aplicaciones-sofia', label: 'Aplicaciones', icon: '🧪' },
+                { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
+                { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
             ]
         },
     ],
@@ -262,6 +274,39 @@ export class AppController {
                 await this.loadStaticSofiaData();
                 this.renderAplicacionesSofiaModule(content);
                 break;
+            case 'informe-gastos':
+                title.textContent = 'Informe de Gastos';
+                content.innerHTML = renderGastosView();
+                break;
+            case 'informe-secaderos':
+                title.textContent = 'Informe de Secaderos';
+                content.innerHTML = renderSecaderosView();
+                setTimeout(() => {
+                    const btnGrid = document.getElementById('btn-secadero-grid');
+                    const btnGantt = document.getElementById('btn-secadero-gantt');
+                    const gridContainer = document.getElementById('secadero-grid-container');
+                    const ganttContainer = document.getElementById('secadero-gantt-container');
+
+                    if (btnGrid && btnGantt && gridContainer && ganttContainer) {
+                        btnGrid.addEventListener('click', () => {
+                            btnGrid.classList.add('active');
+                            btnGantt.classList.remove('active');
+                            gridContainer.style.display = 'block';
+                            ganttContainer.style.display = 'none';
+                        });
+                        btnGantt.addEventListener('click', () => {
+                            btnGantt.classList.add('active');
+                            btnGrid.classList.remove('active');
+                            ganttContainer.style.display = 'block';
+                            gridContainer.style.display = 'none';
+                        });
+                    }
+
+                    // Inicializar Controlador de Secaderos
+                    SecaderosController.init();
+
+                }, 50);
+                break;
             case 'usuarios':
                 title.textContent = 'Gestión de Usuarios';
                 this.renderUsuariosSection(content);
@@ -369,12 +414,100 @@ export class AppController {
                 }
             });
 
-            this.renderJornadasChart(stats);
-
             // Render Historical Comparison
             SofiaApiModel.getHistoricalComparison(filters).then(histData => {
                 this.renderHistoricalChart(histData);
             });
+
+            // ── Chart Filters Logic ──
+            const chartData = data;
+            const predioSelect = document.getElementById('chart-filter-predio');
+            const faenaSelect = document.getElementById('chart-filter-faena');
+            const laborSelect = document.getElementById('chart-filter-labor');
+
+            const populateChartFilters = () => {
+                const updateFaenasLabors = () => {
+                    let subset = chartData;
+                    const pVal = predioSelect.value;
+                    if (pVal) {
+                        if (pVal.startsWith('FINCA:')) {
+                            const fincaName = pVal.replace('FINCA:', '');
+                            subset = subset.filter(r => r.finca === fincaName);
+                        } else {
+                            subset = subset.filter(r => r.clasifica === pVal);
+                        }
+                    }
+
+                    const faenas = [...new Set(subset.map(r => r.faena || 'Sin Faena'))].sort();
+                    faenaSelect.innerHTML = '<option value="">🚜 Todas las Faenas</option>' +
+                        faenas.map(f => `<option value="${f}">${f}</option>`).join('');
+
+                    const updateLabors = (selectedFaena) => {
+                        let laborsSubset = subset;
+                        if (selectedFaena) laborsSubset = subset.filter(r => (r.faena || 'Sin Faena') === selectedFaena);
+                        const labors = [...new Set(laborsSubset.map(r => r.labor_normalized || r.labor))].sort();
+                        laborSelect.innerHTML = '<option value="">📝 Todas las Labores</option>' +
+                            labors.map(l => `<option value="${l}">${l}</option>`).join('');
+                    };
+
+                    updateLabors(faenaSelect.value);
+                };
+
+                predioSelect.addEventListener('change', () => {
+                    updateFaenasLabors();
+                    updateChart();
+                });
+
+                faenaSelect.addEventListener('change', (e) => {
+                    const pVal = predioSelect.value;
+                    let subset = chartData;
+                    if (pVal) {
+                        if (pVal.startsWith('FINCA:')) subset = subset.filter(r => r.finca === pVal.replace('FINCA:', ''));
+                        else subset = subset.filter(r => r.clasifica === pVal);
+                    }
+
+                    let laborsSubset = subset;
+                    if (e.target.value) laborsSubset = subset.filter(r => (r.faena || 'Sin Faena') === e.target.value);
+                    const labors = [...new Set(laborsSubset.map(r => r.labor_normalized || r.labor))].sort();
+                    laborSelect.innerHTML = '<option value="">📝 Todas las Labores</option>' +
+                        labors.map(l => `<option value="${l}">${l}</option>`).join('');
+
+                    updateChart();
+                });
+
+                laborSelect.addEventListener('change', updateChart);
+
+                updateFaenasLabors();
+            };
+
+            const updateChart = () => {
+                const pVal = predioSelect.value;
+                const fVal = faenaSelect.value;
+                const lVal = laborSelect.value;
+
+                let filtered = chartData;
+                if (pVal) {
+                    if (pVal.startsWith('FINCA:')) filtered = filtered.filter(r => r.finca === pVal.replace('FINCA:', ''));
+                    else filtered = filtered.filter(r => r.clasifica === pVal);
+                }
+                if (fVal) filtered = filtered.filter(r => (r.faena || 'Sin Faena') === fVal);
+                if (lVal) filtered = filtered.filter(r => (r.labor_normalized || r.labor) === lVal);
+
+                // Prepare comparison data
+                const currentChartFilters = {
+                    finca: (pVal && pVal.startsWith('FINCA:')) ? pVal.replace('FINCA:', '') : (filters.finca || ''),
+                    predio: (pVal && !pVal.startsWith('FINCA:')) ? pVal : '',
+                    labor: lVal
+                };
+
+                const comparison = fVal || lVal
+                    ? JornalesBudgetModel.getComparisonByLabor(filtered, currentChartFilters)
+                    : JornalesBudgetModel.getComparisonByFaena(filtered, currentChartFilters);
+                this.renderJornadasChart(comparison);
+            };
+
+            populateChartFilters();
+            updateChart();
 
             // Map display names back to clasifica keywords for the API filter
             const CLASIFICA_MAP = {
@@ -413,6 +546,7 @@ export class AppController {
                 const uniqueVals = [...new Set(subData.map(r => {
                     if (key === 'predio') return r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica;
                     if (key === 'variedad') return r.variedad || r.variedades || r.Variedad || r.Variedades;
+                    if (key === 'labor') return r.labor_normalized || r.labor || r.Labor;
                     return r[key];
                 }))].filter(v => v !== null && v !== undefined && v !== '').sort();
 
@@ -424,9 +558,39 @@ export class AppController {
             updateFilterList('filter-jornales-predio', 'predio', SofiaApiModel.DATA_JORNALES);
             updateFilterList('filter-jornales-variedad', 'variedad', SofiaApiModel.DATA_JORNALES);
 
+            JornalesBudgetModel.loadFromStorage();
+
             document.getElementById('input-budget-csv')?.addEventListener('change', (e) => {
                 const file = e.target.files[0];
-                if (file) alert(`Archivo ${file.name} seleccionado. Lógica de comparación de presupuesto en desarrollo.`);
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        const content = event.target.result;
+                        const res = JornalesBudgetModel.importFromCSV(content);
+                        if (res.success) {
+                            // Also save to server Fuentes folder
+                            try {
+                                const saveResp = await fetch('/api/save-jornales-budget', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ filename: file.name, content })
+                                });
+                                const saveRes = await saveResp.json();
+                                if (saveRes.success) {
+                                    this.showToast(`Presupuesto guardado en Fuentes (${res.count} registros)`, 'success');
+                                } else {
+                                    this.showToast(`Cargado localmente, pero error al guardar en servidor`, 'warning');
+                                }
+                            } catch (err) {
+                                console.error('Error saving budget to server:', err);
+                            }
+                            updateChart();
+                        } else {
+                            alert(res.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
             });
         };
 
@@ -945,7 +1109,7 @@ export class AppController {
 
     // ── Sección: USUARIOS (Admin only) ──
     async renderUsuariosSection(container) {
-        const users = await UserModel.getAll();
+        const users = await UserModel.getAll({ includePending: true });
         const roles = Object.values(UserModel.ROLES);
         container.innerHTML = renderUsuariosView(users, roles);
 
@@ -1020,7 +1184,7 @@ export class AppController {
                     btnSave.textContent = originalText;
                     return;
                 }
-                UserModel.add(userData); // Using add for simplicity or could be move to backend too
+                await UserModel.add(userData); // Now async
             }
 
             hideModal();
@@ -1452,6 +1616,30 @@ export class AppController {
     }
 
     // ── Sección 3: FINCAS ──
+    /**
+     * Sincroniza datos maestros (Fincas, Predios, Cuarteles) desde Sofia
+     * a la base de datos PostgreSQL local.
+     */
+    async syncSofiaMasterData(hectareasData) {
+        try {
+            console.log('Sincronizando datos maestros con el servidor...');
+            const resp = await fetch('http://localhost:10000/api/sync-sofia-master', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ groups: hectareasData.groups })
+            });
+
+            if (!resp.ok) {
+                const error = await resp.json();
+                console.warn('Sync master data failed:', error.message);
+            } else {
+                console.log('Datos maestros sincronizados exitosamente.');
+            }
+        } catch (e) {
+            console.warn('Backend reach error during master data sync:', e);
+        }
+    }
+
     async renderFincasSection(container) {
         container.innerHTML = `
         <div class="sofia-filters animate-fade-in">
@@ -1501,6 +1689,11 @@ export class AppController {
                 const hectareasData = SofiaApiModel.getHectareasPorPredio(jornalesData);
 
                 dashboard.innerHTML = renderHectareasPorPredio(hectareasData);
+
+                // Sincronizar con la base de datos local (PostgreSQL)
+                if (hectareasData && hectareasData.groups && hectareasData.groups.length > 0) {
+                    this.syncSofiaMasterData(hectareasData);
+                }
             } catch (err) {
                 dashboard.innerHTML = '<div style="padding: var(--space-10); text-align: center; color: var(--text-tertiary);"><p>Error al cargar datos: ' + err.message + '</p></div>';
             }
@@ -1766,9 +1959,16 @@ export class AppController {
     }
 
     // ── Informes Content ──
-    renderInformesContent(container) {
+    renderInformesContent(container, initialTab = 'presupuesto') {
         container.innerHTML = renderInformesView();
-        this.renderInformeTab('presupuesto');
+
+        // Update active class in the new vertical nav
+        const tabs = document.querySelectorAll('#informes-tabs .tab-btn');
+        tabs.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === initialTab);
+        });
+
+        this.renderInformeTab(initialTab);
         this.bindInformeTabEvents();
     }
 
@@ -1801,6 +2001,12 @@ export class AppController {
             case 'aplicaciones':
                 await this.loadStaticSofiaData();
                 this.renderAplicacionesSofiaModule(content);
+                break;
+            case 'gastos':
+                content.innerHTML = renderGastosView();
+                break;
+            case 'secaderos':
+                content.innerHTML = renderSecaderosView();
                 break;
         }
     }
@@ -3146,12 +3352,14 @@ export class AppController {
     }
 
     // -- Jornadas Chart --
-    renderJornadasChart(stats) {
+    renderJornadasChart(comparison) {
         const ctx = document.getElementById('chart-jornadas-consumidas');
         if (!ctx) return;
 
-        // Take top 6 labors for clarity
-        const topStats = stats.slice(0, 6);
+        // Take top 8 labors for clarity
+        const labels = comparison.labels.slice(0, 8);
+        const realData = comparison.real.slice(0, 8);
+        const budgetData = comparison.budget.slice(0, 8);
 
         if (this.charts['jornadas']) {
             this.charts['jornadas'].destroy();
@@ -3160,26 +3368,56 @@ export class AppController {
         this.charts['jornadas'] = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: topStats.map(s => s.labor),
-                datasets: [{
-                    label: 'Jornadas Consumidas',
-                    data: topStats.map(s => s.totalJornadas),
-                    backgroundColor: [
-                        'rgba(167, 139, 250, 0.8)',
-                        'rgba(52, 211, 153, 0.8)',
-                        'rgba(251, 191, 36, 0.8)',
-                        'rgba(96, 165, 250, 0.8)',
-                        'rgba(248, 113, 113, 0.8)',
-                        'rgba(168, 162, 158, 0.8)'
-                    ],
-                    borderRadius: 4
-                }]
+                labels: labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Ejecutado (Real)',
+                        data: realData,
+                        backgroundColor: [
+                            'rgba(167, 139, 250, 0.8)',
+                            'rgba(52, 211, 153, 0.8)',
+                            'rgba(251, 191, 36, 0.8)',
+                            'rgba(96, 165, 250, 0.8)',
+                            'rgba(248, 113, 113, 0.8)',
+                            'rgba(168, 162, 158, 0.8)',
+                            'rgba(244, 114, 182, 0.8)',
+                            'rgba(45, 212, 191, 0.8)'
+                        ],
+                        borderRadius: 4
+                    },
+                    {
+                        type: 'line',
+                        label: 'Proyectado (Budget)',
+                        data: budgetData,
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        borderColor: 'rgba(255, 255, 255, 0.8)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(255, 255, 255, 1)',
+                        pointBorderColor: 'rgba(255, 255, 255, 1)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        tension: 0.3,
+                        fill: false,
+                        order: 1 // Drawn on top of bars
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false }
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            font: { size: 10 },
+                            usePointStyle: true,
+                            boxWidth: 8
+                        }
+                    }
                 },
                 scales: {
                     y: {

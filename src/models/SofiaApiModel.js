@@ -433,7 +433,7 @@ export class SofiaApiModel {
                 if (filters.origen === 'terceros' && isPropia) return false;
             }
 
-            return true;
+                        return true;
         });
     }
 
@@ -596,11 +596,17 @@ export class SofiaApiModel {
                 const info = this.parseCuartelInfo(r.cuartel);
 
                 if (!predioMap[config.name]) {
-                    predioMap[config.name] = { name: config.name, group: config.group, hectareas: 0, cuarteles: 0, plantas: 0 };
+                    predioMap[config.name] = { name: config.name, group: config.group, hectareas: 0, cuarteles: 0, plantas: 0, cuartelesList: [] };
                 }
-                predioMap[config.name].hectareas += r.hectareas || info.ha;
+                const ha = r.hectareas || info.ha;
+                predioMap[config.name].hectareas += ha;
                 predioMap[config.name].cuarteles += 1;
                 predioMap[config.name].plantas += info.pl;
+                predioMap[config.name].cuartelesList.push({
+                    numero: info.numero,
+                    ha,
+                    pl: info.pl
+                });
             }
         });
 
@@ -929,7 +935,7 @@ export class SofiaApiModel {
                 if (baseFilters.finca && r.finca !== baseFilters.finca) return false;
                 if (baseFilters.predio && r.clasifica !== baseFilters.predio) return false;
                 if (baseFilters.variedad && r.variedad !== baseFilters.variedad) return false;
-                return true;
+                                return true;
             });
             console.log(`[Historical] Cycle ${c} filtered rows: ${filtered.length}`);
 
@@ -1004,7 +1010,7 @@ export class SofiaApiModel {
                 if (baseFilters.finca && r.finca !== baseFilters.finca) return false;
                 if (baseFilters.predio && r.clasifica !== baseFilters.predio) return false;
                 if (baseFilters.variedad && r.variedad !== baseFilters.variedad) return false;
-                return true;
+                                return true;
             });
 
             // Calculate Total Area for this filtered dataset (Total Unique Hectares worked in the cycle)

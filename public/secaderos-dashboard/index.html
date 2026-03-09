@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NATURAL FOOD | Cosecha 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i data-lucide="leaf"></i>
+                <span>NATURAL FOOD</span>
+            </div>
+            <div class="nav-group">
+                <div class="nav-item active" id="nav-dashboard">
+                    <i data-lucide="trending-up"></i>
+                    <span>Cosecha Gral</span>
+                </div>
+                <div class="nav-item" id="nav-daily">
+                    <i data-lucide="layout-grid"></i>
+                    <span>Cosecha por Día</span>
+                </div>
+                <div class="nav-item" id="nav-historical">
+                    <i data-lucide="calendar"></i>
+                    <span>Histórico</span>
+                </div>
+                <div class="nav-item" id="nav-secaderos">
+                    <i data-lucide="sun"></i>
+                    <span>Secaderos</span>
+                </div>
+                <div class="nav-item" id="nav-settings">
+                    <i data-lucide="settings"></i>
+                    <span>Configuración</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header style="display: none;">
+                <h1 class="main-title">COSECHA 2026</h1>
+                <div class="status-row">
+                    <div id="last-update" class="update-badge">Sincronizando...</div>
+                </div>
+            </header>
+
+            <!-- Control Bar -->
+            <section class="controls-bar">
+                <div class="filter-group">
+                    <div id="finca-filter-container" class="custom-dropdown"></div>
+                    <div id="variedad-filter-container" class="custom-dropdown"></div>
+                    <div id="type-filter-container" class="custom-dropdown"></div>
+                    <div id="status-filter-container" class="custom-dropdown"></div>
+                </div>
+                <div class="filter-group">
+                    <button id="refresh-btn" class="btn btn-primary">
+                        <i data-lucide="refresh-cw"></i>
+                        Actualizar
+                    </button>
+                </div>
+            </section>
+
+            <!-- View: Dashboard General -->
+            <div id="dashboard-view" class="view">
+                <!-- Global KPIs -->
+                <section class="global-summary">
+                    <div class="premium-card">
+                        <i data-lucide="grape" class="card-icon"></i>
+                        <span class="card-label">Kgs Reales</span>
+                        <div class="card-value" id="kpi-real">0</div>
+                    </div>
+                    <div class="premium-card">
+                        <i data-lucide="target" class="card-icon"></i>
+                        <span class="card-label">Kgs Estimados</span>
+                        <div class="card-value" id="kpi-planned">0</div>
+                    </div>
+                    <div class="premium-card">
+                        <i data-lucide="sun" class="card-icon" style="color: #fbbf24"></i>
+                        <span class="card-label">Kgs Pasa</span>
+                        <div class="card-value" id="kpi-pasa">0</div>
+                    </div>
+                    <div class="premium-card">
+                        <i data-lucide="check-circle" class="card-icon"></i>
+                        <span class="card-label">Cuarteles Cerrados</span>
+                        <div class="card-value" id="kpi-finished">0/0</div>
+                    </div>
+                    <div class="premium-card">
+                        <i data-lucide="percent" class="card-icon"></i>
+                        <span class="card-label">Avance Total</span>
+                        <div class="card-value" id="kpi-progress">0%</div>
+                    </div>
+                </section>
+
+                <!-- Fincas Grid -->
+                <section id="fincas-grid" class="fincas-container">
+                    <!-- Inyectado dinámicamente -->
+                </section>
+
+                <!-- Detailed Table -->
+                <section class="details-section">
+                    <h2 style="margin-bottom: 2rem;">Detalle Técnico de Cosecha</h2>
+                    <div class="glass" style="padding: 0; overflow: hidden;">
+                        <table class="table-glass" id="details-table">
+                            <thead>
+                                <tr>
+                                    <th>Finca</th>
+                                    <th>Cuartel</th>
+                                    <th>Variedad</th>
+                                    <th>Estimado</th>
+                                    <th>Real</th>
+                                    <th>Δ Kgs</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- View: Cosecha por Día -->
+            <div id="daily-view" class="view" style="display: none;">
+                <section class="premium-card" style="margin-bottom: 2rem; overflow: hidden;">
+                    <h2 style="margin-bottom: 1.5rem;">Evolución Diaria de Cosecha (Kgs por Día)</h2>
+                    <div
+                        style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="info" style="width: 16px;"></i> Deslice hacia la derecha para ver los últimos
+                        ingresos de Marzo.
+                    </div>
+                    <div class="chart-scroll-container">
+                        <div id="daily-chart-wrapper" style="height: 500px; position: relative; min-width: 100%;">
+                            <canvas id="daily-chart"></canvas>
+                        </div>
+                    </div>
+                </section>
+                <section id="daily-summary" class="global-summary">
+                    <!-- Resumen diario extra si es necesario -->
+                </section>
+            </div>
+
+            <!-- View: Historico -->
+            <div id="historical-view" class="view" style="display: none;">
+                <div class="controls-bar" style="margin-bottom: 2rem; background: rgba(255,255,255,0.02);">
+                    <div class="filter-group">
+                        <div id="hist-cuartel-filter-container" class="custom-dropdown"></div>
+                        <div id="hist-materia-filter-container" class="custom-dropdown"></div>
+                    </div>
+                </div>
+                <section class="premium-card" style="margin-bottom: 2rem;">
+                    <h2 style="margin-bottom: 1.5rem;">Comparativa Histórica vs Presupuesto 2026</h2>
+                    <div style="height: 500px; position: relative;">
+                        <canvas id="historical-chart"></canvas>
+                    </div>
+                </section>
+                <section id="historical-summary" class="global-summary" style="grid-template-columns: repeat(3, 1fr);">
+                    <!-- KPIs históricos inyectados -->
+                </section>
+            </div>
+
+            <!-- View: Secaderos -->
+            <div id="secaderos-view" class="view" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Disponibilidad de Secaderos</h2>
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" onclick="toggleSecaderoDisplay('grid')">Vista
+                            Cuadrícula</button>
+                        <button class="toggle-btn" onclick="toggleSecaderoDisplay('gantt')">Vista Gantt</button>
+                    </div>
+                </div>
+
+                <section class="global-summary" id="secadero-stats" style="margin-bottom: 2rem;">
+                    <!-- KPIs de secaderos inyectados -->
+                </section>
+
+                <section class="premium-card">
+                    <div id="secadero-grid-container">
+                        <h2 style="margin-bottom: 1.5rem;">Mapa de Estado: Playas y Sectores</h2>
+                        <div id="secadero-grid" class="secadero-grid">
+                            <!-- Grid inyectado -->
+                        </div>
+                    </div>
+
+                    <div id="secadero-gantt-container" style="display: none;">
+                        <h2 style="margin-bottom: 1.5rem;">Cronograma de Secado (Gantt)</h2>
+                        <div id="secadero-gantt" class="gantt-wrapper">
+                            <!-- Gantt inyectado -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- View: Configuración -->
+            <div id="settings-view" class="view" style="display: none;">
+                <h2 style="margin-bottom: 2rem;">Configuración y Carga de Datos</h2>
+
+                <div class="grid-container"
+                    style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <div class="premium-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--accent-primary);">Carga Manual de Archivos</h3>
+                        <p style="font-size: 0.9rem; margin-bottom: 1.5rem; opacity: 0.8;">Si los datos no se cargan
+                            automáticamente, puede subir los archivos CSV locales aquí.</p>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-size: 0.8rem; margin-bottom: 0.5rem;">Programación
+                                Cosecha (CSV):</label>
+                            <input type="file" id="upload-planned" accept=".csv" class="btn"
+                                style="width: 100%; padding: 0.5rem; background: rgba(255,255,255,0.05);">
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-size: 0.8rem; margin-bottom: 0.5rem;">Histórico 13-25
+                                (CSV):</label>
+                            <input type="file" id="upload-history" accept=".csv" class="btn"
+                                style="width: 100%; padding: 0.5rem; background: rgba(255,255,255,0.05);">
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-size: 0.8rem; margin-bottom: 0.5rem;">Capacidad Secaderos
+                                (CSV):</label>
+                            <input type="file" id="upload-secaderos" accept=".csv" class="btn"
+                                style="width: 100%; padding: 0.5rem; background: rgba(255,255,255,0.05);">
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-size: 0.8rem; margin-bottom: 0.5rem;">Registros de Lluvia
+                                (CSV):</label>
+                            <input type="file" id="upload-rain" accept=".csv" class="btn"
+                                style="width: 100%; padding: 0.5rem; background: rgba(255,255,255,0.05);">
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-size: 0.8rem; margin-bottom: 0.5rem;">Registros de Clima
+                                (CSV):</label>
+                            <input type="file" id="upload-clima" accept=".csv" class="btn"
+                                style="width: 100%; padding: 0.5rem; background: rgba(255,255,255,0.05);">
+                        </div>
+                    </div>
+
+                    <div class="premium-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--accent-emerald);">Estado de Sincronización</h3>
+                        <div id="sync-details" style="font-size: 0.9rem; line-height: 1.6;">
+                            <p>Esperando inicio...</p>
+                        </div>
+                        <button id="re-sync-btn" class="btn btn-primary" style="margin-top: 2rem; width: 100%;">
+                            <i data-lucide="refresh-cw"></i> Forzar Re-Sincronización
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
