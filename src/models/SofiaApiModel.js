@@ -42,7 +42,7 @@ export class SofiaApiModel {
         'El Espejo': '123450S8fgNhWDfKUNxnzFr7xb6DK1us2OqJK2'
     };
 
-    static BASE_URL = '/sofia-api/trabajosfaenas';
+    static BASE_URL = '/sofia-api/trabajvsfaenas';
 
     static getCycleRanges(ciclo) {
         // Ciclo Agrícola: 1 Mayo -> 30 Abril
@@ -340,7 +340,14 @@ export class SofiaApiModel {
                 variedad: r.variedad || r.variedades || r.Variedad || r.Variedades || info.variedad,
                 isCosecha,
                 labor_normalized: (r.finca === 'El Espejo' && (r.labor === 'Poda' || r.labor === 'Poda dov')) ? 'Poda' : r.labor,
-                fecha: r.fecha || r.Fecha || r.date || r.Date // Normalized date field
+                fecha: (() => {
+                    let d = r.fecha || r.Fecha || r.date || r.Date;
+                    if (d && typeof d === 'string' && d.includes('-') && d.split('-')[0].length === 2) {
+                        const p = d.split('-');
+                        return `${p[2]}-${p[1]}-${p[0]}`;
+                    }
+                    return d;
+                })()
             };
         }).filter(r => {
             // EXCLUSION RULE:
@@ -433,7 +440,7 @@ export class SofiaApiModel {
                 if (filters.origen === 'terceros' && isPropia) return false;
             }
 
-                        return true;
+            return true;
         });
     }
 
@@ -935,7 +942,7 @@ export class SofiaApiModel {
                 if (baseFilters.finca && r.finca !== baseFilters.finca) return false;
                 if (baseFilters.predio && r.clasifica !== baseFilters.predio) return false;
                 if (baseFilters.variedad && r.variedad !== baseFilters.variedad) return false;
-                                return true;
+                return true;
             });
             console.log(`[Historical] Cycle ${c} filtered rows: ${filtered.length}`);
 
@@ -1010,7 +1017,7 @@ export class SofiaApiModel {
                 if (baseFilters.finca && r.finca !== baseFilters.finca) return false;
                 if (baseFilters.predio && r.clasifica !== baseFilters.predio) return false;
                 if (baseFilters.variedad && r.variedad !== baseFilters.variedad) return false;
-                                return true;
+                return true;
             });
 
             // Calculate Total Area for this filtered dataset (Total Unique Hectares worked in the cycle)

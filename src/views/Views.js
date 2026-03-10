@@ -1993,11 +1993,27 @@ export function renderWorkLogView(data, catalogs) {
 }
 // ── Utility Functions ──
 function formatDate(dateStr) {
-  const date = new Date(dateStr + 'T00:00:00');
+  if (!dateStr) return '—';
+  const s = dateStr.toString().trim();
+  let date;
+
+  if (s.includes('/')) {
+    const [d, m, y] = s.split('/');
+    const year = y.length === 2 ? '20' + y : y;
+    date = new Date(`${year}-${m.padStart(2, '0')}-${d.padStart(2, '0')}T00:00:00`);
+  } else if (s.includes('-')) {
+    // Assume YYYY-MM-DD
+    date = new Date(s + 'T00:00:00');
+  } else {
+    date = new Date(s);
+  }
+
+  if (isNaN(date.getTime())) return s; // Fallback to raw string if invalid
   return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 export function formatCurrency(amount) {
+  if (amount === undefined || amount === null || isNaN(amount)) return '0';
   return Math.abs(amount).toLocaleString('es-AR');
 }
 

@@ -151,8 +151,13 @@ export class AppController {
         this.currentUser = user;
         const menuItems = ROLE_MENUS[user.role] || [];
 
+        // Load budget data from storage
+        JornalesBudgetModel.loadFromStorage();
+        // Try to auto-load budget CSV if it exists in Fuentes
+        this.autoLoadJornalesBudget();
+
         // Load static Sofia files automatically
-        this.loadStaticSofiaData();
+        await this.loadStaticSofiaData();
 
         // Default section is always jornales
         if (!section) section = 'jornales';
@@ -175,7 +180,7 @@ export class AppController {
                 // Health Check: Verificar si el proxy/servidor de Sofía está vivo
                 let isSofiaDown = false;
                 try {
-                    const testRes = await fetch('/sofia-api/trabajosfaenas');
+                    const testRes = await fetch('/sofia-api/trabajvsfaenas');
                     if (testRes.status === 502 || testRes.status === 504 || testRes.status === 500) {
                         isSofiaDown = true;
                     }
@@ -2978,16 +2983,27 @@ export class AppController {
 
         for (const file of files) {
             try {
+                console.log(`[AppController] Fetching ${file.name}...`);
                 const response = await fetch(`/Fuentes/${file.name}?t=${Date.now()}`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const csvText = await response.text();
+                if (!response.ok) {
+                    console.error(`[AppController] Error fetching ${file.name}: ${response.status} ${response.statusText}`);
+                    continue;
+                }
+
+                const buffer = await response.arrayBuffer();
+                const decoder = new TextDecoder('iso-8859-1');
+                const csvText = decoder.decode(buffer);
+                console.log(`[AppController] Received ${csvText.length} chars from ${file.name}`);
+
                 const result = SofiaImportModel.parseCSV(csvText, file.finca);
                 if (!result.error) {
                     SofiaImportModel.importRows(result.rows);
-                    console.log(`Auto-loaded ${file.name} (${file.finca})`);
+                    console.log(`[AppController] Auto-loaded ${result.rows.length} rows from ${file.name} (${file.finca})`);
+                } else {
+                    console.warn(`[AppController] Error parsing ${file.name}:`, result.error);
                 }
-            } catch (e) {
-                console.error(`Error auto-loading ${file.name}:`, e);
+            } catch (error) {
+                console.error(`[AppController] Exception loading ${file.name}:`, error);
             }
         }
 
@@ -2995,6 +3011,21 @@ export class AppController {
         if (this.currentSection === 'aplicaciones-sofia') {
             const container = document.getElementById('page-content');
             if (container) this.renderAplicacionesSofiaModule(container);
+        }
+    }
+
+    async autoLoadJornalesBudget() {
+        try {
+            const resp = await fetch(`/Fuentes/PresupuestoJornales.csv?t=${Date.now()}`);
+            if (resp.ok) {
+                const csvText = await resp.text();
+                const result = JornalesBudgetModel.importFromCSV(csvText);
+                if (result.success) {
+                    console.log('Auto-loaded PresupuestoJornales.csv');
+                }
+            }
+        } catch (e) {
+            console.error('Error auto-loading Jornales budget:', e);
         }
     }
 

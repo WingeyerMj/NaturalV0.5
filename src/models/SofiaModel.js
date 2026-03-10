@@ -4,24 +4,24 @@
  */
 
 const COLUMNS_MAP = {
-    'Fecha': ['Fecha', 'Fecha Inicio Aplica', 'Fecha de Aplicación', 'Date'],
-    'Labor': ['Labor', 'Labor Code', 'Faena', 'Tarea'],
-    'Producto': ['Nombre Producto', 'Producto', 'Insumo', 'Product'],
-    'Cantidad': ['Cantidad', 'Real Aplicado', 'Cantidad Periodo', 'Monto'],
-    'Tipo': ['tipo', 'Tipo Registro', 'Tipo'],
-    'Cuartel': ['Cuartel / Potrero', 'Cuartel', 'Cod Cuartel', 'Sector'],
-    'CodCuartel': ['Cod Cuartel'],
-    'Finca': ['Predio', 'Finca', 'Farm'],
-    'Clasifica': ['Clasifica', 'Claseifica', 'Clasificacion', 'Sub-Predio'],
-    'Dosis': ['Dosis', 'dosis', 'Dose'],
-    'Variedad': ['Variedad', 'variedad', 'Variety'],
-    'Costo': ['Total Producto', 'Costo', 'Cost', 'Importe'],
-    'N': ['Unidades N', 'N', 'Nitrogeno', 'Units N', 'Unid N'],
-    'P': ['Unidades P', 'P', 'Unidades P2O5', 'P205', 'P2O5', 'Fosforo', 'Units P', 'Unid P'],
+    'Fecha': ['Fecha', 'Fecha Inicio Aplica', 'Fecha de Aplicación', 'Date', 'Fecha Apl.'],
+    'Labor': ['Labor', 'Labor Code', 'Faena', 'Tarea', 'Operación'],
+    'Producto': ['Nombre Producto', 'Producto', 'Insumo', 'Product', 'Artículo'],
+    'Cantidad': ['Cantidad', 'Real Aplicado', 'Cantidad Periodo', 'Monto', 'Cant.'],
+    'Tipo': ['tipo', 'Tipo Registro', 'Tipo', 'Categoría'],
+    'Cuartel': ['Cuartel', 'Cuadro', 'Sector', 'Lote', 'Potrero'],
+    'CodCuartel': ['Cod Cuartel', 'Código Cuartel', 'ID Cuartel'],
+    'Dosis': ['Dosis', 'Dose', 'Dosis/Ha'],
+    'Finca': ['Predio', 'Finca', 'Farm', 'Establecimiento'],
+    'Clasifica': ['Clasifica', 'Clasificación', 'Sub-Predio', 'Variación'],
+    'Estado': ['Estado', 'Status', 'Situación'],
+    'Variedad': ['Variedad', 'Cepa', 'Grape Variety'],
+    'Costo': ['Total Producto', 'Costo', 'Cost', 'Importe', 'Monto USD', 'Monto en USD', 'Total USD'],
+    'N': ['Unidades N', 'N', 'Nitrogeno', 'Units N', 'Unid N', 'Nitrógeno'],
+    'P': ['Unidades P', 'P', 'Fosforo', 'Units P', 'Unid P', 'Fósforo', 'P2O5'],
     'K': ['Unidades K', 'K', 'Unidades K2O', 'K20', 'K2O', 'Potasio', 'Units K', 'Unid K'],
-    'Has': ['Has Totales', 'Has', 'Hectareas', 'Superficie'],
-    'Ca': ['Unidades de Calcio', 'Unidades Ca', 'Calcio', 'Ca', 'CaO', 'Unid Ca'],
-    'Estado': ['Estado', 'estado', 'Status']
+    'Ca': ['Unidades Ca', 'Ca', 'Calcio', 'Calcium'],
+    'Has': ['Has Totales', 'Hectáreas', 'Area', 'Hectareas', 'Ha']
 };
 
 const REQUIRED_KEYS = ['Fecha', 'Labor', 'Producto', 'Cantidad'];
@@ -38,10 +38,16 @@ export class SofiaImportModel {
 
     static parseCSV(csvText, defaultFinca) {
         if (!csvText) return { error: "Archivo vacío" };
-        const lines = csvText.split(/\r?\n/).filter(l => l.trim() !== '');
-        if (lines.length < 2) return { error: "Archivo sin datos" };
+        const lines = csvText.split(/\r\n|\r|\n/).filter(l => l.trim() !== '');
+        console.log(`[SofiaModel] Splitting ${csvText.length} chars resulted in ${lines.length} lines.`);
+        if (lines.length < 2) {
+            console.warn("[SofiaModel] Too few lines found. Raw first 100 chars:", csvText.substring(0, 100));
+            return { error: "Archivo sin datos" };
+        }
 
-        const header = lines[0].split(';');
+        const header = lines[0].split(';').map(h => h.trim().replace(/^[\uFEFF]/, ''));
+        console.log(`[SofiaModel] Parsing CSV with ${header.length} columns. Example columns: ${header.slice(0, 5).join(', ')}`);
+
         const colMap = {};
         Object.keys(COLUMNS_MAP).forEach(key => {
             const possibleNames = COLUMNS_MAP[key];
@@ -49,7 +55,7 @@ export class SofiaImportModel {
 
             // 1. Priority-based Exact Match
             for (const name of possibleNames) {
-                idx = header.findIndex(h => h.trim().toLowerCase() === name.toLowerCase());
+                idx = header.findIndex(h => h.toLowerCase() === name.toLowerCase());
                 if (idx !== -1) break;
             }
 
@@ -65,37 +71,62 @@ export class SofiaImportModel {
         });
 
         const missing = REQUIRED_KEYS.filter(k => colMap[k] === undefined);
-        if (missing.length > 0) return { error: `Faltan columnas esenciales: ${missing.join(', ')}` };
+        if (missing.length > 0) {
+            console.error(`[SofiaModel] Missing required columns: ${missing.join(', ')}`);
+            return { error: `Faltan columnas esenciales: ${missing.join(', ')}` };
+        }
 
         const rows = [];
+        let skippedEmpty = 0;
+        let skippedPendiente = 0;
+
         for (let i = 1; i < lines.length; i++) {
-            const cols = lines[i].split(';');
-            if (cols.length < header.length) continue;
+            const rowStr = lines[i];
+            // Split and clean
+            const cols = rowStr.split(';').map(c => c.trim().replace(/^['"]|['"]$/g, ''));
+
+            // Skip really short rows or just semicolons
+            if (cols.length < (header.length * 0.3) || cols.every(c => c === '')) {
+                skippedEmpty++;
+                continue;
+            }
 
             const fecha = colMap['Fecha'] !== undefined ? cols[colMap['Fecha']] : '';
+            if (!fecha) {
+                skippedEmpty++;
+                continue;
+            }
+
             const labor = colMap['Labor'] !== undefined ? cols[colMap['Labor']] : 'Desconocido';
             let producto = colMap['Producto'] !== undefined ? cols[colMap['Producto']] : '';
 
-            // Product name normalization: remove extra spaces and unify common variants (e.g. 1075M -> 1075 M)
+            // Product name normalization
             if (producto) {
-                producto = producto.trim().toUpperCase()
+                producto = producto.toUpperCase()
                     .replace(/\s+/g, ' ')
-                    .replace(/(\d+)\s*([MV])\b/g, '$1 $2') // Standardize space before M/V suffixes
+                    .replace(/(\d+)\s*([MV])\b/g, '$1 $2')
                     .trim();
             }
-            // Clean numeric quantity (Strict Spanish: . = thousands, , = decimal)
-            let rawCant = colMap['Cantidad'] !== undefined ? cols[colMap['Cantidad']] : '0';
-            rawCant = rawCant.replace(/\./g, '').replace(',', '.');
-            const cantidad = parseFloat(rawCant) || 0;
 
-            // Clean Cost
-            let rawCosto = colMap['Costo'] !== undefined ? cols[colMap['Costo']] : '0';
-            // Remove '$' and spaces, handle Spanish format
-            rawCosto = rawCosto.replace(/[$\s]/g, '').replace(/\./g, '').replace(',', '.');
-            const costo = parseFloat(rawCosto) || 0;
+            // Helper to parse Spanish numbers (1.234,56 -> 1234.56)
+            const parseNum = (val) => {
+                if (!val) return 0;
+                let clean = val.toString().replace(/[$\s]/g, '');
+                // If it has both . and , assume . is thousands
+                if (clean.includes('.') && clean.includes(',')) {
+                    clean = clean.replace(/\./g, '').replace(',', '.');
+                } else if (clean.includes(',')) {
+                    // If only comma, assume it is decimal
+                    clean = clean.replace(',', '.');
+                }
+                return parseFloat(clean) || 0;
+            };
+
+            const cantidad = parseNum(cols[colMap['Cantidad']]);
+            const costo = parseNum(cols[colMap['Costo']]);
 
             const cuartel = colMap['Cuartel'] !== undefined ? cols[colMap['Cuartel']] : 'Sin Asignar';
-            const codCuartel = colMap['CodCuartel'] !== undefined ? (cols[colMap['CodCuartel']] || '').trim() : '';
+            const codCuartel = colMap['CodCuartel'] !== undefined ? cols[colMap['CodCuartel']] : '';
             const dosis = colMap['Dosis'] !== undefined ? cols[colMap['Dosis']] : '';
 
             // Finca logic
@@ -113,9 +144,6 @@ export class SofiaImportModel {
                 finca = 'Finca Desconocida';
             }
 
-            if (finca.toLowerCase() === 'el espejo') finca = 'El Espejo';
-            if (finca.toLowerCase() === 'fincas viejas') finca = 'Fincas Viejas';
-
             // Clasifica (Sub-Predio) logic
             let clasifica = colMap['Clasifica'] !== undefined ? cols[colMap['Clasifica']] : '';
             if (!clasifica || clasifica.trim() === '') clasifica = 'General';
@@ -125,10 +153,13 @@ export class SofiaImportModel {
                 predioFull = `${finca} - ${clasifica}`;
             }
 
-            // Estado filtering: only keep 'Presupuesto' and 'Confirmada', skip 'Pendiente'
-            let estado = colMap['Estado'] !== undefined ? (cols[colMap['Estado']] || '').trim() : '';
+            // Estado filtering
+            let estado = colMap['Estado'] !== undefined ? cols[colMap['Estado']] : '';
             const estadoLower = estado.toLowerCase();
-            if (estadoLower === 'pendiente') continue; // Skip "Pendiente" rows entirely
+            if (estadoLower === 'pendiente') {
+                skippedPendiente++;
+                continue;
+            }
 
             // Tipo cleaning
             let tipoRaw = colMap['Tipo'] !== undefined ? cols[colMap['Tipo']] : 'Real';
@@ -140,6 +171,8 @@ export class SofiaImportModel {
                 tipo = 'Real';
             }
 
+            const variety = (colMap['Variedad'] !== undefined && cols[colMap['Variedad']]) ? cols[colMap['Variedad']] : ((cuartel.split('-')[2] || '').trim() || 'Sin Variedad');
+
             rows.push({
                 fecha_aplicacion: fecha,
                 labor_codigo: labor,
@@ -150,26 +183,30 @@ export class SofiaImportModel {
                 cod_cuartel: codCuartel || cuartel,
                 dosis,
                 costo_total: costo,
+                costo_unitario: cantidad > 0 ? costo / cantidad : 0,
                 finca: predioFull,
                 finca_original: finca,
                 clasifica: clasifica,
                 estado: estado,
-                variedad: (colMap['Variedad'] !== undefined && cols[colMap['Variedad']]) ? cols[colMap['Variedad']] : ((cuartel.split('-')[2] || '').trim() || 'Sin Variedad'),
-                categoria: this.classify(labor, producto),
+                variedad: variety,
+                categoria: this.classify(labor, producto, tipoRaw),
                 ciclo: this.getCycle(fecha),
-                n_units: colMap['N'] !== undefined ? (parseFloat(cols[colMap['N']].replace(/\./g, '').replace(',', '.')) || 0) : 0,
-                k_units: colMap['K'] !== undefined ? (parseFloat(cols[colMap['K']].replace(/\./g, '').replace(',', '.')) || 0) : 0,
-                p_units: colMap['P'] !== undefined ? (parseFloat(cols[colMap['P']].replace(/\./g, '').replace(',', '.')) || 0) : 0,
-                ca_units: colMap['Ca'] !== undefined ? (parseFloat(cols[colMap['Ca']].replace(/\./g, '').replace(',', '.')) || 0) : 0,
-                has_totales: colMap['Has'] !== undefined ? (parseFloat(cols[colMap['Has']].replace(/\./g, '').replace(',', '.')) || 0) : 0
+                n_units: colMap['N'] !== undefined ? parseNum(cols[colMap['N']]) : 0,
+                k_units: colMap['K'] !== undefined ? parseNum(cols[colMap['K']]) : 0,
+                p_units: colMap['P'] !== undefined ? parseNum(cols[colMap['P']]) : 0,
+                ca_units: colMap['Ca'] !== undefined ? parseNum(cols[colMap['Ca']]) : 0,
+                has_totales: colMap['Has'] !== undefined ? parseNum(cols[colMap['Has']]) : 0
             });
         }
+        console.log(`[SofiaModel] Parse complete: ${rows.length} rows kept, ${skippedEmpty} empty/invalid skipped, ${skippedPendiente} pendientes skipped.`);
         return { rows };
     }
 
-    static classify(laborCode, producto) {
+
+    static classify(laborCode, producto, tipoRaw = '') {
         const lab = (laborCode || '').toUpperCase().trim();
         const prod = (producto || '').toLowerCase();
+        const tipo = (tipoRaw || '').toLowerCase();
 
         // 1. Foliares: Starts with "AF -" or is "FITOSANITARIO"
         if (lab.startsWith('AF -') || lab === 'AF' || lab.includes('FOLIAR') || lab === 'FITOSANITARIO') return 'Foliares';
@@ -178,7 +215,7 @@ export class SofiaImportModel {
         if (lab.includes('HERBICIDA') || lab === 'HERB' || HERBICIDE_KEYWORDS.some(k => prod.includes(k))) return 'Herbicidas';
 
         // 3. Fertilización: Strictly "FERTILIZACION" or close variants
-        if (lab.includes('FERTILIZACI') || lab.includes('FERTILIZANTE') || lab === 'FERT' || lab === 'ABONO') return 'Fertilizacion';
+        if (lab.includes('FERTILIZACI') || lab.includes('FERTILIZANTE') || lab === 'FERT' || lab === 'ABONO' || prod.includes('nutri') || tipo.includes('pre-cosecha') || tipo.includes('pos-cosecha')) return 'Fertilizacion';
 
         // 4. Dynamic category: Take the name of the labor if not recognized above
         return lab || 'Otros';
@@ -186,27 +223,30 @@ export class SofiaImportModel {
 
     static getCycle(fechaStr) {
         if (!fechaStr) return 'Unknown';
-        let parts = fechaStr.split('/');
         let year, month;
+        const s = fechaStr.toString().trim();
 
-        if (parts.length === 3) {
-            // dd/mm/yyyy
-            month = parseInt(parts[1]);
-            year = parseInt(parts[2]);
-        } else {
-            // Try yyyy-mm-dd
-            parts = fechaStr.split('-');
+        if (s.includes('/')) {
+            const parts = s.split('/');
             if (parts.length === 3) {
-                year = parseInt(parts[0]);
-                month = parseInt(parts[1]);
-            } else {
-                return 'Unknown';
+                let y = parts[2].trim();
+                year = parseInt(y.length === 2 ? '20' + y : y);
+                month = parseInt(parts[1].trim());
+            }
+        } else if (s.includes('-')) {
+            const parts = s.split('-');
+            if (parts.length === 3) {
+                if (parts[0].length === 4) {
+                    year = parseInt(parts[0]);
+                    month = parseInt(parts[1]);
+                } else if (parts[2].length === 4) {
+                    year = parseInt(parts[2]);
+                    month = parseInt(parts[1]);
+                }
             }
         }
 
-        if (isNaN(month) || isNaN(year)) return 'Unknown';
-
-        // Ciclo Agrícola: May -> Apr
+        if (isNaN(month) || isNaN(year) || !month || !year) return 'Unknown';
         if (month >= 5) return `${year}-${year + 1}`;
         return `${year - 1}-${year}`;
     }
@@ -232,9 +272,9 @@ export class SofiaImportModel {
         return [...set].sort();
     }
 
+
     static applyFilters(data, filters = {}) {
-        console.log(`[SofiaImportModel] Applying filters:`, filters, `Data size: ${data.length}`);
-        const result = data.filter(r => {
+        return data.filter(r => {
             if (filters.finca && r.finca_original !== filters.finca) return false;
             if (filters.ciclo && r.ciclo !== filters.ciclo) return false;
             if (filters.predio && r.clasifica !== filters.predio) return false;
@@ -242,8 +282,6 @@ export class SofiaImportModel {
             if (filters.cuartel && r.cuartel !== filters.cuartel) return false;
             return true;
         });
-        console.log(`[SofiaImportModel] Filtered result: ${result.length} rows`);
-        return result;
     }
 
     static getResumen(filters = {}) {
@@ -292,13 +330,14 @@ export class SofiaImportModel {
         all.forEach(r => {
             const clasifica = r.clasifica || 'Sin Clasifica';
             const key = `${clasifica}|${r.producto}|${r.finca}`;
-            if (!groups[key]) groups[key] = { cuartel: clasifica, finca: r.finca, producto: r.producto, clasifica, pre: 0, pos: 0, real: 0 };
+            if (!groups[key]) groups[key] = { cuartel: clasifica, finca: r.finca_original || r.finca, producto: r.producto, clasifica, pre: 0, pos: 0, real: 0 };
             const tr = (r.tipo_registro || '').toLowerCase();
             if (tr === 'presupuestado-pre') groups[key].pre += r.cantidad;
             else if (tr === 'presupuestado-pos') groups[key].pos += r.cantidad;
             else if (tr === 'real') groups[key].real += r.cantidad;
         });
 
+        // Solo items con presupuesto (pre o pos)
         return Object.values(groups)
             .filter(g => (g.pre + g.pos) > 0)
             .map(g => ({
@@ -306,7 +345,19 @@ export class SofiaImportModel {
                 metaAnual: g.pre + g.pos,
                 desvio: g.real - (g.pre + g.pos),
                 desvioPct: (g.pre + g.pos) > 0 ? Math.round(((g.real - (g.pre + g.pos)) / (g.pre + g.pos)) * 100) : 0,
-            }));
+            }))
+            .sort((a, b) => {
+                // 1. Sort by Finca
+                const fincaComp = a.finca.localeCompare(b.finca);
+                if (fincaComp !== 0) return fincaComp;
+
+                // 2. Sort by Predio (Clasifica)
+                const clasificaComp = (a.clasifica || '').localeCompare(b.clasifica || '');
+                if (clasificaComp !== 0) return clasificaComp;
+
+                // 3. Sort by Product
+                return a.producto.localeCompare(b.producto);
+            });
     }
 
     static getProductComparison(filters = {}) {
@@ -319,6 +370,8 @@ export class SofiaImportModel {
             if (tipo.includes('presupuestado')) groups[key].pre += r.cantidad;
             else if (tipo === 'real') groups[key].real += r.cantidad;
         });
+
+        // Solo items con presupuesto
         return Object.values(groups)
             .filter(g => g.pre > 0)
             .sort((a, b) => {
@@ -327,6 +380,7 @@ export class SofiaImportModel {
                 return a.producto.localeCompare(b.producto);
             });
     }
+
 
     static getWeeklyEvolution(filters = {}, fincaName = '', productoFilter = '', predioFilter = '') {
         // Only these 3 products
@@ -343,9 +397,9 @@ export class SofiaImportModel {
             filters
         );
 
-        // ── Fixed projection period: 09/09/2025 → 08/03/2026 ──
+        // ── Fixed projection period: 09/09/2025 → 30/04/2026 ──
         const projStart = new Date(2025, 8, 9);   // Sep 9, 2025
-        const projEnd = new Date(2026, 2, 8);   // Mar 8, 2026
+        const projEnd = new Date(2026, 3, 30);  // Apr 30, 2026
 
         // Helper: get Monday of the ISO week for a given date
         const getMonday = (d) => {

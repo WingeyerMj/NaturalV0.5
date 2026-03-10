@@ -1,0 +1,269 @@
+id;codigo;faena;tipo;finca;labor;precio;rendimiento;id labor
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;PODA;$ 0,00;0;17
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;SUPERVISIÓN PODA;$ 0,00;0;18
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;PINTURA;$ 0,00;0;19
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....; AMONTONAR SARMIENTO;$ 0,00;0;20
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....; HACER MUGRONES;$ 0,00;0;21
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;  REPASE DE PODA;$ 0,00;0;22
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;  PODA SETO;$ 0,00;0;23
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;  PREPODA TRACTOR;$ 0,00;0;24
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;  PESO PODA;$ 0,00;0;25
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;PODA MUGRONES;$ 0,00;0;176
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESPUNTE DE GUIAS;$ 0,00;0;247
+83;CF001;PODA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;PODA DOV;$ 0,00;0;293
+84;;INJERTO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;PREPARACION DE PLANTA;$ 0,00;0;26
+84;;INJERTO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;RECOLECCION DE MATERIAL;$ 0,00;0;27
+84;;INJERTO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;INJERTO;$ 0,00;0;28
+84;;INJERTO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;REPASO INJERTO;$ 0,00;0;29
+84;;INJERTO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;CORTE DE CINTA;$ 0,00;0;30
+84;;INJERTO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ARMADO DE PAQUETE;$ 0,00;0;294
+85;CF002;ATADA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ATADA BARBECHO;$ 0,00;0;31
+85;CF002;ATADA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ATADA;$ 0,00;0;32
+85;CF002;ATADA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COLGAR PLANTA;$ 0,00;0;33
+85;CF002;ATADA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;SUPERVISIÓN ATADA;$ 0,00;0;141
+85;CF002;ATADA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ATADO CUERPO CEPA;$ 0,00;0;183
+85;CF002;ATADA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ATADA DE INJERTO 1;$ 0,00;0;208
+85;CF002;ATADA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ATADA DE INJERTO 2;$ 0,00;0;209
+85;CF002;ATADA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ATADA DE INJERTO 3;$ 0,00;0;210
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;FERTILIZACION;$ 0,00;0;34
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;HERBICIDA MOCHILA;$ 0,00;0;35
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;FITOSANITARIO;$ 0,00;0;36
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;HERBICIDA ATOMIZADORA;$ 0,00;0;37
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;FERTILIZANTE FOLIAR ATOMIZADORA;$ 0,00;0;38
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero; ENMIENDAS AL SUELO;$ 0,00;0;39
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;  DESMANCHE;$ 0,00;0;40
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;DOSIFICADOR;$ 0,00;0;41
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;COMPLETO;$ 0,00;0;177
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;LA BANDA;$ 0,00;0;178
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;RIENDAS;$ 0,00;0;179
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - BROTE 10;$ 0,00;0;249
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - BROTE 20;$ 0,00;0;250
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - BROTE 40;$ 0,00;0;251
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - BROTE 60;$ 0,00;0;252
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - PREFLOR;$ 0,00;0;253
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - FLOR;$ 0,00;0;254
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - FLOR 1 ;$ 0,00;0;255
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - G. PIMIENTA;$ 0,00;0;256
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - G 8-10 MM;$ 0,00;0;257
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - PRE-ENVERO;$ 0,00;0;258
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - PRE-ENVERO 1;$ 0,00;0;261
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - ENVERO;$ 0,00;0;262
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - PRECOSECHA;$ 0,00;0;263
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - COSECHA;$ 0,00;0;264
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - COSECHA 1;$ 0,00;0;265
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - COSECHA 2;$ 0,00;0;266
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - POST-COSECHA;$ 0,00;0;267
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - POST-COSECHA 1;$ 0,00;0;268
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - POST-COSECHA 2;$ 0,00;0;269
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;AF - POST-COSECHA 3;$ 0,00;0;270
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF -  21;$ 0,00;0;271
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 22;$ 0,00;0;272
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 23;$ 0,00;0;273
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 24;$ 0,00;0;274
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 25;$ 0,00;0;275
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 26;$ 0,00;0;279
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR  AF - 27;$ 0,00;0;280
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 28;$ 0,00;0;281
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 29;$ 0,00;0;282
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 30;$ 0,00;0;283
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 31;$ 0,00;0;284
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 32;$ 0,00;0;285
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 33;$ 0,00;0;286
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 34;$ 0,00;0;287
+86;CF003;APLICACIONES;Aplicación;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NO USAR AF - 35;$ 0,00;0;288
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ACOMODO DE BROTES;$ 0,00;0;42
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ACOMODO DE BROTES;$ 0,00;0;43
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 1;$ 0,00;0;44
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 2;$ 0,00;0;45
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....; DESHOJE;$ 0,00;0;46
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 3;$ 0,00;0;47
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 4;$ 0,00;0;48
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 5;$ 0,00;0;49
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 6;$ 0,00;0;146
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;MUGRONES ;$ 0,00;0;147
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO;$ 0,00;0;149
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ATADO CUERPO CEPA ;$ 0,00;0;150
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;RETAPADO ;$ 0,00;0;151
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESNIETE, DESHOJE;$ 0,00;0;181
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;RALEO DE RACIMOS(30CM);$ 0,00;0;182
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DOV 1;$ 0,00;0;201
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DOV 2;$ 0,00;0;202
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DOV 3;$ 0,00;0;203
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE CON CRITERIO DE PODA;$ 0,00;0;204
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE PLANTAS REINJERTADAS 1;$ 0,00;0;205
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE PLANTAS REINJERTADAS 2;$ 0,00;0;206
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE PLANTAS REINJERTADAS 3;$ 0,00;0;207
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ACOMODO DE BROTE POST ZONDA;$ 0,00;0;219
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 7;$ 0,00;0;232
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 8;$ 0,00;0;233
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 9;$ 0,00;0;241
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE TRONCO 10;$ 0,00;0;245
+87; CF004;TRABAJOS VERDE;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESBROTE DE PLANTAS REINJERTADAS 4;$ 0,00;0;296
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA CAJONES;$ 0,00;0;50
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA BINES;$ 300,00;0;51
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....; SUPERVISION COSECHA;$ 0,00;0;52
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....; COSECHA MECANICA;$ 0,00;0;53
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TRACTORISTA UÑAS;$ 0,00;0;54
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....; LIMPIEZA BINS;$ 0,00;0;55
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TRACTORISTA CARRO;$ 0,00;0;56
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TRACTO ELEVADOR;$ 0,00;0;57
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LIMPIEZA CAJONES;$ 0,00;0;58
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;REPARACION ENVASES;$ 0,00;0;59
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TRACTORISTA REGADOR;$ 0,00;0;60
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA KG 1;$ 0,00;0;155
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA BINS (DIA);$ 0,00;0;172
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ANOTADOR COSECHA;$ 0,00;0;173
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ENCARGADO;$ 0,00;0;174
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA CARRO;$ 0,00;0;185
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA DOV;$ 0,00;0;187
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;CONTROL ;$ 0,00;0;188
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TENDIDO 1;$ 0,00;0;215
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TENDIDO 2;$ 0,00;0;216
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TENDIDO 3;$ 0,00;0;217
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TENDIDO 4;$ 0,00;0;218
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;CORTE DOV;$ 0,00;0;220
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA KG 2;$ 0,00;0;225
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA KG 3;$ 0,00;0;226
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA KG 4;$ 0,00;0;227
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LEVANTADO 1;$ 0,00;0;228
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LEVANTADO 2;$ 0,00;0;229
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LEVANTADO 3;$ 0,00;0;230
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LEVANTADO 4;$ 0,00;0;231
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;FICHERO;$ 0,00;0;237
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TRACTORISTA  ACOPLADO;$ 0,00;0;242
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA GAMELAS;$ 0,00;0;276
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA DOV BINS;$ 0,00;0;277
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA KG 5;$ 0,00;0;289
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LEVANTADO 5;$ 0,00;0;290
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA REPASO;$ 0,00;0;291
+88;CF005;COSECHA;Cosecha;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA REPASO BINS;$ 0,00;0;292
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;PESAJE;$ 0,00;0;61
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA UÑAS;$ 0,00;0;62
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA CARRO;$ 0,00;0;63
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTO ELEVADOR;$ 0,00;0;64
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA REGADOR;$ 0,00;0;65
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;SUPERVISION ;$ 0,00;0;66
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TENDER LONAS;$ 0,00;0;67
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;REPARAR LONAS;$ 0,00;0;68
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;LEVANTAR LONAS;$ 0,00;0;69
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TENDER UVA DE CAJONES;$ 0,00;0;70
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ESPARCIR UVA BINES;$ 0,00;0;71
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ACORDONAR LA PASA;$ 0,00;0;72
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ABRIR LA PASA;$ 0,00;0;73
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;CURAR LA PASA;$ 0,00;0;74
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;DESGARGA DE CAMIONES;$ 0,00;0;75
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ARMAR Y DESARMAR ESTRUCTURAS;$ 0,00;0;76
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;SERENO;$ 0,00;0;77
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;LEVANTAR PASA;$ 0,00;0;138
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORIASTA VOLCADOR;$ 0,00;0;156
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;CINCELADO DE PIEDRAS ;$ 0,00;0;157
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORITA GENERAL;$ 0,00;0;162
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;VOLTEAR PASA;$ 0,00;0;168
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;DESPARAMAR UVA ;$ 0,00;0;186
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;LIMPIEZA DE SECADERO;$ 0,00;0;223
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;CORTAR LONAS ;$ 0,00;0;238
+89;;SECADERO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA  ACOPLADO ;$ 0,00;0;240
+90;;RIEGO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;RIEGO GOTEO;$ 0,00;0;78
+90;;RIEGO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;RIEGO MANTO;$ 0,00;0;79
+90;;RIEGO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;AYUDA DE RIEGO;$ 0,00;0;80
+90;;RIEGO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;MANTENIMIENTO;$ 0,00;0;81
+90;;RIEGO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LAVADO DE MANGUERAS;$ 0,00;0;82
+90;;RIEGO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;CALICATA;$ 0,00;0;83
+90;;RIEGO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;MOVIMIENTO DE MANGUERAS;$ 0,00;0;84
+90;;RIEGO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;SERENO;$ 0,00;0;128
+90;;RIEGO;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ARMADO DE CAÑERIA ;$ 0,00;0;180
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;CONTROL MALEZA;$ 0,00;0;85
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;OTRAS LABORES;$ 0,00;0;86
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;HORMIGAS;$ 0,00;0;87
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;CONTEO,MONITOREO,MUESTREO;$ 0,00;0;88
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LIMPIEZA Y ASEO;$ 0,00;0;89
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;JARDINERIA;$ 0,00;0;90
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;OTROS REMUNERACIONES;$ 0,00;0;91
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;PLANTACION FISICA;$ 0,00;0;92
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LABORES ADM Y SUPERVISION;$ 0,00;0;93
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESMALEZAMIENTO MANUAL 1;$ 0,00;0;94
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;CAPACITACION DE PERSONAL;$ 0,00;0;95
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;INASISTENCIA;$ 0,00;0;96
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;VACACIONES;$ 0,00;0;97
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;PARTE ENFERMO;$ 0,00;0;98
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;FALTA SIN AVISO;$ 0,00;0;99
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;FALTAS JUSTIFICADAS;$ 0,00;0;100
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;SUSPENSION;$ 0,00;0;101
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;FERIADO;$ 0,00;0;102
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LLUVIA;$ 0,00;0;103
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;INSTALACION SIST. DE RIEGO;$ 0,00;0;104
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....; TRASLADO DE MAQUINARIA, INSUM;$ 0,00;0;105
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....; DESCARGA DE CAMION;$ 0,00;0;106
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;MOVIMIENTO INTERNO;$ 0,00;0;107
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LEVANTAR MANGUERAS;$ 0,00;0;108
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....; SIEMBRA VERDEO;$ 0,00;0;109
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;SEGURIDAD;$ 0,00;0;137
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ENCARGADO;$ 0,00;0;140
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;REPLANTADO;$ 0,00;0;142
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;PLASTICO ;$ 0,00;0;148
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;HELADAS ;$ 0,00;0;152
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COSECHA BINS (DIA);$ 0,00;0;159
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;APLICACION DE PRODUCTO CON MOCHILA;$ 0,00;0;175
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;TALLER;$ 0,00;0;189
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;REPARACION BINS;$ 0,00;0;191
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DOSIFICADORES;$ 0,00;0;192
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESMALEZAMIENTO MANUAL 2;$ 0,00;0;199
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESMALEZAMIENTO MANUAL 3;$ 0,00;0;200
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESNIETE, DESHOJE;$ 0,00;0;224
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESMALEZAMIENTO MANUAL 4;$ 0,00;0;244
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;CALICATA ;$ 0,00;0;246
+91; CF007;OTRAS LABORES;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;FERTILIZACION MANUAL;$ 0,00;0;295
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;MANTENCION Y REPARACION ESTRUCTURA;$ 0,00;0;110
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ARREGLO ALAMBRADO PERIMETRAL;$ 0,00;0;111
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;MANTENIMIENTO DE EDIFICIOS;$ 0,00;0;112
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;MANTENCION CAMINOS;$ 0,00;0;113
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LIMPIEZA CANALES Y DESAGUES;$ 0,00;0;114
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;CABRAS;$ 0,00;0;115
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;COLOCACIÓN DE ALAMBRES;$ 0,00;0;116
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;DESARMAR PARRALES;$ 0,00;0;117
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ARMAR PARRALES;$ 0,00;0;118
+92; CF006;MANTENCION DE ESTRUCTURA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;ACARREO DE MADERA;$ 0,00;0;134
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRITURADO DE  SARMIENTO;$ 0,00;0;119
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;UÑAS;$ 0,00;0;120
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;PREPODA;$ 0,00;0;121
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRITURADO DE MALEZAS;$ 0,00;0;122
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;CINCELAR;$ 0,00;0;123
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ZANJEAR;$ 0,00;0;124
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;SUBSOLAR;$ 0,00;0;125
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero; RASTREAR;$ 0,00;0;126
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ARMAR Y DESARMAR BORDOS;$ 0,00;0;127
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;NIVELETA;$ 0,00;0;130
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA GENERAL;$ 0,00;0;136
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA HERBICIDA;$ 0,00;0;139
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA DESMALEZADOR;$ 0,00;0;145
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ATOMIZADORA 1;$ 0,00;0;153
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTO ELEVADOR;$ 0,00;0;158
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;VOLCADOR BINS;$ 0,00;0;160
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA CARRO;$ 0,00;0;161
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ATOMIZADORA 2;$ 0,00;0;221
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ATOMIZADORA 3;$ 0,00;0;222
+93;CF008;LABORES MECANICA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;ATOMIZADORA 4;$ 0,00;0;234
+94;;SEGURIDAD;Labor Agrícola;El espejo<br>Predio test (cambiar Nombre)....;SERENO GALPON;$ 0,00;0;129
+94;;SEGURIDAD;Labor Agrícola;El espejo<br>Predio test (cambiar Nombre)....;SERENO RESERVORIO;$ 0,00;0;190
+95;;TANQUE REGADOR;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;REGAR CALLEJONES;$ 0,00;0;131
+95;;TANQUE REGADOR;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;LLENADO DE PILETAS;$ 0,00;0;132
+95;;TANQUE REGADOR;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....;MOJAR POSO DE RIENDA;$ 0,00;0;133
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo;HOYADO;$ 0,00;0;143
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo;PLANTACIÓN;$ 0,00;0;144
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo;RETAPADO;$ 0,00;0;184
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo;DESBROTE DE PLANTAS NUEVAS 1;$ 0,00;0;193
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo; DESBROTE DE PLANTAS NUEVAS 2;$ 0,00;0;194
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo; DESBROTE DE PLANTAS NUEVAS 3;$ 0,00;0;195
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo; DESBROTE DE PLANTAS NUEVAS 4;$ 0,00;0;196
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo; DESBROTE DE PLANTAS NUEVAS 5;$ 0,00;0;197
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo; DESBROTE DE PLANTAS NUEVAS 6;$ 0,00;0;198
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo;DESBROTE DE PLANTAS NUEVAS 7;$ 0,00;0;235
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo; DESBROTE DE PLANTAS NUEVAS 8;$ 0,00;0;239
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo;DESBROTE DE PLANTAS NUEVAS 9;$ 0,00;0;243
+98;;PLANTACIONES NUEVAS;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo;ARMADO DE PLANTAS;$ 0,00;0;278
+102;;COSECHA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTO ELEVADOR;$ 0,00;0;163
+102;;COSECHA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA UÑA;$ 0,00;0;164
+102;;COSECHA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;CONTEO Y SUPERVICÓN COSECHA;$ 0,00;0;165
+102;;COSECHA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;COSECHA AL DIA;$ 0,00;0;166
+102;;COSECHA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;TRACTORISTA CARRO;$ 0,00;0;167
+102;;COSECHA;Labor Agrícola;Camino Truncado, Puente Alto y La Chimbera<br>El espejo<br>Predio test (cambiar Nombre)....<br>Secadero;FICHERO ;$ 0,00;0;236

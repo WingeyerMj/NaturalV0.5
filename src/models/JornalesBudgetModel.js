@@ -17,15 +17,16 @@ export class JornalesBudgetModel {
         if (lines.length < 2) return { success: false, message: 'El archivo no contiene datos' };
 
         const header = lines[0].split(';').map(h => h.trim().toLowerCase());
-        const idxFinca = header.indexOf('finca');
-        const idxPredio = header.indexOf('predio');
-        const idxLabor = header.indexOf('labor');
-        const idxJornales = header.indexOf('jornales');
+        const idxFinca = header.findIndex(h => h === 'finca' || h === 'fincas');
+        const idxPredio = header.findIndex(h => h === 'predio' || h === 'predios');
+        const idxLabor = header.findIndex(h => h === 'labor' || h === 'labores' || h === 'faena' || h === 'faenas');
+        const idxJornales = header.findIndex(h => h === 'jornales' || h === 'presupuestado' || h === 'cantidad');
 
         if (idxFinca === -1 || idxPredio === -1 || idxLabor === -1 || idxJornales === -1) {
+            console.warn('[JornalesBudgetModel] Missing columns in CSV header:', header);
             return {
                 success: false,
-                message: 'Formato inválido. Se esperan columnas: Finca;Predio;Labor;Jornales'
+                message: 'Formato inválido. Se esperan columnas equivalentes a: Finca;Predio;Labor;Jornales'
             };
         }
 
