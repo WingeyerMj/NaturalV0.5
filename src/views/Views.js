@@ -2865,3 +2865,16 @@ export function renderSecaderosView() {
   `;
 }
 
+// ── Gastos Históricos View (External Dashboard) ──
+export function renderGastosHistoricosView() {
+  return `
+    <div class="animate-fade-in" style="height: calc(100vh - 160px); width: 100%; overflow: hidden; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); background: #0f172a;">
+        <iframe 
+            src="/gastos-dash/index.html" 
+            style="width: 100%; height: 100%; border: none;"
+            title="Dashboard de Gastos Históricos"
+        ></iframe>
+    </div>
+  `;
+}
+
