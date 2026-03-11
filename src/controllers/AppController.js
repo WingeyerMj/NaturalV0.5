@@ -34,7 +34,7 @@ import {
     renderSofiaHerbicidas, renderFertilizacionComparativa, formatCurrency,
     renderHectareasPorPredio, renderEficienciaChartSection,
     renderCosechaLevantadoTable, renderAdminCrudView, renderWorkLogView,
-    renderGastosView, renderSecaderosView
+    renderGastosView, renderSecaderosView, renderGastosHistoricosView
 } from '../views/Views.js';
 
 import { SecaderosController } from './SecaderosController.js';
@@ -56,6 +56,7 @@ const ROLE_MENUS = {
                 { id: 'fincas', label: 'Fincas', icon: '🏡' },
                 { id: 'aplicaciones-sofia', label: 'Aplicaciones', icon: '🧪' },
                 { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
+                { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
             ]
         },
@@ -98,6 +99,7 @@ const ROLE_MENUS = {
                 { id: 'fincas', label: 'Fincas', icon: '🏡' },
                 { id: 'aplicaciones-sofia', label: 'Aplicaciones', icon: '🧪' },
                 { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
+                { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
             ]
         },
@@ -110,6 +112,7 @@ const ROLE_MENUS = {
                 { id: 'fincas', label: 'Fincas', icon: '🏡' },
                 { id: 'aplicaciones-sofia', label: 'Aplicaciones', icon: '🧪' },
                 { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
+                { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
             ]
         },
@@ -282,6 +285,10 @@ export class AppController {
             case 'informe-gastos':
                 title.textContent = 'Informe de Gastos';
                 content.innerHTML = renderGastosView();
+                break;
+            case 'informe-gastos-historicos':
+                title.textContent = 'Informe de Gastos Históricos';
+                content.innerHTML = renderGastosHistoricosView();
                 break;
             case 'informe-secaderos':
                 title.textContent = 'Informe de Secaderos';
