@@ -34,7 +34,8 @@ import {
     renderSofiaHerbicidas, renderFertilizacionComparativa, formatCurrency,
     renderHectareasPorPredio, renderEficienciaChartSection,
     renderCosechaLevantadoTable, renderAdminCrudView, renderWorkLogView,
-    renderGastosView, renderSecaderosView, renderGastosHistoricosView
+    renderGastosView, renderSecaderosView, renderGastosHistoricosView,
+    renderControlCargaView
 } from '../views/Views.js';
 
 import { SecaderosController } from './SecaderosController.js';
@@ -58,6 +59,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
+                { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
             ]
         },
         {
@@ -101,6 +103,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
+                { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
             ]
         },
     ],
@@ -114,6 +117,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
+                { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
             ]
         },
     ],
@@ -162,8 +166,8 @@ export class AppController {
         // Load static Sofia files automatically
         await this.loadStaticSofiaData();
 
-        // Default section is always jornales
-        if (!section) section = 'jornales';
+        // Default section is 'informe-gastos-historicos'
+        if (!section) section = 'informe-gastos-historicos';
         this.currentSection = section;
 
         // Render layout first so overlay exists
@@ -318,6 +322,11 @@ export class AppController {
                     SecaderosController.init();
 
                 }, 50);
+                break;
+            case 'control-carga':
+                title.textContent = 'Control de Carga de Labores';
+                content.innerHTML = renderControlCargaView();
+                this.renderControlCarga(content);
                 break;
             case 'usuarios':
                 title.textContent = 'Gestión de Usuarios';
@@ -2991,7 +3000,7 @@ export class AppController {
         for (const file of files) {
             try {
                 console.log(`[AppController] Fetching ${file.name}...`);
-                const response = await fetch(`/Fuentes/${file.name}?t=${Date.now()}`);
+                const response = await fetch(`/Fuentes/Aplicaciones/${file.name}?t=${Date.now()}`);
                 if (!response.ok) {
                     console.error(`[AppController] Error fetching ${file.name}: ${response.status} ${response.statusText}`);
                     continue;
@@ -3023,7 +3032,7 @@ export class AppController {
 
     async autoLoadJornalesBudget() {
         try {
-            const resp = await fetch(`/Fuentes/PresupuestoJornales.csv?t=${Date.now()}`);
+            const resp = await fetch(`/Fuentes/Auxiliares/PresupuestoJornales.csv?t=${Date.now()}`);
             if (resp.ok) {
                 const csvText = await resp.text();
                 const result = JornalesBudgetModel.importFromCSV(csvText);
@@ -3209,8 +3218,8 @@ export class AppController {
 
         // 2. Timeline Charts (Weekly per-week Evolution) — one per finca with product + predio filter
         const weeklyConfigs = [
-            { id: 'chart-fert-weekly-ee', filterId: 'filter-weekly-producto-ee', predioFilterId: 'filter-weekly-predio-ee', summaryId: 'weekly-summary-ee', finca: 'El Espejo', barColor: 'rgba(167, 139, 250, 0.7)', barBorder: 'rgba(167, 139, 250, 1)', lineColor: 'rgba(52, 211, 153, 1)' },
-            { id: 'chart-fert-weekly-fv', filterId: 'filter-weekly-producto-fv', predioFilterId: 'filter-weekly-predio-fv', summaryId: 'weekly-summary-fv', finca: 'Fincas Viejas', barColor: 'rgba(96, 165, 250, 0.7)', barBorder: 'rgba(96, 165, 250, 1)', lineColor: 'rgba(251, 191, 36, 1)' }
+            { id: 'chart-fert-weekly-ee', filterId: 'filter-weekly-producto-ee', predioFilterId: 'filter-weekly-predio-ee', summaryId: 'weekly-summary-ee', finca: 'El Espejo', barColor: 'rgba(6, 182, 212, 0.7)', barBorder: 'rgba(6, 182, 212, 1)', lineColor: 'rgba(168, 85, 247, 1)' },
+            { id: 'chart-fert-weekly-fv', filterId: 'filter-weekly-producto-fv', predioFilterId: 'filter-weekly-predio-fv', summaryId: 'weekly-summary-fv', finca: 'Fincas Viejas', barColor: 'rgba(249, 115, 22, 0.7)', barBorder: 'rgba(249, 115, 22, 1)', lineColor: 'rgba(52, 211, 153, 1)' }
         ];
 
         const renderWeeklyChart = (cfg) => {
@@ -3234,7 +3243,7 @@ export class AppController {
             const summaryEl = document.getElementById(cfg.summaryId);
             if (summaryEl) {
                 const totalPptado = weeklyData.pptado.reduce((s, v) => s + v, 0);
-                const totalReal = weeklyData.real.reduce((s, v) => s + v, 0);
+                const totalReal = weeklyData.realPre.reduce((s, v) => s + v, 0) + weeklyData.realPos.reduce((s, v) => s + v, 0);
                 const desvio = totalReal - totalPptado;
                 const desvioPct = totalPptado > 0 ? Math.round((desvio / totalPptado) * 100) : 0;
                 const fmt = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(v);
@@ -3293,12 +3302,23 @@ export class AppController {
                         },
                         {
                             type: 'bar',
-                            label: 'Real Aplicado Semanal',
-                            data: weeklyData.real,
-                            backgroundColor: cfg.barColor,
-                            borderColor: cfg.barBorder,
-                            borderWidth: 1, borderRadius: 4,
+                            label: 'Real Aplicado PRE',
+                            data: weeklyData.realPre,
+                            backgroundColor: 'rgba(56, 189, 248, 0.8)', // Sky Blue
+                            borderColor: 'rgba(56, 189, 248, 1)',
+                            borderWidth: 1, borderRadius: 2,
+                            stack: 'real',
                             order: 2
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Real Aplicado POS (Bio-Crecimiento)',
+                            data: weeklyData.realPos,
+                            backgroundColor: 'rgba(232, 121, 249, 0.8)', // Fuschia/Pink
+                            borderColor: 'rgba(232, 121, 249, 1)',
+                            borderWidth: 1, borderRadius: 2,
+                            stack: 'real',
+                            order: 3
                         }
                     ]
                 },
@@ -3306,13 +3326,22 @@ export class AppController {
                     ...this.getChartOptions('Litros (L) por Semana'),
                     interaction: { mode: 'index', intersect: false },
                     scales: {
-                        ...this.getChartOptions('Litros (L) por Semana').scales,
                         x: {
+                            stacked: true,
                             grid: { color: 'rgba(255, 255, 255, 0.05)' },
                             ticks: {
                                 color: 'rgba(255, 255, 255, 0.5)',
                                 font: { size: 9, family: 'Inter' },
                                 maxRotation: 45, minRotation: 45
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            stacked: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.55)',
+                                font: { size: 10 }
                             }
                         }
                     },
@@ -3515,13 +3544,19 @@ export class AppController {
         setupProductFilter('filter-producto-fv', 'fertProductoFV');
 
         // Build filters per finca
-        const filtersEE = { ...baseFilters };
-        const filtersFV = { ...baseFilters };
+        const filtersEE = { ...baseFilters, budgetType: 'pre' };
+        const filtersFV = { ...baseFilters, budgetType: 'pre' };
         if (this.fertProductoEE) filtersEE.producto = this.fertProductoEE;
         if (this.fertProductoFV) filtersFV.producto = this.fertProductoFV;
 
+        // POS-COSECHA filters
+        const filtersEEPos = { ...baseFilters, budgetType: 'pos' };
+        const filtersFVPos = { ...baseFilters, budgetType: 'pos' };
+        if (this.fertProductoEE) filtersEEPos.producto = this.fertProductoEE;
+        if (this.fertProductoFV) filtersFVPos.producto = this.fertProductoFV;
+
         // Destroy all previous nutrient charts
-        ['n-ee', 'p-ee', 'k-ee', 'n-fv', 'p-fv', 'k-fv'].forEach(id => {
+        ['n-ee', 'p-ee', 'k-ee', 'n-fv', 'p-fv', 'k-fv', 'n-ee-pos', 'n-fv-pos'].forEach(id => {
             const key = `sofia-fert-unidades-${id}`;
             if (this.charts[key]) {
                 this.charts[key].destroy();
@@ -3529,9 +3564,11 @@ export class AppController {
             }
         });
 
-        // Get data for each finca with independent product filters
+        // Get data for each finca and each budget type
         const dataEE = SofiaImportModel.getFertilizacionUnidades(filtersEE, 'espejo');
         const dataFV = SofiaImportModel.getFertilizacionUnidades(filtersFV, 'fincasviejas');
+        const dataEEPos = SofiaImportModel.getFertilizacionUnidades(filtersEEPos, 'espejo');
+        const dataFVPos = SofiaImportModel.getFertilizacionUnidades(filtersFVPos, 'fincasviejas');
 
         // Nutrient config (colors)
         const nutrients = {
@@ -3549,10 +3586,21 @@ export class AppController {
             }
         };
 
+        const nutrientsPos = {
+            n: {
+                budgetColor: 'rgba(129, 140, 248, 0.35)', budgetBorder: 'rgba(129, 140, 248, 0.8)',
+                realColor: 'rgba(129, 140, 248, 0.85)', realBorder: 'rgba(129, 140, 248, 1)',
+            }
+        };
+
         // Helper to create a single nutrient chart
         const createChart = (canvasId, chartKey, data, colors) => {
             const ctx = document.getElementById(canvasId);
-            if (!ctx || !data || data.length === 0) return;
+            if (!ctx) return;
+            if (!data || data.length === 0) {
+                // Optionally show "No data" message in canvas parent
+                return;
+            }
 
             this.charts[chartKey] = new Chart(ctx, {
                 type: 'bar',
@@ -3633,16 +3681,250 @@ export class AppController {
             });
         };
 
-        // Render El Espejo charts (N, P, K)
+        // Render El Espejo charts (PRE)
         Object.entries(nutrients).forEach(([nut, colors]) => {
             const flatData = dataEE.map(d => ({ name: d.name, budget: d[nut].budget, real: d[nut].real }));
             createChart(`chart-fert-unidades-${nut}-ee`, `sofia-fert-unidades-${nut}-ee`, flatData, colors);
         });
 
-        // Render Fincas Viejas charts (N, P, K)
+        // Render El Espejo charts (POS)
+        if (dataEEPos && dataEEPos.length > 0) {
+            const flatData = dataEEPos.map(d => ({ name: d.name, budget: d['n'].budget, real: d['n'].real }));
+            createChart(`chart-fert-unidades-n-ee-pos`, `sofia-fert-unidades-n-ee-pos`, flatData, nutrientsPos.n);
+        }
+
+        // Render Fincas Viejas charts (PRE)
         Object.entries(nutrients).forEach(([nut, colors]) => {
             const flatData = dataFV.map(d => ({ name: d.name, budget: d[nut].budget, real: d[nut].real }));
             createChart(`chart-fert-unidades-${nut}-fv`, `sofia-fert-unidades-${nut}-fv`, flatData, colors);
         });
+
+        // Render Fincas Viejas charts (POS)
+        if (dataFVPos && dataFVPos.length > 0) {
+            const flatData = dataFVPos.map(d => ({ name: d.name, budget: d['n'].budget, real: d['n'].real }));
+            createChart(`chart-fert-unidades-n-fv-pos`, `sofia-fert-unidades-n-fv-pos`, flatData, nutrientsPos.n);
+        }
+    }
+
+    async renderControlCarga(content) {
+        const dateInput = document.getElementById('control-carga-date');
+        const refreshBtn = document.getElementById('refresh-control-carga');
+        const cuartelSelect = document.getElementById('control-carga-cuartel');
+        const container = document.getElementById('control-carga-tables-container');
+        
+        this.currentControlCargaData = [];
+
+        const populateCuarteles = (data) => {
+            if (!cuartelSelect) return;
+            const currentVal = cuartelSelect.value;
+            const cuarteles = [...new Set(data.map(r => r.cuartel).filter(c => c))].sort();
+            
+            let html = '<option value="all" style="background: var(--color-bg-sidebar);">Todos</option>';
+            cuarteles.forEach(c => {
+                html += `<option value="${c}" style="background: var(--color-bg-sidebar);">${c}</option>`;
+            });
+            cuartelSelect.innerHTML = html;
+            if (cuarteles.includes(currentVal)) cuartelSelect.value = currentVal;
+            else cuartelSelect.value = 'all';
+        };
+
+        const updateData = async () => {
+            const selectedDate = dateInput.value;
+            if (!selectedDate) return;
+
+            if (container) {
+                container.innerHTML = `
+                    <div class="card" style="padding: 3rem; text-align: center; background: var(--color-bg-sidebar); border: 1px solid var(--color-border);">
+                        <div class="loader-container">
+                            <div class="loader"></div>
+                            <p style="margin-top: 10px; color: var(--text-secondary);">Consultando APIs de Sofía para ${selectedDate}...</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            try {
+                const fincas = ['Fincas Viejas', 'El Espejo'];
+                const allData = await Promise.all(
+                    fincas.map(finca => SofiaApiModel.fetchFromSofia(finca, selectedDate, selectedDate))
+                );
+                
+                this.currentControlCargaData = allData.flat();
+                populateCuarteles(this.currentControlCargaData);
+                this.updateControlCargaUI(this.currentControlCargaData);
+            } catch (error) {
+                console.error("Error fetching Control de Carga:", error);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="card" style="padding: 3rem; text-align: center; color: var(--color-error); background: var(--color-bg-sidebar); border: 1px solid var(--color-border);">
+                            Error al cargar datos desde la API. Verifique su conexión y refresque.
+                        </div>
+                    `;
+                }
+            }
+        };
+
+        if (refreshBtn) refreshBtn.addEventListener('click', updateData);
+        if (dateInput) dateInput.addEventListener('change', updateData);
+        if (cuartelSelect) {
+            cuartelSelect.addEventListener('change', () => {
+                this.updateControlCargaUI(this.currentControlCargaData);
+            });
+        }
+
+        // Initial load
+        updateData();
+    }
+
+    updateControlCargaUI(data) {
+        const container = document.getElementById('control-carga-tables-container');
+        const countEl = document.getElementById('cc-total-registros');
+        const jornadasEl = document.getElementById('cc-total-jornadas');
+        const prediosEl = document.getElementById('cc-total-predios');
+        const cuartelFilter = document.getElementById('control-carga-cuartel')?.value || 'all';
+
+        if (!container) return;
+
+        if (data.length === 0) {
+            container.innerHTML = `
+                <div class="card" style="padding: 3rem; text-align: center; color: var(--text-tertiary); background: var(--color-bg-sidebar); border: 1px solid var(--color-border);">
+                    No se encontraron labores cargadas para esta fecha en Sofía.
+                </div>
+            `;
+            if (countEl) countEl.textContent = '0';
+            if (jornadasEl) jornadasEl.textContent = '0';
+            if (prediosEl) prediosEl.textContent = '0';
+            return;
+        }
+
+        // Apply Cuartel Filter
+        let filteredData = data;
+        if (cuartelFilter !== 'all') {
+            filteredData = data.filter(r => r.cuartel === cuartelFilter);
+        }
+
+        // Processing Summary Stats (on original data or filtered? Usually on filtered if UI shows filtered)
+        // User might want to see global totals but table filtered. I'll use filtered for consistency in this view.
+        let totalJornadas = 0;
+        const prediosSet = new Set();
+        
+        // Grouping logic: Finca -> Labor
+        // If "all" is selected, we should aggregate by Persona so we don't separate by cuartel in rows
+        const processedData = [];
+        if (cuartelFilter === 'all') {
+            const aggregationMap = {};
+            filteredData.forEach(r => {
+                const key = `${r.finca}|${r.labor}|${r.persona}|${r.clasificacion || r.clasifica}`;
+                if (!aggregationMap[key]) {
+                    aggregationMap[key] = { ...r, jornada: 0, totalJornadas: 0, cuartel: 'Varios' };
+                }
+                const j = parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
+                aggregationMap[key].jornada += j;
+            });
+            Object.values(aggregationMap).forEach(val => processedData.push(val));
+        } else {
+            filteredData.forEach(r => processedData.push(r));
+        }
+
+        const groupedData = processedData.reduce((acc, r) => {
+            const finca = r.finca || 'Otros';
+            const labor = r.labor || 'Otras Labores';
+            
+            if (!acc[finca]) acc[finca] = {};
+            if (!acc[finca][labor]) acc[finca][labor] = [];
+            
+            acc[finca][labor].push(r);
+            
+            // Stats (actually use raw data for accurate total jornadas)
+            totalJornadas += parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
+            prediosSet.add(r.clasificacion || r.clasifica || 'Sin Clasificar');
+            
+            return acc;
+        }, {});
+
+        // Re-calcs summary on total data or filtered? I'll use filtered.
+        if (cuartelFilter !== 'all') {
+            // Re-calculate exactly for filtered data
+            totalJornadas = filteredData.reduce((s, r) => s + (parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0), 0);
+            const pSet = new Set(filteredData.map(r => r.clasificacion || r.clasifica || 'Sin Clasificar'));
+            if (countEl) countEl.textContent = filteredData.length.toLocaleString();
+            if (jornadasEl) jornadasEl.textContent = totalJornadas.toFixed(1).toLocaleString();
+            if (prediosEl) prediosEl.textContent = pSet.size.toString();
+        } else {
+            if (countEl) countEl.textContent = data.length.toLocaleString();
+            // Total jornadas from full data
+            const fullTotal = data.reduce((s, r) => s + (parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0), 0);
+            if (jornadasEl) jornadasEl.textContent = fullTotal.toFixed(1).toLocaleString();
+            if (prediosEl) prediosEl.textContent = new Set(data.map(r => r.clasificacion || r.clasifica || 'Sin Clasificar')).size.toString();
+        }
+
+        let finalHtml = '';
+
+        // Generate a table for each Finca
+        Object.entries(groupedData).forEach(([fincaName, labors]) => {
+            const isCuartelHidden = (cuartelFilter === 'all');
+            
+            let fincaHtml = `
+                <div class="card" style="margin-bottom: 2rem; padding: 0; overflow: hidden; background: var(--color-bg-sidebar); border: 1px solid var(--color-border);">
+                    <div style="padding: 1rem 1.5rem; background: rgba(16, 185, 129, 0.1); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; color: var(--accent-emerald); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                            <span>📍</span> ${fincaName}
+                        </h3>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: rgba(255,255,255,0.03);">
+                                    <th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 25%;">Predio / Clasif.</th>
+                                    ${!isCuartelHidden ? '<th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 10%;">Cuartel</th>' : ''}
+                                    <th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 40%;">Persona</th>
+                                    <th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 15%;">Jornada</th>
+                                    <th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 15%;">Rend.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+            // Group rows by Labor within the Finca table
+            Object.entries(labors).forEach(([laborName, rows]) => {
+                const laborTotalJornadas = rows.reduce((s, r) => s + (parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0), 0);
+                
+                fincaHtml += `
+                    <tr style="background: rgba(255,255,255,0.05);">
+                        <td colspan="${isCuartelHidden ? 4 : 5}" style="padding: 0.8rem 1rem; font-weight: 700; color: var(--text-primary); border-top: 1px solid var(--color-border);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>🛠️ ${laborName}</span>
+                                <span style="font-size: 0.85rem; background: rgba(129, 140, 248, 0.2); color: var(--accent-primary); padding: 2px 8px; border-radius: 6px;">
+                                    Subtotal: ${laborTotalJornadas.toFixed(2)} jornadas
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+
+                rows.forEach(r => {
+                    const jornadas = parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
+                    fincaHtml += `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                            <td style="padding: 0.8rem 1rem; color: var(--text-secondary);">${r.clasificacion || r.clasifica || '-'}</td>
+                            ${!isCuartelHidden ? `<td style="padding: 0.8rem 1rem;">${r.cuartel || '-'}</td>` : ''}
+                            <td style="padding: 0.8rem 1rem;">${r.persona || '-'}</td>
+                            <td style="padding: 0.8rem 1rem; font-weight: 600;">${jornadas.toFixed(2)}</td>
+                            <td style="padding: 0.8rem 1rem;">${r.rendimiento || '-'}</td>
+                        </tr>
+                    `;
+                });
+            });
+
+            fincaHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            finalHtml += fincaHtml;
+        });
+
+        container.innerHTML = finalHtml;
     }
 }

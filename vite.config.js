@@ -21,15 +21,10 @@ function serveFuentesPlugin() {
         // Copy Fuentes into dist during build
         closeBundle() {
             const distFuentes = path.resolve(__dirname, 'dist', 'Fuentes');
-            if (!fs.existsSync(distFuentes)) fs.mkdirSync(distFuentes, { recursive: true });
-            const files = fs.readdirSync(fuentesDir);
-            for (const file of files) {
-                const src = path.join(fuentesDir, file);
-                if (fs.statSync(src).isFile()) {
-                    fs.copyFileSync(src, path.join(distFuentes, file));
-                }
+            if (fs.existsSync(fuentesDir)) {
+                fs.cpSync(fuentesDir, distFuentes, { recursive: true });
+                console.log(`[serve-fuentes] Recursively copied Fuentes to dist/Fuentes`);
             }
-            console.log(`[serve-fuentes] Copied ${files.length} files to dist/Fuentes`);
         }
     };
 }

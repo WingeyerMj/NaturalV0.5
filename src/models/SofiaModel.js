@@ -4,7 +4,7 @@
  */
 
 const COLUMNS_MAP = {
-    'Fecha': ['Fecha', 'Fecha Inicio Aplica', 'Fecha de Aplicación', 'Date', 'Fecha Apl.'],
+    'Fecha': ['Fecha Inicio Aplica', 'Fecha Inicio', 'Fecha', 'Fecha de Aplicación', 'Date', 'Fecha Apl.'],
     'Labor': ['Labor', 'Labor Code', 'Faena', 'Tarea', 'Operación'],
     'Producto': ['Nombre Producto', 'Producto', 'Insumo', 'Product', 'Artículo'],
     'Cantidad': ['Cantidad', 'Real Aplicado', 'Cantidad Periodo', 'Monto', 'Cant.'],
@@ -80,6 +80,10 @@ export class SofiaImportModel {
         let skippedEmpty = 0;
         let skippedPendiente = 0;
 
+        // Date selection logic: Prefer 'Fecha Inicio Aplica' (index in colMap) but fallback to standard 'Fecha'
+        const primaryFechaIdx = colMap['Fecha'];
+        const fallbackFechaIdx = header.findIndex(h => h.toLowerCase() === 'fecha');
+
         for (let i = 1; i < lines.length; i++) {
             const rowStr = lines[i];
             // Split and clean
@@ -91,7 +95,11 @@ export class SofiaImportModel {
                 continue;
             }
 
-            const fecha = colMap['Fecha'] !== undefined ? cols[colMap['Fecha']] : '';
+            let fecha = primaryFechaIdx !== undefined ? cols[primaryFechaIdx] : '';
+            if (!fecha && fallbackFechaIdx !== -1) {
+                fecha = cols[fallbackFechaIdx];
+            }
+
             if (!fecha) {
                 skippedEmpty++;
                 continue;
@@ -384,7 +392,7 @@ export class SofiaImportModel {
 
     static getWeeklyEvolution(filters = {}, fincaName = '', productoFilter = '', predioFilter = '') {
         // Only these 3 products
-        const ALLOWED = ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M'];
+        const ALLOWED = ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M', 'BIO-CRECIMIENTO'];
 
         const all = this.applyFilters(
             this.REGISTROS.filter(r =>
@@ -431,7 +439,7 @@ export class SofiaImportModel {
             weekEnd.setDate(weekEnd.getDate() + 6);
             const label = `S${weekIdx + 1} (${fmtShort(cursor)})`;
             weeks.push({ start: new Date(cursor), end: weekEnd, label });
-            weekMap[weekIdx] = { real: 0 };
+            weekMap[weekIdx] = { realPre: 0, realPos: 0 };
             cursor.setDate(cursor.getDate() + 7);
             weekIdx++;
         }
@@ -453,9 +461,15 @@ export class SofiaImportModel {
             const fecha = parseDate(r.fecha_aplicacion);
             if (!fecha) return;
 
+            // Determine if this real record belongs to a PRE or POS product
+            // Products starting with 'NUTRI' are PRE, 'BIO-CRECIMIENTO' is POS
+            const prod = (r.producto || '').toUpperCase();
+            const isPosProduct = prod.includes('BIO-CRECIMIENTO');
+
             for (let i = 0; i < weeks.length; i++) {
                 if (fecha >= weeks[i].start && fecha <= weeks[i].end) {
-                    weekMap[i].real += r.cantidad;
+                    if (isPosProduct) weekMap[i].realPos += r.cantidad;
+                    else weekMap[i].realPre += r.cantidad;
                     break;
                 }
             }
@@ -465,19 +479,21 @@ export class SofiaImportModel {
         // ── 4. Build per-week arrays (NOT cumulative) ──
         const labels = [];
         const pptado = [];
-        const real = [];
+        const realPre = [];
+        const realPos = [];
 
         for (let i = 0; i < totalWeeks; i++) {
             labels.push(weeks[i].label);
             pptado.push(weeklyBudget);  // constant line
-            real.push(Math.round(weekMap[i].real * 100) / 100);
+            realPre.push(Math.round(weekMap[i].realPre * 100) / 100);
+            realPos.push(Math.round(weekMap[i].realPos * 100) / 100);
         }
 
-        return { labels, pptado, real };
+        return { labels, pptado, realPre, realPos };
     }
 
     static getProductosFertilizacion() {
-        return ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M'];
+        return ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M', 'BIO-CRECIMIENTO'];
     }
 
     static getFertilizacionUnidades(filters = {}, fincaGroup = 'espejo') {
@@ -487,14 +503,15 @@ export class SofiaImportModel {
             'NUTRI 1683 M': { n: 0.0126, k: 0.0284, p: 0 },
             'NUTRI 1684 M': { n: 0.0062, k: 0.0125, p: 0 },
             'SULFATO DE POTASIO': { n: 0, k: 0.50, p: 0 },
-            'UREA': { n: 0.46, k: 0, p: 0 }
+            'UREA': { n: 0.46, k: 0, p: 0 },
+            'BIO-CRECIMIENTO': { n: 0.1, k: 0, p: 0 }
         };
         const nutrientDensities = {};
         const budgetStats = {};
         const processedBudgets = new Set();
 
         // Only consider these products for nutrient charts
-        const allowedProducts = ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M'];
+        const allowedProducts = ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M', 'BIO-CRECIMIENTO'];
 
         // Helper: check if record belongs to requested finca group
         const belongsToGroup = (r) => {
@@ -526,6 +543,13 @@ export class SofiaImportModel {
             if (!allowedProducts.includes(prod)) return;
             // Product filter (individual selection)
             if (filters.producto && prod !== filters.producto.toUpperCase()) return;
+
+            if (filters.budgetType) {
+                const bType = filters.budgetType.toLowerCase();
+                const tipoLower = tipo.toLowerCase();
+                if (bType === 'pre' && !tipoLower.endsWith('-pre')) return;
+                if (bType === 'pos' && !tipoLower.endsWith('-pos')) return;
+            }
 
             if (r.cantidad > 0) {
                 const key = getGroupKey(r);

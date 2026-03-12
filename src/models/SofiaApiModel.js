@@ -118,7 +118,7 @@ export class SofiaApiModel {
         if (this._csvData) return this._csvData;
 
         try {
-            const response = await fetch('/Fuentes/Cosecha 13-25.csv');
+            const response = await fetch('/Fuentes/Secaderos/Cosecha 13-25.csv');
             if (!response.ok) throw new Error('CSV not found');
 
             const buffer = await response.arrayBuffer();

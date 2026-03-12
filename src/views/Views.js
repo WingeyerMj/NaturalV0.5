@@ -2292,7 +2292,7 @@ export function renderFertilizacionComparativa(data) {
       <div class="section-divider" style="margin: var(--space-6) 0; height: 2px; background: linear-gradient(90deg, transparent, var(--color-primary-500), transparent);"></div>
       <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4);">
         <h3 style="font-family: 'Outfit'; color: var(--color-primary-400); margin: 0;">
-          🍇 El Espejo — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Cod Cuartel</span>
+          🍇 El Espejo (PRE-COSECHA) — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Cod Cuartel</span>
         </h3>
         <div style="display: flex; align-items: center; gap: var(--space-2);">
           <label for="filter-producto-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
@@ -2325,11 +2325,27 @@ export function renderFertilizacionComparativa(data) {
         </div>
       </div>
 
+      <!-- ═══ EL ESPEJO: Nutrientes POS COSECHA ═══ -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); margin-bottom: var(--space-4);">
+        <h3 style="font-family: 'Outfit'; color: var(--color-primary-400); margin: 0;">
+          🍇 El Espejo (POS-COSECHA) — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Cod Cuartel</span>
+        </h3>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-6);">
+        <div class="chart-container" style="min-height: 420px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #34d399;">
+              <span class="chart-title">🧪 Nitrógeno (N)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Bio-Crecimiento</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-unidades-n-ee-pos"></canvas></div>
+        </div>
+      </div>
+
       <!-- ═══ FINCAS VIEJAS: Nutrientes por Clasifica ═══ -->
       <div class="section-divider" style="margin: var(--space-6) 0; height: 2px; background: linear-gradient(90deg, transparent, var(--color-amber-500), transparent);"></div>
       <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4);">
         <h3 style="font-family: 'Outfit'; color: var(--color-amber-400); margin: 0;">
-          🌾 Fincas Viejas — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Clasifica</span>
+          🌾 Fincas Viejas (PRE-COSECHA) — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Clasifica</span>
         </h3>
         <div style="display: flex; align-items: center; gap: var(--space-2);">
           <label for="filter-producto-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
@@ -2362,6 +2378,22 @@ export function renderFertilizacionComparativa(data) {
         </div>
       </div>
 
+      <!-- ═══ FINCAS VIEJAS: Nutrientes POS COSECHA ═══ -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); margin-bottom: var(--space-4);">
+        <h3 style="font-family: 'Outfit'; color: var(--color-amber-400); margin: 0;">
+          🌾 Fincas Viejas (POS-COSECHA) — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Clasifica</span>
+        </h3>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-6);">
+        <div class="chart-container" style="min-height: 420px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #34d399;">
+              <span class="chart-title">🧪 Nitrógeno (N)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Bio-Crecimiento</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-unidades-n-fv-pos"></canvas></div>
+        </div>
+      </div>
+
       <div class="chart-container" style="min-height: 400px; padding: var(--space-6); grid-column: 1 / -1;">
           <div class="chart-header" style="color: var(--color-primary-400); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3);">
             <span class="chart-title">📈 🍇 El Espejo — Aplicación Semanal (L)</span>
@@ -2379,6 +2411,7 @@ export function renderFertilizacionComparativa(data) {
                   <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
                   <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
                   <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
+                  <option value="BIO-CRECIMIENTO" style="color:#000;">BIO-CRECIMIENTO</option>
                 </select>
               </div>
             </div>
@@ -2403,6 +2436,7 @@ export function renderFertilizacionComparativa(data) {
                   <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
                   <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
                   <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
+                  <option value="BIO-CRECIMIENTO" style="color:#000;">BIO-CRECIMIENTO</option>
                 </select>
               </div>
             </div>
@@ -2876,5 +2910,59 @@ export function renderGastosHistoricosView() {
         ></iframe>
     </div>
   `;
+}
+
+// ── Control de Carga View ──
+export function renderControlCargaView() {
+    const today = new Date().toISOString().split('T')[0];
+    return `
+    <div id="control-carga-view" class="view animate-fade-in" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin: 0;">Control de Carga</h1>
+                <p style="color: var(--text-secondary); margin: 5px 0 0 0;">Visualización de labores cargadas por día desde Sofía API</p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="filter-group" style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px;">
+                    <label for="control-carga-date" style="font-size: 0.9rem; color: var(--text-secondary);">Fecha:</label>
+                    <input type="date" id="control-carga-date" value="${today}" style="background: transparent; border: none; color: white; outline: none; cursor: pointer;">
+                </div>
+                <div class="filter-group" style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px;">
+                    <label for="control-carga-cuartel" style="font-size: 0.9rem; color: var(--text-secondary);">Cuartel:</label>
+                    <select id="control-carga-cuartel" style="background: transparent; border: none; color: white; outline: none; cursor: pointer; max-width: 150px;">
+                        <option value="all" style="background: var(--color-bg-sidebar);">Todos</option>
+                    </select>
+                </div>
+                <button id="refresh-control-carga" class="btn-primary" style="padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; gap: 4px;">
+                    <span>🔄</span> Actualizar
+                </button>
+            </div>
+        </div>
+
+        <div id="control-carga-summary" class="dashboard-grid" style="margin-bottom: 2rem;">
+            <div class="metric-card animate-slide-up">
+                <span class="metric-label">Total Registros</span>
+                <span class="metric-value" id="cc-total-registros">0</span>
+            </div>
+            <div class="metric-card animate-slide-up" style="animation-delay: 0.1s;">
+                <span class="metric-label">Total Jornadas</span>
+                <span class="metric-value" id="cc-total-jornadas">0</span>
+            </div>
+            <div class="metric-card animate-slide-up" style="animation-delay: 0.2s;">
+                <span class="metric-label">Predios con Carga</span>
+                <span class="metric-value" id="cc-total-predios">0</span>
+            </div>
+        </div>
+
+        <div id="control-carga-tables-container">
+            <div class="card" style="padding: 3rem; text-align: center; background: var(--color-bg-sidebar); border: 1px solid var(--color-border);">
+                <div class="loader-container">
+                    <div class="loader"></div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Cargando datos de Sofía...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
 }
 

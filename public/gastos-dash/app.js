@@ -6,12 +6,12 @@ const CONFIG = {
         { name: 'Ullum', key: '123450S8fgNhWDfKUNxnzFr7xb6DK1us2OqJK2' }
     ],
     startDate: '2025-12-01',
-    historyPath: 'https://raw.githubusercontent.com/Leonixorm/Leonixorm/main/Cosecha%2013-25.csv',
-    secaderoPath: './CSV/Has de secadero.csv',
-    lluviasPath: './CSV/lluvias.csv',
-    climasPath: './CSV/Climas4.csv',
-    expensesHistoryPath: './CSV 2/Historico.csv',
-    expenses2026Path: './CSV 2/2026.csv'
+    historyPath: '/Fuentes/Secaderos/Cosecha 13-25.csv',
+    secaderoPath: '/Fuentes/Secaderos/Has de secadero.csv',
+    lluviasPath: '/Fuentes/Secaderos/lluvias.csv',
+    climasPath: '/Fuentes/Secaderos/Climas4.csv',
+    expensesHistoryPath: '/Fuentes/Gastos/Historico.csv',
+    expenses2026Path: '/Fuentes/Gastos/2026.csv'
 };
 
 let state = {
@@ -34,7 +34,7 @@ let state = {
         gItem: ['all'],
         gUnif: ['all']
     },
-    currentView: 'dashboard',
+    currentView: 'gastos',
     historicalData: [],
     expensesData: { hist: [], cur: [] },
     charts: {}
@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     lucide.createIcons();
 
     await initDashboard();
+    switchView('gastos');
 
     // Event listeners
     document.getElementById('refresh-btn').addEventListener('click', () => initDashboard());
@@ -464,7 +465,7 @@ async function initDashboard() {
             await fetchClimaData();
         }
 
-        if (state.expensesData.length === 0) {
+        if (state.expensesData.hist.length === 0) {
             showStatus('Cargando Gastos...');
             await fetchExpensesData();
         }
