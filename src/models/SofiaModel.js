@@ -445,51 +445,73 @@ export class SofiaImportModel {
         }
         const totalWeeks = weeks.length;
 
-        // ── 2. Calculate total budget → constant weekly fraction ──
-        let totalBudget = 0;
+        // ── 2. Assign data to each week ──
         all.forEach(r => {
-            const tipo = (r.tipo_registro || '').toLowerCase();
-            if (tipo.includes('presupuestado')) totalBudget += r.cantidad;
-        });
-        const weeklyBudget = totalWeeks > 0 ? Math.round((totalBudget / totalWeeks) * 100) / 100 : 0;
-
-        // ── 3. Assign real data to each week (NOT cumulative) ──
-        all.forEach(r => {
-            const tipo = (r.tipo_registro || '').toLowerCase();
-            if (tipo.includes('presupuestado')) return;
-
             const fecha = parseDate(r.fecha_aplicacion);
             if (!fecha) return;
 
-            // Determine if this real record belongs to a PRE or POS product
-            // Products starting with 'NUTRI' are PRE, 'BIO-CRECIMIENTO' is POS
+            const tipo = (r.tipo_registro || '').toLowerCase();
+            const isBudget = tipo.includes('presupuestado');
+            
+            // Determine if this record belongs to a PRE or POS product
             const prod = (r.producto || '').toUpperCase();
             const isPosProduct = prod.includes('BIO-CRECIMIENTO');
 
             for (let i = 0; i < weeks.length; i++) {
                 if (fecha >= weeks[i].start && fecha <= weeks[i].end) {
-                    if (isPosProduct) weekMap[i].realPos += r.cantidad;
-                    else weekMap[i].realPre += r.cantidad;
+                    if (isBudget) {
+                        if (isPosProduct) weekMap[i].budgetPos = (weekMap[i].budgetPos || 0) + r.cantidad;
+                        else weekMap[i].budgetPre = (weekMap[i].budgetPre || 0) + r.cantidad;
+                    } else {
+                        if (isPosProduct) weekMap[i].realPos += r.cantidad;
+                        else weekMap[i].realPre += r.cantidad;
+                    }
                     break;
                 }
             }
         });
-        console.log(`[Weekly] ${fincaName || 'All'}: ${all.length} records, budget=${totalBudget}, weeks=${totalWeeks}`);
 
-        // ── 4. Build per-week arrays (NOT cumulative) ──
+        // ── 3. Build per-week arrays (NOT cumulative) ──
         const labels = [];
-        const pptado = [];
+        const pptadoPre = [];
+        const pptadoPos = [];
         const realPre = [];
         const realPos = [];
 
+        // Transition week: March 5, 2026
+        const posStart = new Date(2026, 2, 5);
+        let transitionIdx = -1;
+        for (let i = 0; i < weeks.length; i++) {
+            if (posStart >= weeks[i].start && posStart <= weeks[i].end) {
+                transitionIdx = i;
+                break;
+            }
+        }
+
         for (let i = 0; i < totalWeeks; i++) {
             labels.push(weeks[i].label);
-            pptado.push(weeklyBudget);  // constant line
+            
+            // For budget lines: use null for non-active periods to make lines "end" cleanly
+            const bPre = Math.round((weekMap[i].budgetPre || 0) * 100) / 100;
+            const bPos = Math.round((weekMap[i].budgetPos || 0) * 100) / 100;
+
+            if (transitionIdx === -1 || i < transitionIdx) {
+                pptadoPre.push(bPre);
+                pptadoPos.push(null);
+            } else if (i === transitionIdx) {
+                // On transition week, we might have both or just the start of POS
+                pptadoPre.push(bPre); 
+                pptadoPos.push(bPos);
+            } else {
+                pptadoPre.push(null);
+                pptadoPos.push(bPos);
+            }
+
             realPre.push(Math.round(weekMap[i].realPre * 100) / 100);
             realPos.push(Math.round(weekMap[i].realPos * 100) / 100);
         }
 
-        return { labels, pptado, realPre, realPos };
+        return { labels, pptadoPre, pptadoPos, realPre, realPos };
     }
 
     static getProductosFertilizacion() {

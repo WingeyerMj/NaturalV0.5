@@ -6,7 +6,7 @@ const CONFIG = {
         { name: 'Ullum', key: '123450S8fgNhWDfKUNxnzFr7xb6DK1us2OqJK2' }
     ],
     startDate: '2025-12-01',
-    historyPath: 'https://raw.githubusercontent.com/Leonixorm/Leonixorm/main/Cosecha%2013-25.csv',
+    historyPath: '/Fuentes/secadero/Cosecha 12-25.csv',
     secaderoPath: '../CSV/Has de secadero.csv',
     lluviasPath: '../CSV/lluvias.csv',
     climasPath: '../CSV/Climas4.csv'

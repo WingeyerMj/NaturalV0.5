@@ -19,9 +19,9 @@ export class SecaderosController {
         // Usamos las rutas locales de public
         const CONFIG = {
             csvPath: '/Fuentes/Auxiliares/Programación Cosecha.csv',
-            secaderoPath: '/Fuentes/Secaderos/Has de secadero.csv',
-            lluviasPath: '/Fuentes/Secaderos/lluvias.csv',
-            climasPath: '/Fuentes/Secaderos/Climas4.csv',
+            secaderoPath: '/Fuentes/secadero/Has de secadero.csv',
+            lluviasPath: '/Fuentes/secadero/lluvias.csv',
+            climasPath: '/Fuentes/secadero/Climas4.csv',
         };
 
         // 1. Fetch Planned

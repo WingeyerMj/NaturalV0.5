@@ -3242,8 +3242,8 @@ export class AppController {
             // ── Update dynamic summary cards ──
             const summaryEl = document.getElementById(cfg.summaryId);
             if (summaryEl) {
-                const totalPptado = weeklyData.pptado.reduce((s, v) => s + v, 0);
-                const totalReal = weeklyData.realPre.reduce((s, v) => s + v, 0) + weeklyData.realPos.reduce((s, v) => s + v, 0);
+                const totalPptado = [...weeklyData.pptadoPre, ...weeklyData.pptadoPos].reduce((s, v) => s + (v || 0), 0);
+                const totalReal = weeklyData.realPre.reduce((s, v) => s + (v || 0), 0) + weeklyData.realPos.reduce((s, v) => s + (v || 0), 0);
                 const desvio = totalReal - totalPptado;
                 const desvioPct = totalPptado > 0 ? Math.round((desvio / totalPptado) * 100) : 0;
                 const fmt = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(v);
@@ -3290,21 +3290,33 @@ export class AppController {
                     datasets: [
                         {
                             type: 'line',
-                            label: 'Presupuesto Semanal',
-                            data: weeklyData.pptado,
-                            borderColor: cfg.lineColor,
+                            label: 'PPTO PRE',
+                            data: weeklyData.pptadoPre,
+                            borderColor: '#38bdf8', // Blue
                             backgroundColor: 'transparent',
-                            borderWidth: 2.5,
-                            borderDash: [8, 4],
-                            tension: 0, fill: false,
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.1, fill: false,
+                            pointRadius: 0, pointHoverRadius: 4,
+                            order: 1
+                        },
+                        {
+                            type: 'line',
+                            label: 'PPTO POS',
+                            data: weeklyData.pptadoPos,
+                            borderColor: '#e879f9', // Pink
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.1, fill: false,
                             pointRadius: 0, pointHoverRadius: 4,
                             order: 1
                         },
                         {
                             type: 'bar',
-                            label: 'Real Aplicado PRE',
+                            label: 'Real PRE',
                             data: weeklyData.realPre,
-                            backgroundColor: 'rgba(56, 189, 248, 0.8)', // Sky Blue
+                            backgroundColor: 'rgba(56, 189, 248, 0.4)',
                             borderColor: 'rgba(56, 189, 248, 1)',
                             borderWidth: 1, borderRadius: 2,
                             stack: 'real',
@@ -3312,9 +3324,9 @@ export class AppController {
                         },
                         {
                             type: 'bar',
-                            label: 'Real Aplicado POS (Bio-Crecimiento)',
+                            label: 'Real POS (Bio-Crecimiento)',
                             data: weeklyData.realPos,
-                            backgroundColor: 'rgba(232, 121, 249, 0.8)', // Fuschia/Pink
+                            backgroundColor: 'rgba(232, 121, 249, 0.4)',
                             borderColor: 'rgba(232, 121, 249, 1)',
                             borderWidth: 1, borderRadius: 2,
                             stack: 'real',

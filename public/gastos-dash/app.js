@@ -6,10 +6,10 @@ const CONFIG = {
         { name: 'Ullum', key: '123450S8fgNhWDfKUNxnzFr7xb6DK1us2OqJK2' }
     ],
     startDate: '2025-12-01',
-    historyPath: '/Fuentes/Secaderos/Cosecha 13-25.csv',
-    secaderoPath: '/Fuentes/Secaderos/Has de secadero.csv',
-    lluviasPath: '/Fuentes/Secaderos/lluvias.csv',
-    climasPath: '/Fuentes/Secaderos/Climas4.csv',
+    historyPath: '/Fuentes/secadero/Cosecha 12-25.csv',
+    secaderoPath: '/Fuentes/secadero/Has de secadero.csv',
+    lluviasPath: '/Fuentes/secadero/lluvias.csv',
+    climasPath: '/Fuentes/secadero/Climas4.csv',
     expensesHistoryPath: '/Fuentes/Gastos/Historico.csv',
     expenses2026Path: '/Fuentes/Gastos/2026.csv'
 };
