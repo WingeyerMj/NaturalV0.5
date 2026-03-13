@@ -492,19 +492,19 @@ export class SofiaImportModel {
             labels.push(weeks[i].label);
             
             // For budget lines: use null for non-active periods to make lines "end" cleanly
-            const bPre = Math.round((weekMap[i].budgetPre || 0) * 100) / 100;
-            const bPos = Math.round((weekMap[i].budgetPos || 0) * 100) / 100;
-
-            if (transitionIdx === -1 || i < transitionIdx) {
-                pptadoPre.push(bPre);
+            // Budget distribution logic
+            if (i < transitionIdx || transitionIdx === -1) {
+                // Pre-harvest period
+                pptadoPre.push(budgetPreTotal / (transitionIdx === -1 ? totalWeeks : transitionIdx));
                 pptadoPos.push(null);
-            } else if (i === transitionIdx) {
-                // On transition week, we might have both or just the start of POS
-                pptadoPre.push(bPre); 
-                pptadoPos.push(bPos);
-            } else {
+            } else if (i >= transitionIdx && i < transitionIdx + 5) {
+                // Post-harvest period (first 5 weeks)
                 pptadoPre.push(null);
-                pptadoPos.push(bPos);
+                pptadoPos.push(budgetPosTotal / 5);
+            } else {
+                // After the 5 weeks of application
+                pptadoPre.push(null);
+                pptadoPos.push(0);
             }
 
             realPre.push(Math.round(weekMap[i].realPre * 100) / 100);
@@ -575,7 +575,8 @@ export class SofiaImportModel {
 
             if (r.cantidad > 0) {
                 const key = getGroupKey(r);
-                const uniqueKey = `${r.clasifica}-${r.cod_cuartel}-${r.producto}-${r.variedad}-${r.ciclo}-${tipo}`;
+                // Use a more unique index if available or just don't deduplicate if they are from CSV
+                const uniqueKey = `${r.clasifica}-${r.cod_cuartel}-${r.producto}-${r.variedad}-${r.ciclo}-${tipo}-${r.fecha_aplicacion}-${r.cantidad}`;
 
                 // Get nutrient units: use explicit columns if available, otherwise derive from composition
                 let nUnits = r.n_units || 0;

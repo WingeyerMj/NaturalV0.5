@@ -22,7 +22,7 @@ export class UserModel {
   };
 
   static CACHE = [
-    { id: 1, name: 'Admin Natural', email: 'admin@naturalfood.com', password: 'admin', role: 'Administrador', active: true, registeredAt: '2025-01-01' },
+    { id: 1, name: 'Admin Natural', email: 'admin@naturalfood.com', password: 'admin123', role: 'Administrador', active: true, registeredAt: '2025-01-01' },
     { id: 2, name: 'Sub Admin', email: 'subadmin@naturalfood.com', password: 'N4tur4lf00d$00', role: 'Sub-Admin', active: true, registeredAt: '2025-01-05' },
     { id: 3, name: 'Visualizador', email: 'v@naturalfood.com', password: 'v', role: 'Visualizador', active: true, registeredAt: '2025-02-10' },
     { id: 4, name: 'Ingeniero Laura', email: 'laura@naturalfood.com', password: 'laura', role: 'Ingeniero', active: true, registeredAt: '2025-02-15' }
