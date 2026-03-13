@@ -9,7 +9,7 @@
  */
 
 // ── Base API Configuration ──
-const BASE_API_URL = 'http://localhost:10000/api';
+const BASE_API_URL = '/api';
 
 // ── User Model ──
 export class UserModel {

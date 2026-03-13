@@ -42,7 +42,7 @@ import { SecaderosController } from './SecaderosController.js';
 import { JornalesBudgetModel } from '../models/JornalesBudgetModel.js';
 
 // ── Constants ──
-const VITE_API_URL = 'http://localhost:10000/api';
+const VITE_API_URL = '/api';
 const ROLE_MENUS = {
     'Administrador': [
         {
@@ -3011,10 +3011,10 @@ export class AppController {
                 const csvText = decoder.decode(buffer);
                 console.log(`[AppController] Received ${csvText.length} chars from ${file.name}`);
 
-                const result = SofiaImportModel.parseCSV(csvText, file.finca);
+                const result = SofiaImportModel.parseCSV(csvText, file.defaultFinca);
                 if (!result.error) {
                     SofiaImportModel.importRows(result.rows);
-                    console.log(`[AppController] Auto-loaded ${result.rows.length} rows from ${file.name} (${file.finca})`);
+                    console.log(`[AppController] Auto-loaded ${result.rows.length} rows from ${file.name} (${file.defaultFinca})`);
                 } else {
                     console.warn(`[AppController] Error parsing ${file.name}:`, result.error);
                 }

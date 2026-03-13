@@ -37,6 +37,10 @@ export default defineConfig({
                 target: 'http://apisofia.sofiagestionagricola.cl',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/sofia-api/, '')
+            },
+            '/api': {
+                target: 'http://localhost:10000',
+                changeOrigin: true
             }
         }
     },

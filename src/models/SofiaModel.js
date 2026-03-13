@@ -16,7 +16,7 @@ const COLUMNS_MAP = {
     'Clasifica': ['Clasifica', 'Clasificación', 'Sub-Predio', 'Variación'],
     'Estado': ['Estado', 'Status', 'Situación'],
     'Variedad': ['Variedad', 'Cepa', 'Grape Variety'],
-    'Costo': ['Total Producto', 'Costo', 'Cost', 'Importe', 'Monto USD', 'Monto en USD', 'Total USD'],
+    'Costo': ['Total Producto', 'Costo', 'Cost', 'Importe', 'Monto USD', 'Monto en USD', 'Total USD', 'Monto en USDO'],
     'N': ['Unidades N', 'N', 'Nitrogeno', 'Units N', 'Unid N', 'Nitrógeno'],
     'P': ['Unidades P', 'P', 'Fosforo', 'Units P', 'Unid P', 'Fósforo', 'P2O5'],
     'K': ['Unidades K', 'K', 'Unidades K2O', 'K20', 'K2O', 'Potasio', 'Units K', 'Unid K'],
@@ -392,7 +392,7 @@ export class SofiaImportModel {
 
     static getWeeklyEvolution(filters = {}, fincaName = '', productoFilter = '', predioFilter = '') {
         // Only these 3 products
-        const ALLOWED = ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M', 'BIO-CRECIMIENTO'];
+        const ALLOWED = ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M', 'BIO-CRECIMIENTO', 'NITRON 27', 'NITRATO DE CALCIO', 'UREA', 'SULFATO DE POTASIO'];
 
         const all = this.applyFilters(
             this.REGISTROS.filter(r =>
@@ -488,6 +488,15 @@ export class SofiaImportModel {
             }
         }
 
+        // ── 3. Calculate Totals for Distribution ──
+        const getSum = (t, isPos) => all
+            .filter(r => (r.tipo_registro || '').toLowerCase().includes(t) && 
+                         ((r.producto || '').toUpperCase().includes('BIO-CRECIMIENTO') === isPos))
+            .reduce((s, r) => s + r.cantidad, 0);
+
+        const budgetPreTotal = getSum('presupuestado', false);
+        const budgetPosTotal = getSum('presupuestado', true);
+
         for (let i = 0; i < totalWeeks; i++) {
             labels.push(weeks[i].label);
             
@@ -526,14 +535,15 @@ export class SofiaImportModel {
             'NUTRI 1684 M': { n: 0.0062, k: 0.0125, p: 0 },
             'SULFATO DE POTASIO': { n: 0, k: 0.50, p: 0 },
             'UREA': { n: 0.46, k: 0, p: 0 },
-            'BIO-CRECIMIENTO': { n: 0.1, k: 0, p: 0 }
+            'BIO-CRECIMIENTO': { n: 0.1, k: 0, p: 0 },
+            'NITRON 27': { n: 0.27, k: 0, p: 0 }
         };
         const nutrientDensities = {};
         const budgetStats = {};
         const processedBudgets = new Set();
 
         // Only consider these products for nutrient charts
-        const allowedProducts = ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M', 'BIO-CRECIMIENTO'];
+        const allowedProducts = Object.keys(compositions);
 
         // Helper: check if record belongs to requested finca group
         const belongsToGroup = (r) => {
