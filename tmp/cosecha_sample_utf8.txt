@@ -1,0 +1,20 @@
+﻿Finca;Predio;Cuartel;Variedad;Has;Año;Ciclo;Kg;Estado;Referencia
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2013;2012-2013;46.930;Uva;Camino Truncado 8 2013
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2014;2013-2014;24.110;Uva;Camino Truncado 8 2014
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2015;2014-2015;45.950;Uva;Camino Truncado 8 2015
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2016;2015-2016;37.500;Uva;Camino Truncado 8 2016
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2017;2016-2017;27.436;Uva;Camino Truncado 8 2017
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2018;2017-2018;39.059;Uva;Camino Truncado 8 2018
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2019;2018-2019;103.028;Uva;Camino Truncado 8 2019
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2020;2019-2020;42.500;Uva;Camino Truncado 8 2020
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2021;2020-2021;113.917;Uva;Camino Truncado 8 2021
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2022;2021-2022;15.373;Uva;Camino Truncado 8 2022
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2023;2022-2023;32.280;Uva;Camino Truncado 8 2023
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;8;Arizul;2,37;2024;2023-2024;42.190;Uva;Camino Truncado 8 2024
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;2;Flame;4,08;2025;2024-2025;100.935;Uva;Camino Truncado 2 2025
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;12;Arizul;2,54;2013;2012-2013;45.360;Uva;Camino Truncado 12 2013
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;12;Arizul;2,54;2014;2013-2014;66.950;Uva;Camino Truncado 12 2014
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;12;Arizul;2,54;2015;2014-2015;38.900;Uva;Camino Truncado 12 2015
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;12;Arizul;2,54;2016;2015-2016;64.710;Uva;Camino Truncado 12 2016
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;12;Arizul;2,54;2017;2016-2017;64.800;Uva;Camino Truncado 12 2017
+Camino Truncado, Puente Alto y La Chimbera;Camino Truncado;12;Arizul;2,54;2018;2017-2018;129.224;Uva;Camino Truncado 12 2018

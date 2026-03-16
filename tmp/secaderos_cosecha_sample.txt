@@ -1,0 +1,5 @@
+﻿Finca;Cuartel;Variedad;Has;Año;Kg;Estado;Referencia
+Camino Truncado;8;Arizul;2,37;2013;46.930;Uva;Camino Truncado 8 2013
+Camino Truncado;8;Arizul;2,37;2014;24.110;Uva;Camino Truncado 8 2014
+Camino Truncado;8;Arizul;2,37;2015;45.950;Uva;Camino Truncado 8 2015
+Camino Truncado;8;Arizul;2,37;2016;37.500;Uva;Camino Truncado 8 2016
