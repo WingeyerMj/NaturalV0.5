@@ -40,4 +40,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (nav) nav.classList.toggle('open');
         }
     });
+
+    // Check for charts and show mobile portrait rotation suggestion
+    setInterval(() => {
+        const suggestion = document.getElementById('rotate-device-suggestion');
+        if (!suggestion || suggestion.style.display === 'none') return;
+
+        // If a canvas is present, we assume charts are being shown
+        const hasCharts = document.querySelector('canvas') || document.querySelector('.chart-container');
+        if (hasCharts) {
+            suggestion.classList.add('active');
+        } else {
+            suggestion.classList.remove('active');
+        }
+    }, 1000);
 });

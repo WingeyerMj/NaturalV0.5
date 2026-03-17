@@ -1832,13 +1832,15 @@ export function renderWorkLogView(data, catalogs) {
               <th>Lugar / Ubicación</th>
               <th>Tarea / Labor</th>
               <th style="text-align: right;">Cant.</th>
-              <th style="text-align: center;">Acciones</th>
+               <th style="text-align: right;">Jornales</th>
+               <th style="text-align: left;">Audit/Carga</th>
+               <th style="text-align: center;">Acciones</th>
             </tr>
           </thead>
           <tbody>
             ${tableData.length === 0 ? `
               <tr>
-                <td colspan="6" style="text-align: center; padding: var(--space-10); color: var(--text-tertiary);">
+                <td colspan="7" style="text-align: center; padding: var(--space-10); color: var(--text-tertiary);">
                   No se han registrado trabajos.
                 </td>
               </tr>
@@ -1852,7 +1854,13 @@ export function renderWorkLogView(data, catalogs) {
                    ${row.labor_nombre ? ` > <span style="opacity:0.8; font-size:0.9em;">${row.labor_nombre}</span>` : ''}
                 </span></td>
                 <td style="text-align: right; font-weight: 700;">${row.cantidad} <small style="color: var(--text-tertiary); font-weight: 400;">${row.unidad}</small></td>
-                <td style="text-align: center;">
+                <td style="text-align: right; font-weight: 700; color: var(--color-accent);">${parseFloat(row.total_jornadas || 0).toFixed(2)}</td>
+                <td style="font-size: 0.8em; line-height: 1.2;">
+                   <div style="color: var(--text-secondary);">${row.usuario_nombre || 'S/U'}</div>
+                   <div style="color: var(--text-tertiary); opacity: 0.7;">${row.created_at ? new Date(row.created_at).toLocaleString('es-AR') : '-'}</div>
+                </td>
+                <td style="text-align: center; white-space: nowrap;">
+                  <button class="btn btn-sm btn-ghost btn-edit-work-log" data-id="${row.id}" style="color: var(--color-primary-400); margin-right: 8px;">✏️</button>
                   <button class="btn btn-sm btn-ghost btn-delete-work-log" data-id="${row.id}" style="color: var(--color-error); opacity: 0.7;">🗑️</button>
                 </td>
               </tr>
@@ -1866,18 +1874,31 @@ export function renderWorkLogView(data, catalogs) {
     <div id="work-log-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(8px); align-items:center; justify-content:center;">
       <div style="background: var(--bg-secondary); border-radius: 20px; padding: var(--space-8); max-width: 800px; width: 94%; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8); border: 1px solid var(--border-subtle); max-height: 90vh; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-6);">
-          <h3>🚜 Registro de Jornal / Trabajo Diario</h3>
+          <h3 id="work-modal-title">🚜 Registro de Jornal / Trabajo Diario</h3>
           <button type="button" class="btn btn-ghost" id="btn-close-work-modal" style="font-size: 1.5em; padding: 0;">×</button>
         </div>
 
         <form id="form-work-log" autocomplete="off">
+          <input type="hidden" id="work-log-id" value="" />
           <!-- Datos Generales -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-6);">
             <div class="form-group">
-              <label class="form-label">Fecha de Trabajo</label>
-              <input type="date" id="work-fecha" class="form-input" required value="${new Date().toISOString().split('T')[0]}" />
+              <label class="form-label">Fecha de Inicio</label>
+              <input type="date" id="work-fecha-inicio" class="form-input" required value="${new Date().toISOString().split('T')[0]}" />
             </div>
             <div class="form-group">
+              <label class="form-label">Fecha de Fin</label>
+              <input type="date" id="work-fecha-fin" class="form-input" required value="${new Date().toISOString().split('T')[0]}" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora de Inicio</label>
+              <input type="time" id="work-hora-inicio" class="form-input" value="08:00" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora de Fin</label>
+              <input type="time" id="work-hora-fin" class="form-input" value="17:00" />
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
               <label class="form-label">Personal Responsable</label>
               <select id="work-empleado" class="form-select" required>
                 <option value="">Seleccionar empleado...</option>
@@ -1899,10 +1920,10 @@ export function renderWorkLogView(data, catalogs) {
                 <label class="form-label">Predio / Lote</label>
                 <select id="work-predio" class="form-select" disabled required><option value="">Puntualizando...</option></select>
               </div>
-              <div class="form-group">
+            <div class="form-group" style="height: auto;">
                 <label class="form-label">Cuartel / Cuadro</label>
-                <select id="work-cuartel" class="form-select" disabled required><option value="">Ubicando...</option></select>
-              </div>
+                <select id="work-cuartel" class="form-select" disabled required multiple size="3" style="height: auto;"><option value="">Ubicando...</option></select>
+            </div>
             </div>
           </div>
 
@@ -1933,6 +1954,9 @@ export function renderWorkLogView(data, catalogs) {
                 <option value="kg">Kg</option>
               </select>
             </div>
+          </div>
+          <div id="work-jornal-preview" style="margin-top: -15px; margin-bottom: 15px; font-size: 0.9em; color: var(--color-accent); font-weight: 600; text-align: right; display: none;">
+            Equivale a: <span>0.00</span> Jornales
           </div>
 
           <!-- Insumos (Salida de Bodega) -->
@@ -1966,7 +1990,7 @@ export function renderWorkLogView(data, catalogs) {
 
           <div style="display: flex; gap: var(--space-4); justify-content: flex-end; margin-top: var(--space-8);">
             <button type="button" class="btn btn-ghost" id="btn-cancel-work-log" style="padding: var(--space-2) var(--space-8);">Cancelar</button>
-            <button type="submit" class="btn btn-primary" style="padding: var(--space-2) var(--space-12); font-weight: 600;">💾 Registrar Trabajo</button>
+            <button type="submit" class="btn btn-primary" id="work-btn-submit" style="padding: var(--space-2) var(--space-12); font-weight: 600;">💾 Registrar Trabajo</button>
           </div>
         </form>
       </div>
@@ -2962,6 +2986,123 @@ export function renderControlCargaView() {
                 </div>
             </div>
         </div>
+    </div>
+    `;
+}
+
+export function renderStockMovementView(movements, catalogs, user) {
+    const { productos } = catalogs;
+    const canLoadFactura = user.role === 'Administrador';
+    const canLoadRemito = user.role === 'Administrador' || user.role === 'Carga' || user.role === 'Ingeniero';
+
+    return `
+    <div class="work-log-view animate-fade-in">
+      <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+        <div>
+          <h2 style="font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em;">📦 Movimientos de Inventario</h2>
+          <p style="color: var(--text-tertiary);">Facturas de Compra (Admin) y Remitos de Entrega (Carga)</p>
+        </div>
+        <button class="btn btn-primary" id="btn-add-stock-move" style="box-shadow: var(--shadow-lg);">
+          <span style="margin-right: 8px;">➕</span> Cargar Movimiento
+        </button>
+      </div>
+
+      <div class="card" style="margin-bottom: var(--space-6);">
+        <div style="padding: var(--space-5); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1.1em; color: var(--text-secondary);">Últimos Movimientos de Entrada/Ajuste</h3>
+            <input type="text" id="search-stock-moves" class="form-input" placeholder="🔍 Buscar por comprobante o producto..." style="max-width: 300px;" />
+        </div>
+        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+            <table class="table" id="table-stock-moves">
+                <thead style="position: sticky; top: 0; background: var(--bg-secondary); z-index: 10;">
+                    <tr>
+                        <th style="padding: var(--space-4);">Fecha</th>
+                        <th>Producto</th>
+                        <th>Tipo</th>
+                        <th>Nº Comprobante</th>
+                        <th>Cantidad</th>
+                        <th>Usuario</th>
+                        <th>Notas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${movements.map(m => `
+                        <tr>
+                            <td style="padding: var(--space-4);">
+                                <div style="font-weight: 600;">${new Date(m.fecha).toLocaleDateString('es-AR')}</div>
+                                <div style="font-size: 0.8em; opacity: 0.6;">${new Date(m.fecha).toLocaleTimeString('es-AR')}</div>
+                            </td>
+                            <td><div style="font-weight: 600;">${m.producto_nombre || 'ID: ' + m.producto_id}</div></td>
+                            <td>
+                                <span class="badge" style="background: ${m.tipo_movimiento === 'factura' ? 'rgba(139, 92, 246, 0.15)' : (m.tipo_movimiento === 'remito' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)')}; color: ${m.tipo_movimiento === 'factura' ? '#a78bfa' : (m.tipo_movimiento === 'remito' ? '#4ade80' : '#f87171')};">
+                                    ${m.tipo_movimiento.toUpperCase()}
+                                </span>
+                            </td>
+                            <td><code>${m.nro_comprobante || '-'}</code></td>
+                            <td style="font-weight: 800; color: ${m.cantidad > 0 ? '#10b981' : '#ef4444'}">
+                                ${m.cantidad > 0 ? '+' : ''}${m.cantidad}
+                            </td>
+                            <td><div style="font-size: 0.9em;">${m.usuario_nombre || 'S/U'}</div></td>
+                            <td style="font-size: 0.85em; opacity: 0.8; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.notas}">${m.notas || '-'}</td>
+                        </tr>
+                    `).join('')}
+                    ${movements.length === 0 ? '<tr><td colspan="7" style="text-align: center; padding: 4rem; color: var(--text-tertiary); font-style: italic;">No hay movimientos registrados recientemente</td></tr>' : ''}
+                </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Movimiento Stock -->
+    <div id="stock-move-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 24px; padding: var(--space-8); max-width: 500px; width: 94%; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8); border: 1px solid var(--border-subtle); overflow: hidden; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-6);">
+          <div>
+            <h3 style="font-size: 1.4em; font-weight: 800;">📦 Registro de Ingreso</h3>
+            <p style="color: var(--text-tertiary); font-size: 0.9em;">Actualización de inventario físico</p>
+          </div>
+          <button type="button" class="btn btn-ghost" id="btn-close-stock-modal" style="font-size: 1.5em; padding: 0;">×</button>
+        </div>
+
+        <form id="form-stock-move" autocomplete="off">
+          <div class="form-group" style="margin-bottom: var(--space-5);">
+            <label class="form-label" style="font-weight: 600;">Tipo de Comprobante</label>
+            <select id="move-tipo" class="form-select" required style="background: rgba(255,255,255,0.03);">
+                ${canLoadFactura ? '<option value="factura">📄 Factura de Compra (Admin)</option>' : ''}
+                ${canLoadRemito ? '<option value="remito">🚚 Remito de Entrega (Recepción)</option>' : ''}
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-5);">
+            <label class="form-label" style="font-weight: 600;">Producto / Insumo</label>
+            <select id="move-producto" class="form-select" required style="background: rgba(255,255,255,0.03);">
+                <option value="">Seleccionar producto...</option>
+                ${productos.map(p => `<option value="${p.id}">${p.nombre} (Stock: ${p.stock} ${p.unidad || ''})</option>`).join('')}
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-5);">
+            <div class="form-group">
+                <label class="form-label" style="font-weight: 600;">Cantidad</label>
+                <input type="number" step="any" id="move-cantidad" class="form-input" required placeholder="0.00" style="background: rgba(255,255,255,0.03);" />
+            </div>
+            <div class="form-group">
+                <label class="form-label" style="font-weight: 600;">Nº Comprobante</label>
+                <input type="text" id="move-comprobante" class="form-input" required placeholder="Ej: 001-4567" style="background: rgba(255,255,255,0.03);" />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-6);">
+            <label class="form-label" style="font-weight: 600;">Notas / Observaciones</label>
+            <textarea id="move-notas" class="form-input" style="min-height: 80px; background: rgba(255,255,255,0.03);" placeholder="Detalles adicionales..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: var(--space-4); justify-content: flex-end;">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-stock-move" style="padding: var(--space-2) var(--space-6);">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-stock-move" style="padding: var(--space-2) var(--space-8); font-weight: 600;">💾 Guardar Ingreso</button>
+          </div>
+        </form>
+      </div>
     </div>
     `;
 }

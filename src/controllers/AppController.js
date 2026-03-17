@@ -48,6 +48,7 @@ const ROLE_MENUS = {
         {
             id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
                 { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
+                { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' },
             ]
         },
         {
@@ -95,6 +96,11 @@ const ROLE_MENUS = {
     ],
     'Ingeniero': [
         {
+            id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
+                { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
+            ]
+        },
+        {
             id: 'informes', label: 'Informes', icon: '📈', section: 'Principal', submenu: [
                 { id: 'jornales', label: 'Jornales', icon: '👷' },
                 { id: 'cosecha', label: 'Cosecha', icon: '🍇' },
@@ -104,6 +110,14 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
+            ]
+        },
+    ],
+    'Carga': [
+        {
+            id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
+                { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
+                { id: 'admin-bodegas-movimientos', label: 'Ingreso Insumos', icon: '📦' },
             ]
         },
     ],
@@ -335,6 +349,10 @@ export class AppController {
             case 'admin-carga-trabajo':
                 title.textContent = 'Carga de Trabajo de Campo';
                 this.renderCargaTrabajoSection(content);
+                break;
+            case 'admin-bodegas-movimientos':
+                title.textContent = 'Movimientos de Inventario';
+                this.renderInventarioSection(content);
                 break;
             default:
                 // Handle all admin-* sections dynamically
@@ -908,18 +926,31 @@ export class AppController {
         if (btnCerrarCiclo) {
             btnCerrarCiclo.addEventListener('click', async () => {
                 const currentCycle = document.getElementById('filter-cosecha-ciclo').value;
-                if (confirm(`¿Estás seguro que deseas pasar el ciclo ${currentCycle} a histórico (Archivarlo)?\nSe guardará localmente para mejorar el rendimiento y dejará de actualizarse desde Sofía.`)) {
+                if (confirm(`¿Estás seguro que deseas pasar el ciclo ${currentCycle} a histórico (Archivarlo)?\nSe guardará localmente para mejorar el rendimiento, se almacenará en la base de datos histórica y dejará de actualizarse desde Sofía.`)) {
                     // Force refresh from API one last time before converting it to manual historical
                     const btnOriginalText = btnCerrarCiclo.textContent;
                     btnCerrarCiclo.textContent = 'Archivando...';
                     btnCerrarCiclo.disabled = true;
                     try {
-                        await SofiaApiModel.fetchCycleData(currentCycle, true);
+                        const dataToArchive = await SofiaApiModel.fetchCycleData(currentCycle, true);
+                        
+                        // Guardar en la base de datos de PostgreSQL
+                        const archiveResponse = await fetch('/api/archive-cycle', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ciclo: currentCycle, data: dataToArchive })
+                        });
+                        const archiveResult = await archiveResponse.json();
+                        
+                        if (!archiveResponse.ok || !archiveResult.success) {
+                            throw new Error(archiveResult.message || 'Error del servidor al archivar');
+                        }
+
                         localStorage.setItem(`manualHistory_${currentCycle}`, 'true');
-                        alert(`Ciclo ${currentCycle} guardado en histórico exitosamente.`);
+                        alert(`Ciclo ${currentCycle} guardado en base de datos histórica exitosamente.`);
                         updateDashboard();
                     } catch (e) {
-                        alert("Error archivando el ciclo.");
+                        alert("Error archivando el ciclo: " + e.message);
                     } finally {
                         btnCerrarCiclo.textContent = btnOriginalText;
                         btnCerrarCiclo.disabled = false;
@@ -1337,7 +1368,7 @@ export class AppController {
                 ADMIN_MODELS['admin-cuarteles'].getAll().catch(e => { console.error('Error cuarteles:', e); throw e; }),
                 ADMIN_MODELS['admin-faenas'].getAll().catch(e => { console.error('Error faenas:', e); throw e; }),
                 ADMIN_MODELS['admin-labor'].getAll().catch(e => { console.error('Error labor:', e); throw e; }),
-                UserModel.getAll().catch(e => { console.error('Error personal:', e); throw e; }), // Personal/Empleados
+                ADMIN_MODELS['admin-personal'].getAll().catch(e => { console.error('Error personal:', e); throw e; }), // Personal/Empleados
                 ADMIN_MODELS['admin-productos'].getAll().catch(e => { console.error('Error productos:', e); throw e; })
             ]);
 
@@ -1355,30 +1386,56 @@ export class AppController {
     }
 
     bindWorkLogEvents(container, currentLogs, catalogs) {
-        const { fincas, predios, cuarteles, productos } = catalogs;
+        const { fincas, predios, cuarteles, productos, faenas, labores } = catalogs;
 
         const refresh = () => this.renderCargaTrabajoSection(container);
 
-        // -- Modal UI --
+        // -- Modal UI Elements --
         const modal = document.getElementById('work-log-modal-overlay');
-        document.getElementById('btn-add-work-log')?.addEventListener('click', () => modal.style.display = 'flex');
-        document.getElementById('btn-close-work-modal')?.addEventListener('click', () => modal.style.display = 'none');
-        document.getElementById('btn-cancel-work-log')?.addEventListener('click', () => modal.style.display = 'none');
+        const modalTitle = document.getElementById('work-modal-title');
+        const hiddenIdInput = document.getElementById('work-log-id');
+        const submitBtn = document.getElementById('work-btn-submit');
+        const form = document.getElementById('form-work-log');
 
-        // -- Chained Dropdowns --
         const fincaSelect = document.getElementById('work-finca');
         const predioSelect = document.getElementById('work-predio');
         const cuartelSelect = document.getElementById('work-cuartel');
+        const faenaSelect = document.getElementById('work-faena');
+        const laborSelect = document.getElementById('work-labor');
+        const insumoContainer = document.getElementById('insumos-list-container');
+        const template = document.getElementById('template-insumo-item');
 
+        const resetForm = () => {
+            form.reset();
+            hiddenIdInput.value = '';
+            modalTitle.textContent = '🚜 Registro de Jornal / Trabajo Diario';
+            submitBtn.textContent = '💾 Registrar Trabajo';
+            insumoContainer.innerHTML = '';
+            predioSelect.disabled = true;
+            cuartelSelect.disabled = true;
+            laborSelect.disabled = true;
+            // Clear checked tools
+            document.querySelectorAll('input[name="work-tools"]').forEach(i => i.checked = false);
+        };
+
+        // Open for New
+        document.getElementById('btn-add-work-log')?.addEventListener('click', () => {
+            resetForm();
+            modal.style.display = 'flex';
+        });
+
+        const closeModal = () => modal.style.display = 'none';
+        document.getElementById('btn-close-work-modal')?.addEventListener('click', closeModal);
+        document.getElementById('btn-cancel-work-log')?.addEventListener('click', closeModal);
+
+        // -- Chained Dropdowns --
         fincaSelect?.addEventListener('change', (e) => {
             const fid = e.target.value;
             predioSelect.innerHTML = '<option value="">Seleccionar Predio...</option>';
             cuartelSelect.innerHTML = '<option value="">-</option>';
             cuartelSelect.disabled = true;
-
             if (fid) {
-                const subPredios = predios.filter(p => p.finca_id == fid);
-                subPredios.forEach(p => {
+                predios.filter(p => p.finca_id == fid).forEach(p => {
                     const opt = document.createElement('option');
                     opt.value = p.id; opt.textContent = p.nombre;
                     predioSelect.appendChild(opt);
@@ -1393,8 +1450,7 @@ export class AppController {
             const pid = e.target.value;
             cuartelSelect.innerHTML = '<option value="">Seleccionar Cuartel...</option>';
             if (pid) {
-                const subCuarteles = cuarteles.filter(c => c.predio_id == pid);
-                subCuarteles.forEach(c => {
+                cuarteles.filter(c => c.predio_id == pid).forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c.id; opt.textContent = `Cuartel ${c.numero}`;
                     cuartelSelect.appendChild(opt);
@@ -1405,19 +1461,11 @@ export class AppController {
             }
         });
 
-        // -- Faena -> Labor Chained Dropdown --
-        const faenaSelect = document.getElementById('work-faena');
-        const laborSelect = document.getElementById('work-labor');
-
         faenaSelect?.addEventListener('change', (e) => {
             const faenaId = e.target.value;
             laborSelect.innerHTML = '<option value="">Seleccionar Labor Específica...</option>';
-            laborSelect.disabled = true;
-
             if (faenaId) {
-                const { labores } = catalogs;
-                const subLabores = labores.filter(l => l.faena_id == faenaId);
-                subLabores.forEach(l => {
+                labores.filter(l => l.faena_id == faenaId).forEach(l => {
                     const opt = document.createElement('option');
                     opt.value = l.id; opt.textContent = l.nombre;
                     laborSelect.appendChild(opt);
@@ -1428,17 +1476,38 @@ export class AppController {
             }
         });
 
-        // -- Insumos Dynamic Rows --
-        const addInsumoBtn = document.getElementById('btn-add-insumo-row');
-        const insumoContainer = document.getElementById('insumos-list-container');
-        const template = document.getElementById('template-insumo-item');
+        // -- Live Jornal Preview --
+        const qtyInp = document.getElementById('work-cantidad');
+        const unitSel = document.getElementById('work-unidad');
+        const previewDiv = document.getElementById('work-jornal-preview');
 
-        addInsumoBtn?.addEventListener('click', () => {
+        const updatePreview = () => {
+            if (!qtyInp || !unitSel || !previewDiv) return;
+            const qty = parseFloat(qtyInp.value) || 0;
+            const unit = unitSel.value;
+            if (unit === 'horas') {
+                previewDiv.querySelector('span').textContent = (qty / 8).toFixed(2);
+                previewDiv.style.display = 'block';
+            } else if (unit === 'jornal') {
+                previewDiv.querySelector('span').textContent = qty.toFixed(2);
+                previewDiv.style.display = 'block';
+            } else {
+                previewDiv.style.display = 'none';
+            }
+        };
+        qtyInp?.addEventListener('input', updatePreview);
+        unitSel?.addEventListener('change', updatePreview);
+
+        // -- Insumos Dynamic Rows --
+        const addInsumoRow = (prodId = '', qty = '') => {
             const clone = template.content.cloneNode(true);
             const row = clone.querySelector('.insumo-row');
+            if (prodId) row.querySelector('.select-insumo-id').value = prodId;
+            if (qty) row.querySelector('.input-insumo-qty').value = qty;
             row.querySelector('.btn-remove-insumo').onclick = () => row.remove();
             insumoContainer.appendChild(clone);
-        });
+        };
+        document.getElementById('btn-add-insumo-row')?.addEventListener('click', () => addInsumoRow());
 
         // -- Search --
         document.getElementById('search-work-logs')?.addEventListener('input', (e) => {
@@ -1448,71 +1517,149 @@ export class AppController {
             });
         });
 
+        // -- Edit --
+        container.querySelectorAll('.btn-edit-work-log').forEach(btn => {
+            btn.onclick = async () => {
+                const id = btn.dataset.id;
+                try {
+                    const res = await fetch(`${VITE_API_URL}/trabajo-campo/${id}`).then(r => r.json());
+                    if (!res.success) throw new Error(res.message);
+
+                    resetForm();
+                    const { log, insumos, herramientas } = res;
+
+                    hiddenIdInput.value = log.id;
+                    modalTitle.textContent = '✏️ Editar Registro de Trabajo';
+                    submitBtn.textContent = '💾 Actualizar Registro';
+
+                    document.getElementById('work-fecha-inicio').value = log.fecha.split('T')[0];
+                    document.getElementById('work-fecha-fin').value = log.fecha.split('T')[0]; // One date edit
+                    document.getElementById('work-hora-inicio').value = log.hora_inicio || '08:00';
+                    document.getElementById('work-hora-fin').value = log.hora_fin || '17:00';
+                    document.getElementById('work-empleado').value = log.empleado_id;
+                    
+                    // Trigger chains
+                    fincaSelect.value = log.finca_id;
+                    fincaSelect.dispatchEvent(new Event('change'));
+                    predioSelect.value = log.predio_id;
+                    predioSelect.dispatchEvent(new Event('change'));
+                    
+                    // For multiple selection, we need to handle it
+                    const options = Array.from(cuartelSelect.options);
+                    options.forEach(opt => opt.selected = opt.value == log.cuartel_id);
+
+                    faenaSelect.value = log.faena_id;
+                    faenaSelect.dispatchEvent(new Event('change'));
+                    laborSelect.value = log.labor_id || '';
+
+                    document.getElementById('work-cantidad').value = log.cantidad;
+                    document.getElementById('work-unidad').value = log.unidad;
+                    document.getElementById('work-notas').value = log.notas || '';
+
+                    insumos.forEach(i => addInsumoRow(i.producto_id, i.cantidad));
+                    
+                    document.querySelectorAll('input[name="work-tools"]').forEach(chk => {
+                        chk.checked = herramientas.includes(parseInt(chk.value));
+                    });
+
+                    updatePreview();
+                    modal.style.display = 'flex';
+                } catch (e) {
+                    alert('Error al cargar detalle: ' + e.message);
+                }
+            };
+        });
+
         // -- Delete --
         container.querySelectorAll('.btn-delete-work-log').forEach(btn => {
             btn.onclick = async () => {
-                if (confirm('¿Eliminar este registro de trabajo? Esto no restaurará el stock de insumos automáticamente.')) {
+                if (confirm('¿Eliminar este registro de trabajo? El stock de insumos será restaurado automáticamente.')) {
                     const id = btn.dataset.id;
-                    const res = await ADMIN_MODELS['admin-carga-trabajo'].delete(id);
-                    if (res.success) refresh();
+                    try {
+                        const res = await fetch(`${VITE_API_URL}/trabajo-campo/${id}`, { method: 'DELETE' }).then(r => r.json());
+                        if (res.success) refresh();
+                        else alert('Error: ' + res.message);
+                    } catch (e) { alert('Error de red'); }
                 }
             };
         });
 
         // -- Form Submission --
-        document.getElementById('form-work-log')?.addEventListener('submit', async (e) => {
+        form?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btnSubmit = e.target.querySelector('button[type="submit"]');
-            btnSubmit.disabled = true;
-            btnSubmit.textContent = '...';
+            const editId = hiddenIdInput.value;
+            submitBtn.disabled = true;
+            submitBtn.textContent = '...';
 
             try {
-                // Gather Data
-                const logData = {
-                    fecha: document.getElementById('work-fecha').value,
-                    empleado_id: document.getElementById('work-empleado').value,
-                    finca_id: document.getElementById('work-finca').value,
-                    predio_id: document.getElementById('work-predio').value,
-                    cuartel_id: document.getElementById('work-cuartel').value,
-                    faena_id: document.getElementById('work-faena').value,
-                    labor_id: document.getElementById('work-labor').value || null,
-                    cantidad: document.getElementById('work-cantidad').value,
-                    unidad: document.getElementById('work-unidad').value,
-                    notas: document.getElementById('work-notas').value
-                };
-
+                const cuartelesSelected = Array.from(cuartelSelect.selectedOptions).map(o => o.value).filter(Boolean);
+                const fechaInicio = document.getElementById('work-fecha-inicio').value;
+                const fechaFin = document.getElementById('work-fecha-fin').value;
                 const insumosUsed = [];
                 insumoContainer.querySelectorAll('.insumo-row').forEach(row => {
-                    const prodId = row.querySelector('.select-insumo-id').value;
+                    const pid = row.querySelector('.select-insumo-id').value;
                     const qty = row.querySelector('.input-insumo-qty').value;
-                    if (prodId && qty) {
-                        insumosUsed.push({ producto_id: prodId, cantidad: qty });
-                    }
+                    if (pid && qty) insumosUsed.push({ producto_id: pid, cantidad: qty });
                 });
-
                 const toolsUsed = Array.from(document.querySelectorAll('input[name="work-tools"]:checked')).map(i => i.value);
 
-                const payload = { log: logData, insumos: insumosUsed, herramientas: toolsUsed };
+                const baseLog = {
+                    hora_inicio: document.getElementById('work-hora-inicio').value,
+                    hora_fin: document.getElementById('work-hora-fin').value,
+                    empleado_id: document.getElementById('work-empleado').value,
+                    finca_id: fincaSelect.value,
+                    predio_id: predioSelect.value,
+                    faena_id: faenaSelect.value,
+                    labor_id: laborSelect.value || null,
+                    cantidad: document.getElementById('work-cantidad').value,
+                    unidad: document.getElementById('work-unidad').value,
+                    notas: document.getElementById('work-notas').value,
+                    usuario_cargo_id: this.currentUser.id
+                };
 
-                const resp = await fetch(`${VITE_API_URL}/trabajo-campo`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await resp.json();
+                // Total jornadas calculation
+                const qtyVal = parseFloat(baseLog.cantidad) || 0;
+                baseLog.total_jornadas = baseLog.unidad === 'horas' ? qtyVal / 8 : (baseLog.unidad === 'jornal' ? qtyVal : 0);
 
-                if (result.success) {
-                    modal.style.display = 'none';
-                    refresh();
+                if (editId) {
+                    // Update single record
+                    baseLog.fecha = fechaInicio;
+                    baseLog.cuartel_id = cuartelesSelected[0];
+                    const resp = await fetch(`${VITE_API_URL}/trabajo-campo/${editId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ log: baseLog, insumos: insumosUsed, herramientas: toolsUsed })
+                    }).then(r => r.json());
+                    if (!resp.success) throw new Error(resp.message);
                 } else {
-                    alert('Error: ' + result.message);
+                    // Create (multi-date/multi-cuartel)
+                    if (!cuartelesSelected.length) throw new Error('Seleccione al menos un cuartel');
+                    const dates = [];
+                    for(let d = new Date(fechaInicio); d <= new Date(fechaFin); d.setDate(d.getDate() + 1)) {
+                        dates.push(d.toISOString().split('T')[0]);
+                    }
+
+                    for (const dStr of dates) {
+                        for (const cid of cuartelesSelected) {
+                            const logData = { ...baseLog, fecha: dStr, cuartel_id: cid };
+                            const resp = await fetch(`${VITE_API_URL}/trabajo-campo`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ log: logData, insumos: insumosUsed, herramientas: toolsUsed })
+                            }).then(r => r.json());
+                            if (!resp.success) throw new Error(resp.message);
+                        }
+                    }
                 }
+
+                modal.style.display = 'none';
+                refresh();
             } catch (err) {
                 console.error(err);
-                alert('Error al registrar trabajo');
+                alert('Error: ' + err.message);
             } finally {
-                btnSubmit.disabled = false;
-                btnSubmit.textContent = '💾 Registrar Trabajo';
+                submitBtn.disabled = false;
+                submitBtn.textContent = editId ? '💾 Actualizar Registro' : '💾 Registrar Trabajo';
             }
         });
     }
@@ -2803,6 +2950,7 @@ export class AppController {
     // ── Usuario CRUD ──
     bindUsuarioCRUD(user) {
         document.getElementById('btn-add-usuario')?.addEventListener('click', () => {
+            const fincas = FincaModel.getActive();
             const body = `
                 <form id="modal-usuario-form">
                     <div class="form-group">
@@ -2828,6 +2976,19 @@ export class AppController {
                             <option value="Sub-Admin">Sub-Admin</option>
                         </select>
                     </div>
+                    <div class="form-group user-carga-fields" style="display: none; margin-top: var(--space-4);">
+                        <label class="form-label">Finca Asignada</label>
+                        <select class="form-select" id="user-finca" style="padding-left: var(--space-4);">
+                            <option value="">Seleccionar...</option>
+                            ${fincas.map(f => `<option value="${f.id}">${f.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group user-carga-fields" style="display: none; margin-top: var(--space-4);">
+                        <label class="form-label">Predio Asignado</label>
+                        <select class="form-select" id="user-predio" style="padding-left: var(--space-4);" disabled>
+                            <option value="">Seleccionar finca primero...</option>
+                        </select>
+                    </div>
                 </form>
             `;
             const footer = `
@@ -2835,21 +2996,44 @@ export class AppController {
                 <button class="btn btn-primary" id="modal-save">💾 Crear Usuario</button>
             `;
             this.showModal('⚙️ Nuevo Usuario', body, footer);
+            
+            const roleSelect = document.getElementById('user-role');
+            const cargaFields = document.querySelectorAll('.user-carga-fields');
+            roleSelect?.addEventListener('change', () => {
+                const isCarga = roleSelect.value === 'Carga';
+                cargaFields.forEach(f => f.style.display = isCarga ? 'block' : 'none');
+            });
+
+            const fincaSelect = document.getElementById('user-finca');
+            const predioSelect = document.getElementById('user-predio');
+            fincaSelect?.addEventListener('change', () => {
+                const fid = fincaSelect.value;
+                const selectedFinca = fincas.find(f => f.id == fid);
+                const prediosInfo = selectedFinca ? PredioModel.getByFinca(fid) : [];
+                predioSelect.innerHTML = prediosInfo.length 
+                    ? prediosInfo.map(p => `<option value="${p.id}">${p.nombre || p.name}</option>`).join('')
+                    : '<option value="">Sin predios</option>';
+                predioSelect.disabled = !fid;
+            });
+
             document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
             document.getElementById('modal-save')?.addEventListener('click', () => {
                 const name = document.getElementById('user-name').value;
                 const email = document.getElementById('user-email').value;
                 const password = document.getElementById('user-password').value;
                 const role = document.getElementById('user-role').value;
+                const finca_id = document.getElementById('user-finca').value;
+                const predio_id = document.getElementById('user-predio').value;
+                
                 if (!name || !email || !password || !role) {
-                    this.showToast('Complete todos los campos', 'warning');
+                    this.showToast('Complete todos los campos principales', 'warning');
                     return;
                 }
                 if (password.length < 6) {
                     this.showToast('La contraseña debe tener al menos 6 caracteres', 'warning');
                     return;
                 }
-                UserModel.add({ name, email, password, role });
+                UserModel.add({ name, email, password, role, finca_id, predio_id });
                 this.showToast(`Usuario "${name}" creado exitosamente`, 'success');
                 this.closeModal();
                 this.loadSection('usuarios', user);
@@ -3011,10 +3195,10 @@ export class AppController {
                 const csvText = decoder.decode(buffer);
                 console.log(`[AppController] Received ${csvText.length} chars from ${file.name}`);
 
-                const result = SofiaImportModel.parseCSV(csvText, file.defaultFinca);
+                const result = SofiaImportModel.parseCSV(csvText, file.finca);
                 if (!result.error) {
                     SofiaImportModel.importRows(result.rows);
-                    console.log(`[AppController] Auto-loaded ${result.rows.length} rows from ${file.name} (${file.defaultFinca})`);
+                    console.log(`[AppController] Auto-loaded ${result.rows.length} rows from ${file.name} (${file.finca})`);
                 } else {
                     console.warn(`[AppController] Error parsing ${file.name}:`, result.error);
                 }
@@ -3938,5 +4122,79 @@ export class AppController {
         });
 
         container.innerHTML = finalHtml;
+    }
+
+    async renderInventarioSection(container) {
+        container.innerHTML = `<div style="padding: 2rem; text-align: center;">⌛ Cargando movimientos de inventario...</div>`;
+        try {
+            const [movements, products] = await Promise.all([
+                fetch(`${VITE_API_URL}/inventario/movimientos`).then(r => r.json()),
+                ADMIN_MODELS['admin-productos'].getAll()
+            ]);
+            
+            container.innerHTML = renderStockMovementView(movements, { productos: products }, this.currentUser);
+            this.bindInventarioEvents(container, movements, { productos: products });
+        } catch (e) {
+            console.error('Inventario load error:', e);
+            container.innerHTML = `<div class="alert alert-error">Error al cargar datos de inventario.</div>`;
+        }
+    }
+
+    bindInventarioEvents(container, movements, catalogs) {
+        const refresh = () => this.renderInventarioSection(container);
+        const modal = document.getElementById('stock-move-modal-overlay');
+        const form = document.getElementById('form-stock-move');
+
+        document.getElementById('btn-add-stock-move')?.addEventListener('click', () => {
+            form.reset();
+            modal.style.display = 'flex';
+        });
+
+        const closeModal = () => modal.style.display = 'none';
+        document.getElementById('btn-close-stock-modal')?.addEventListener('click', closeModal);
+        document.getElementById('btn-cancel-stock-move')?.addEventListener('click', closeModal);
+
+        document.getElementById('search-stock-moves')?.addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('#table-stock-moves tbody tr').forEach(row => {
+               row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+
+        form?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('btn-submit-stock-move');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '...';
+
+            const payload = {
+                producto_id: document.getElementById('move-producto').value,
+                tipo_movimiento: document.getElementById('move-tipo').value,
+                cantidad: parseFloat(document.getElementById('move-cantidad').value),
+                nro_comprobante: document.getElementById('move-comprobante').value,
+                usuario_id: this.currentUser.id,
+                notas: document.getElementById('move-notas').value
+            };
+
+            try {
+                const res = await fetch(`${VITE_API_URL}/inventario/movimiento`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(r => r.json());
+
+                if (res.success) {
+                    modal.style.display = 'none';
+                    refresh();
+                } else {
+                    alert('Error: ' + res.message);
+                }
+            } catch (err) {
+                alert('Error al registrar movimiento');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💾 Guardar Ingreso';
+            }
+        });
     }
 }

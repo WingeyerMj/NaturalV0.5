@@ -130,7 +130,18 @@ export class SofiaImportModel {
                 return parseFloat(clean) || 0;
             };
 
-            const cantidad = parseNum(cols[colMap['Cantidad']]);
+            // Improved quantity detection: try all possible mapped columns if the primary one is 0
+            const qtyPossibleIndices = header.reduce((acc, h, idx) => {
+                if (COLUMNS_MAP['Cantidad'].some(name => h.toLowerCase().includes(name.toLowerCase()))) acc.push(idx);
+                return acc;
+            }, []);
+
+            let cantidad = 0;
+            for (const idx of qtyPossibleIndices) {
+                cantidad = parseNum(cols[idx]);
+                if (cantidad > 0) break;
+            }
+
             const costo = parseNum(cols[colMap['Costo']]);
 
             const cuartel = colMap['Cuartel'] !== undefined ? cols[colMap['Cuartel']] : 'Sin Asignar';
@@ -162,9 +173,11 @@ export class SofiaImportModel {
             }
 
             // Estado filtering
+            // Relaxed Estado filtering: only skip Pendiente if it has no quantity
+            // This ensures we show 'Real' applications that Sofia still marks as 'Pendiente'
             let estado = colMap['Estado'] !== undefined ? cols[colMap['Estado']] : '';
             const estadoLower = estado.toLowerCase();
-            if (estadoLower === 'pendiente') {
+            if (estadoLower === 'pendiente' && cantidad === 0) {
                 skippedPendiente++;
                 continue;
             }
@@ -576,6 +589,9 @@ export class SofiaImportModel {
             // Product filter (individual selection)
             if (filters.producto && prod !== filters.producto.toUpperCase()) return;
 
+            // Exclusion of BIO-CRECIMIENTO for PRE-COSECHA charts
+            if (filters.budgetType === 'pre' && prod === 'BIO-CRECIMIENTO') return;
+
             if (filters.budgetType) {
                 const bType = filters.budgetType.toLowerCase();
                 const tipoLower = tipo.toLowerCase();
@@ -655,6 +671,9 @@ export class SofiaImportModel {
             if (!allowedProducts.includes(prod)) return;
             // Product filter (individual selection)
             if (filters.producto && prod !== filters.producto.toUpperCase()) return;
+
+            // Exclusion of BIO-CRECIMIENTO for PRE-COSECHA charts
+            if (filters.budgetType === 'pre' && prod === 'BIO-CRECIMIENTO') return;
 
             const key = getGroupKey(r);
             if (!realStats[key]) realStats[key] = { n: 0, p: 0, k: 0 };

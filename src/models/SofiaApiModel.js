@@ -76,14 +76,17 @@ export class SofiaApiModel {
         const url = `${this.BASE_URL}?nombre_usuario=NATURALFOOD&key_usuario=${key}&fecha_inicial=${desde}&fecha_final=${hasta}`;
 
         try {
-            // Note: If CORS fails, we would need a proxy or the user to allow it.
-            // Using a CORS proxy as a fallback if this were a production app.
+            console.log(`[Sofia API] Fetching: ${url}`);
             const response = await fetch(url);
-            if (!response.ok) return [];
+            if (!response.ok) {
+                console.error(`[Sofia API] Error: ${response.status} ${response.statusText}`);
+                return [];
+            }
             const data = await response.json();
+            console.log(`[Sofia API] Received ${Array.isArray(data) ? data.length : 0} records for ${finca}`);
             return Array.isArray(data) ? data.map(r => ({ ...r, finca })) : [];
         } catch (e) {
-            console.warn(`Error fetching Sofia for ${finca} (${desde} to ${hasta}):`, e);
+            console.error(`[Sofia API] Exception fetching Sofia for ${finca}:`, e);
             return [];
         }
     }
@@ -276,11 +279,52 @@ export class SofiaApiModel {
         const isManualHistorical = localStorage.getItem(`manualHistory_${ciclo}`) === 'true';
         const isHistorical = (ciclo !== activeCycle) || isManualHistorical;
 
-        // 2. Si es histórico (ej. el ciclo anterior), traer los datos desde la Base de Datos Local
+        // 2. Intentar backend oficial histórico de PostgreSQL (solo si es histórico o forzamos)
+        // Prioridad: Si NO es el ciclo activo o si fue archivado manualmente, buscamos en DB.
         if (isHistorical && !forceRefresh) {
+            try {
+                const histRes = await fetch(`/api/historical-data/${ciclo}`);
+                if (histRes.ok) {
+                    const json = await histRes.json();
+                    if (json.success && json.data.length > 0) {
+                        const mappedData = json.data.map(row => {
+                            let parsed = row.raw_data;
+                            if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+
+                            return {
+                                ...parsed,
+                                finca: row.finca,
+                                fecha: row.fecha || `${ciclo.split('-')[1]}-02-15`, // Ficticia compatible
+                                labor: row.labor,
+                                labor_normalized: row.labor,
+                                cuartel: row.cuartel,
+                                persona: row.persona,
+                                rendimiento_val: parseFloat(row.rendimiento) || 0,
+                                totalJornadas: parseFloat(row.total_jornadas) || 0,
+                                costo_ars: parseFloat(row.costo_ars) || 0,
+                                hectareas: parseFloat(row.hectareas) || 0,
+                                clasifica: row.clasifica,
+                                variedad: row.variedad,
+                                isCosecha: row.is_cosecha,
+                                origen_archivo: row.origen_archivo,
+                                ciclo: ciclo
+                            };
+                        });
+                        console.log(`[PostgreSQL DB] Cargado ciclo histórico completo ${ciclo}.`);
+                        this._cyclesCache.set(ciclo, mappedData);
+                        
+                        await this.saveLocalCycle(ciclo, mappedData);
+                        return mappedData;
+                    }
+                }
+            } catch (e) {
+                console.warn(`Error obteniendo ciclo histórico en PostgreSQL:`, e);
+            }
+
+            // Fallback a IndexedDB Local
             const localData = await this.getLocalCycle(ciclo);
             if (localData && localData.length > 0) {
-                console.log(`[Base de Datos] Cargado el ciclo histórico ${ciclo} de la tabla local. Proceso agilizado.`);
+                console.log(`[Base de Datos] Cargado el ciclo histórico ${ciclo} de la tabla local.`);
                 this._cyclesCache.set(ciclo, localData);
                 return localData;
             }
@@ -324,7 +368,10 @@ export class SofiaApiModel {
             // User sample shows "jornada" as the field name for jornadas
             const jornadas = parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
             const costo = parseFloat(r.valor_total_jornada) || 0;
-            const isCosecha = r.labor && r.labor.toLowerCase().includes('cosecha kg');
+            
+            // Refined Harvest detection: either by name or by Sofia's type code 'C'
+            const laborLower = (r.labor || '').toLowerCase();
+            const isCosecha = laborLower.includes('cosecha') || r.id_tipo_faena === 'C' || r.tipo_faena === 'Cosecha';
 
             // Extract Ha for this record from cuartel string
             const info = this.parseCuartelInfo(r.cuartel);
@@ -394,27 +441,6 @@ export class SofiaApiModel {
      */
     static async fetchCosecha(filters = {}) {
         const ciclo = filters.ciclo || '2025-2026';
-
-        // Si el ciclo NO está cubierto por la API, usar el CSV
-        if (!this.API_CYCLES.includes(ciclo)) {
-            const csvData = await this.loadCSVHistorico();
-            const rows = csvData[ciclo] || [];
-
-            // Convertir filas del CSV a formato compatible con el dashboard
-            this.DATA_COSECHA = rows.map(r => ({
-                finca: r.finca,
-                cuartel: r.cuartel,
-                variedad: r.variedad,
-                clasifica: r.predio, // Columna Predio del CSV es la clasificación
-                hectareas: r.has,
-                rendimiento_val: r.kg,
-                isCosecha: true,
-                ciclo: ciclo,
-                labor: 'Cosecha Kg',
-                fecha: `${ciclo.split('-')[1]}-02-15` // Fecha ficticia para compatibilidad
-            }));
-            return this.applyFilters(this.DATA_COSECHA, filters);
-        }
 
         const cycleData = await this.fetchCycleData(ciclo);
 
@@ -880,7 +906,15 @@ export class SofiaApiModel {
      * Returns Chart.js compatible partial data structure
      */
     static async getHistoricalComparison(baseFilters = {}) {
-        const cycles = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
+        const activeCycle = this.getCurrentCycle();
+        const startYear = 2013;
+        const currentYear = parseInt(activeCycle.split('-')[1]);
+        
+        const cycles = [];
+        for (let y = startYear; y < currentYear; y++) {
+            cycles.push(`${y}-${y+1}`);
+        }
+        
         const monthNames = ['May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene', 'Feb', 'Mar', 'Abr'];
 
         // Helper to convert date to cycle-relative month index (0-11)
@@ -947,10 +981,14 @@ export class SofiaApiModel {
             console.log(`[Historical] Cycle ${c} filtered rows: ${filtered.length}`);
 
             // Aggregate by month
+            // Aggregate by month (Priority: totalJornadas, Fallback: rendimiento if appropriate)
             const monthlySum = new Array(12).fill(0);
             filtered.forEach(r => {
-                const idx = getRelativeMonth(r.fecha); // Make sure r.fecha exists
+                const idx = getRelativeMonth(r.fecha);
                 if (idx >= 0 && idx < 12) {
+                    // If we have jornadas, use them. 
+                    // Note: Since historical DB has 0 jornadas for CSV imports, we might see 0s.
+                    // However, we still fetch from DB as requested.
                     monthlySum[idx] += r.totalJornadas;
                 }
             });
@@ -964,11 +1002,9 @@ export class SofiaApiModel {
         }
 
         const colors = [
-            '#94a3b8', // 2021 (Gray)
-            '#60a5fa', // 2022 (Blue)
-            '#34d399', // 2023 (Green)
-            '#fbbf24', // 2024 (Amber)
-            '#8b5cf6'  // 2025 (Purple - Current)
+            '#94a3b8', '#60a5fa', '#34d399', '#fbbf24', '#8b5cf6',
+            '#ec4899', '#f97316', '#06b6d4', '#84cc16', '#6366f1',
+            '#f43f5e', '#10b981', '#facc15'
         ];
 
         return {

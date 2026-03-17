@@ -20,7 +20,17 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// -- Proxy para la API de Sofía --
+app.use('/sofia-api', createProxyMiddleware({
+    target: 'http://apisofia.sofiagestionagricola.cl',
+    changeOrigin: true,
+    pathRewrite: {
+        '^/sofia-api': '',
+    },
+}));
+
 app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // -- Auth API Endpoints --
 
@@ -409,9 +419,16 @@ ADMIN_TABLES.forEach(tableName => {
 app.use('/sofia-api', createProxyMiddleware({
     target: 'http://apisofia.sofiagestionagricola.cl',
     changeOrigin: true,
+    secure: false, // In case of cert issues
     pathRewrite: {
-        '^/sofia-api': '', // Quitar /sofia-api al enviar a la API real
+        '^/sofia-api': '',
     },
+    onProxyRes: function (proxyRes, req, res) {
+        // console.log('[Proxy] Sofia Response:', proxyRes.statusCode, req.url);
+    },
+    onError: function (err, req, res) {
+        console.error('[Proxy] Sofia Error:', err);
+    }
 }));
 
 // Serve static files from the "dist" directory
@@ -428,7 +445,8 @@ app.get('/api/trabajo-campo-completo', async (req, res) => {
                    c.numero as cuartel_numero,
                    fa.nombre as faena_nombre,
                    la.nombre as labor_nombre,
-                   e.name as empleado_nombre
+                   e.name as empleado_nombre,
+                   u.name as usuario_nombre
             FROM trabajo_campo_logs l
             LEFT JOIN admin_fincas f ON l.finca_id = f.id
             LEFT JOIN admin_predios p ON l.predio_id = p.id
@@ -436,6 +454,7 @@ app.get('/api/trabajo-campo-completo', async (req, res) => {
             LEFT JOIN admin_faenas fa ON l.faena_id = fa.id
             LEFT JOIN admin_labor la ON l.labor_id = la.id
             LEFT JOIN empleados e ON l.empleado_id = e.id
+            LEFT JOIN users u ON l.usuario_cargo_id = u.id
             WHERE l.status::text = 'active'
             ORDER BY l.fecha DESC, l.id DESC
         `;
@@ -443,6 +462,27 @@ app.get('/api/trabajo-campo-completo', async (req, res) => {
         res.json(result.rows);
     } catch (error) {
         console.error('Fetch trabajo-campo error:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+// GET Single Work Log Detail
+app.get('/api/trabajo-campo/:id', async (req, res) => {
+    try {
+        const logRes = await pool.query('SELECT * FROM trabajo_campo_logs WHERE id = $1', [req.params.id]);
+        if (logRes.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado' });
+
+        const insumosRes = await pool.query('SELECT * FROM trabajo_campo_insumos WHERE log_id = $1', [req.params.id]);
+        const herramientasRes = await pool.query('SELECT * FROM trabajo_campo_herramientas WHERE log_id = $1', [req.params.id]);
+
+        res.json({
+            success: true,
+            log: logRes.rows[0],
+            insumos: insumosRes.rows,
+            herramientas: herramientasRes.rows.map(h => h.producto_id)
+        });
+    } catch (error) {
+        console.error('Fetch trabajo-campo detail error:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
@@ -455,14 +495,23 @@ app.post('/api/trabajo-campo', async (req, res) => {
 
         // 1. Insert Log
         const logRes = await client.query(
-            'INSERT INTO trabajo_campo_logs (fecha, finca_id, predio_id, cuartel_id, faena_id, labor_id, empleado_id, cantidad, unidad, notas) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id',
-            [log.fecha, log.finca_id, log.predio_id, log.cuartel_id, log.faena_id, log.labor_id, log.empleado_id, log.cantidad, log.unidad, log.notas]
+            'INSERT INTO trabajo_campo_logs (fecha, hora_inicio, hora_fin, finca_id, predio_id, cuartel_id, faena_id, labor_id, empleado_id, cantidad, unidad, total_jornadas, usuario_cargo_id, notas) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id',
+            [log.fecha, log.hora_inicio, log.hora_fin, log.finca_id, log.predio_id, log.cuartel_id, log.faena_id, log.labor_id, log.empleado_id, log.cantidad, log.unidad, log.total_jornadas, log.usuario_cargo_id, log.notas]
         );
         const logId = logRes.rows[0].id;
 
-        // 2. Insert Insumos and Update Stock
+        // 2. Insert Insumos and Update Stock with Validation
         if (insumos && Array.isArray(insumos)) {
             for (const item of insumos) {
+                // Check Stock
+                const prodRes = await client.query('SELECT stock, nombre FROM admin_productos WHERE id = $1', [item.producto_id]);
+                if (prodRes.rows.length === 0) throw new Error(`Producto ID ${item.producto_id} no existe.`);
+                
+                const currentStock = parseFloat(prodRes.rows[0].stock) || 0;
+                if (currentStock <= 0 || currentStock < item.cantidad) {
+                    throw new Error(`Stock insuficiente para "${prodRes.rows[0].nombre}". Requerido: ${item.cantidad}, Disponible: ${currentStock}`);
+                }
+
                 await client.query(
                     'INSERT INTO trabajo_campo_insumos (log_id, producto_id, cantidad) VALUES ($1, $2, $3)',
                     [logId, item.producto_id, item.cantidad]
@@ -471,6 +520,11 @@ app.post('/api/trabajo-campo', async (req, res) => {
                 await client.query(
                     'UPDATE admin_productos SET stock = stock - $1 WHERE id = $2',
                     [item.cantidad, item.producto_id]
+                );
+                // Record Movement
+                await client.query(
+                    'INSERT INTO stock_movimientos (producto_id, tipo_movimiento, cantidad, nro_comprobante, usuario_id, notas) VALUES ($1, $2, $3, $4, $5, $6)',
+                    [item.producto_id, 'consumo', -item.cantidad, `LOG-${logId}`, log.usuario_cargo_id, `Carga de faena log #${logId}`]
                 );
             }
         }
@@ -490,7 +544,264 @@ app.post('/api/trabajo-campo', async (req, res) => {
     } catch (error) {
         await client.query('ROLLBACK');
         console.error('Work Log Error:', error);
+        const status = error.message.includes('Stock insuficiente') ? 400 : 500;
+        res.status(status).json({ success: false, message: error.message });
+    } finally {
+        client.release();
+    }
+});
+
+app.put('/api/trabajo-campo/:id', async (req, res) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const { id } = req.params;
+        const { log, insumos, herramientas } = req.body;
+
+        // 1. Get old insumos to restore stock
+        const oldInsumos = await client.query('SELECT producto_id, cantidad FROM trabajo_campo_insumos WHERE log_id = $1', [id]);
+        for (const item of oldInsumos.rows) {
+            await client.query('UPDATE admin_productos SET stock = stock + $1 WHERE id = $2', [item.cantidad, item.producto_id]);
+        }
+
+        // 2. Delete old records
+        await client.query('DELETE FROM trabajo_campo_insumos WHERE log_id = $1', [id]);
+        await client.query('DELETE FROM trabajo_campo_herramientas WHERE log_id = $1', [id]);
+
+        // 3. Update Log
+        await client.query(
+            'UPDATE trabajo_campo_logs SET fecha=$1, hora_inicio=$2, hora_fin=$3, finca_id=$4, predio_id=$5, cuartel_id=$6, faena_id=$7, labor_id=$8, empleado_id=$9, cantidad=$10, unidad=$11, total_jornadas=$12, notas=$13 WHERE id=$14',
+            [log.fecha, log.hora_inicio, log.hora_fin, log.finca_id, log.predio_id, log.cuartel_id, log.faena_id, log.labor_id, log.empleado_id, log.cantidad, log.unidad, log.total_jornadas, log.notas, id]
+        );
+
+        // 4. Insert new Insumos and Update Stock with Validation
+        if (insumos && Array.isArray(insumos)) {
+            for (const item of insumos) {
+                // Check Stock
+                const prodRes = await client.query('SELECT stock, nombre FROM admin_productos WHERE id = $1', [item.producto_id]);
+                const currentStock = parseFloat(prodRes.rows[0].stock) || 0;
+                if (currentStock <= 0 || currentStock < item.cantidad) {
+                    throw new Error(`Stock insuficiente para "${prodRes.rows[0].nombre}". Requerido: ${item.cantidad}, Disponible: ${currentStock}`);
+                }
+
+                await client.query(
+                    'INSERT INTO trabajo_campo_insumos (log_id, producto_id, cantidad) VALUES ($1, $2, $3)',
+                    [id, item.producto_id, item.cantidad]
+                );
+                await client.query('UPDATE admin_productos SET stock = stock - $1 WHERE id = $2', [item.cantidad, item.producto_id]);
+                
+                await client.query(
+                    'INSERT INTO stock_movimientos (producto_id, tipo_movimiento, cantidad, nro_comprobante, usuario_id, notas) VALUES ($1, $2, $3, $4, $5, $6)',
+                    [item.producto_id, 'consumo', -item.cantidad, `LOG-${id}`, log.usuario_cargo_id, `Edición faena log #${id}`]
+                );
+            }
+        }
+
+        // 5. Insert new Herramientas
+        if (herramientas && Array.isArray(herramientas)) {
+            for (const toolId of herramientas) {
+                await client.query('INSERT INTO trabajo_campo_herramientas (log_id, producto_id) VALUES ($1, $2)', [id, toolId]);
+            }
+        }
+
+        await client.query('COMMIT');
+        res.json({ success: true, message: 'Registro actualizado con éxito.' });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Work Log Update Error:', error);
+        const status = error.message.includes('Stock insuficiente') ? 400 : 500;
+        res.status(status).json({ success: false, message: error.message });
+    } finally {
+        client.release();
+    }
+});
+
+app.delete('/api/trabajo-campo/:id', async (req, res) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const { id } = req.params;
+
+        // 1. Find and restore stock
+        const insumos = await client.query('SELECT producto_id, cantidad FROM trabajo_campo_insumos WHERE log_id = $1', [id]);
+        for (const item of insumos.rows) {
+            await client.query(
+                'UPDATE admin_productos SET stock = stock + $1 WHERE id = $2',
+                [item.cantidad, item.producto_id]
+            );
+        }
+
+        // 2. Soft delete log
+        await client.query("UPDATE trabajo_campo_logs SET status = 'inactive' WHERE id = $1", [id]);
+
+        await client.query('COMMIT');
+        res.json({ success: true, message: 'Registro eliminado y stock restaurado.' });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Work Log Delete Error:', error);
         res.status(500).json({ success: false, message: error.message });
+    } finally {
+        client.release();
+    }
+});
+
+// ── MOVIMIENTOS DE INVENTARIO (Facturas y Remitos) ──
+app.post('/api/inventario/movimiento', async (req, res) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const { producto_id, tipo_movimiento, cantidad, nro_comprobante, usuario_id, notas } = req.body;
+
+        if (!producto_id || !cantidad || !tipo_movimiento) {
+             throw new Error('Faltan datos obligatorios');
+        }
+
+        // 1. Log movement
+        await client.query(
+            'INSERT INTO stock_movimientos (producto_id, tipo_movimiento, cantidad, nro_comprobante, usuario_id, notas) VALUES ($1, $2, $3, $4, $5, $6)',
+            [producto_id, tipo_movimiento, cantidad, nro_comprobante, usuario_id, notas]
+        );
+
+        // 2. Update physical stock
+        await client.query(
+            'UPDATE admin_productos SET stock = stock + $1 WHERE id = $2',
+            [cantidad, producto_id]
+        );
+
+        await client.query('COMMIT');
+        res.json({ success: true, message: 'Movimiento de inventario registrado con éxito.' });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Inventory Movement Error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    } finally {
+        client.release();
+    }
+});
+
+app.get('/api/inventario/movimientos', async (req, res) => {
+    try {
+        const query = `
+            SELECT sm.*, p.nombre as producto_nombre, u.name as usuario_nombre
+            FROM stock_movimientos sm
+            LEFT JOIN admin_productos p ON sm.producto_id = p.id
+            LEFT JOIN users u ON sm.usuario_id = u.id
+            ORDER BY sm.fecha DESC
+            LIMIT 100
+        `;
+        const result = await pool.query(query);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Fetch inventory movements error:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+// ── ARCHIVAR CICLO DE PRODUCCIÓN (HISTÓRICO) ──
+app.post('/api/archive-cycle', async (req, res) => {
+    const { ciclo, data } = req.body;
+    if (!ciclo || !data || !Array.isArray(data)) {
+        return res.status(400).json({ success: false, message: 'Faltan datos (ciclo o data)' });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        // Creamos un esquema separado llamado 'historicos' para actuar como base de datos aparte
+        await client.query('CREATE SCHEMA IF NOT EXISTS historicos');
+
+        // La tabla lleva exactamente el nombre del ciclo (ej: "2024-2025")
+        const tableName = `historicos."${ciclo}"`;
+
+        // Creamos la tabla dinámicamente
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS ${tableName} (
+                id SERIAL PRIMARY KEY,
+                finca VARCHAR(255),
+                fecha VARCHAR(255),
+                labor VARCHAR(255),
+                cuartel VARCHAR(255),
+                persona VARCHAR(255),
+                rendimiento NUMERIC,
+                total_jornadas NUMERIC,
+                costo_ars NUMERIC,
+                hectareas NUMERIC,
+                clasifica VARCHAR(255),
+                variedad VARCHAR(255),
+                is_cosecha BOOLEAN,
+                origen_archivo VARCHAR(255),
+                raw_data JSONB,
+                archived_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Insertamos los nuevos registros
+        // Nota: ya no truncamos la tabla entera porque ahora contiene información histórica masiva provista por CSVs.
+        // Si archivan de vuelta el mismo ciclo, la lógica ideal es eliminar los provenientes de la App antes de reinsertar para evitar duplicar.
+        await client.query(`DELETE FROM ${tableName} WHERE origen_archivo = 'NaturalFood App'`);
+
+        for (const item of data) {
+            // Validar formato de fecha, si es NULL lo pasamos nulo.
+            let fechaVal = item.fecha ? item.fecha.toString() : null;
+            
+            await client.query(`
+                INSERT INTO ${tableName} (
+                    finca, fecha, labor, cuartel, persona, rendimiento, total_jornadas, costo_ars, hectareas, clasifica, variedad, is_cosecha, origen_archivo, raw_data
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            `, [
+                item.finca,
+                fechaVal,
+                item.labor_normalized || item.labor,
+                item.cuartel,
+                item.persona,
+                item.rendimiento_val || 0,
+                item.totalJornadas || 0,
+                item.costo_ars || 0,
+                item.hectareas || 0,
+                item.clasifica,
+                item.variedad,
+                item.isCosecha || false,
+                'NaturalFood App',
+                JSON.stringify(item)
+            ]);
+        }
+
+        await client.query('COMMIT');
+        res.json({ success: true, message: `Ciclo ${ciclo} archivado exitosamente en base de datos histórica.` });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Error archivando el ciclo:', error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor al archivar el ciclo' });
+    } finally {
+        client.release();
+    }
+});
+
+// ── CONSULTAR CICLO DE PRODUCCIÓN (HISTÓRICO) ──
+app.get('/api/historical-data/:ciclo', async (req, res) => {
+    const { ciclo } = req.params;
+    const client = await pool.connect();
+    try {
+        // Verificar si la tabla existe en el esquema historicos
+        const tableCheck = await client.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'historicos' 
+                AND table_name = $1
+            );
+        `, [ciclo]);
+
+        if (!tableCheck.rows[0].exists) {
+            return res.status(404).json({ success: false, message: 'Ciclo no archived' });
+        }
+
+        const tableName = `historicos."${ciclo}"`;
+        const result = await client.query(`SELECT * FROM ${tableName}`);
+        res.json({ success: true, data: result.rows });
+    } catch (error) {
+        console.error('Error fetching historical cycle:', error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor' });
     } finally {
         client.release();
     }
