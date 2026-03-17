@@ -236,6 +236,10 @@ CREATE TABLE IF NOT EXISTS trabajo_campo_logs (
     unidad VARCHAR(50) DEFAULT 'horas',
     costo_unitario DECIMAL(12,2) DEFAULT 0,
     total_costo DECIMAL(12,2) DEFAULT 0,
+    total_jornadas DECIMAL(10,2) DEFAULT 0,
+    hora_inicio TIME,
+    hora_fin TIME,
+    usuario_cargo_id INT REFERENCES users(id),
     notas TEXT,
     status active_status DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -257,6 +261,17 @@ CREATE TABLE IF NOT EXISTS trabajo_campo_herramientas (
     id SERIAL PRIMARY KEY,
     log_id INT NOT NULL REFERENCES trabajo_campo_logs(id) ON DELETE CASCADE,
     producto_id INT NOT NULL REFERENCES admin_productos(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS stock_movimientos (
+    id SERIAL PRIMARY KEY,
+    producto_id INT REFERENCES admin_productos(id) ON DELETE CASCADE,
+    tipo_movimiento VARCHAR(50) NOT NULL, -- 'entrada', 'salida', 'consumo', 'ajuste'
+    cantidad DECIMAL(12,2) NOT NULL,
+    nro_comprobante VARCHAR(100),
+    usuario_id INT REFERENCES users(id),
+    notas TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

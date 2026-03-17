@@ -1373,9 +1373,15 @@ export class AppController {
             ]);
 
             const catalogs = { fincas, predios, cuarteles, faenas, labores, empleados: personal, productos };
-
-            container.innerHTML = renderWorkLogView(logs, catalogs);
-            this.bindWorkLogEvents(container, logs, catalogs);
+            
+            // Safety check: ensure logs is an array
+            const logsArray = Array.isArray(logs) ? logs : [];
+            if (!Array.isArray(logs)) {
+                console.error('Expected array for work-logs, got:', logs);
+            }
+            
+            container.innerHTML = renderWorkLogView(logsArray, catalogs);
+            this.bindWorkLogEvents(container, logsArray, catalogs);
         } catch (e) {
             console.error('Work section load error:', e);
             container.innerHTML = `<div style="padding: 2rem; color: var(--color-error);">
