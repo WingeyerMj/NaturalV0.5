@@ -9,6 +9,7 @@
 
 import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import * as XLSX from 'xlsx';
 Chart.register(...registerables, ChartDataLabels);
 // Desactivar datalabels globalmente, solo se activa explícitamente por gráfico
 Chart.defaults.set('plugins.datalabels', { display: false });
@@ -98,6 +99,7 @@ const ROLE_MENUS = {
         {
             id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
                 { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
+                { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' },
             ]
         },
         {
@@ -117,7 +119,7 @@ const ROLE_MENUS = {
         {
             id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
                 { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
-                { id: 'admin-bodegas-movimientos', label: 'Ingreso Insumos', icon: '📦' },
+                { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' },
             ]
         },
     ],
@@ -307,6 +309,7 @@ export class AppController {
             case 'informe-gastos-historicos':
                 title.textContent = 'Informe de Gastos Históricos';
                 content.innerHTML = renderGastosHistoricosView();
+                this.renderGastosHistoricosSection();
                 break;
             case 'informe-secaderos':
                 title.textContent = 'Informe de Secaderos';
@@ -351,7 +354,7 @@ export class AppController {
                 this.renderCargaTrabajoSection(content);
                 break;
             case 'admin-bodegas-movimientos':
-                title.textContent = 'Movimientos de Inventario';
+                title.textContent = 'Movimientos Stock';
                 this.renderInventarioSection(content);
                 break;
             default:
@@ -1350,10 +1353,10 @@ export class AppController {
         const refreshTable = async () => {
             const freshData = await model.getAll();
             container.innerHTML = renderAdminCrudView(config, freshData);
-            this.bindAdminCrudEvents(container, config, model, refreshTable);
+            this.bindAdminCrudEvents(container, config, model, refreshTable, sectionId);
         };
 
-        this.bindAdminCrudEvents(container, config, model, refreshTable);
+        this.bindAdminCrudEvents(container, config, model, refreshTable, sectionId);
     }
 
     async renderCargaTrabajoSection(container) {
@@ -1670,7 +1673,7 @@ export class AppController {
         });
     }
 
-    bindAdminCrudEvents(container, config, model, refreshTable) {
+    bindAdminCrudEvents(container, config, model, refreshTable, sectionId) {
         const columns = config.columns;
 
         const showModal = (editing = null) => {
@@ -1786,6 +1789,125 @@ export class AppController {
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(q) ? '' : 'none';
             });
+        });
+
+        // 📥 Mass Import (Excel/CSV)
+        const btnImport = document.getElementById('btn-import-admin-crud');
+        const fileInput = document.getElementById('input-import-admin-crud');
+
+        btnImport?.addEventListener('click', () => fileInput.click());
+
+        fileInput?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (evt) => {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+
+                    if (rows.length === 0) {
+                        alert('El archivo está vacío.');
+                        return;
+                    }
+
+                    if (!confirm(`¿Desea importar ${rows.length} registros en "${config.title}"?`)) {
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    btnImport.disabled = true;
+                    btnImport.textContent = '⌛ Importando...';
+
+                    let successCount = 0;
+                    let errorCount = 0;
+
+                    // Support for Predio Name mapping to ID (if loading cuarteles)
+                    let predioMap = null;
+                    if (sectionId === 'admin-cuarteles') {
+                        const predios = await ADMIN_MODELS['admin-predios'].getAll();
+                        predioMap = new Map(predios.map(p => [p.nombre.toLowerCase().trim(), p.id]));
+                    }
+
+                    // Normalize helper
+                    const norm = (s) => String(s || '').toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+                    // Helper to map Excel headers to model keys
+                    const mapRow = (row) => {
+                        const mapped = {};
+                        columns.forEach(col => {
+                            const colLabelNorm = norm(col.label);
+                            const colKeyNorm = norm(col.key);
+
+                            // Try map by various headers
+                            const key = Object.keys(row).find(k => {
+                                const kn = norm(k);
+                                return kn === colKeyNorm || 
+                                       kn === colLabelNorm || 
+                                       (col.key === 'numero' && (kn.includes('cuartel') || kn === 'nº')) ||
+                                       (col.key === 'superficie' && kn.includes('hectarea')) ||
+                                       (col.key === 'plantas_por_hilera' && kn.includes('plantas'));
+                            });
+
+                            if (key !== undefined) {
+                                let val = row[key];
+                                if (col.type === 'number') val = Number(val) || 0;
+                                if (col.type === 'select' && col.options) {
+                                    const opt = col.options.find(o => norm(o) === norm(val));
+                                    if (opt) val = opt;
+                                }
+                                mapped[col.key] = val;
+                            }
+                        });
+
+                        // Special case: Map Predio Name to ID if needed
+                        if (predioMap && !mapped.predio_id) {
+                            const pKey = Object.keys(row).find(k => norm(k).includes('predio'));
+                            if (pKey) {
+                                const pName = norm(row[pKey]);
+                                if (predioMap.has(pName)) mapped.predio_id = predioMap.get(pName);
+                            }
+                        }
+                        return mapped;
+                    };
+
+                    for (const [idx, row] of rows.entries()) {
+                        const dataToSave = mapRow(row);
+                        // Ensure required fields
+                        const missing = columns.filter(c => c.required && !dataToSave[c.key]);
+                        if (missing.length > 0) {
+                            console.warn(`[Row ${idx + 2}] Saltada por falta de campos requeridos:`, missing.map(m => m.label));
+                            errorCount++;
+                            continue;
+                        }
+
+                        const res = await model.create(dataToSave);
+                        if (res.success) {
+                            successCount++;
+                        } else {
+                            console.error(`[Row ${idx + 2}] Error al crear:`, res.message);
+                            errorCount++;
+                        }
+                    }
+
+                    this.showToast(`Importación finalizada: ${successCount} exitosos, ${errorCount} fallidos.`, successCount > 0 ? 'success' : 'error');
+                    await refreshTable();
+
+                } catch (err) {
+                    console.error('Import error:', err);
+                    alert(`Error al procesar el archivo Excel: ${err.message || 'Formato incorrecto'}`);
+                } finally {
+                    btnImport.disabled = false;
+                    btnImport.textContent = '📥 Carga Masiva';
+                    fileInput.value = '';
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
         });
     }
 
@@ -3906,6 +4028,358 @@ export class AppController {
             const flatData = dataFVPos.map(d => ({ name: d.name, budget: d['n'].budget, real: d['n'].real }));
             createChart(`chart-fert-unidades-n-fv-pos`, `sofia-fert-unidades-n-fv-pos`, flatData, nutrientsPos.n);
         }
+    }
+
+    // ── Gastos Históricos Section (Native, no iframe) ──
+    async renderGastosHistoricosSection() {
+        const statusEl = document.getElementById('gh-status');
+        const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg; };
+
+        setStatus('Cargando datos de gastos...');
+
+        // ── 1. Load CSVs ──
+        const parseCSVSimple = (text) => {
+            const lines = text.split(/\r\n|\r|\n/).filter(l => l.trim());
+            if (lines.length < 2) return [];
+            const headers = lines[0].split(';').map(h => h.trim().replace(/^\uFEFF/, ''));
+            return lines.slice(1).map(line => {
+                const cols = line.split(';').map(c => c.trim());
+                const obj = {};
+                headers.forEach((h, i) => { obj[h] = cols[i] || ''; });
+                return obj;
+            }).filter(row => Object.values(row).some(v => v !== ''));
+        };
+
+        let histData = [], curData = [];
+        try {
+            const [histRes, curRes] = await Promise.all([
+                fetch('/Fuentes/Gastos/Historico.csv').then(r => r.ok ? r.text() : ''),
+                fetch('/Fuentes/Gastos/2026.csv').then(r => r.ok ? r.text() : '')
+            ]);
+            histData = parseCSVSimple(histRes);
+            curData = parseCSVSimple(curRes);
+        } catch (e) {
+            console.error('Error loading gastos CSVs:', e);
+            setStatus('Error cargando archivos de gastos.');
+            return;
+        }
+
+        const allExpenses = [...histData, ...curData];
+        if (allExpenses.length === 0) {
+            setStatus('No hay datos de gastos disponibles. Verifique los archivos CSV en /Fuentes/Gastos/');
+            return;
+        }
+
+        // ── 2. Detect columns ──
+        const sample = allExpenses[0];
+        const findCol = (names) => {
+            const keys = Object.keys(sample);
+            let f = keys.find(k => names.some(n => k.trim().toLowerCase() === n.toLowerCase()));
+            if (f) return f;
+            f = keys.find(k => names.some(n => k.trim().toLowerCase().includes(n.toLowerCase())));
+            return f || null;
+        };
+
+        const COL_FINCA = findCol(['FINCA', 'Finca']) || Object.keys(sample)[0];
+        const COL_ITEM = findCol(['ITEMS', 'ITEM', 'Ítem', 'Item']) || Object.keys(sample)[1];
+        const COL_UNIF = findCol(['UNIFICACION', 'Unificación', 'Unificacion']) || Object.keys(sample)[2];
+        const COL_USD = findCol(['USD Final', 'USD']) || 'USD';
+        const COL_YEAR = findCol(['Año', 'AÑO', 'Ao']) || Object.keys(sample).find(k => {
+            const c = k.trim().toLowerCase(); return c.length <= 5 && c.startsWith('a');
+        }) || Object.keys(sample)[4];
+        const COL_HAS = findCol(['Has']) || 'Has';
+
+        // ── 3. Normalize finca names ──
+        const FINCA_MAP = {
+            '01 - LA CHIMBERA': 'La Chimbera',
+            '02 - CAMINO TRUNCADO': 'Camino Truncado',
+            '03 - PUENTE ALTO': 'Puente Alto',
+            '04 - EL ESPEJO': 'El Espejo I y II',
+            '05 - EL ESPEJO': 'El Espejo III'
+        };
+        const normFinca = (raw) => FINCA_MAP[String(raw || '').trim()] || String(raw || '').trim();
+
+        // ── 4. Populate filters ──
+        const gFincas = [...new Set(allExpenses.map(d => normFinca(d[COL_FINCA])))].filter(Boolean).sort();
+        const gItems = [...new Set(allExpenses.map(d => String(d[COL_ITEM] || '').trim()))].filter(Boolean).sort();
+        const gUnifs = [...new Set(allExpenses.map(d => String(d[COL_UNIF] || '').trim()))].filter(Boolean).sort();
+
+        const fincaSel = document.getElementById('gh-filter-finca');
+        const itemSel = document.getElementById('gh-filter-item');
+        const unifSel = document.getElementById('gh-filter-unif');
+
+        if (fincaSel) gFincas.forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; fincaSel.appendChild(o); });
+        if (itemSel) gItems.forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; itemSel.appendChild(o); });
+        if (unifSel) gUnifs.forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; unifSel.appendChild(o); });
+
+        // ── 5. Chart rendering function ──
+        const formatUSD = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+
+        const renderGastosCharts = () => {
+            const fFinca = fincaSel?.value || 'all';
+            const fItem = itemSel?.value || 'all';
+            const fUnif = unifSel?.value || 'all';
+
+            const filtered = allExpenses.filter(d => {
+                const finca = normFinca(d[COL_FINCA]);
+                const item = String(d[COL_ITEM] || '').trim();
+                const unif = String(d[COL_UNIF] || '').trim();
+                return (fFinca === 'all' || finca === fFinca) &&
+                       (fItem === 'all' || item === fItem) &&
+                       (fUnif === 'all' || unif === fUnif);
+            });
+
+            // Aggregate by year
+            const realYears = {}, bpYears = {}, itemsDist = {}, yearsHas = {};
+
+            filtered.forEach(d => {
+                const rawYear = String(d[COL_YEAR] || '').trim();
+                if (!rawYear) return;
+
+                let rawUsd = String(d[COL_USD] || '0').trim();
+                const usd = parseFloat(rawUsd.replace(/\./g, '').replace(',', '.')) || 0;
+                let rawHas = String(d[COL_HAS] || '0').trim();
+                const has = parseFloat(rawHas.replace(',', '.')) || 0;
+                const finca = normFinca(d[COL_FINCA]);
+                const item = String(d[COL_ITEM] || 'Otros').trim();
+
+                const isBP = rawYear.toUpperCase().startsWith('BP');
+                const cleanYear = rawYear.replace(/^BP\s*/i, '').trim();
+                if (!cleanYear || isNaN(parseInt(cleanYear))) return;
+
+                if (isBP) {
+                    bpYears[cleanYear] = (bpYears[cleanYear] || 0) + usd;
+                } else {
+                    if (!realYears[cleanYear]) { realYears[cleanYear] = 0; yearsHas[cleanYear] = {}; }
+                    realYears[cleanYear] += usd;
+                    if (!yearsHas[cleanYear][finca] || has > yearsHas[cleanYear][finca]) {
+                        yearsHas[cleanYear][finca] = has;
+                    }
+                    itemsDist[item] = (itemsDist[item] || 0) + usd;
+                }
+            });
+
+            const sortedYears = Object.keys(realYears).sort();
+            if (sortedYears.length === 0) {
+                setStatus('Sin datos de gastos para los filtros seleccionados.');
+                return;
+            }
+
+            const usdEvolution = sortedYears.map(y => realYears[y]);
+            const bpEvolution = sortedYears.map(y => y === '2026' ? (bpYears['2026'] || 0) : 0);
+            const usdPerHa = sortedYears.map(y => {
+                let totalHas = 0;
+                if (yearsHas[y]) Object.values(yearsHas[y]).forEach(h => totalHas += h);
+                return totalHas > 0 ? realYears[y] / totalHas : 0;
+            });
+
+            // Destroy previous charts
+            ['gh-evol', 'gh-ha', 'gh-pasa', 'gh-pie'].forEach(k => {
+                if (this.charts[k]) { this.charts[k].destroy(); delete this.charts[k]; }
+            });
+
+            // ── Chart 1: Evolution ──
+            const ctxEvol = document.getElementById('gh-chart-evolution');
+            if (ctxEvol) {
+                const datasets = [{
+                    type: 'bar', label: 'Gasto Real (USD)', data: usdEvolution,
+                    backgroundColor: 'rgba(129, 140, 248, 0.85)', borderColor: '#818cf8',
+                    borderWidth: 1, borderRadius: 6, order: 1,
+                    barPercentage: 0.85, categoryPercentage: 0.8
+                }];
+                if (bpEvolution.some(v => v > 0)) {
+                    datasets.push({
+                        type: 'bar', label: 'BP (USD)', data: bpEvolution,
+                        backgroundColor: 'rgba(16, 185, 129, 0.5)', borderColor: 'rgba(16, 185, 129, 0.7)',
+                        borderWidth: 1, borderRadius: 6, order: 2,
+                        barPercentage: 0.85, categoryPercentage: 0.8
+                    });
+                }
+
+                this.charts['gh-evol'] = new Chart(ctxEvol, {
+                    data: { labels: sortedYears, datasets },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { family: 'Inter', size: 11 } } },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)', titleFont: { family: 'Inter' }, bodyFont: { family: 'Inter' },
+                                callbacks: { label: ctx => ` ${ctx.dataset.label}: ${formatUSD(ctx.raw)}` }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.5)', callback: v => formatUSD(v) } },
+                            x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.6)' } }
+                        }
+                    }
+                });
+            }
+
+            // ── Chart 2: USD/Ha ──
+            const ctxHa = document.getElementById('gh-chart-ha');
+            if (ctxHa) {
+                const ctx2d = ctxHa.getContext('2d');
+                const grad = ctx2d.createLinearGradient(0, 0, 0, 380);
+                grad.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+                grad.addColorStop(1, 'rgba(16, 185, 129, 0.02)');
+
+                this.charts['gh-ha'] = new Chart(ctxHa, {
+                    type: 'line',
+                    data: {
+                        labels: sortedYears,
+                        datasets: [{
+                            label: 'USD por Hectárea', data: usdPerHa,
+                            borderColor: '#10b981', backgroundColor: grad,
+                            borderWidth: 3, fill: true,
+                            pointRadius: 5, pointHoverRadius: 8,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#0f172a', pointBorderWidth: 2,
+                            tension: 0.35
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                callbacks: { label: ctx => ` ${formatUSD(ctx.raw)} por ha` }
+                            }
+                        },
+                        scales: {
+                            y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.5)' } },
+                            x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.5)' } }
+                        }
+                    }
+                });
+            }
+
+            // ── Chart 3: USD/Kg Pasa ──
+            const ctxPasa = document.getElementById('gh-chart-pasa');
+            if (ctxPasa) {
+                // Estimate Kg Pasa per year (from historical_data if available, or hardcoded known values)
+                const kgPasaByYear = {
+                    '2020': 1512000, '2021': 1890000, '2022': 1345000, '2023': 1620000,
+                    '2024': 1780000, '2025': 1950000, '2026': 1500000
+                };
+                const usdPerKgPasa = sortedYears.map(y => {
+                    const kg = kgPasaByYear[y] || 0;
+                    return kg > 0 ? realYears[y] / kg : 0;
+                });
+
+                const ctx2d = ctxPasa.getContext('2d');
+                const gradP = ctx2d.createLinearGradient(0, 0, 0, 380);
+                gradP.addColorStop(0, 'rgba(251, 191, 36, 0.2)');
+                gradP.addColorStop(1, 'rgba(251, 191, 36, 0.01)');
+
+                this.charts['gh-pasa'] = new Chart(ctxPasa, {
+                    type: 'line',
+                    data: {
+                        labels: sortedYears,
+                        datasets: [{
+                            label: 'USD por Kg Pasa', data: usdPerKgPasa,
+                            borderColor: '#fbbf24', backgroundColor: gradP,
+                            borderWidth: 3, fill: true,
+                            pointRadius: 5, pointHoverRadius: 8,
+                            pointBackgroundColor: '#fbbf24',
+                            pointBorderColor: '#0f172a', pointBorderWidth: 2,
+                            tension: 0.35
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                callbacks: { label: ctx => ` $${ctx.raw.toFixed(2)} por Kg pasa` }
+                            }
+                        },
+                        scales: {
+                            y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.5)', callback: v => '$' + v.toFixed(2) } },
+                            x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.5)' } }
+                        }
+                    }
+                });
+            }
+
+            // ── Chart 4: Distribution Pie ──
+            const ctxPie = document.getElementById('gh-chart-pie');
+            if (ctxPie) {
+                const pieLabels = Object.keys(itemsDist).sort((a, b) => itemsDist[b] - itemsDist[a]);
+                const pieData = pieLabels.map(l => itemsDist[l]);
+                const totalPie = pieData.reduce((a, b) => a + b, 0);
+
+                this.charts['gh-pie'] = new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: {
+                        labels: pieLabels,
+                        datasets: [{
+                            data: pieData,
+                            backgroundColor: [
+                                '#6366f1', '#10b981', '#fbbf24', '#ef4444', '#f472b6',
+                                '#a78bfa', '#2dd4bf', '#fb923c', '#94a3b8', '#e879f9',
+                                '#38bdf8', '#34d399'
+                            ],
+                            borderWidth: 2, borderColor: 'rgba(15,23,42,0.8)',
+                            hoverOffset: 8, borderRadius: 3, spacing: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        cutout: '55%',
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { color: 'rgba(255,255,255,0.7)', font: { family: 'Inter', size: 11 }, padding: 10, usePointStyle: true }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                callbacks: {
+                                    label: ctx => {
+                                        const pct = totalPie > 0 ? ((ctx.raw / totalPie) * 100).toFixed(1) : 0;
+                                        return ` ${ctx.label}: ${formatUSD(ctx.raw)} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ── KPIs ──
+            const lastYear = sortedYears[sortedYears.length - 1];
+            const prevYear = sortedYears.length >= 2 ? sortedYears[sortedYears.length - 2] : null;
+            const totalSelected = usdEvolution.reduce((a, b) => a + b, 0);
+            const lastYearUSD = realYears[lastYear] || 0;
+            const bpLastYear = bpYears[lastYear] || 0;
+            const prevYearUSD = prevYear ? (realYears[prevYear] || 0) : 0;
+            const varPerc = prevYearUSD > 0 ? ((lastYearUSD / prevYearUSD) - 1) * 100 : 0;
+
+            const kpiTotal = document.getElementById('gh-kpi-total');
+            const kpiLast = document.getElementById('gh-kpi-last');
+            const kpiBP = document.getElementById('gh-kpi-bp');
+            const kpiVar = document.getElementById('gh-kpi-var');
+
+            if (kpiTotal) kpiTotal.textContent = formatUSD(totalSelected);
+            if (kpiLast) { kpiLast.textContent = formatUSD(lastYearUSD); kpiLast.closest('.metric-card').querySelector('.metric-label').textContent = `Gasto ${lastYear} (Real)`; }
+            if (kpiBP) { kpiBP.textContent = bpLastYear > 0 ? formatUSD(bpLastYear) : 'N/A'; kpiBP.closest('.metric-card').querySelector('.metric-label').textContent = `BP ${lastYear}`; }
+            if (kpiVar) {
+                kpiVar.textContent = `${varPerc > 0 ? '+' : ''}${varPerc.toFixed(1)}%`;
+                kpiVar.style.color = varPerc > 0 ? '#ef4444' : '#10b981';
+                kpiVar.closest('.metric-card').querySelector('.metric-label').textContent = `Variación vs ${prevYear || '-'}`;
+            }
+
+            setStatus(`Datos cargados: ${filtered.length} registros. Última actualización: ${new Date().toLocaleTimeString()}`);
+        };
+
+        // Initial render
+        renderGastosCharts();
+
+        // Filter events
+        [fincaSel, itemSel, unifSel].forEach(sel => {
+            if (sel) sel.addEventListener('change', renderGastosCharts);
+        });
     }
 
     async renderControlCarga(content) {

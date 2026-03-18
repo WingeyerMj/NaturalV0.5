@@ -2435,7 +2435,6 @@ export function renderFertilizacionComparativa(data) {
                   <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
                   <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
                   <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
-                  <option value="BIO-CRECIMIENTO" style="color:#000;">BIO-CRECIMIENTO</option>
                 </select>
               </div>
             </div>
@@ -2460,7 +2459,6 @@ export function renderFertilizacionComparativa(data) {
                   <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
                   <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
                   <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
-                  <option value="BIO-CRECIMIENTO" style="color:#000;">BIO-CRECIMIENTO</option>
                 </select>
               </div>
             </div>
@@ -2680,7 +2678,9 @@ export function renderAdminCrudView(config, data) {
             <span class="search-icon">🔍</span>
             <input type="text" class="search-input" placeholder="Buscar..." id="search-admin-crud" />
           </div>
+          <button class="btn btn-secondary btn-sm" id="btn-import-admin-crud" style="background: var(--color-emerald-600); border-color: var(--color-emerald-600); color: white;">📥 Carga Masiva</button>
           <button class="btn btn-primary btn-sm" id="btn-add-admin-crud">+ Nuevo Registro</button>
+          <input type="file" id="input-import-admin-crud" style="display:none;" accept=".xlsx, .xls, .csv" />
         </div>
       </div>
       <div style="overflow-x: auto;">
@@ -2926,12 +2926,83 @@ export function renderSecaderosView() {
 // ── Gastos Históricos View (External Dashboard) ──
 export function renderGastosHistoricosView() {
   return `
-    <div class="animate-fade-in" style="height: calc(100vh - 160px); width: 100%; overflow: hidden; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); background: #0f172a;">
-        <iframe 
-            src="/gastos-dash/index.html" 
-            style="width: 100%; height: 100%; border: none;"
-            title="Dashboard de Gastos Históricos"
-        ></iframe>
+    <div class="animate-fade-in" style="padding: 0;">
+      <!-- Filters -->
+      <div class="sofia-filters" style="margin-bottom: var(--space-6);">
+        <div class="filter-group">
+          <label class="form-label">Finca</label>
+          <select class="form-select sofia-filter-select" id="gh-filter-finca">
+            <option value="all">Todas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Ítem de Gasto</label>
+          <select class="form-select sofia-filter-select" id="gh-filter-item">
+            <option value="all">Todas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Unificación</label>
+          <select class="form-select sofia-filter-select" id="gh-filter-unif">
+            <option value="all">Todas</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- KPI Summary -->
+      <div class="dashboard-grid" id="gh-kpi-summary" style="margin-bottom: var(--space-6);">
+        <div class="metric-card animate-slide-up">
+          <span class="metric-label">Gasto Acumulado</span>
+          <span class="metric-value" id="gh-kpi-total">$0</span>
+        </div>
+        <div class="metric-card animate-slide-up" style="animation-delay: 0.1s;">
+          <span class="metric-label">Gasto Último Año</span>
+          <span class="metric-value" id="gh-kpi-last">$0</span>
+        </div>
+        <div class="metric-card animate-slide-up" style="animation-delay: 0.2s;">
+          <span class="metric-label">BP Último Año</span>
+          <span class="metric-value" id="gh-kpi-bp" style="color: var(--accent-emerald);">N/A</span>
+        </div>
+        <div class="metric-card animate-slide-up" style="animation-delay: 0.3s;">
+          <span class="metric-label">Variación vs Anterior</span>
+          <span class="metric-value" id="gh-kpi-var">0%</span>
+        </div>
+      </div>
+
+      <!-- Charts Row 1: Evolution + USD/Ha -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); margin-bottom: var(--space-8);">
+        <div class="animate-fade-in" style="padding: var(--space-4) 0;">
+          <h3 style="margin-bottom: var(--space-4); font-weight: 700; color: var(--accent-primary); font-size: 1.05rem; padding-left: 12px; border-left: 3px solid var(--accent-primary);">Evolución Histórica de Gastos (USD)</h3>
+          <div style="height: 380px; position: relative;">
+            <canvas id="gh-chart-evolution"></canvas>
+          </div>
+        </div>
+        <div class="animate-fade-in" style="padding: var(--space-4) 0; animation-delay: 0.1s;">
+          <h3 style="margin-bottom: var(--space-4); font-weight: 700; color: var(--accent-emerald); font-size: 1.05rem; padding-left: 12px; border-left: 3px solid var(--accent-emerald);">Gasto por Hectárea (USD/Ha)</h3>
+          <div style="height: 380px; position: relative;">
+            <canvas id="gh-chart-ha"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2: Costo/Kg Pasa + Distribución -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); margin-bottom: var(--space-6);">
+        <div class="animate-fade-in" style="padding: var(--space-4) 0;">
+          <h3 style="margin-bottom: var(--space-4); font-weight: 700; color: #fbbf24; font-size: 1.05rem; padding-left: 12px; border-left: 3px solid #fbbf24;">Costo por Kg de Pasa (USD/Kg)</h3>
+          <div style="height: 380px; position: relative;">
+            <canvas id="gh-chart-pasa"></canvas>
+          </div>
+        </div>
+        <div class="animate-fade-in" style="padding: var(--space-4) 0; animation-delay: 0.1s;">
+          <h3 style="margin-bottom: var(--space-4); font-weight: 700; color: #f472b6; font-size: 1.05rem; padding-left: 12px; border-left: 3px solid #f472b6;">Distribución de Gastos por Ítem</h3>
+          <div style="height: 380px; position: relative;">
+            <canvas id="gh-chart-pie"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div id="gh-status" style="text-align: center; padding: var(--space-4); color: var(--text-tertiary); font-size: 0.85rem;"></div>
     </div>
   `;
 }
@@ -2999,7 +3070,7 @@ export function renderStockMovementView(movements, catalogs, user) {
     <div class="work-log-view animate-fade-in">
       <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
         <div>
-          <h2 style="font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em;">📦 Movimientos de Inventario</h2>
+          <h2 style="font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em;">📦 Movimientos Stock</h2>
           <p style="color: var(--text-tertiary);">Facturas de Compra (Admin) y Remitos de Entrega (Carga)</p>
         </div>
         <button class="btn btn-primary" id="btn-add-stock-move" style="box-shadow: var(--shadow-lg);">

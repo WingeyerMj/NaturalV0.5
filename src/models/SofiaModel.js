@@ -32,8 +32,12 @@ export class SofiaImportModel {
     static REGISTROS = [];
 
     static importRows(rows) {
-        this.REGISTROS.push(...rows);
-        console.log(`[SofiaImportModel] Imported ${rows.length} rows. Total: ${this.REGISTROS.length}`);
+        // Simple deduplication based on common fields to avoid bloating the model if imported multiple times
+        const existingHashes = new Set(this.REGISTROS.map(r => `${r.fecha_aplicacion}|${r.producto}|${r.cantidad}|${r.finca}|${r.cuartel}|${r.tipo_registro}`));
+        const newRows = rows.filter(r => !existingHashes.has(`${r.fecha_aplicacion}|${r.producto}|${r.cantidad}|${r.finca}|${r.cuartel}|${r.tipo_registro}`));
+        
+        this.REGISTROS.push(...newRows);
+        console.log(`[SofiaImportModel] Imported ${newRows.length} new rows. Skipped ${rows.length - newRows.length} duplicates. Total: ${this.REGISTROS.length}`);
     }
 
     static parseCSV(csvText, defaultFinca) {
@@ -537,7 +541,7 @@ export class SofiaImportModel {
     }
 
     static getProductosFertilizacion() {
-        return ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M', 'BIO-CRECIMIENTO'];
+        return ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M'];
     }
 
     static getFertilizacionUnidades(filters = {}, fincaGroup = 'espejo') {
@@ -650,30 +654,40 @@ export class SofiaImportModel {
         const groupProductRatios = {};
         Object.entries(nutrientDensities).forEach(([ratioKey, sums]) => {
             if (sums.totalQty > 0) {
-                groupProductRatios[ratioKey] = {
-                    n: sums.n / sums.totalQty,
-                    p: sums.p / sums.totalQty,
-                    k: sums.k / sums.totalQty
-                };
+                let rN = sums.n / sums.totalQty;
+                let rP = sums.p / sums.totalQty;
+                let rK = sums.k / sums.totalQty;
+
+                // Sanity Check: If Sofia export has percentage instead of absolute units (e.g. "10" for 10%), 
+                // the ratio would be e.g. 10. We cap it to reasonable levels based on known maxes.
+                // Most high-concentration fertilizers (like Urea) are ~0.46. 
+                // If it's > 1.0, it's almost certainly a percentage or a units error.
+                if (rN > 0.8) rN = rN / 100;
+                if (rP > 0.8) rP = rP / 100;
+                if (rK > 0.8) rK = rK / 100;
+
+                groupProductRatios[ratioKey] = { n: rN, p: rP, k: rK };
             }
         });
 
         // ── 2. Process REAL applied rows ──
-        const all = this.applyFilters(
+        const allReal = this.applyFilters(
             this.REGISTROS.filter(r => r.categoria === 'Fertilizacion' && r.tipo_registro === 'Real' && belongsToGroup(r)),
             filters
         );
         const realStats = {};
+        const processedReal = new Set();
 
-        all.forEach(r => {
+        allReal.forEach(r => {
             const prod = (r.producto || '').toUpperCase();
-            // Only allowed products
             if (!allowedProducts.includes(prod)) return;
-            // Product filter (individual selection)
             if (filters.producto && prod !== filters.producto.toUpperCase()) return;
-
-            // Exclusion of BIO-CRECIMIENTO for PRE-COSECHA charts
             if (filters.budgetType === 'pre' && prod === 'BIO-CRECIMIENTO') return;
+
+            // Deduplication for Real rows to avoid over-counting if data was imported multiple times
+            const uniqueKey = `${r.fecha_aplicacion}-${r.finca}-${r.cuartel}-${r.producto}-${r.cantidad}-${r.ciclo}`;
+            if (processedReal.has(uniqueKey)) return;
+            processedReal.add(uniqueKey);
 
             const key = getGroupKey(r);
             if (!realStats[key]) realStats[key] = { n: 0, p: 0, k: 0 };
