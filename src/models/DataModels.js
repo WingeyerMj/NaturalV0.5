@@ -537,7 +537,7 @@ export class AdminCrudModel {
       return result;
     } catch (e) {
       console.error(`Create ${this.tableName} error:`, e);
-      return { success: false, message: 'Error de conexión' };
+      return { success: false, message: 'Error de conexión: El servidor backend (puerto 10000) no responde. ¿Está iniciado?' };
     }
   }
 
@@ -553,7 +553,7 @@ export class AdminCrudModel {
       return result;
     } catch (e) {
       console.error(`Update ${this.tableName} error:`, e);
-      return { success: false, message: 'Error de conexión' };
+      return { success: false, message: 'Error de conexión: El servidor backend (puerto 10000) no responde.' };
     }
   }
 
@@ -565,7 +565,7 @@ export class AdminCrudModel {
       return result;
     } catch (e) {
       console.error(`Delete ${this.tableName} error:`, e);
-      return { success: false, message: 'Error de conexión' };
+      return { success: false, message: 'Error de conexión: El servidor backend (puerto 10000) no responde.' };
     }
   }
 }
@@ -624,7 +624,11 @@ export const ADMIN_TABLE_CONFIG = {
     columns: [
       { key: 'nombre', label: 'Nombre', type: 'text', required: true },
       { key: 'tipo', label: 'Tipo Predio', type: 'select', options: ['Productivo', 'Secadero'] },
+<<<<<<< HEAD
       { key: 'finca_id', label: 'Finca (ID)', type: 'number' },
+=======
+      { key: 'finca_id', label: 'Finca', type: 'select-model', model: 'admin-fincas' },
+>>>>>>> b3ae38f8288c6c30d28784d2e01c6f33e181b44e
       { key: 'superficie', label: 'Superficie (ha)', type: 'number' },
       { key: 'tiene_bodega', label: '¿Cuenta con Bodega?', type: 'select', options: ['No', 'Si'] },
       { key: 'variedad', label: 'Variedades', type: 'text-multi' },
@@ -637,7 +641,11 @@ export const ADMIN_TABLE_CONFIG = {
     icon: '🗺️',
     columns: [
       { key: 'numero', label: 'Nº de Cuartel', type: 'number', required: true },
+<<<<<<< HEAD
       { key: 'predio_id', label: 'Predio (ID)', type: 'number' },
+=======
+      { key: 'predio_id', label: 'Predio', type: 'select-model', model: 'admin-predios' },
+>>>>>>> b3ae38f8288c6c30d28784d2e01c6f33e181b44e
       { key: 'superficie', label: 'Hectáreas', type: 'number' },
       { key: 'variedad', label: 'Variedad Sembrada', type: 'text-multi' },
       { key: 'hileras', label: 'Hileras', type: 'number' },

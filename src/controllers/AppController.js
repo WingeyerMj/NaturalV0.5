@@ -150,6 +150,46 @@ export class AppController {
         this.sofiaSubTab = 'resumen';
     }
 
+    async showConfirmModal(title, message) {
+        return new Promise((resolve) => {
+            const modalEl = document.getElementById('confirmDeleteModal');
+            const titleEl = document.getElementById('confirmDeleteModalLabel');
+            const messageEl = document.getElementById('confirmDeleteModalMessage');
+            const btnConfirm = document.getElementById('btn-confirm-delete-action');
+
+            if (!modalEl || !btnConfirm) {
+                resolve(confirm(message));
+                return;
+            }
+
+            if (titleEl) titleEl.textContent = title;
+            if (messageEl) messageEl.innerHTML = message;
+
+            // Initialize or get Bootstrap modal instance
+            let bsModal = bootstrap.Modal.getInstance(modalEl);
+            if (!bsModal) bsModal = new bootstrap.Modal(modalEl);
+            
+            const handleConfirm = () => {
+                bsModal.hide();
+                btnConfirm.onclick = null;
+                resolve(true);
+            };
+
+            const handleCancel = () => {
+                btnConfirm.onclick = null;
+                resolve(false);
+            };
+
+            btnConfirm.onclick = handleConfirm;
+            
+            // Clean up listener before adding to avoid multiple registrations
+            modalEl.removeEventListener('hidden.bs.modal', handleCancel);
+            modalEl.addEventListener('hidden.bs.modal', handleCancel, { once: true });
+
+            bsModal.show();
+        });
+    }
+
     init() {
         const user = UserModel.getCurrentUser();
         if (user) {
@@ -831,8 +871,7 @@ export class AppController {
             const filtered = SofiaApiModel.applyFilters(data, filters);
             const stats = SofiaApiModel.getCosechaDashboardStats(filtered);
 
-            // Add expectativa from local storage
-            stats.expectativaKg = localStorage.getItem(`expectativa_${filters.ciclo}`) || '';
+
 
             const clWrapper = document.getElementById('cosecha-levantado-wrapper');
             if (!clWrapper) {
@@ -858,13 +897,7 @@ export class AppController {
                 }
             }
 
-            // Bind Expectativa Listener
-            const inputExpectativa = document.getElementById('input-expectativa');
-            if (inputExpectativa) {
-                inputExpectativa.addEventListener('change', (e) => {
-                    localStorage.setItem(`expectativa_${filters.ciclo}`, e.target.value);
-                });
-            }
+
 
             // Update dynamic filter options
             updateFilterList('filter-cosecha-predio', 'predio', data);
@@ -1346,13 +1379,39 @@ export class AppController {
             </div>
         `;
 
-        const data = await model.getAll();
-        container.innerHTML = renderAdminCrudView(config, data);
+        // Fetch primary data and catalogs for relations
+        const catalogs = {};
+        const modelsToFetch = new Set();
+        (config.columns || []).forEach(col => {
+            if (col.type === 'select-model' && col.model) modelsToFetch.add(col.model);
+        });
+        // Extra for Quartel dependency
+        if (sectionId === 'admin-cuarteles') modelsToFetch.add('admin-fincas');
+
+        const [data] = await Promise.all([
+            model.getAll(true),
+            ...([...modelsToFetch].map(async mId => {
+                if (ADMIN_MODELS[mId]) catalogs[mId] = await ADMIN_MODELS[mId].getAll(true);
+            }))
+        ]);
+
+        container.innerHTML = renderAdminCrudView(config, data, catalogs, sectionId);
 
         // ── Event bindings ──
         const refreshTable = async () => {
+<<<<<<< HEAD
             const freshData = await model.getAll();
             container.innerHTML = renderAdminCrudView(config, freshData);
+=======
+            // Re-fetch everything on refresh to ensure catalogs are fresh
+            const [freshData] = await Promise.all([
+                model.getAll(true),
+                ...([...modelsToFetch].map(async mId => {
+                    if (ADMIN_MODELS[mId]) catalogs[mId] = await ADMIN_MODELS[mId].getAll(true);
+                }))
+            ]);
+            container.innerHTML = renderAdminCrudView(config, freshData, catalogs, sectionId);
+>>>>>>> b3ae38f8288c6c30d28784d2e01c6f33e181b44e
             this.bindAdminCrudEvents(container, config, model, refreshTable, sectionId);
         };
 
@@ -1733,7 +1792,7 @@ export class AppController {
                 const el = document.getElementById(`admin-crud-${col.key}`);
                 if (!el) return;
                 let val = el.value;
-                if (col.type === 'number' && val !== '') val = Number(val);
+                if ((col.type === 'number' || col.type === 'select-model') && val !== '') val = Number(val);
                 formData[col.key] = val;
             });
 
@@ -1766,20 +1825,123 @@ export class AppController {
 
         // Delete
         container.querySelectorAll('.btn-delete-admin-crud').forEach(btn => {
-            btn.addEventListener('click', async () => {
+            btn.onclick = async (e) => {
+                e.preventDefault();
                 const id = parseInt(btn.dataset.id);
-                if (confirm('¿Está seguro que desea eliminar este registro?')) {
+                const confirmed = await this.showConfirmModal(
+                    '⚠️ Confirmar Eliminación',
+                    `¿Está seguro de que desea eliminar permanentemente este registro de <strong>${config.title}</strong>?<br><br><span style="color: var(--color-error);">Esta acción no se puede deshacer.</span>`
+                );
+
+                if (confirmed) {
                     btn.disabled = true;
-                    const result = await model.delete(id);
-                    if (result.success) {
-                        this.showToast('Registro eliminado', 'success');
-                        await refreshTable();
-                    } else {
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+                    try {
+                        const result = await model.delete(id);
+                        if (result.success) {
+                            this.showToast('✅ Registro eliminado correctamente', 'success');
+                            await refreshTable();
+                        } else {
+                            btn.disabled = false;
+                            btn.innerHTML = '🗑️';
+                            alert('❌ Error: ' + (result.message || 'No se pudo eliminar el registro.'));
+                        }
+                    } catch (err) {
                         btn.disabled = false;
-                        alert(result.message || 'Error al eliminar');
+                        btn.innerHTML = '🗑️';
+                        alert('❌ Error de conexión al intentar eliminar.');
                     }
                 }
+            };
+        });
+
+        // Status Toggle (Quick switch)
+        container.querySelectorAll('.status-select-admin-crud').forEach(sel => {
+            sel.addEventListener('change', async (e) => {
+                const id = parseInt(sel.dataset.id);
+                const newStatus = e.target.value;
+                sel.disabled = true;
+                const result = await model.update(id, { status: newStatus });
+                if (result.success) {
+                    this.showToast('Estado actualizado', 'success');
+                } else {
+                    alert(result.message || 'Error al actualizar estado');
+                }
+                await refreshTable();
             });
+        });
+
+        // Multi-Select Deletion
+        const btnDeleteSelected = document.getElementById('btn-delete-selected-admin-crud');
+        const countSelectedSpan = document.getElementById('count-selected-admin-crud');
+        const chkSelectAll = document.getElementById('chk-select-all-admin-crud');
+        const rowCheckboxes = container.querySelectorAll('.chk-row-admin-crud');
+
+        const updateSelectionUI = () => {
+            const checked = container.querySelectorAll('.chk-row-admin-crud:checked');
+            const count = checked.length;
+            if (btnDeleteSelected) {
+                btnDeleteSelected.style.display = count > 0 ? 'inline-flex' : 'none';
+            }
+            if (countSelectedSpan) {
+                countSelectedSpan.textContent = count;
+            }
+            if (chkSelectAll) {
+                const visibleCheckboxes = [...rowCheckboxes].filter(cb => cb.closest('tr').style.display !== 'none');
+                const visibleChecked = visibleCheckboxes.filter(cb => cb.checked);
+                chkSelectAll.checked = visibleCheckboxes.length > 0 && visibleChecked.length === visibleCheckboxes.length;
+                chkSelectAll.indeterminate = visibleChecked.length > 0 && visibleChecked.length < visibleCheckboxes.length;
+            }
+        };
+
+        // Select All Checkbox
+        chkSelectAll?.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            rowCheckboxes.forEach(cb => {
+                if (cb.closest('tr').style.display !== 'none') {
+                    cb.checked = isChecked;
+                }
+            });
+            updateSelectionUI();
+        });
+
+        // Individual Row Checkbox
+        rowCheckboxes.forEach(cb => {
+            cb.addEventListener('change', updateSelectionUI);
+        });
+
+        // Bulk Delete Button
+        btnDeleteSelected?.addEventListener('click', async () => {
+            const checkedBoxes = container.querySelectorAll('.chk-row-admin-crud:checked');
+            const ids = [...checkedBoxes].map(cb => parseInt(cb.dataset.id));
+            if (ids.length === 0) return;
+
+            const confirmed = await this.showConfirmModal(
+                '⚠️ Eliminación Masiva',
+                `¿Está seguro que desea eliminar los <strong>${ids.length}</strong> registros seleccionados?<br><br><span style="color: var(--color-error);">Esta acción eliminará permanentemente todos los elementos seleccionados.</span>`
+            );
+
+            if (!confirmed) return;
+
+            btnDeleteSelected.disabled = true;
+            const originalText = btnDeleteSelected.innerHTML;
+            btnDeleteSelected.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Eliminando...';
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const id of ids) {
+                const result = await model.delete(id);
+                if (result.success) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                    console.error(`Error deleting ID ${id}:`, result.message);
+                }
+            }
+
+            this.showToast(`Eliminados: ${successCount} exitosos${errorCount > 0 ? `, ${errorCount} fallidos` : ''}`, successCount > 0 ? 'success' : 'error');
+            await refreshTable();
         });
 
         // Search
@@ -1789,6 +1951,142 @@ export class AppController {
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(q) ? '' : 'none';
             });
+            updateSelectionUI();
+        });
+
+        // 📥 Mass Import (Excel/CSV)
+        const btnImport = document.getElementById('btn-import-admin-crud');
+        const fileInput = document.getElementById('input-import-admin-crud');
+
+        btnImport?.addEventListener('click', () => fileInput.click());
+
+        fileInput?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (evt) => {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+
+                    if (rows.length === 0) {
+                        alert('El archivo está vacío.');
+                        return;
+                    }
+
+                    if (!confirm(`¿Desea importar ${rows.length} registros en "${config.title}"?`)) {
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    btnImport.disabled = true;
+                    btnImport.textContent = '⌛ Importando...';
+
+                    let successCount = 0;
+                    let errorCount = 0;
+
+                    // Build relation maps for 'select-model' columns
+                    const relationMaps = {};
+                    for (const col of config.columns) {
+                        if (col.type === 'select-model' && col.model) {
+                            const relatedData = await ADMIN_MODELS[col.model].getAll();
+                            const map = new Map();
+                            relatedData.forEach(item => {
+                                const name = (item.nombre || item.name || item.numero || String(item.id)).toLowerCase().trim();
+                                map.set(name, item.id);
+                            });
+                            relationMaps[col.key] = map;
+                        }
+                    }
+
+                    // Normalize helper
+                    const norm = (s) => String(s || '').toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+                    // Helper to map Excel headers to model keys
+                    const mapRow = (row) => {
+                        const mapped = {};
+                        columns.forEach(col => {
+                            const colLabelNorm = norm(col.label);
+                            const colKeyNorm = norm(col.key);
+
+                            // Try map by various headers
+                            const key = Object.keys(row).find(k => {
+                                const kn = norm(k);
+                                return kn === colKeyNorm || 
+                                       kn === colLabelNorm || 
+                                       (col.key === 'numero' && (kn.includes('cuartel') || kn === 'nº' || kn === 'n°' || kn === 'nro' || kn === 'num' || kn === 'numero')) ||
+                                       (col.key === 'predio_id' && (kn.includes('predio') || kn.includes('parcela'))) ||
+                                       (col.key === 'finca_id' && kn.includes('finca')) ||
+                                       (col.key === 'superficie' && (kn.includes('hectarea') || kn === 'ha' || kn === 'has' || kn === 'sup' || kn.includes('superficie'))) ||
+                                       (col.key === 'plantas_por_hilera' && (kn.includes('plantas') || kn.includes('ejemplares') || kn.includes('p.h'))) ||
+                                       (col.key === 'variedad' && (kn.includes('variedad') || kn.includes('uva') || kn.includes('cepa') || kn.includes('cultivo'))) ||
+                                       (col.key === 'hileras' && (kn.includes('hileras') || kn.includes('filas'))) ||
+                                       (col.key === 'sistema_riego' && (kn.includes('riego') || kn.includes('conduccion'))) ||
+                                       (col.key === 'estado' && (kn.includes('estado') || kn.includes('situacion'))) ||
+                                       (col.key === 'notas' && (kn.includes('nota') || kn.includes('obs') || kn.includes('comentario') || kn.includes('detalle'))) ||
+                                       (col.key === 'nombre' && (kn.includes('nombre') || kn.includes('descripcion')));
+                            });
+
+                            if (key !== undefined) {
+                                let val = row[key];
+                                if (col.type === 'number') {
+                                    val = Number(val) || 0;
+                                } else if (col.type === 'select-model' && relationMaps[col.key]) {
+                                    const vNorm = String(val || '').toLowerCase().trim();
+                                    if (relationMaps[col.key].has(vNorm)) {
+                                        val = relationMaps[col.key].get(vNorm);
+                                    } else {
+                                        // If not found in map, maybe it's already an ID
+                                        const numVal = Number(val);
+                                        if (!isNaN(numVal)) val = numVal;
+                                    }
+                                } else if (col.type === 'select' && col.options) {
+                                    const opt = col.options.find(o => norm(o) === norm(val));
+                                    if (opt) val = opt;
+                                }
+                                mapped[col.key] = val;
+                            }
+                        });
+                        return mapped;
+                    };
+
+                    for (const [idx, row] of rows.entries()) {
+                        const dataToSave = mapRow(row);
+                        // Ensure required fields
+                        const missing = columns.filter(c => c.required && (dataToSave[c.key] === undefined || dataToSave[c.key] === ''));
+                        if (missing.length > 0) {
+                            console.warn(`[Row ${idx + 2}] Saltada por falta de campos requeridos:`, missing.map(m => m.label));
+                            errorCount++;
+                            continue;
+                        }
+
+                        const res = await model.create(dataToSave);
+                        if (res.success) {
+                            successCount++;
+                        } else {
+                            console.error(`[Row ${idx + 2}] Error al crear:`, res.message);
+                            errorCount++;
+                        }
+                    }
+
+                    this.showToast(`Importación finalizada: ${successCount} exitosos, ${errorCount} fallidos.`, successCount > 0 ? 'success' : 'error');
+                    await refreshTable();
+
+                } catch (err) {
+                    console.error('Import error:', err);
+                    alert(`Error al procesar el archivo Excel: ${err.message || 'Formato incorrecto'}`);
+                } finally {
+                    btnImport.disabled = false;
+                    btnImport.textContent = '📥 Carga Masiva';
+                    fileInput.value = '';
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
         });
 
         // 📥 Mass Import (Excel/CSV)
@@ -1919,7 +2217,7 @@ export class AppController {
     async syncSofiaMasterData(hectareasData) {
         try {
             console.log('Sincronizando datos maestros con el servidor...');
-            const resp = await fetch('http://localhost:10000/api/sync-sofia-master', {
+            const resp = await fetch('/api/sync-sofia-master', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ groups: hectareasData.groups })

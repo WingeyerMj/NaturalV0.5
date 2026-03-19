@@ -349,6 +349,31 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
         <div class="modal-footer" id="modal-footer"></div>
       </div>
     </div>
+
+    <!-- Bootstrap 5 Confirmation Modal -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); background: var(--bg-secondary); color: var(--text-primary);">
+          <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.5rem;">
+            <h5 class="modal-title" id="confirmDeleteModalLabel" style="font-weight: 700; font-family: 'Outfit';">
+              ⚠️ Confirmar Eliminación
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" style="padding: 2rem; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🗑️</div>
+            <p id="confirmDeleteModalMessage" style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.5;">
+              ¿Estás seguro que deseas eliminar este registro? <br>
+              <strong style="color: var(--color-error);">Esta acción no se puede deshacer.</strong>
+            </p>
+          </div>
+          <div class="modal-footer" style="border-top: 1px solid var(--border-subtle); padding: 1rem 1.5rem; display: flex; gap: 1rem; justify-content: center;">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600;">Cancelar</button>
+            <button type="button" class="btn btn-danger" id="btn-confirm-delete-action" style="padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; background: var(--color-error); border: none;">Eliminar Registro</button>
+          </div>
+        </div>
+      </div>
+    </div>
   `;
 }
 
@@ -1475,16 +1500,7 @@ export function renderCosechaDashboard(stats, userRole = 'Administrador') {
         <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Tipos de uva cosechados</p>
       </div>
 
-      ${isAdmin ? `<div class="metric-card">
-        <div class="metric-card-header">
-          <div class="metric-card-icon blue">🎯</div>
-        </div>
-        <div class="metric-value">
-            <input type="number" id="input-expectativa" class="form-input" style="width: 100px; font-size: 0.8em; font-weight: bold; background: transparent; border: 1px solid var(--border-subtle); padding: 5px; color: var(--text-primary); border-radius: 4px;" placeholder="Ej: 1500000" value="${stats.expectativaKg || ''}">
-            <small style="font-size: 0.5em; color: var(--text-tertiary);">kg</small>
-        </div>
-        <div class="metric-label">EXPECTATIVA DEL CICLO</div>
-      </div>` : ''}
+
     </div>
 
     <!-- Lists Row -->
@@ -2665,7 +2681,8 @@ export function renderUsuariosView(users, roles) {
 }
 
 // ── Vista CRUD Genérica para Administración ──
-export function renderAdminCrudView(config, data) {
+// ── Vista CRUD Genérica para Administración ──
+export function renderAdminCrudView(config, data, catalogs = {}, sectionId = '') {
   const { title, icon, columns } = config;
   const tableColumns = columns.filter(c => c.type !== 'textarea');
 
@@ -2678,6 +2695,10 @@ export function renderAdminCrudView(config, data) {
             <span class="search-icon">🔍</span>
             <input type="text" class="search-input" placeholder="Buscar..." id="search-admin-crud" />
           </div>
+<<<<<<< HEAD
+=======
+          <button class="btn btn-sm" id="btn-delete-selected-admin-crud" style="display:none; background: var(--color-error); border-color: var(--color-error); color: white; gap: var(--space-1);">🗑️ Eliminar Seleccionados (<span id="count-selected-admin-crud">0</span>)</button>
+>>>>>>> b3ae38f8288c6c30d28784d2e01c6f33e181b44e
           <button class="btn btn-secondary btn-sm" id="btn-import-admin-crud" style="background: var(--color-emerald-600); border-color: var(--color-emerald-600); color: white;">📥 Carga Masiva</button>
           <button class="btn btn-primary btn-sm" id="btn-add-admin-crud">+ Nuevo Registro</button>
           <input type="file" id="input-import-admin-crud" style="display:none;" accept=".xlsx, .xls, .csv" />
@@ -2687,6 +2708,7 @@ export function renderAdminCrudView(config, data) {
         <table class="data-table" id="table-admin-crud">
           <thead>
             <tr>
+              <th style="width: 40px; text-align: center;"><input type="checkbox" id="chk-select-all-admin-crud" title="Seleccionar todos" style="cursor: pointer; width: 16px; height: 16px;" /></th>
               <th style="width: 50px;">#</th>
               ${tableColumns.map(col => `<th>${col.label}</th>`).join('')}
               <th>Estado</th>
@@ -2696,30 +2718,50 @@ export function renderAdminCrudView(config, data) {
           <tbody>
             ${data.length === 0 ? `
               <tr>
-                <td colspan="${tableColumns.length + 3}" style="text-align: center; padding: var(--space-8); color: var(--text-tertiary);">
+                <td colspan="${tableColumns.length + 4}" style="text-align: center; padding: var(--space-8); color: var(--text-tertiary);">
                   <div style="font-size: 2em; margin-bottom: var(--space-2);">📭</div>
                   No hay registros. Haz clic en "+ Nuevo Registro" para agregar uno.
                 </td>
               </tr>
             ` : data.map((row, idx) => `
-              <tr data-id="${row.id}">
+              <tr data-id="${row.id}" class="${row.status === 'inactive' ? 'row-inactive' : ''}">
+                <td style="text-align: center;"><input type="checkbox" class="chk-row-admin-crud" data-id="${row.id}" style="cursor: pointer; width: 16px; height: 16px;" /></td>
                 <td style="color: var(--text-tertiary); font-size: 0.85em;">${idx + 1}</td>
                 ${tableColumns.map(col => {
     let val = row[col.key] ?? '';
-    if (col.type === 'number' && val !== '') {
-      val = new Intl.NumberFormat('es-AR').format(Number(val));
+    let displayVal = val;
+
+    // Relation Lookup
+    if (col.type === 'select-model' && catalogs[col.model]) {
+      const parent = catalogs[col.model].find(i => i.id == val);
+      if (parent) {
+        displayVal = parent.nombre || parent.name || parent.numero || val;
+        // Special case for Quarteles: Show Finca name
+        if (sectionId === 'admin-cuarteles' && col.key === 'predio_id') {
+          const finca = catalogs['admin-fincas']?.find(f => f.id == parent.finca_id);
+          if (finca) displayVal = `${displayVal} <span style="font-size: 0.8em; color: var(--text-tertiary); font-weight: 400;">(${finca.nombre})</span>`;
+        }
+      }
+    } else if (col.type === 'number' && val !== '') {
+      displayVal = new Intl.NumberFormat('es-AR').format(Number(val));
+    } else if (col.type === 'date' && val) {
+      try { displayVal = new Date(val).toLocaleDateString('es-AR'); } catch (e) { displayVal = val; }
     }
-    if (col.type === 'date' && val) {
-      try { val = new Date(val).toLocaleDateString('es-AR'); } catch (e) { }
-    }
+
     const isFirst = col === tableColumns[0];
-    return `<td${isFirst ? ' style="font-weight: 600;"' : ''}>${val}</td>`;
+    return `<td${isFirst ? ' style="font-weight: 600;"' : ''}>${displayVal}</td>`;
   }).join('')}
                 <td>
-                  <span class="status-badge ${row.status === 'active' ? 'active' : 'inactive'}">
-                    <span class="status-dot"></span>
-                    ${row.status === 'active' ? 'Activo' : 'Inactivo'}
-                  </span>
+                  <select class="status-select-admin-crud" data-id="${row.id}" style="
+                    background: ${row.status === 'active' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+                    color: ${row.status === 'active' ? '#10b981' : '#ef4444'};
+                    border: 1px solid ${row.status === 'active' ? '#10b98133' : '#ef444433'};
+                    border-radius: 20px; font-size: 0.75em; padding: 4px 12px; cursor: pointer;
+                    font-weight: 600; outline: none; transition: all 0.2s;
+                  ">
+                    <option value="active" ${row.status === 'active' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">● Activo</option>
+                    <option value="inactive" ${row.status === 'inactive' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">● Inactivo</option>
+                  </select>
                 </td>
                 <td>
                   <div style="display: flex; gap: var(--space-2);">
@@ -2763,6 +2805,27 @@ export function renderAdminCrudView(config, data) {
                   <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
                   <select id="admin-crud-${col.key}" class="form-select" style="padding-left: var(--space-4);"${col.required ? ' required' : ''}>
                     ${(col.options || []).map(opt => `<option value="${opt}">${opt.charAt(0).toUpperCase() + opt.slice(1).replace(/_/g, ' ')}</option>`).join('')}
+                  </select>
+                </div>
+              `;
+    }
+    if (col.type === 'select-model') {
+       const opts = catalogs[col.model] || [];
+       return `
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                  <select id="admin-crud-${col.key}" class="form-select" style="padding-left: var(--space-4);"${col.required ? ' required' : ''}>
+                    <option value="">Seleccionar ${col.label}...</option>
+                    ${opts.map(opt => {
+                        const name = opt.nombre || opt.name || opt.numero || '';
+                        let extra = '';
+                        // Special for Quartel form: Show Finca next to Predio
+                        if (sectionId === 'admin-cuarteles' && col.key === 'predio_id') {
+                            const finca = catalogs['admin-fincas']?.find(f => f.id == opt.finca_id);
+                            if (finca) extra = ` (${finca.nombre})`;
+                        }
+                        return `<option value="${opt.id}">${name}${extra}</option>`;
+                    }).join('')}
                   </select>
                 </div>
               `;
