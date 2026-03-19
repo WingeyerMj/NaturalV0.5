@@ -537,7 +537,7 @@ export class AdminCrudModel {
       return result;
     } catch (e) {
       console.error(`Create ${this.tableName} error:`, e);
-      return { success: false, message: 'Error de conexión' };
+      return { success: false, message: 'Error de conexión: El servidor backend (puerto 10000) no responde. ¿Está iniciado?' };
     }
   }
 
@@ -553,7 +553,7 @@ export class AdminCrudModel {
       return result;
     } catch (e) {
       console.error(`Update ${this.tableName} error:`, e);
-      return { success: false, message: 'Error de conexión' };
+      return { success: false, message: 'Error de conexión: El servidor backend (puerto 10000) no responde.' };
     }
   }
 
@@ -565,7 +565,7 @@ export class AdminCrudModel {
       return result;
     } catch (e) {
       console.error(`Delete ${this.tableName} error:`, e);
-      return { success: false, message: 'Error de conexión' };
+      return { success: false, message: 'Error de conexión: El servidor backend (puerto 10000) no responde.' };
     }
   }
 }
@@ -613,6 +613,7 @@ export const ADMIN_TABLE_CONFIG = {
       { key: 'ubicacion', label: 'Ubicación', type: 'text' },
       { key: 'hectareas', label: 'Hectáreas', type: 'number' },
       { key: 'encargado', label: 'Encargado', type: 'text' },
+      { key: 'tiene_bodega', label: '¿Cuenta con Bodega?', type: 'select', options: ['No', 'Si'] },
       { key: 'telefono', label: 'Teléfono', type: 'text' },
       { key: 'notas', label: 'Notas', type: 'textarea' },
     ]
@@ -622,8 +623,10 @@ export const ADMIN_TABLE_CONFIG = {
     icon: '📍',
     columns: [
       { key: 'nombre', label: 'Nombre', type: 'text', required: true },
-      { key: 'finca_id', label: 'Finca (ID)', type: 'number' },
+      { key: 'tipo', label: 'Tipo Predio', type: 'select', options: ['Productivo', 'Secadero'] },
+      { key: 'finca_id', label: 'Finca', type: 'select-model', model: 'admin-fincas' },
       { key: 'superficie', label: 'Superficie (ha)', type: 'number' },
+      { key: 'tiene_bodega', label: '¿Cuenta con Bodega?', type: 'select', options: ['No', 'Si'] },
       { key: 'variedad', label: 'Variedades', type: 'text-multi' },
       { key: 'tipo_suelo', label: 'Tipo de Suelo', type: 'text' },
       { key: 'notas', label: 'Notas', type: 'textarea' },
@@ -634,12 +637,13 @@ export const ADMIN_TABLE_CONFIG = {
     icon: '🗺️',
     columns: [
       { key: 'numero', label: 'Nº de Cuartel', type: 'number', required: true },
-      { key: 'predio_id', label: 'Predio (ID)', type: 'number' },
-      { key: 'superficie', label: 'Superficie (ha)', type: 'number' },
-      { key: 'variedad', label: 'Variedades', type: 'text-multi' },
+      { key: 'predio_id', label: 'Predio', type: 'select-model', model: 'admin-predios' },
+      { key: 'superficie', label: 'Hectáreas', type: 'number' },
+      { key: 'variedad', label: 'Variedad Sembrada', type: 'text-multi' },
       { key: 'hileras', label: 'Hileras', type: 'number' },
-      { key: 'plantas_por_hilera', label: 'Plantas/Hilera', type: 'number' },
-      { key: 'sistema_conduccion', label: 'Sistema Conducción', type: 'text' },
+      { key: 'plantas_por_hilera', label: 'Cantidad de Plantas', type: 'number' },
+      { key: 'sistema_riego', label: 'Sistema de Riego', type: 'text' },
+      { key: 'estado', label: 'Estado Cultivo', type: 'select', options: ['Activo', 'Inactivo', 'En Preparación'] },
       { key: 'notas', label: 'Notas', type: 'textarea' },
     ]
   },

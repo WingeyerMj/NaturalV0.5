@@ -1,39 +1,55 @@
-import pool from './src/db.js';
 
-async function migrate() {
+import pkg from 'pg';
+const { Pool } = pkg;
+import dotenv from 'dotenv';
+dotenv.config();
+
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL || `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
+
+async function runAlters() {
+    const client = await pool.connect();
     try {
-        console.log('Starting full schema migration...');
-        
-        // 1. Update trabajo_campo_logs
-        console.log('Updating trabajo_campo_logs...');
-        await pool.query('ALTER TABLE trabajo_campo_logs ADD COLUMN IF NOT EXISTS hora_inicio TIME;');
-        await pool.query('ALTER TABLE trabajo_campo_logs ADD COLUMN IF NOT EXISTS hora_fin TIME;');
-        await pool.query('ALTER TABLE trabajo_campo_logs ADD COLUMN IF NOT EXISTS total_jornadas DECIMAL(10,2) DEFAULT 0;');
-        await pool.query('ALTER TABLE trabajo_campo_logs ADD COLUMN IF NOT EXISTS usuario_cargo_id INT REFERENCES users(id);');
-        console.log('✓ trabajo_campo_logs updated.');
+        console.log('🔄 Iniciando actualización de esquema para asegurar persistencia total...');
 
-        // 2. Create stock_movimientos
-        console.log('Creating stock_movimientos table...');
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS stock_movimientos (
-                id SERIAL PRIMARY KEY,
-                producto_id INT REFERENCES admin_productos(id) ON DELETE CASCADE,
-                tipo_movimiento VARCHAR(50) NOT NULL, -- 'entrada', 'salida', 'consumo', 'ajuste'
-                cantidad DECIMAL(12,2) NOT NULL,
-                nro_comprobante VARCHAR(100),
-                usuario_id INT REFERENCES users(id),
-                notas TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
+        // 1. admin_fincas
+        await client.query(`
+            ALTER TABLE admin_fincas ADD COLUMN IF NOT EXISTS tiene_bodega VARCHAR(50) DEFAULT 'No';
         `);
-        console.log('✓ stock_movimientos table created.');
 
-        console.log('Migration completed successfully!');
-    } catch (e) {
-        console.error('Error during migration:', e);
+        // 2. admin_predios
+        await client.query(`
+            ALTER TABLE admin_predios ADD COLUMN IF NOT EXISTS tipo VARCHAR(50) DEFAULT 'Productivo';
+            ALTER TABLE admin_predios ADD COLUMN IF NOT EXISTS tiene_bodega VARCHAR(50) DEFAULT 'No';
+        `);
+
+        // 3. admin_cuarteles
+        await client.query(`
+            ALTER TABLE admin_cuarteles ADD COLUMN IF NOT EXISTS sistema_riego VARCHAR(100);
+            ALTER TABLE admin_cuarteles ADD COLUMN IF NOT EXISTS estado VARCHAR(100) DEFAULT 'Activo';
+            ALTER TABLE admin_cuarteles ADD COLUMN IF NOT EXISTS plantas_por_hilera INT DEFAULT 0;
+            -- hileras e hileras ya están en el SQL pero nos aseguramos
+            ALTER TABLE admin_cuarteles ADD COLUMN IF NOT EXISTS hileras INT DEFAULT 0;
+        `);
+
+        // 4. empleados (Asegurar que existan los nombres de columnas que usa el frontend o viceversa)
+        // El frontend usa 'position' y 'start_date'. El SQL usa 'cargo' y 'fecha_ingreso'.
+        // Vamos a añadir los campos faltantes para no romper nada.
+        await client.query(`
+            ALTER TABLE empleados ADD COLUMN IF NOT EXISTS position VARCHAR(100);
+            ALTER TABLE empleados ADD COLUMN IF NOT EXISTS start_date DATE;
+            ALTER TABLE empleados ADD COLUMN IF NOT EXISTS salary DECIMAL(12,2) DEFAULT 0;
+        `);
+
+        console.log('✅ Esquema actualizado correctamente.');
+    } catch (err) {
+        console.error('❌ Error actualizando esquema:', err);
     } finally {
-        process.exit();
+        client.release();
+        await pool.end();
     }
 }
 
-migrate();
+runAlters();

@@ -1,0 +1,8 @@
+﻿/api/trabajo-campo-completo: []
+/api/admin-fincas: [{"id":2,"nombre":"Fincas Viejas","ubicacion":"Sar
+/api/admin-predios: [{"id":6,"nombre":"EEIII","finca_id":1,"superficie
+/api/admin-cuarteles: [{"id":6,"numero":1,"predio_id":6,"superficie":"10
+/api/admin-faenas: [{"id":7,"nombre":"GENERAL","descripcion":"Labores
+/api/admin-labor: [{"id":9,"nombre":"Supervisi├│n de Cuadro","faena_i
+/api/users: [{"id":13,"name":"Marcelo Wingeyer","email":"winge
+/api/admin-productos: []

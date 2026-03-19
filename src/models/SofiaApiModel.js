@@ -636,9 +636,10 @@ export class SofiaApiModel {
                 predioMap[config.name].cuarteles += 1;
                 predioMap[config.name].plantas += info.pl;
                 predioMap[config.name].cuartelesList.push({
-                    numero: info.numero,
+                    numero: info.code || info.numero,
                     ha,
-                    pl: info.pl
+                    pl: info.pl,
+                    variedad: info.variedad
                 });
             }
         });

@@ -20,6 +20,12 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Log incoming requests
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 // -- Proxy para la API de Sofía --
 app.use('/sofia-api', createProxyMiddleware({
     target: 'http://apisofia.sofiagestionagricola.cl',
@@ -292,8 +298,8 @@ app.post('/api/sync-sofia-master', async (req, res) => {
             for (const predioData of fincaGroup.predios) {
                 // 2. Upsert Predio
                 const predioRes = await client.query(
-                    `INSERT INTO admin_predios (finca_id, nombre, superficie, status) 
-                     VALUES ($1, $2, $3, 'active') 
+                    `INSERT INTO admin_predios (finca_id, nombre, superficie, tipo, status) 
+                     VALUES ($1, $2, $3, 'Productivo', 'active') 
                      ON CONFLICT (finca_id, nombre) DO UPDATE 
                      SET superficie = EXCLUDED.superficie, updated_at = NOW() 
                      RETURNING id`,
@@ -305,11 +311,11 @@ app.post('/api/sync-sofia-master', async (req, res) => {
                 if (predioData.cuartelesList && Array.isArray(predioData.cuartelesList)) {
                     for (const cuartel of predioData.cuartelesList) {
                         await client.query(
-                            `INSERT INTO admin_cuarteles (predio_id, numero, superficie, plantas_por_hilera, status) 
-                             VALUES ($1, $2, $3, $4, 'active') 
+                            `INSERT INTO admin_cuarteles (predio_id, numero, superficie, plantas_por_hilera, variedad, status) 
+                             VALUES ($1, $2, $3, $4, $5, 'active') 
                              ON CONFLICT (predio_id, numero) DO UPDATE 
-                             SET superficie = EXCLUDED.superficie, plantas_por_hilera = EXCLUDED.plantas_por_hilera, updated_at = NOW()`,
-                            [predioId, cuartel.numero, cuartel.ha, cuartel.pl]
+                             SET superficie = EXCLUDED.superficie, plantas_por_hilera = EXCLUDED.plantas_por_hilera, variedad = EXCLUDED.variedad, updated_at = NOW()`,
+                            [predioId, cuartel.numero, cuartel.ha, cuartel.pl, cuartel.variedad]
                         );
                     }
                 }
@@ -331,14 +337,12 @@ app.post('/api/sync-sofia-master', async (req, res) => {
 ADMIN_TABLES.forEach(tableName => {
     const route = `/api/${tableName.replace(/_/g, '-')}`;
 
-    // GET all (active only by default, ?all=true for all)
+    // GET all
     app.get(route, async (req, res) => {
         try {
-            const showAll = req.query.all === 'true';
-            const query = showAll
-                ? `SELECT * FROM ${tableName} ORDER BY id DESC`
-                : `SELECT * FROM ${tableName} WHERE status::text = 'active' ORDER BY id DESC`;
-            const result = await pool.query(query);
+            // Default: show everything (active and inactive). 
+            // Only use hard-delete to remove completely.
+            const result = await pool.query(`SELECT * FROM ${tableName} ORDER BY id DESC`);
             res.json(result.rows);
         } catch (error) {
             console.error(`Fetch ${tableName} error:`, error);
@@ -404,11 +408,11 @@ ADMIN_TABLES.forEach(tableName => {
         }
     });
 
-    // DELETE (soft delete - set status to inactive)
+    // DELETE (hard delete - remove from database)
     app.delete(`${route}/:id`, async (req, res) => {
         try {
-            await pool.query(`UPDATE ${tableName} SET status = 'inactive' WHERE id = $1`, [req.params.id]);
-            res.json({ success: true, message: 'Registro eliminado exitosamente.' });
+            await pool.query(`DELETE FROM ${tableName} WHERE id = $1`, [req.params.id]);
+            res.json({ success: true, message: 'Registro eliminado permanentemente del sistema.' });
         } catch (error) {
             console.error(`Delete ${tableName} error:`, error);
             res.status(500).json({ success: false, message: 'Error al eliminar registro: ' + error.message });
