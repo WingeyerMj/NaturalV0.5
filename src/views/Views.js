@@ -216,59 +216,63 @@ export function renderLoginPage() {
         </div>
       </div>
 
-      <!-- Registration Modal -->
-      <div id="register-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
-        <div style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-8); max-width: 480px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle);">
-          <div style="text-align: center; margin-bottom: var(--space-6);">
-            <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 60px; height: 60px; margin-bottom: var(--space-3);">
-            <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-1);">Crear Cuenta</h3>
-            <p style="font-size: var(--text-sm); color: var(--text-tertiary);">Completá tus datos para solicitar acceso</p>
-          </div>
-
-          <div class="form-error" id="register-error" style="display:none; margin-bottom: var(--space-4);">
-            ⚠️ <span id="register-error-msg"></span>
-          </div>
-
-          <form id="form-register" autocomplete="off">
-            <div class="form-group" style="margin-bottom: var(--space-4);">
-              <label class="form-label" for="register-name">Nombre Completo</label>
-              <div class="form-input-wrapper">
-                <input type="text" id="register-name" class="form-input" placeholder="Ej: Juan Pérez" required />
-                <span class="form-input-icon">👤</span>
-              </div>
+      <!-- Registration Modal (Bootstrap 5) -->
+      <div class="modal fade" id="register-modal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content" style="background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-subtle); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            <div class="modal-header border-0 pb-0">
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="form-group" style="margin-bottom: var(--space-4);">
-              <label class="form-label" for="register-email">Correo Electrónico</label>
-              <div class="form-input-wrapper">
-                <input type="email" id="register-email" class="form-input" placeholder="tucorreo@ejemplo.com" required />
-                <span class="form-input-icon">📧</span>
+            <div class="modal-body p-4 pt-0">
+              <div style="text-align: center; margin-bottom: var(--space-6);">
+                <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 60px; height: 60px; margin-bottom: var(--space-3);">
+                <h3 id="registerModalLabel" style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-1);">Crear Cuenta</h3>
+                <p style="font-size: var(--text-sm); color: var(--text-tertiary);">Completá tus datos para solicitar acceso</p>
               </div>
-            </div>
-            <div class="form-group" style="margin-bottom: var(--space-4);">
-              <label class="form-label" for="register-password">Contraseña</label>
-              <div class="form-input-wrapper">
-                <input type="password" id="register-password" class="form-input" placeholder="Mínimo 6 caracteres" required minlength="6" />
-                <span class="form-input-icon">🔒</span>
-              </div>
-            </div>
-            <div class="form-group" style="margin-bottom: var(--space-6);">
-              <label class="form-label" for="register-password-confirm">Confirmar Contraseña</label>
-              <div class="form-input-wrapper">
-                <input type="password" id="register-password-confirm" class="form-input" placeholder="Repetí tu contraseña" required minlength="6" />
-                <span class="form-input-icon">🔒</span>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary login-btn" style="width: 100%;">
-              Solicitar Acceso
-            </button>
-          </form>
 
-          <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-4); text-align: center; line-height: 1.5;">
-            Tu solicitud será revisada por un administrador.<br>Recibirás un correo cuando tu cuenta sea activada.
-          </p>
+              <div class="form-error" id="register-error" style="display:none; margin-bottom: var(--space-4);">
+                ⚠️ <span id="register-error-msg"></span>
+              </div>
 
-          <div style="text-align: center; margin-top: var(--space-4);">
-            <a href="#" id="btn-cancel-register" style="color: var(--text-tertiary); font-size: var(--text-sm); text-decoration: none;">← Volver al inicio de sesión</a>
+              <form id="form-register" autocomplete="off">
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="register-name">Nombre Completo</label>
+                  <div class="form-input-wrapper">
+                    <input type="text" id="register-name" class="form-input" placeholder="Ej: Juan Pérez" required />
+                    <span class="form-input-icon">👤</span>
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="register-email">Correo Electrónico</label>
+                  <div class="form-input-wrapper">
+                    <input type="email" id="register-email" class="form-input" placeholder="tucorreo@ejemplo.com" required />
+                    <span class="form-input-icon">📧</span>
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="register-password">Contraseña</label>
+                  <div class="form-input-wrapper">
+                    <input type="password" id="register-password" class="form-input" placeholder="Mínimo 6 caracteres" required minlength="6" />
+                    <span class="form-input-icon">🔒</span>
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom: var(--space-6);">
+                  <label class="form-label" for="register-password-confirm">Confirmar Contraseña</label>
+                  <div class="form-input-wrapper">
+                    <input type="password" id="register-password-confirm" class="form-input" placeholder="Repetí tu contraseña" required minlength="6" />
+                    <span class="form-input-icon">🔒</span>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" style="padding: var(--space-3); border-radius: var(--radius-lg); font-weight: 600;">
+                  🚀 Solicitar Acceso
+                </button>
+              </form>
+
+              <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-4); text-align: center; line-height: 1.5;">
+                Tu solicitud será revisada por un administrador.<br>Recibirás un correo cuando tu cuenta sea activada.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -371,6 +375,38 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600;">Cancelar</button>
             <button type="button" class="btn btn-danger" id="btn-confirm-delete-action" style="padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; background: var(--color-error); border: none;">Eliminar Registro</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 Generic Alert Modal -->
+    <div class="modal fade" id="genericAlertModal" tabindex="-1" aria-labelledby="genericAlertModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); background: var(--bg-secondary); color: var(--text-primary);">
+          <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.5rem;">
+            <h5 class="modal-title" id="genericAlertModalLabel" style="font-weight: 700; font-family: 'Outfit';">
+              Mensaje del Sistema
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="genericAlertModalMessage" style="padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 1.1rem; line-height: 1.5;">
+            Mensaje aquí...
+          </div>
+          <div class="modal-footer" style="border-top: 1px solid var(--border-subtle); padding: 1rem 1.5rem; display: flex; justify-content: center;">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="padding: 0.6rem 2rem; border-radius: 8px; font-weight: 600;">Entendido</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 10000;">
+      <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body" id="liveToastMessage">
+            Mensaje aquí...
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
       </div>
     </div>
@@ -2695,10 +2731,7 @@ export function renderAdminCrudView(config, data, catalogs = {}, sectionId = '')
             <span class="search-icon">🔍</span>
             <input type="text" class="search-input" placeholder="Buscar..." id="search-admin-crud" />
           </div>
-<<<<<<< HEAD
-=======
           <button class="btn btn-sm" id="btn-delete-selected-admin-crud" style="display:none; background: var(--color-error); border-color: var(--color-error); color: white; gap: var(--space-1);">🗑️ Eliminar Seleccionados (<span id="count-selected-admin-crud">0</span>)</button>
->>>>>>> b3ae38f8288c6c30d28784d2e01c6f33e181b44e
           <button class="btn btn-secondary btn-sm" id="btn-import-admin-crud" style="background: var(--color-emerald-600); border-color: var(--color-emerald-600); color: white;">📥 Carga Masiva</button>
           <button class="btn btn-primary btn-sm" id="btn-add-admin-crud">+ Nuevo Registro</button>
           <input type="file" id="input-import-admin-crud" style="display:none;" accept=".xlsx, .xls, .csv" />

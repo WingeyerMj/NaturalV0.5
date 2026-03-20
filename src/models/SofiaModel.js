@@ -33,8 +33,8 @@ export class SofiaImportModel {
 
     static importRows(rows) {
         // Simple deduplication based on common fields to avoid bloating the model if imported multiple times
-        const existingHashes = new Set(this.REGISTROS.map(r => `${r.fecha_aplicacion}|${r.producto}|${r.cantidad}|${r.finca}|${r.cuartel}|${r.tipo_registro}`));
-        const newRows = rows.filter(r => !existingHashes.has(`${r.fecha_aplicacion}|${r.producto}|${r.cantidad}|${r.finca}|${r.cuartel}|${r.tipo_registro}`));
+        const existingHashes = new Set(this.REGISTROS.map(r => `${r.fecha_aplicacion}|${r.producto}|${r.cantidad}|${r.finca}|${r.cuartel}|${r.tipo_registro}|${r.costo_total}|${r.n_units}|${r.original_index}`));
+        const newRows = rows.filter(r => !existingHashes.has(`${r.fecha_aplicacion}|${r.producto}|${r.cantidad}|${r.finca}|${r.cuartel}|${r.tipo_registro}|${r.costo_total}|${r.n_units}|${r.original_index}`));
         
         this.REGISTROS.push(...newRows);
         console.log(`[SofiaImportModel] Imported ${newRows.length} new rows. Skipped ${rows.length - newRows.length} duplicates. Total: ${this.REGISTROS.length}`);
@@ -220,7 +220,8 @@ export class SofiaImportModel {
                 k_units: colMap['K'] !== undefined ? parseNum(cols[colMap['K']]) : 0,
                 p_units: colMap['P'] !== undefined ? parseNum(cols[colMap['P']]) : 0,
                 ca_units: colMap['Ca'] !== undefined ? parseNum(cols[colMap['Ca']]) : 0,
-                has_totales: colMap['Has'] !== undefined ? parseNum(cols[colMap['Has']]) : 0
+                has_totales: colMap['Has'] !== undefined ? parseNum(cols[colMap['Has']]) : 0,
+                original_index: i // To distinguish otherwise identical rows within the same file import
             });
         }
         console.log(`[SofiaModel] Parse complete: ${rows.length} rows kept, ${skippedEmpty} empty/invalid skipped, ${skippedPendiente} pendientes skipped.`);
@@ -637,14 +638,10 @@ export class SofiaImportModel {
                     nutrientDensities[ratioKey].totalQty += r.cantidad;
 
                     if (cycleMatch && fincaMatch && predioMatch) {
-                        if (!processedBudgets.has(uniqueKey)) {
-                            processedBudgets.add(uniqueKey);
-                            if (!budgetStats[key]) budgetStats[key] = { n: 0, p: 0, k: 0 };
-
-                            budgetStats[key].n += nUnits;
-                            budgetStats[key].p += pUnits;
-                            budgetStats[key].k += kUnits;
-                        }
+                        if (!budgetStats[key]) budgetStats[key] = { n: 0, p: 0, k: 0 };
+                        budgetStats[key].n += nUnits;
+                        budgetStats[key].p += pUnits;
+                        budgetStats[key].k += kUnits;
                     }
                 }
             }
@@ -684,20 +681,21 @@ export class SofiaImportModel {
             if (filters.producto && prod !== filters.producto.toUpperCase()) return;
             if (filters.budgetType === 'pre' && prod === 'BIO-CRECIMIENTO') return;
 
-            // Deduplication for Real rows to avoid over-counting if data was imported multiple times
-            const uniqueKey = `${r.fecha_aplicacion}-${r.finca}-${r.cuartel}-${r.producto}-${r.cantidad}-${r.ciclo}`;
-            if (processedReal.has(uniqueKey)) return;
-            processedReal.add(uniqueKey);
-
             const key = getGroupKey(r);
             if (!realStats[key]) realStats[key] = { n: 0, p: 0, k: 0 };
 
             let appliedN = 0, appliedP = 0, appliedK = 0;
 
-            // Use group+product specific ratio first
             const ratioKey = `${key}|${prod}`;
+            // Hierarchy: 1. Specific key (Cuartel/Parcela) -> 2. Predio level -> 3. Global average
             if (groupProductRatios[ratioKey]) {
                 const ratios = groupProductRatios[ratioKey];
+                appliedN = r.cantidad * ratios.n;
+                appliedP = r.cantidad * ratios.p;
+                appliedK = r.cantidad * ratios.k;
+            } else if (groupProductRatios[`${r.clasifica}|${prod}`]) {
+                // Try to use the ratio from the broader "Predio" (Clasifica) if Cuartel specific ratio is missing
+                const ratios = groupProductRatios[`${r.clasifica}|${prod}`];
                 appliedN = r.cantidad * ratios.n;
                 appliedP = r.cantidad * ratios.p;
                 appliedK = r.cantidad * ratios.k;
@@ -715,7 +713,6 @@ export class SofiaImportModel {
                     appliedP = r.cantidad * avgP;
                     appliedK = r.cantidad * avgK;
                 }
-                // If no budget data at all, nutrients stay at 0 (don't use hardcoded compositions)
             }
 
             realStats[key].n += appliedN;

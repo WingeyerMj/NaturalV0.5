@@ -252,6 +252,34 @@ app.post('/api/save-jornales-budget', async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════
+// MIGRACIÓN: Agregar columna 'cultivo' a admin_cuarteles
+// ═══════════════════════════════════════════════════════════
+app.post('/api/migrate-cultivo', async (req, res) => {
+    try {
+        // 1. Add cultivo column if it doesn't exist
+        await pool.query(`ALTER TABLE admin_cuarteles ADD COLUMN IF NOT EXISTS cultivo VARCHAR(100) DEFAULT NULL`);
+        
+        // 2. Migrate existing data: extract variety name from "30 - Sultanina" format
+        //    Set cultivo = 'Uva' for all existing records (they are all grape varieties)
+        //    Clean variedad to just the name part (remove the number prefix)
+        await pool.query(`
+            UPDATE admin_cuarteles 
+            SET cultivo = 'Uva',
+                variedad = CASE 
+                    WHEN variedad LIKE '%-%' THEN TRIM(SUBSTRING(variedad FROM POSITION('-' IN variedad) + 1))
+                    ELSE variedad
+                END
+            WHERE cultivo IS NULL AND variedad IS NOT NULL AND variedad != ''
+        `);
+        
+        res.json({ success: true, message: 'Migración de cultivo completada exitosamente.' });
+    } catch (error) {
+        console.error('Migration error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// ═══════════════════════════════════════════════════════════
 // MÓDULO: Administración Usuarios - CRUD Genérico
 // ═══════════════════════════════════════════════════════════
 
@@ -310,12 +338,19 @@ app.post('/api/sync-sofia-master', async (req, res) => {
                 // Sync Cuarteles
                 if (predioData.cuartelesList && Array.isArray(predioData.cuartelesList)) {
                     for (const cuartel of predioData.cuartelesList) {
+                        // Extract clean variety name from "30 - Sultanina" format
+                        let variedadClean = cuartel.variedad || '';
+                        if (variedadClean.includes('-')) {
+                            variedadClean = variedadClean.substring(variedadClean.indexOf('-') + 1).trim();
+                        }
+                        const cultivo = 'Uva'; // Sofia data is all grape-related
+                        
                         await client.query(
-                            `INSERT INTO admin_cuarteles (predio_id, numero, superficie, plantas_por_hilera, variedad, status) 
-                             VALUES ($1, $2, $3, $4, $5, 'active') 
+                            `INSERT INTO admin_cuarteles (predio_id, numero, superficie, plantas_por_hilera, variedad, cultivo, status) 
+                             VALUES ($1, $2, $3, $4, $5, $6, 'active') 
                              ON CONFLICT (predio_id, numero) DO UPDATE 
-                             SET superficie = EXCLUDED.superficie, plantas_por_hilera = EXCLUDED.plantas_por_hilera, variedad = EXCLUDED.variedad, updated_at = NOW()`,
-                            [predioId, cuartel.numero, cuartel.ha, cuartel.pl, cuartel.variedad]
+                             SET superficie = EXCLUDED.superficie, plantas_por_hilera = EXCLUDED.plantas_por_hilera, variedad = EXCLUDED.variedad, cultivo = EXCLUDED.cultivo, updated_at = NOW()`,
+                            [predioId, cuartel.numero, cuartel.ha, cuartel.pl, variedadClean, cultivo]
                         );
                     }
                 }

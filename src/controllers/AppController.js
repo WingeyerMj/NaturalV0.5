@@ -190,6 +190,55 @@ export class AppController {
         });
     }
 
+    async showAlert(message, title = 'Mensaje del Sistema') {
+        return new Promise((resolve) => {
+            const modalEl = document.getElementById('genericAlertModal');
+            const titleEl = document.getElementById('genericAlertModalLabel');
+            const messageEl = document.getElementById('genericAlertModalMessage');
+
+            if (!modalEl) {
+                alert(message);
+                resolve();
+                return;
+            }
+
+            if (titleEl) titleEl.textContent = title;
+            if (messageEl) messageEl.innerHTML = message;
+
+            let bsModal = bootstrap.Modal.getInstance(modalEl);
+            if (!bsModal) bsModal = new bootstrap.Modal(modalEl);
+
+            const handleClose = () => {
+                modalEl.removeEventListener('hidden.bs.modal', handleClose);
+                resolve();
+            };
+
+            modalEl.addEventListener('hidden.bs.modal', handleClose);
+            bsModal.show();
+        });
+    }
+
+    showToast(message, type = 'info') {
+        const toastEl = document.getElementById('liveToast');
+        const messageEl = document.getElementById('liveToastMessage');
+        if (!toastEl || !messageEl) return;
+
+        // Set colors based on type
+        const colors = {
+            success: 'var(--color-success)',
+            error: 'var(--color-error)',
+            warning: 'var(--color-amber-500)',
+            info: 'var(--color-primary-500)'
+        };
+
+        toastEl.style.backgroundColor = colors[type] || colors.info;
+        messageEl.textContent = message;
+
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 4000 });
+        bsToast.show();
+    }
+
+
     init() {
         const user = UserModel.getCurrentUser();
         if (user) {
@@ -668,7 +717,7 @@ export class AppController {
                             }
                             updateChart();
                         } else {
-                            alert(res.message);
+                            this.showAlert(res.message);
                         }
                     };
                     reader.readAsText(file);
@@ -1296,7 +1345,8 @@ export class AppController {
                 if (!user) return;
 
                 const action = user.active ? 'desactivar' : 'reactivar';
-                if (confirm(`¿Está seguro que desea ${action} al usuario "${user.name}"?`)) {
+                const confirmed = await this.showConfirmModal(`¿Está seguro que desea ${action} al usuario "${user.name}"?`);
+                if (confirmed) {
                     btn.disabled = true;
                     await UserModel.update(id, { ...user, active: !user.active });
                     refreshTable();
@@ -1312,7 +1362,8 @@ export class AppController {
                 const user = users.find(u => u.id === id);
                 if (!user) return;
 
-                if (confirm(`¿Aprobar el acceso de "${user.name}" (${user.email})?`)) {
+                const confirmed = await this.showConfirmModal(`¿Aprobar el acceso de "${user.name}" (${user.email})?`);
+                if (confirmed) {
                     btn.disabled = true;
                     btn.textContent = '...';
                     const success = await UserModel.approveUser(id);
@@ -1324,7 +1375,7 @@ export class AppController {
                     } else {
                         btn.disabled = false;
                         btn.textContent = '✅ Aprobar';
-                        alert('Error al aprobar usuario.');
+                        this.showAlert('Error al aprobar usuario.');
                     }
                 }
             });
@@ -1337,7 +1388,8 @@ export class AppController {
                 const user = users.find(u => u.id === id);
                 if (!user) return;
 
-                if (confirm(`¿Rechazar la solicitud de "${user.name}"?\nEl usuario será eliminado.`)) {
+                const confirmed = await this.showConfirmModal(`¿Rechazar la solicitud de "${user.name}"?\nEl usuario será eliminado.`);
+                if (confirmed) {
                     btn.disabled = true;
                     btn.textContent = '...';
                     const success = await UserModel.rejectUser(id);
@@ -1349,7 +1401,7 @@ export class AppController {
                     } else {
                         btn.disabled = false;
                         btn.textContent = '❌ Rechazar';
-                        alert('Error al rechazar usuario.');
+                        this.showAlert('Error al rechazar usuario.');
                     }
                 }
             });
@@ -1399,10 +1451,6 @@ export class AppController {
 
         // ── Event bindings ──
         const refreshTable = async () => {
-<<<<<<< HEAD
-            const freshData = await model.getAll();
-            container.innerHTML = renderAdminCrudView(config, freshData);
-=======
             // Re-fetch everything on refresh to ensure catalogs are fresh
             const [freshData] = await Promise.all([
                 model.getAll(true),
@@ -1411,7 +1459,6 @@ export class AppController {
                 }))
             ]);
             container.innerHTML = renderAdminCrudView(config, freshData, catalogs, sectionId);
->>>>>>> b3ae38f8288c6c30d28784d2e01c6f33e181b44e
             this.bindAdminCrudEvents(container, config, model, refreshTable, sectionId);
         };
 
@@ -1633,7 +1680,7 @@ export class AppController {
                     updatePreview();
                     modal.style.display = 'flex';
                 } catch (e) {
-                    alert('Error al cargar detalle: ' + e.message);
+                    this.showAlert('Error al cargar detalle: ' + e.message);
                 }
             };
         });
@@ -1641,13 +1688,16 @@ export class AppController {
         // -- Delete --
         container.querySelectorAll('.btn-delete-work-log').forEach(btn => {
             btn.onclick = async () => {
-                if (confirm('¿Eliminar este registro de trabajo? El stock de insumos será restaurado automáticamente.')) {
-                    const id = btn.dataset.id;
-                    try {
-                        const res = await fetch(`${VITE_API_URL}/trabajo-campo/${id}`, { method: 'DELETE' }).then(r => r.json());
-                        if (res.success) refresh();
-                        else alert('Error: ' + res.message);
-                    } catch (e) { alert('Error de red'); }
+                const confirmed = await this.showConfirmModal('⚠️ Confirmar Eliminación','¿Eliminar este registro de trabajo? El stock de insumos será restaurado automáticamente.');
+                if (!confirmed) return;
+
+                const id = btn.dataset.id;
+                try {
+                    const res = await fetch(`${VITE_API_URL}/trabajo-campo/${id}`, { method: 'DELETE' }).then(r => r.json());
+                    if (res.success) refresh();
+                    else this.showAlert('Error: ' + res.message);
+                } catch (e) { 
+                    this.showAlert('Error de red'); 
                 }
             };
         });
@@ -1724,7 +1774,7 @@ export class AppController {
                 refresh();
             } catch (err) {
                 console.error(err);
-                alert('Error: ' + err.message);
+                this.showAlert('Error: ' + err.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = editId ? '💾 Actualizar Registro' : '💾 Registrar Trabajo';
@@ -1808,7 +1858,7 @@ export class AppController {
                 this.showToast(result.message || 'Operación exitosa', 'success');
                 await refreshTable();
             } else {
-                alert(result.message || 'Error en la operación');
+                this.showAlert(result.message || 'Error en la operación');
                 btnSave.disabled = false;
                 btnSave.textContent = originalText;
             }
@@ -1844,12 +1894,12 @@ export class AppController {
                         } else {
                             btn.disabled = false;
                             btn.innerHTML = '🗑️';
-                            alert('❌ Error: ' + (result.message || 'No se pudo eliminar el registro.'));
+                            this.showAlert('❌ Error: ' + (result.message || 'No se pudo eliminar el registro.'));
                         }
                     } catch (err) {
                         btn.disabled = false;
                         btn.innerHTML = '🗑️';
-                        alert('❌ Error de conexión al intentar eliminar.');
+                        this.showAlert('❌ Error de conexión al intentar eliminar.');
                     }
                 }
             };
@@ -1865,7 +1915,7 @@ export class AppController {
                 if (result.success) {
                     this.showToast('Estado actualizado', 'success');
                 } else {
-                    alert(result.message || 'Error al actualizar estado');
+                    this.showAlert(result.message || 'Error al actualizar estado');
                 }
                 await refreshTable();
             });
@@ -1942,6 +1992,8 @@ export class AppController {
 
             this.showToast(`Eliminados: ${successCount} exitosos${errorCount > 0 ? `, ${errorCount} fallidos` : ''}`, successCount > 0 ? 'success' : 'error');
             await refreshTable();
+            btnDeleteSelected.disabled = false;
+            btnDeleteSelected.innerHTML = originalText;
         });
 
         // Search
@@ -1974,11 +2026,12 @@ export class AppController {
                     const rows = XLSX.utils.sheet_to_json(sheet);
 
                     if (rows.length === 0) {
-                        alert('El archivo está vacío.');
+                        this.showAlert('El archivo está vacío.');
                         return;
                     }
 
-                    if (!confirm(`¿Desea importar ${rows.length} registros en "${config.title}"?`)) {
+                    const confirmed = await this.showConfirmModal('📥 Importar Datos', `¿Desea importar ${rows.length} registros en "${config.title}"?`);
+                    if (!confirmed) {
                         fileInput.value = '';
                         return;
                     }
@@ -2078,164 +2131,45 @@ export class AppController {
 
                 } catch (err) {
                     console.error('Import error:', err);
-                    alert(`Error al procesar el archivo Excel: ${err.message || 'Formato incorrecto'}`);
+                    this.showAlert(`Error al procesar el archivo Excel: ${err.message || 'Formato incorrecto'}`);
                 } finally {
                     btnImport.disabled = false;
                     btnImport.textContent = '📥 Carga Masiva';
                     fileInput.value = '';
                 }
             };
-
-            reader.readAsArrayBuffer(file);
-        });
-
-        // 📥 Mass Import (Excel/CSV)
-        const btnImport = document.getElementById('btn-import-admin-crud');
-        const fileInput = document.getElementById('input-import-admin-crud');
-
-        btnImport?.addEventListener('click', () => fileInput.click());
-
-        fileInput?.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = async (evt) => {
-                try {
-                    const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheetName = workbook.SheetNames[0];
-                    const sheet = workbook.Sheets[sheetName];
-                    const rows = XLSX.utils.sheet_to_json(sheet);
-
-                    if (rows.length === 0) {
-                        alert('El archivo está vacío.');
-                        return;
-                    }
-
-                    if (!confirm(`¿Desea importar ${rows.length} registros en "${config.title}"?`)) {
-                        fileInput.value = '';
-                        return;
-                    }
-
-                    btnImport.disabled = true;
-                    btnImport.textContent = '⌛ Importando...';
-
-                    let successCount = 0;
-                    let errorCount = 0;
-
-                    // Support for Predio Name mapping to ID (if loading cuarteles)
-                    let predioMap = null;
-                    if (sectionId === 'admin-cuarteles') {
-                        const predios = await ADMIN_MODELS['admin-predios'].getAll();
-                        predioMap = new Map(predios.map(p => [p.nombre.toLowerCase().trim(), p.id]));
-                    }
-
-                    // Normalize helper
-                    const norm = (s) => String(s || '').toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-                    // Helper to map Excel headers to model keys
-                    const mapRow = (row) => {
-                        const mapped = {};
-                        columns.forEach(col => {
-                            const colLabelNorm = norm(col.label);
-                            const colKeyNorm = norm(col.key);
-
-                            // Try map by various headers
-                            const key = Object.keys(row).find(k => {
-                                const kn = norm(k);
-                                return kn === colKeyNorm || 
-                                       kn === colLabelNorm || 
-                                       (col.key === 'numero' && (kn.includes('cuartel') || kn === 'nº')) ||
-                                       (col.key === 'superficie' && kn.includes('hectarea')) ||
-                                       (col.key === 'plantas_por_hilera' && kn.includes('plantas'));
-                            });
-
-                            if (key !== undefined) {
-                                let val = row[key];
-                                if (col.type === 'number') val = Number(val) || 0;
-                                if (col.type === 'select' && col.options) {
-                                    const opt = col.options.find(o => norm(o) === norm(val));
-                                    if (opt) val = opt;
-                                }
-                                mapped[col.key] = val;
-                            }
-                        });
-
-                        // Special case: Map Predio Name to ID if needed
-                        if (predioMap && !mapped.predio_id) {
-                            const pKey = Object.keys(row).find(k => norm(k).includes('predio'));
-                            if (pKey) {
-                                const pName = norm(row[pKey]);
-                                if (predioMap.has(pName)) mapped.predio_id = predioMap.get(pName);
-                            }
-                        }
-                        return mapped;
-                    };
-
-                    for (const [idx, row] of rows.entries()) {
-                        const dataToSave = mapRow(row);
-                        // Ensure required fields
-                        const missing = columns.filter(c => c.required && !dataToSave[c.key]);
-                        if (missing.length > 0) {
-                            console.warn(`[Row ${idx + 2}] Saltada por falta de campos requeridos:`, missing.map(m => m.label));
-                            errorCount++;
-                            continue;
-                        }
-
-                        const res = await model.create(dataToSave);
-                        if (res.success) {
-                            successCount++;
-                        } else {
-                            console.error(`[Row ${idx + 2}] Error al crear:`, res.message);
-                            errorCount++;
-                        }
-                    }
-
-                    this.showToast(`Importación finalizada: ${successCount} exitosos, ${errorCount} fallidos.`, successCount > 0 ? 'success' : 'error');
-                    await refreshTable();
-
-                } catch (err) {
-                    console.error('Import error:', err);
-                    alert(`Error al procesar el archivo Excel: ${err.message || 'Formato incorrecto'}`);
-                } finally {
-                    btnImport.disabled = false;
-                    btnImport.textContent = '📥 Carga Masiva';
-                    fileInput.value = '';
-                }
-            };
-
             reader.readAsArrayBuffer(file);
         });
     }
 
-    // ── Sección 3: FINCAS ──
-    /**
-     * Sincroniza datos maestros (Fincas, Predios, Cuarteles) desde Sofia
-     * a la base de datos PostgreSQL local.
-     */
-    async syncSofiaMasterData(hectareasData) {
-        try {
-            console.log('Sincronizando datos maestros con el servidor...');
-            const resp = await fetch('/api/sync-sofia-master', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ groups: hectareasData.groups })
-            });
 
-            if (!resp.ok) {
-                const error = await resp.json();
-                console.warn('Sync master data failed:', error.message);
-            } else {
-                console.log('Datos maestros sincronizados exitosamente.');
-            }
-        } catch (e) {
-            console.warn('Backend reach error during master data sync:', e);
+// ── Sección 3: FINCAS ──
+/**
+ * Sincroniza datos maestros (Fincas, Predios, Cuarteles) desde Sofia
+ * a la base de datos PostgreSQL local.
+ */
+async syncSofiaMasterData(hectareasData) {
+    try {
+        console.log('Sincronizando datos maestros con el servidor...');
+        const resp = await fetch('/api/sync-sofia-master', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ groups: hectareasData.groups })
+        });
+
+        if (!resp.ok) {
+            const error = await resp.json();
+            console.warn('Sync master data failed:', error.message);
+        } else {
+            console.log('Datos maestros sincronizados exitosamente.');
         }
+    } catch (e) {
+        console.warn('Backend reach error during master data sync:', e);
     }
+}
 
-    async renderFincasSection(container) {
-        container.innerHTML = `
+async renderFincasSection(container) {
+    container.innerHTML = `
         <div class="sofia-filters animate-fade-in">
           <div class="filter-group">
             <label class="form-label">Ciclo Producción</label>
@@ -2266,648 +2200,650 @@ export class AppController {
         </div>
         `;
 
-        const filters = {
-            ciclo: document.getElementById('filter-fincas-ciclo').value,
-            finca: ''
-        };
+    const filters = {
+        ciclo: document.getElementById('filter-fincas-ciclo').value,
+        finca: ''
+    };
 
-        const updateFincasDashboard = async () => {
-            const dashboard = document.getElementById('fincas-dashboard-container');
-            if (!dashboard) return;
+    const updateFincasDashboard = async () => {
+        const dashboard = document.getElementById('fincas-dashboard-container');
+        if (!dashboard) return;
 
-            dashboard.innerHTML = '<div style="padding: var(--space-10); text-align: center; color: var(--text-tertiary);"><div class="spinner" style="margin: 0 auto var(--space-4);"></div><p>Actualizando datos...</p></div>';
+        dashboard.innerHTML = '<div style="padding: var(--space-10); text-align: center; color: var(--text-tertiary);"><div class="spinner" style="margin: 0 auto var(--space-4);"></div><p>Actualizando datos...</p></div>';
 
-            try {
-                // Fetch jornales data for Hectáreas por Predio
-                const jornalesData = await SofiaApiModel.fetchJornales(filters);
-                const hectareasData = SofiaApiModel.getHectareasPorPredio(jornalesData);
+        try {
+            // Fetch jornales data for Hectáreas por Predio
+            const jornalesData = await SofiaApiModel.fetchJornales(filters);
+            const hectareasData = SofiaApiModel.getHectareasPorPredio(jornalesData);
 
-                dashboard.innerHTML = renderHectareasPorPredio(hectareasData);
+            dashboard.innerHTML = renderHectareasPorPredio(hectareasData);
 
-                // Sincronizar con la base de datos local (PostgreSQL)
-                if (hectareasData && hectareasData.groups && hectareasData.groups.length > 0) {
-                    this.syncSofiaMasterData(hectareasData);
-                }
-            } catch (err) {
-                dashboard.innerHTML = '<div style="padding: var(--space-10); text-align: center; color: var(--text-tertiary);"><p>Error al cargar datos: ' + err.message + '</p></div>';
+            // Sincronizar con la base de datos local (PostgreSQL)
+            if (hectareasData && hectareasData.groups && hectareasData.groups.length > 0) {
+                this.syncSofiaMasterData(hectareasData);
             }
+        } catch (err) {
+            dashboard.innerHTML = '<div style="padding: var(--space-10); text-align: center; color: var(--text-tertiary);"><p>Error al cargar datos: ' + err.message + '</p></div>';
+        }
+    };
+
+    // Bind filter changes
+    document.getElementById('filter-fincas-ciclo')?.addEventListener('change', (e) => {
+        filters.ciclo = e.target.value;
+        updateFincasDashboard();
+    });
+    document.getElementById('filter-fincas-finca')?.addEventListener('change', (e) => {
+        filters.finca = e.target.value;
+        updateFincasDashboard();
+    });
+
+    await updateFincasDashboard();
+}
+
+renderDashboardContent(container) {
+    const metrics = {
+        totalHectares: FincaModel.getTotalHectares(),
+        totalFincas: FincaModel.getActive().length,
+        totalEmpleados: EmpleadoModel.getActive().length,
+        budgetExecution: PresupuestoModel.getExecutionPercentage(),
+        recentLabores: LaborModel.getAll().slice(0, 5)
+    };
+
+    container.innerHTML = renderDashboardHome(metrics);
+
+    // Animated counters
+    this.animateCounters();
+
+    // Render charts after DOM update
+    requestAnimationFrame(() => {
+        this.renderBudgetChart();
+        this.renderLaboresChart();
+        this.renderHoursChart();
+    });
+}
+
+// ── Animated Counters ──
+animateCounters() {
+    document.querySelectorAll('.metric-value').forEach(el => {
+        const text = el.textContent;
+        const numericMatch = text.match(/(\d+)/);
+        if (!numericMatch) return;
+
+        const target = parseInt(numericMatch[0]);
+        const suffix = text.replace(numericMatch[0], '').trim();
+        const prefix = text.substring(0, text.indexOf(numericMatch[0]));
+        const duration = 1200;
+        const start = performance.now();
+
+        const animate = (now) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+            const current = Math.round(target * eased);
+            el.textContent = `${prefix}${current}${suffix}`;
+            if (progress < 1) requestAnimationFrame(animate);
         };
+        el.textContent = `${prefix}0${suffix}`;
+        requestAnimationFrame(animate);
+    });
+}
 
-        // Bind filter changes
-        document.getElementById('filter-fincas-ciclo')?.addEventListener('change', (e) => {
-            filters.ciclo = e.target.value;
-            updateFincasDashboard();
-        });
-        document.getElementById('filter-fincas-finca')?.addEventListener('change', (e) => {
-            filters.finca = e.target.value;
-            updateFincasDashboard();
-        });
-
-        await updateFincasDashboard();
-    }
-
-    renderDashboardContent(container) {
-        const metrics = {
-            totalHectares: FincaModel.getTotalHectares(),
-            totalFincas: FincaModel.getActive().length,
-            totalEmpleados: EmpleadoModel.getActive().length,
-            budgetExecution: PresupuestoModel.getExecutionPercentage(),
-            recentLabores: LaborModel.getAll().slice(0, 5)
-        };
-
-        container.innerHTML = renderDashboardHome(metrics);
-
-        // Animated counters
-        this.animateCounters();
-
-        // Render charts after DOM update
-        requestAnimationFrame(() => {
-            this.renderBudgetChart();
-            this.renderLaboresChart();
-            this.renderHoursChart();
-        });
-    }
-
-    // ── Animated Counters ──
-    animateCounters() {
-        document.querySelectorAll('.metric-value').forEach(el => {
-            const text = el.textContent;
-            const numericMatch = text.match(/(\d+)/);
-            if (!numericMatch) return;
-
-            const target = parseInt(numericMatch[0]);
-            const suffix = text.replace(numericMatch[0], '').trim();
-            const prefix = text.substring(0, text.indexOf(numericMatch[0]));
-            const duration = 1200;
-            const start = performance.now();
-
-            const animate = (now) => {
-                const elapsed = now - start;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
-                const current = Math.round(target * eased);
-                el.textContent = `${prefix}${current}${suffix}`;
-                if (progress < 1) requestAnimationFrame(animate);
-            };
-            el.textContent = `${prefix}0${suffix}`;
-            requestAnimationFrame(animate);
-        });
-    }
-
-    // ── Chart Options Helper ──
-    getChartOptions(yLabel = '') {
-        return {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    labels: {
-                        color: '#94a3b8',
-                        font: { family: 'Inter', size: 12 },
-                        padding: 14,
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
-                    grid: { color: 'rgba(148, 163, 184, 0.06)' }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: yLabel ? { display: true, text: yLabel, color: '#64748b', font: { family: 'Inter', size: 12 } } : undefined,
-                    ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
-                    grid: { color: 'rgba(148, 163, 184, 0.06)' }
+// ── Chart Options Helper ──
+getChartOptions(yLabel = '') {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#94a3b8',
+                    font: { family: 'Inter', size: 12 },
+                    padding: 14,
                 }
             }
-        };
-    }
-
-    // ── Chart Rendering ──
-    renderBudgetChart() {
-        const ctx = document.getElementById('chart-budget');
-        if (!ctx) return;
-
-        const data = PresupuestoModel.getByCategory();
-        const categories = Object.keys(data);
-
-        this.charts['budget'] = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: categories,
-                datasets: [
-                    {
-                        label: 'Presupuestado',
-                        data: categories.map(c => data[c].planned),
-                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                        borderColor: 'rgba(16, 185, 129, 1)',
-                        borderWidth: 1,
-                        borderRadius: 6,
-                    },
-                    {
-                        label: 'Ejecutado',
-                        data: categories.map(c => data[c].executed),
-                        backgroundColor: 'rgba(168, 85, 247, 0.6)',
-                        borderColor: 'rgba(168, 85, 247, 1)',
-                        borderWidth: 1,
-                        borderRadius: 6,
-                    }
-                ]
+        },
+        scales: {
+            x: {
+                ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                grid: { color: 'rgba(148, 163, 184, 0.06)' }
             },
-            options: this.getChartOptions('Monto ($)')
-        });
-    }
-
-    renderLaboresChart() {
-        const ctx = document.getElementById('chart-labores');
-        if (!ctx) return;
-
-        const data = LaborModel.getByType();
-        const labels = Object.keys(data);
-        const values = Object.values(data);
-
-        const colors = [
-            'rgba(16, 185, 129, 0.8)',
-            'rgba(168, 85, 247, 0.8)',
-            'rgba(245, 158, 11, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(239, 68, 68, 0.8)',
-            'rgba(34, 197, 94, 0.8)',
-        ];
-
-        this.charts['labores'] = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: colors.slice(0, labels.length),
-                    borderWidth: 0,
-                    hoverOffset: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '65%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#94a3b8',
-                            padding: 16,
-                            font: { family: 'Inter', size: 12 }
-                        }
-                    }
-                }
+            y: {
+                beginAtZero: true,
+                title: yLabel ? { display: true, text: yLabel, color: '#64748b', font: { family: 'Inter', size: 12 } } : undefined,
+                ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                grid: { color: 'rgba(148, 163, 184, 0.06)' }
             }
-        });
-    }
+        }
+    };
+}
 
-    renderHoursChart() {
-        const ctx = document.getElementById('chart-hours');
-        if (!ctx) return;
+// ── Chart Rendering ──
+renderBudgetChart() {
+    const ctx = document.getElementById('chart-budget');
+    if (!ctx) return;
 
-        const data = LaborModel.getHoursByFinca();
-        const labels = Object.keys(data);
-        const values = Object.values(data);
+    const data = PresupuestoModel.getByCategory();
+    const categories = Object.keys(data);
 
-        this.charts['hours'] = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels.map(l => l.replace('Finca ', '')),
-                datasets: [{
-                    label: 'Horas Totales',
-                    data: values,
-                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                    borderColor: 'rgba(59, 130, 246, 1)',
+    this.charts['budget'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: categories,
+            datasets: [
+                {
+                    label: 'Presupuestado',
+                    data: categories.map(c => data[c].planned),
+                    backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
                     borderWidth: 1,
                     borderRadius: 6,
-                }]
-            },
-            options: {
-                ...this.getChartOptions('Horas'),
-                indexAxis: 'y',
-            }
-        });
-    }
+                },
+                {
+                    label: 'Ejecutado',
+                    data: categories.map(c => data[c].executed),
+                    backgroundColor: 'rgba(168, 85, 247, 0.6)',
+                    borderColor: 'rgba(168, 85, 247, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                }
+            ]
+        },
+        options: this.getChartOptions('Monto ($)')
+    });
+}
 
-    renderPresupuestoChart() {
-        const ctx = document.getElementById('chart-presupuesto-mgmt');
-        if (!ctx) return;
+renderLaboresChart() {
+    const ctx = document.getElementById('chart-labores');
+    if (!ctx) return;
 
-        const data = PresupuestoModel.getByCategory();
-        const categories = Object.keys(data);
+    const data = LaborModel.getByType();
+    const labels = Object.keys(data);
+    const values = Object.values(data);
 
-        this.charts['presupuesto-mgmt'] = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: categories,
-                datasets: [
-                    {
-                        label: 'Presupuestado',
-                        data: categories.map(c => data[c].planned),
-                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                        borderColor: 'rgba(16, 185, 129, 1)',
-                        borderWidth: 1,
-                        borderRadius: 6,
-                    },
-                    {
-                        label: 'Ejecutado',
-                        data: categories.map(c => data[c].executed),
-                        backgroundColor: 'rgba(245, 158, 11, 0.6)',
-                        borderColor: 'rgba(245, 158, 11, 1)',
-                        borderWidth: 1,
-                        borderRadius: 6,
-                    }
-                ]
-            },
-            options: this.getChartOptions('Monto ($)')
-        });
-    }
+    const colors = [
+        'rgba(16, 185, 129, 0.8)',
+        'rgba(168, 85, 247, 0.8)',
+        'rgba(245, 158, 11, 0.8)',
+        'rgba(59, 130, 246, 0.8)',
+        'rgba(239, 68, 68, 0.8)',
+        'rgba(34, 197, 94, 0.8)',
+    ];
 
-    getChartOptions(yLabel = '') {
-        return {
+    this.charts['labores'] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors.slice(0, labels.length),
+                borderWidth: 0,
+                hoverOffset: 8,
+            }]
+        },
+        options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '65%',
             plugins: {
                 legend: {
+                    position: 'bottom',
                     labels: {
                         color: '#94a3b8',
+                        padding: 16,
                         font: { family: 'Inter', size: 12 }
                     }
                 }
-            },
-            scales: {
-                x: {
-                    ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
-                    grid: { color: 'rgba(255,255,255,0.04)' }
-                },
-                y: {
-                    title: { display: !!yLabel, text: yLabel, color: '#64748b' },
-                    ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
-                    grid: { color: 'rgba(255,255,255,0.04)' }
-                }
             }
-        };
-    }
-
-    // ── Informes Content ──
-    renderInformesContent(container, initialTab = 'presupuesto') {
-        container.innerHTML = renderInformesView();
-
-        // Update active class in the new vertical nav
-        const tabs = document.querySelectorAll('#informes-tabs .tab-btn');
-        tabs.forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.tab === initialTab);
-        });
-
-        this.renderInformeTab(initialTab);
-        this.bindInformeTabEvents();
-    }
-
-    async renderInformeTab(tab) {
-        const content = document.getElementById('informe-content');
-
-        // Destroy existing charts
-        Object.keys(this.charts).filter(k => k.includes('report')).forEach(k => {
-            this.charts[k].destroy();
-            delete this.charts[k];
-        });
-
-        switch (tab) {
-            case 'presupuesto':
-                content.innerHTML = renderInformePresupuesto(PresupuestoModel.getByCategory());
-                requestAnimationFrame(() => this.renderBudgetReportChart());
-                break;
-            case 'labores':
-                content.innerHTML = renderInformeLabores(LaborModel.getByType(), LaborModel.getHoursByFinca());
-                requestAnimationFrame(() => {
-                    this.renderLaboresReportChart();
-                    this.renderHoursReportChart();
-                });
-                break;
-            case 'parametros':
-                content.innerHTML = renderInformeParametros(
-                    FincaModel.getAll(), VariedadModel.getAll(), AplicacionModel.getAll()
-                );
-                break;
-            case 'aplicaciones':
-                await this.loadStaticSofiaData();
-                this.renderAplicacionesSofiaModule(content);
-                break;
-            case 'gastos':
-                content.innerHTML = renderGastosView();
-                break;
-            case 'secaderos':
-                content.innerHTML = renderSecaderosView();
-                break;
         }
-    }
+    });
+}
 
-    renderBudgetReportChart() {
-        const ctx = document.getElementById('chart-budget-report');
-        if (!ctx) return;
+renderHoursChart() {
+    const ctx = document.getElementById('chart-hours');
+    if (!ctx) return;
 
-        const data = PresupuestoModel.getByCategory();
-        const categories = Object.keys(data);
+    const data = LaborModel.getHoursByFinca();
+    const labels = Object.keys(data);
+    const values = Object.values(data);
 
-        this.charts['budget-report'] = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: categories,
-                datasets: [
-                    {
-                        label: 'Presupuestado',
-                        data: categories.map(c => data[c].planned),
-                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                        borderColor: 'rgba(16, 185, 129, 1)',
-                        borderWidth: 1,
-                        borderRadius: 8,
-                    },
-                    {
-                        label: 'Ejecutado',
-                        data: categories.map(c => data[c].executed),
-                        backgroundColor: 'rgba(168, 85, 247, 0.7)',
-                        borderColor: 'rgba(168, 85, 247, 1)',
-                        borderWidth: 1,
-                        borderRadius: 8,
-                    }
-                ]
-            },
-            options: this.getChartOptions('Monto ($)')
-        });
-    }
+    this.charts['hours'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels.map(l => l.replace('Finca ', '')),
+            datasets: [{
+                label: 'Horas Totales',
+                data: values,
+                backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1,
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            ...this.getChartOptions('Horas'),
+            indexAxis: 'y',
+        }
+    });
+}
 
-    renderLaboresReportChart() {
-        const ctx = document.getElementById('chart-labores-report');
-        if (!ctx) return;
+renderPresupuestoChart() {
+    const ctx = document.getElementById('chart-presupuesto-mgmt');
+    if (!ctx) return;
 
-        const data = LaborModel.getByType();
-        const colors = [
-            'rgba(16, 185, 129, 0.8)', 'rgba(168, 85, 247, 0.8)',
-            'rgba(245, 158, 11, 0.8)', 'rgba(59, 130, 246, 0.8)',
-            'rgba(239, 68, 68, 0.8)', 'rgba(34, 197, 94, 0.8)',
-        ];
+    const data = PresupuestoModel.getByCategory();
+    const categories = Object.keys(data);
 
-        this.charts['labores-report'] = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: Object.keys(data),
-                datasets: [{
-                    data: Object.values(data),
-                    backgroundColor: colors,
-                    borderWidth: 0,
-                    hoverOffset: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 }, padding: 12 }
-                    }
-                }
-            }
-        });
-    }
-
-    renderHoursReportChart() {
-        const ctx = document.getElementById('chart-hours-report');
-        if (!ctx) return;
-
-        const data = LaborModel.getHoursByFinca();
-
-        this.charts['hours-report'] = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(data).map(l => l.replace('Finca ', '')),
-                datasets: [{
-                    label: 'Horas',
-                    data: Object.values(data),
-                    backgroundColor: [
-                        'rgba(16, 185, 129, 0.6)',
-                        'rgba(168, 85, 247, 0.6)',
-                        'rgba(245, 158, 11, 0.6)',
-                        'rgba(59, 130, 246, 0.6)',
-                    ],
-                    borderWidth: 0,
+    this.charts['presupuesto-mgmt'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: categories,
+            datasets: [
+                {
+                    label: 'Presupuestado',
+                    data: categories.map(c => data[c].planned),
+                    backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 1,
                     borderRadius: 6,
-                }]
+                },
+                {
+                    label: 'Ejecutado',
+                    data: categories.map(c => data[c].executed),
+                    backgroundColor: 'rgba(245, 158, 11, 0.6)',
+                    borderColor: 'rgba(245, 158, 11, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                }
+            ]
+        },
+        options: this.getChartOptions('Monto ($)')
+    });
+}
+
+getChartOptions(yLabel = '') {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#94a3b8',
+                    font: { family: 'Inter', size: 12 }
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                grid: { color: 'rgba(255,255,255,0.04)' }
             },
-            options: this.getChartOptions('Horas')
-        });
-    }
+            y: {
+                title: { display: !!yLabel, text: yLabel, color: '#64748b' },
+                ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                grid: { color: 'rgba(255,255,255,0.04)' }
+            }
+        }
+    };
+}
 
-    // ══════════════════════════════════════════════════
-    // EVENT BINDING
-    // ══════════════════════════════════════════════════
+// ── Informes Content ──
+renderInformesContent(container, initialTab = 'presupuesto') {
+    container.innerHTML = renderInformesView();
 
-    bindLandingEvents() {
-        // New Login Button
-        document.getElementById('btn-login-nav')?.addEventListener('click', () => this.loadLogin());
+    // Update active class in the new vertical nav
+    const tabs = document.querySelectorAll('#informes-tabs .tab-btn');
+    tabs.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === initialTab);
+    });
 
-        // Hero actions (if they exist in the new landing)
-        document.getElementById('btn-hero-login')?.addEventListener('click', () => this.loadLogin());
-        document.getElementById('btn-hero-features')?.addEventListener('click', () => {
-            document.getElementById('machines-modernas')?.scrollIntoView({ behavior: 'smooth' });
-        });
+    this.renderInformeTab(initialTab);
+    this.bindInformeTabEvents();
+}
 
-        // Animation for #traz-producto elements
-        const trazObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('traz-anim-visible');
-                    observer.unobserve(entry.target);
-                }
+async renderInformeTab(tab) {
+    const content = document.getElementById('informe-content');
+
+    // Destroy existing charts
+    Object.keys(this.charts).filter(k => k.includes('report')).forEach(k => {
+        this.charts[k].destroy();
+        delete this.charts[k];
+    });
+
+    switch (tab) {
+        case 'presupuesto':
+            content.innerHTML = renderInformePresupuesto(PresupuestoModel.getByCategory());
+            requestAnimationFrame(() => this.renderBudgetReportChart());
+            break;
+        case 'labores':
+            content.innerHTML = renderInformeLabores(LaborModel.getByType(), LaborModel.getHoursByFinca());
+            requestAnimationFrame(() => {
+                this.renderLaboresReportChart();
+                this.renderHoursReportChart();
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-        const trazElements = document.querySelectorAll('#traz-producto h2, #traz-producto figure, #traz-producto p');
-        trazElements.forEach((el, index) => {
-            el.classList.add('traz-anim-init');
-            // Adding a small progressive delay based on DOM order for a smoother cascade effect
-            el.style.transitionDelay = `${(index % 3) * 0.15}s`;
-            trazObserver.observe(el);
-        });
+            break;
+        case 'parametros':
+            content.innerHTML = renderInformeParametros(
+                FincaModel.getAll(), VariedadModel.getAll(), AplicacionModel.getAll()
+            );
+            break;
+        case 'aplicaciones':
+            await this.loadStaticSofiaData();
+            this.renderAplicacionesSofiaModule(content);
+            break;
+        case 'gastos':
+            content.innerHTML = renderGastosView();
+            break;
+        case 'secaderos':
+            content.innerHTML = renderSecaderosView();
+            break;
     }
+}
 
-    bindLoginEvents() {
-        const form = document.getElementById('login-form');
-        const errorDiv = document.getElementById('login-error');
-        const pendingDiv = document.getElementById('login-pending-error');
-        const successDiv = document.getElementById('login-success');
+renderBudgetReportChart() {
+    const ctx = document.getElementById('chart-budget-report');
+    if (!ctx) return;
 
-        form?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+    const data = PresupuestoModel.getByCategory();
+    const categories = Object.keys(data);
 
-            // Hide all messages
-            errorDiv?.classList.remove('show');
-            if (pendingDiv) pendingDiv.style.display = 'none';
-            if (successDiv) successDiv.style.display = 'none';
+    this.charts['budget-report'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: categories,
+            datasets: [
+                {
+                    label: 'Presupuestado',
+                    data: categories.map(c => data[c].planned),
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 1,
+                    borderRadius: 8,
+                },
+                {
+                    label: 'Ejecutado',
+                    data: categories.map(c => data[c].executed),
+                    backgroundColor: 'rgba(168, 85, 247, 0.7)',
+                    borderColor: 'rgba(168, 85, 247, 1)',
+                    borderWidth: 1,
+                    borderRadius: 8,
+                }
+            ]
+        },
+        options: this.getChartOptions('Monto ($)')
+    });
+}
 
-            const user = await UserModel.authenticate(email, password);
-            if (user && user.pending) {
-                // User exists but is pending approval
-                if (pendingDiv) pendingDiv.style.display = 'block';
-            } else if (user) {
-                this.loadDashboard(user);
-            } else {
-                if (errorDiv) {
-                    errorDiv.classList.add('show');
-                    setTimeout(() => errorDiv.classList.remove('show'), 3000);
+renderLaboresReportChart() {
+    const ctx = document.getElementById('chart-labores-report');
+    if (!ctx) return;
+
+    const data = LaborModel.getByType();
+    const colors = [
+        'rgba(16, 185, 129, 0.8)', 'rgba(168, 85, 247, 0.8)',
+        'rgba(245, 158, 11, 0.8)', 'rgba(59, 130, 246, 0.8)',
+        'rgba(239, 68, 68, 0.8)', 'rgba(34, 197, 94, 0.8)',
+    ];
+
+    this.charts['labores-report'] = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data),
+                backgroundColor: colors,
+                borderWidth: 0,
+                hoverOffset: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 }, padding: 12 }
                 }
             }
-        });
+        }
+    });
+}
 
-        document.getElementById('btn-back-landing')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.loadLanding();
-        });
+renderHoursReportChart() {
+    const ctx = document.getElementById('chart-hours-report');
+    if (!ctx) return;
 
-        // ── Registration Modal ──
-        const registerOverlay = document.getElementById('register-modal-overlay');
+    const data = LaborModel.getHoursByFinca();
 
-        document.getElementById('btn-show-register')?.addEventListener('click', () => {
-            if (registerOverlay) registerOverlay.style.display = 'flex';
-        });
+    this.charts['hours-report'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(data).map(l => l.replace('Finca ', '')),
+            datasets: [{
+                label: 'Horas',
+                data: Object.values(data),
+                backgroundColor: [
+                    'rgba(16, 185, 129, 0.6)',
+                    'rgba(168, 85, 247, 0.6)',
+                    'rgba(245, 158, 11, 0.6)',
+                    'rgba(59, 130, 246, 0.6)',
+                ],
+                borderWidth: 0,
+                borderRadius: 6,
+            }]
+        },
+        options: this.getChartOptions('Horas')
+    });
+}
 
-        document.getElementById('btn-cancel-register')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (registerOverlay) registerOverlay.style.display = 'none';
-        });
+// ══════════════════════════════════════════════════
+// EVENT BINDING
+// ══════════════════════════════════════════════════
 
-        registerOverlay?.addEventListener('click', (e) => {
-            if (e.target === registerOverlay) registerOverlay.style.display = 'none';
-        });
+bindLandingEvents() {
+    // New Login Button
+    document.getElementById('btn-login-nav')?.addEventListener('click', () => this.loadLogin());
 
-        // ── Registration Form Submit ──
-        document.getElementById('form-register')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btnSubmit = e.target.querySelector('button[type="submit"]');
-            const originalBtnText = btnSubmit?.textContent;
+    // Hero actions (if they exist in the new landing)
+    document.getElementById('btn-hero-login')?.addEventListener('click', () => this.loadLogin());
+    document.getElementById('btn-hero-features')?.addEventListener('click', () => {
+        document.getElementById('machines-modernas')?.scrollIntoView({ behavior: 'smooth' });
+    });
 
-            const regError = document.getElementById('register-error');
-            const regErrorMsg = document.getElementById('register-error-msg');
-
-            const name = document.getElementById('register-name').value.trim();
-            const email = document.getElementById('register-email').value.trim();
-            const password = document.getElementById('register-password').value;
-            const passwordConfirm = document.getElementById('register-password-confirm').value;
-
-            // Validate
-            if (password !== passwordConfirm) {
-                if (regError) { regError.style.display = 'block'; regErrorMsg.textContent = 'Las contraseñas no coinciden.'; }
-                return;
-            }
-            if (password.length < 6) {
-                if (regError) { regError.style.display = 'block'; regErrorMsg.textContent = 'La contraseña debe tener al menos 6 caracteres.'; }
-                return;
-            }
-
-            if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.textContent = 'Procesando...'; }
-
-            const result = await UserModel.register(name, email, password);
-
-            if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.textContent = originalBtnText; }
-
-            if (result.error || result.success === false) {
-                if (regError) {
-                    regError.style.display = 'block';
-                    regErrorMsg.textContent = result.error || result.message;
-                }
-                return;
-            }
-
-            // Success - close modal and show success message on login page
-            if (registerOverlay) registerOverlay.style.display = 'none';
-            if (successDiv) {
-                const successMsg = document.getElementById('login-success-msg');
-                if (successMsg) successMsg.textContent = result.message || '¡Registro exitoso! Tu solicitud será revisada por un administrador.';
-                successDiv.style.display = 'block';
+    // Animation for #traz-producto elements
+    const trazObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('traz-anim-visible');
+                observer.unobserve(entry.target);
             }
         });
-    }
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    bindDashboardEvents(user) {
-        // Sidebar dropdown toggle
-        document.querySelectorAll('.sidebar-dropdown-toggle').forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                const menuId = toggle.dataset.toggle;
-                const submenu = document.getElementById(`submenu-${menuId}`);
-                const isOpen = submenu?.classList.contains('open');
-                submenu?.classList.toggle('open', !isOpen);
-                toggle.classList.toggle('expanded', !isOpen);
-                const chevron = toggle.querySelector('.sidebar-chevron');
-                if (chevron) chevron.textContent = isOpen ? '▸' : '▾';
-            });
-        });
+    const trazElements = document.querySelectorAll('#traz-producto h2, #traz-producto figure, #traz-producto p');
+    trazElements.forEach((el, index) => {
+        el.classList.add('traz-anim-init');
+        // Adding a small progressive delay based on DOM order for a smoother cascade effect
+        el.style.transitionDelay = `${(index % 3) * 0.15}s`;
+        trazObserver.observe(el);
+    });
+}
 
-        // Sidebar sub-item navigation
-        document.querySelectorAll('.sidebar-item[data-section]').forEach(item => {
-            item.addEventListener('click', () => {
-                const section = item.dataset.section;
-                this.currentSection = section;
-                this.loadSection(section, user);
-                // Close mobile sidebar
-                document.getElementById('sidebar')?.classList.remove('open');
-            });
-        });
+bindLoginEvents() {
+    const form = document.getElementById('login-form');
+    const errorDiv = document.getElementById('login-error');
+    const pendingDiv = document.getElementById('login-pending-error');
+    const successDiv = document.getElementById('login-success');
 
-        // Logout
-        document.getElementById('btn-logout')?.addEventListener('click', () => {
-            UserModel.logout();
-            this.loadLanding();
-        });
+    form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
 
-        // Mobile menu
-        document.getElementById('btn-mobile-menu')?.addEventListener('click', () => {
-            document.getElementById('sidebar')?.classList.toggle('open');
-        });
+        // Hide all messages
+        errorDiv?.classList.remove('show');
+        if (pendingDiv) pendingDiv.style.display = 'none';
+        if (successDiv) successDiv.style.display = 'none';
 
-        // Modal close
-        document.getElementById('modal-close')?.addEventListener('click', () => this.closeModal());
-        document.getElementById('modal-overlay')?.addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) this.closeModal();
-        });
-
-        // Notification bell
-        this.bindNotificationBell();
-    }
-
-    // ── Notification Bell ──
-    bindNotificationBell() {
-        const bell = document.querySelector('.notification-bell');
-        if (!bell) return;
-
-        bell.addEventListener('click', (e) => {
-            e.stopPropagation();
-            let dropdown = document.getElementById('notification-dropdown');
-
-            if (dropdown) {
-                dropdown.remove();
-                return;
+        const user = await UserModel.authenticate(email, password);
+        if (user && user.pending) {
+            // User exists but is pending approval
+            if (pendingDiv) pendingDiv.style.display = 'block';
+        } else if (user) {
+            this.loadDashboard(user);
+        } else {
+            if (errorDiv) {
+                errorDiv.classList.add('show');
+                setTimeout(() => errorDiv.classList.remove('show'), 3000);
             }
+        }
+    });
 
-            const notifications = NotificationModel.getAll();
-            const unreadCount = NotificationModel.getUnread().length;
-            const typeIcons = { warning: '⚠️', error: '🔴', success: '✅', info: 'ℹ️' };
+    document.getElementById('btn-back-landing')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.loadLanding();
+    });
 
-            dropdown = document.createElement('div');
-            dropdown.id = 'notification-dropdown';
-            dropdown.className = 'notification-dropdown animate-fade-in';
-            dropdown.innerHTML = `
+    // ── Registration Modal ──
+    const registerModalEl = document.getElementById('register-modal');
+    let bsRegisterModal = null;
+    if (registerModalEl) bsRegisterModal = new bootstrap.Modal(registerModalEl);
+
+    document.getElementById('btn-show-register')?.addEventListener('click', () => {
+        if (bsRegisterModal) bsRegisterModal.show();
+    });
+
+    document.getElementById('btn-cancel-register')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (bsRegisterModal) bsRegisterModal.hide();
+    });
+
+
+    // ── Registration Form Submit ──
+    document.getElementById('form-register')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btnSubmit = e.target.querySelector('button[type="submit"]');
+        const originalBtnText = btnSubmit?.textContent;
+
+        const regError = document.getElementById('register-error');
+        const regErrorMsg = document.getElementById('register-error-msg');
+
+        const name = document.getElementById('register-name').value.trim();
+        const email = document.getElementById('register-email').value.trim();
+        const password = document.getElementById('register-password').value;
+        const passwordConfirm = document.getElementById('register-password-confirm').value;
+
+        // Validate
+        if (password !== passwordConfirm) {
+            if (regError) { regError.style.display = 'block'; regErrorMsg.textContent = 'Las contraseñas no coinciden.'; }
+            return;
+        }
+        if (password.length < 6) {
+            if (regError) { regError.style.display = 'block'; regErrorMsg.textContent = 'La contraseña debe tener al menos 6 caracteres.'; }
+            return;
+        }
+
+        if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.textContent = 'Procesando...'; }
+
+        const result = await UserModel.register(name, email, password);
+
+        if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.textContent = originalBtnText; }
+
+        if (result.error || result.success === false) {
+            if (regError) {
+                regError.style.display = 'block';
+                regErrorMsg.textContent = result.error || result.message;
+            }
+            return;
+        }
+
+        // Success - close modal and show success message on login page
+        if (registerModalEl) {
+            const modalInstance = bootstrap.Modal.getInstance(registerModalEl);
+            if (modalInstance) modalInstance.hide();
+        }
+        if (successDiv) {
+            const successMsg = document.getElementById('login-success-msg');
+            if (successMsg) successMsg.textContent = result.message || '¡Registro exitoso! Tu solicitud será revisada por un administrador.';
+            successDiv.style.display = 'block';
+        }
+    });
+}
+
+bindDashboardEvents(user) {
+    // Sidebar dropdown toggle
+    document.querySelectorAll('.sidebar-dropdown-toggle').forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const menuId = toggle.dataset.toggle;
+            const submenu = document.getElementById(`submenu-${menuId}`);
+            const isOpen = submenu?.classList.contains('open');
+            submenu?.classList.toggle('open', !isOpen);
+            toggle.classList.toggle('expanded', !isOpen);
+            const chevron = toggle.querySelector('.sidebar-chevron');
+            if (chevron) chevron.textContent = isOpen ? '▸' : '▾';
+        });
+    });
+
+    // Sidebar sub-item navigation
+    document.querySelectorAll('.sidebar-item[data-section]').forEach(item => {
+        item.addEventListener('click', () => {
+            const section = item.dataset.section;
+            this.currentSection = section;
+            this.loadSection(section, user);
+            // Close mobile sidebar
+            document.getElementById('sidebar')?.classList.remove('open');
+        });
+    });
+
+    // Logout
+    document.getElementById('btn-logout')?.addEventListener('click', () => {
+        UserModel.logout();
+        this.loadLanding();
+    });
+
+    // Mobile menu
+    document.getElementById('btn-mobile-menu')?.addEventListener('click', () => {
+        document.getElementById('sidebar')?.classList.toggle('open');
+    });
+
+    // Modal close
+    document.getElementById('modal-close')?.addEventListener('click', () => this.closeModal());
+    document.getElementById('modal-overlay')?.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) this.closeModal();
+    });
+
+    // Notification bell
+    this.bindNotificationBell();
+}
+
+// ── Notification Bell ──
+bindNotificationBell() {
+    const bell = document.querySelector('.notification-bell');
+    if (!bell) return;
+
+    bell.addEventListener('click', (e) => {
+        e.stopPropagation();
+        let dropdown = document.getElementById('notification-dropdown');
+
+        if (dropdown) {
+            dropdown.remove();
+            return;
+        }
+
+        const notifications = NotificationModel.getAll();
+        const unreadCount = NotificationModel.getUnread().length;
+        const typeIcons = { warning: '⚠️', error: '🔴', success: '✅', info: 'ℹ️' };
+
+        dropdown = document.createElement('div');
+        dropdown.id = 'notification-dropdown';
+        dropdown.className = 'notification-dropdown animate-fade-in';
+        dropdown.innerHTML = `
                 <div class="notif-header">
                     <h4>Notificaciones</h4>
                     ${unreadCount > 0 ? `<button class="btn btn-ghost btn-sm" id="btn-mark-all-read">Marcar todas leídas</button>` : ''}
                 </div>
                 <div class="notif-list">
                     ${notifications.length === 0 ? '<div class="notif-empty">No hay notificaciones</div>' :
-                    notifications.map(n => `
+            notifications.map(n => `
                         <div class="notif-item ${n.read ? 'read' : 'unread'}" data-id="${n.id}">
                             <span class="notif-icon">${typeIcons[n.type] || 'ℹ️'}</span>
                             <div class="notif-content">
@@ -2921,148 +2857,148 @@ export class AppController {
                 </div>
             `;
 
-            bell.parentElement.appendChild(dropdown);
+        bell.parentElement.appendChild(dropdown);
 
-            // Mark all as read
-            document.getElementById('btn-mark-all-read')?.addEventListener('click', () => {
-                NotificationModel.markAllRead();
+        // Mark all as read
+        document.getElementById('btn-mark-all-read')?.addEventListener('click', () => {
+            NotificationModel.markAllRead();
+            this.updateNotifBadge();
+            dropdown.remove();
+            this.showToast('Todas las notificaciones marcadas como leídas', 'info');
+        });
+
+        // Mark single as read
+        dropdown.querySelectorAll('.notif-item.unread').forEach(item => {
+            item.addEventListener('click', () => {
+                NotificationModel.markAsRead(parseInt(item.dataset.id));
+                item.classList.remove('unread');
+                item.classList.add('read');
+                const dot = item.querySelector('.notif-unread-dot');
+                if (dot) dot.remove();
                 this.updateNotifBadge();
+            });
+        });
+
+        // Close on outside click
+        const closeHandler = (ev) => {
+            if (!dropdown.contains(ev.target) && ev.target !== bell) {
                 dropdown.remove();
-                this.showToast('Todas las notificaciones marcadas como leídas', 'info');
-            });
-
-            // Mark single as read
-            dropdown.querySelectorAll('.notif-item.unread').forEach(item => {
-                item.addEventListener('click', () => {
-                    NotificationModel.markAsRead(parseInt(item.dataset.id));
-                    item.classList.remove('unread');
-                    item.classList.add('read');
-                    const dot = item.querySelector('.notif-unread-dot');
-                    if (dot) dot.remove();
-                    this.updateNotifBadge();
-                });
-            });
-
-            // Close on outside click
-            const closeHandler = (ev) => {
-                if (!dropdown.contains(ev.target) && ev.target !== bell) {
-                    dropdown.remove();
-                    document.removeEventListener('click', closeHandler);
-                }
-            };
-            setTimeout(() => document.addEventListener('click', closeHandler), 0);
-        });
-    }
-
-    updateNotifBadge() {
-        const count = NotificationModel.getUnread().length;
-        const badge = document.querySelector('.notification-count');
-        if (badge) {
-            badge.textContent = count;
-            badge.style.display = count > 0 ? 'flex' : 'none';
-        }
-    }
-
-    bindInformeTabEvents() {
-        document.querySelectorAll('#informes-tabs .tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('#informes-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.renderInformeTab(btn.dataset.tab);
-            });
-        });
-    }
-
-    bindLaboresEvents() {
-        document.querySelectorAll('#labores-tabs .tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('#labores-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                const filter = btn.dataset.tab;
-                document.querySelectorAll('#table-labores tbody tr').forEach(row => {
-                    if (filter === 'all') {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = row.dataset.status === filter ? '' : 'none';
-                    }
-                });
-            });
-        });
-
-        document.getElementById('btn-add-labor')?.addEventListener('click', () => {
-            this.showNewLaborModal();
-        });
-    }
-
-    bindCargaEvents() {
-        const fincaSelect = document.getElementById('labor-finca');
-        const predioSelect = document.getElementById('labor-predio');
-
-        fincaSelect?.addEventListener('change', () => {
-            const fincaName = fincaSelect.value;
-            const finca = FincaModel.getAll().find(f => f.name === fincaName);
-            const predios = finca ? PredioModel.getByFinca(finca.id) : [];
-
-            predioSelect.innerHTML = predios.length
-                ? predios.map(p => `<option value="${p.name}">${p.name}</option>`).join('')
-                : '<option value="">Sin predios disponibles</option>';
-        });
-
-        document.getElementById('form-nueva-labor')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = this.currentUser;
-            const date = document.getElementById('labor-date').value;
-            const type = document.getElementById('labor-type').value;
-            const finca = document.getElementById('labor-finca').value;
-            const predio = document.getElementById('labor-predio').value;
-            const hours = parseInt(document.getElementById('labor-hours').value);
-            const notes = document.getElementById('labor-notes').value;
-
-            if (!type || !finca || !predio || !hours) {
-                this.showToast('Por favor complete todos los campos obligatorios', 'warning');
-                return;
+                document.removeEventListener('click', closeHandler);
             }
+        };
+        setTimeout(() => document.addEventListener('click', closeHandler), 0);
+    });
+}
 
-            LaborModel.add({
-                date,
-                type,
-                predio,
-                finca,
-                employee: user?.name || 'Operador',
-                hours,
-                notes,
-                status: 'completed'
-            });
-
-            this.showToast('✅ Labor registrada exitosamente', 'success');
-            // Refresh the view
-            this.loadSection('carga', user);
-        });
+updateNotifBadge() {
+    const count = NotificationModel.getUnread().length;
+    const badge = document.querySelector('.notification-count');
+    if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'flex' : 'none';
     }
+}
 
-    bindTableSearch(inputId, tableId) {
-        const input = document.getElementById(inputId);
-        const table = document.getElementById(tableId);
-        if (!input || !table) return;
+bindInformeTabEvents() {
+    document.querySelectorAll('#informes-tabs .tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#informes-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.renderInformeTab(btn.dataset.tab);
+        });
+    });
+}
 
-        input.addEventListener('input', () => {
-            const query = input.value.toLowerCase();
-            table.querySelectorAll('tbody tr').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(query) ? '' : 'none';
+bindLaboresEvents() {
+    document.querySelectorAll('#labores-tabs .tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#labores-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filter = btn.dataset.tab;
+            document.querySelectorAll('#table-labores tbody tr').forEach(row => {
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else {
+                    row.style.display = row.dataset.status === filter ? '' : 'none';
+                }
             });
         });
-    }
+    });
 
-    // ══════════════════════════════════════════════════
-    // CRUD MODAL BINDINGS
-    // ══════════════════════════════════════════════════
+    document.getElementById('btn-add-labor')?.addEventListener('click', () => {
+        this.showNewLaborModal();
+    });
+}
 
-    // ── Finca CRUD ──
-    bindFincaCRUD(user) {
-        document.getElementById('btn-add-finca')?.addEventListener('click', () => {
-            const body = `
+bindCargaEvents() {
+    const fincaSelect = document.getElementById('labor-finca');
+    const predioSelect = document.getElementById('labor-predio');
+
+    fincaSelect?.addEventListener('change', () => {
+        const fincaName = fincaSelect.value;
+        const finca = FincaModel.getAll().find(f => f.name === fincaName);
+        const predios = finca ? PredioModel.getByFinca(finca.id) : [];
+
+        predioSelect.innerHTML = predios.length
+            ? predios.map(p => `<option value="${p.name}">${p.name}</option>`).join('')
+            : '<option value="">Sin predios disponibles</option>';
+    });
+
+    document.getElementById('form-nueva-labor')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const user = this.currentUser;
+        const date = document.getElementById('labor-date').value;
+        const type = document.getElementById('labor-type').value;
+        const finca = document.getElementById('labor-finca').value;
+        const predio = document.getElementById('labor-predio').value;
+        const hours = parseInt(document.getElementById('labor-hours').value);
+        const notes = document.getElementById('labor-notes').value;
+
+        if (!type || !finca || !predio || !hours) {
+            this.showToast('Por favor complete todos los campos obligatorios', 'warning');
+            return;
+        }
+
+        LaborModel.add({
+            date,
+            type,
+            predio,
+            finca,
+            employee: user?.name || 'Operador',
+            hours,
+            notes,
+            status: 'completed'
+        });
+
+        this.showToast('✅ Labor registrada exitosamente', 'success');
+        // Refresh the view
+        this.loadSection('carga', user);
+    });
+}
+
+bindTableSearch(inputId, tableId) {
+    const input = document.getElementById(inputId);
+    const table = document.getElementById(tableId);
+    if (!input || !table) return;
+
+    input.addEventListener('input', () => {
+        const query = input.value.toLowerCase();
+        table.querySelectorAll('tbody tr').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    });
+}
+
+// ══════════════════════════════════════════════════
+// CRUD MODAL BINDINGS
+// ══════════════════════════════════════════════════
+
+// ── Finca CRUD ──
+bindFincaCRUD(user) {
+    document.getElementById('btn-add-finca')?.addEventListener('click', () => {
+        const body = `
                 <form id="modal-finca-form">
                     <div class="form-group">
                         <label class="form-label">Nombre de la Finca</label>
@@ -3086,35 +3022,35 @@ export class AppController {
                     </div>
                 </form>
             `;
-            const footer = `
+        const footer = `
                 <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
                 <button class="btn btn-primary" id="modal-save">💾 Guardar Finca</button>
             `;
-            this.showModal('🏘️ Nueva Finca', body, footer);
-            document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
-            document.getElementById('modal-save')?.addEventListener('click', () => {
-                const name = document.getElementById('finca-name').value;
-                const location = document.getElementById('finca-location').value;
-                const hectares = parseInt(document.getElementById('finca-hectares').value);
-                const predios = parseInt(document.getElementById('finca-predios').value);
-                const manager = document.getElementById('finca-manager').value;
-                if (!name || !location || !hectares || !manager) {
-                    this.showToast('Complete todos los campos', 'warning');
-                    return;
-                }
-                FincaModel.add({ name, location, hectares, predios: predios || 0, manager });
-                this.showToast(`Finca "${name}" creada exitosamente`, 'success');
-                this.closeModal();
-                this.loadSection('fincas', user);
-            });
+        this.showModal('🏘️ Nueva Finca', body, footer);
+        document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
+        document.getElementById('modal-save')?.addEventListener('click', () => {
+            const name = document.getElementById('finca-name').value;
+            const location = document.getElementById('finca-location').value;
+            const hectares = parseInt(document.getElementById('finca-hectares').value);
+            const predios = parseInt(document.getElementById('finca-predios').value);
+            const manager = document.getElementById('finca-manager').value;
+            if (!name || !location || !hectares || !manager) {
+                this.showToast('Complete todos los campos', 'warning');
+                return;
+            }
+            FincaModel.add({ name, location, hectares, predios: predios || 0, manager });
+            this.showToast(`Finca "${name}" creada exitosamente`, 'success');
+            this.closeModal();
+            this.loadSection('fincas', user);
         });
-    }
+    });
+}
 
-    // ── Predio CRUD ──
-    bindPredioCRUD(user) {
-        document.getElementById('btn-add-predio')?.addEventListener('click', () => {
-            const fincas = FincaModel.getActive();
-            const body = `
+// ── Predio CRUD ──
+bindPredioCRUD(user) {
+    document.getElementById('btn-add-predio')?.addEventListener('click', () => {
+        const fincas = FincaModel.getActive();
+        const body = `
                 <form id="modal-predio-form">
                     <div class="form-group">
                         <label class="form-label">Nombre del Predio</label>
@@ -3160,35 +3096,35 @@ export class AppController {
                     </div>
                 </form>
             `;
-            const footer = `
+        const footer = `
                 <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
                 <button class="btn btn-primary" id="modal-save">💾 Guardar Predio</button>
             `;
-            this.showModal('🌾 Nuevo Predio', body, footer);
-            document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
-            document.getElementById('modal-save')?.addEventListener('click', () => {
-                const name = document.getElementById('predio-name').value;
-                const fincaId = parseInt(document.getElementById('predio-finca').value);
-                const hectares = parseInt(document.getElementById('predio-hectares').value);
-                const variety = document.getElementById('predio-variety').value;
-                const irrigationType = document.getElementById('predio-riego').value;
-                const soilType = document.getElementById('predio-suelo').value;
-                if (!name || !fincaId || !hectares || !variety || !irrigationType || !soilType) {
-                    this.showToast('Complete todos los campos', 'warning');
-                    return;
-                }
-                PredioModel.add({ name, fincaId, hectares, variety, irrigationType, soilType });
-                this.showToast(`Predio "${name}" creado exitosamente`, 'success');
-                this.closeModal();
-                this.loadSection('predios', user);
-            });
+        this.showModal('🌾 Nuevo Predio', body, footer);
+        document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
+        document.getElementById('modal-save')?.addEventListener('click', () => {
+            const name = document.getElementById('predio-name').value;
+            const fincaId = parseInt(document.getElementById('predio-finca').value);
+            const hectares = parseInt(document.getElementById('predio-hectares').value);
+            const variety = document.getElementById('predio-variety').value;
+            const irrigationType = document.getElementById('predio-riego').value;
+            const soilType = document.getElementById('predio-suelo').value;
+            if (!name || !fincaId || !hectares || !variety || !irrigationType || !soilType) {
+                this.showToast('Complete todos los campos', 'warning');
+                return;
+            }
+            PredioModel.add({ name, fincaId, hectares, variety, irrigationType, soilType });
+            this.showToast(`Predio "${name}" creado exitosamente`, 'success');
+            this.closeModal();
+            this.loadSection('predios', user);
         });
-    }
+    });
+}
 
-    // ── Variedad CRUD ──
-    bindVariedadCRUD(user) {
-        document.getElementById('btn-add-variedad')?.addEventListener('click', () => {
-            const body = `
+// ── Variedad CRUD ──
+bindVariedadCRUD(user) {
+    document.getElementById('btn-add-variedad')?.addEventListener('click', () => {
+        const body = `
                 <form id="modal-variedad-form">
                     <div class="form-group">
                         <label class="form-label">Nombre de la Variedad</label>
@@ -3223,35 +3159,35 @@ export class AppController {
                     </div>
                 </form>
             `;
-            const footer = `
+        const footer = `
                 <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
                 <button class="btn btn-primary" id="modal-save">💾 Guardar Variedad</button>
             `;
-            this.showModal('🍇 Nueva Variedad', body, footer);
-            document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
-            document.getElementById('modal-save')?.addEventListener('click', () => {
-                const name = document.getElementById('variedad-name').value;
-                const type = document.getElementById('variedad-type').value;
-                const daysToHarvest = parseInt(document.getElementById('variedad-days').value);
-                const sugarContent = document.getElementById('variedad-sugar').value;
-                const usage = document.getElementById('variedad-usage').value;
-                if (!name || !type || !daysToHarvest || !sugarContent || !usage) {
-                    this.showToast('Complete todos los campos', 'warning');
-                    return;
-                }
-                VariedadModel.add({ name, type, daysToHarvest, sugarContent, usage });
-                this.showToast(`Variedad "${name}" agregada exitosamente`, 'success');
-                this.closeModal();
-                this.loadSection('variedades', user);
-            });
+        this.showModal('🍇 Nueva Variedad', body, footer);
+        document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
+        document.getElementById('modal-save')?.addEventListener('click', () => {
+            const name = document.getElementById('variedad-name').value;
+            const type = document.getElementById('variedad-type').value;
+            const daysToHarvest = parseInt(document.getElementById('variedad-days').value);
+            const sugarContent = document.getElementById('variedad-sugar').value;
+            const usage = document.getElementById('variedad-usage').value;
+            if (!name || !type || !daysToHarvest || !sugarContent || !usage) {
+                this.showToast('Complete todos los campos', 'warning');
+                return;
+            }
+            VariedadModel.add({ name, type, daysToHarvest, sugarContent, usage });
+            this.showToast(`Variedad "${name}" agregada exitosamente`, 'success');
+            this.closeModal();
+            this.loadSection('variedades', user);
         });
-    }
+    });
+}
 
-    // ── Empleado CRUD ──
-    bindEmpleadoCRUD(user) {
-        document.getElementById('btn-add-empleado')?.addEventListener('click', () => {
-            const fincas = FincaModel.getActive();
-            const body = `
+// ── Empleado CRUD ──
+bindEmpleadoCRUD(user) {
+    document.getElementById('btn-add-empleado')?.addEventListener('click', () => {
+        const fincas = FincaModel.getActive();
+        const body = `
                 <form id="modal-empleado-form">
                     <div class="form-group">
                         <label class="form-label">Nombre Completo</label>
@@ -3289,36 +3225,36 @@ export class AppController {
                     </div>
                 </form>
             `;
-            const footer = `
+        const footer = `
                 <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
                 <button class="btn btn-primary" id="modal-save">💾 Guardar Empleado</button>
             `;
-            this.showModal('👥 Nuevo Empleado', body, footer);
-            document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
-            document.getElementById('modal-save')?.addEventListener('click', () => {
-                const name = document.getElementById('empleado-name').value;
-                const dni = document.getElementById('empleado-dni').value;
-                const position = document.getElementById('empleado-position').value;
-                const finca = document.getElementById('empleado-finca').value;
-                const startDate = document.getElementById('empleado-date').value;
-                const salary = parseInt(document.getElementById('empleado-salary').value);
-                if (!name || !dni || !position || !finca || !startDate || !salary) {
-                    this.showToast('Complete todos los campos', 'warning');
-                    return;
-                }
-                EmpleadoModel.add({ name, dni, position, finca, startDate, salary });
-                this.showToast(`Empleado "${name}" registrado exitosamente`, 'success');
-                this.closeModal();
-                this.loadSection('empleados', user);
-            });
+        this.showModal('👥 Nuevo Empleado', body, footer);
+        document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
+        document.getElementById('modal-save')?.addEventListener('click', () => {
+            const name = document.getElementById('empleado-name').value;
+            const dni = document.getElementById('empleado-dni').value;
+            const position = document.getElementById('empleado-position').value;
+            const finca = document.getElementById('empleado-finca').value;
+            const startDate = document.getElementById('empleado-date').value;
+            const salary = parseInt(document.getElementById('empleado-salary').value);
+            if (!name || !dni || !position || !finca || !startDate || !salary) {
+                this.showToast('Complete todos los campos', 'warning');
+                return;
+            }
+            EmpleadoModel.add({ name, dni, position, finca, startDate, salary });
+            this.showToast(`Empleado "${name}" registrado exitosamente`, 'success');
+            this.closeModal();
+            this.loadSection('empleados', user);
         });
-    }
+    });
+}
 
-    // ── Aplicación CRUD ──
-    bindAplicacionCRUD(user) {
-        document.getElementById('btn-add-aplicacion')?.addEventListener('click', () => {
-            const predios = PredioModel.getAll().filter(p => p.status === 'active');
-            const body = `
+// ── Aplicación CRUD ──
+bindAplicacionCRUD(user) {
+    document.getElementById('btn-add-aplicacion')?.addEventListener('click', () => {
+        const predios = PredioModel.getAll().filter(p => p.status === 'active');
+        const body = `
                 <form id="modal-aplicacion-form">
                     <div class="form-group">
                         <label class="form-label">Producto</label>
@@ -3349,35 +3285,35 @@ export class AppController {
                     </div>
                 </form>
             `;
-            const footer = `
+        const footer = `
                 <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
                 <button class="btn btn-primary" id="modal-save">💾 Guardar Aplicación</button>
             `;
-            this.showModal('🧪 Nueva Aplicación', body, footer);
-            document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
-            document.getElementById('modal-save')?.addEventListener('click', () => {
-                const product = document.getElementById('app-product').value;
-                const dose = document.getElementById('app-dose').value;
-                const predio = document.getElementById('app-predio').value;
-                const date = document.getElementById('app-date').value;
-                const status = document.getElementById('app-status').value;
-                if (!product || !dose || !predio || !date) {
-                    this.showToast('Complete todos los campos', 'warning');
-                    return;
-                }
-                AplicacionModel.add({ product, dose, predio, date, status, engineer: this.currentUser?.name || 'Ingeniero' });
-                this.showToast(`Aplicación de "${product}" registrada`, 'success');
-                this.closeModal();
-                this.loadSection('aplicaciones', user);
-            });
+        this.showModal('🧪 Nueva Aplicación', body, footer);
+        document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
+        document.getElementById('modal-save')?.addEventListener('click', () => {
+            const product = document.getElementById('app-product').value;
+            const dose = document.getElementById('app-dose').value;
+            const predio = document.getElementById('app-predio').value;
+            const date = document.getElementById('app-date').value;
+            const status = document.getElementById('app-status').value;
+            if (!product || !dose || !predio || !date) {
+                this.showToast('Complete todos los campos', 'warning');
+                return;
+            }
+            AplicacionModel.add({ product, dose, predio, date, status, engineer: this.currentUser?.name || 'Ingeniero' });
+            this.showToast(`Aplicación de "${product}" registrada`, 'success');
+            this.closeModal();
+            this.loadSection('aplicaciones', user);
         });
-    }
+    });
+}
 
-    // ── Usuario CRUD ──
-    bindUsuarioCRUD(user) {
-        document.getElementById('btn-add-usuario')?.addEventListener('click', () => {
-            const fincas = FincaModel.getActive();
-            const body = `
+// ── Usuario CRUD ──
+bindUsuarioCRUD(user) {
+    document.getElementById('btn-add-usuario')?.addEventListener('click', () => {
+        const fincas = FincaModel.getActive();
+        const body = `
                 <form id="modal-usuario-form">
                     <div class="form-group">
                         <label class="form-label">Nombre Completo</label>
@@ -3417,72 +3353,72 @@ export class AppController {
                     </div>
                 </form>
             `;
-            const footer = `
+        const footer = `
                 <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
                 <button class="btn btn-primary" id="modal-save">💾 Crear Usuario</button>
             `;
-            this.showModal('⚙️ Nuevo Usuario', body, footer);
-            
-            const roleSelect = document.getElementById('user-role');
-            const cargaFields = document.querySelectorAll('.user-carga-fields');
-            roleSelect?.addEventListener('change', () => {
-                const isCarga = roleSelect.value === 'Carga';
-                cargaFields.forEach(f => f.style.display = isCarga ? 'block' : 'none');
-            });
+        this.showModal('⚙️ Nuevo Usuario', body, footer);
 
-            const fincaSelect = document.getElementById('user-finca');
-            const predioSelect = document.getElementById('user-predio');
-            fincaSelect?.addEventListener('change', () => {
-                const fid = fincaSelect.value;
-                const selectedFinca = fincas.find(f => f.id == fid);
-                const prediosInfo = selectedFinca ? PredioModel.getByFinca(fid) : [];
-                predioSelect.innerHTML = prediosInfo.length 
-                    ? prediosInfo.map(p => `<option value="${p.id}">${p.nombre || p.name}</option>`).join('')
-                    : '<option value="">Sin predios</option>';
-                predioSelect.disabled = !fid;
-            });
-
-            document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
-            document.getElementById('modal-save')?.addEventListener('click', () => {
-                const name = document.getElementById('user-name').value;
-                const email = document.getElementById('user-email').value;
-                const password = document.getElementById('user-password').value;
-                const role = document.getElementById('user-role').value;
-                const finca_id = document.getElementById('user-finca').value;
-                const predio_id = document.getElementById('user-predio').value;
-                
-                if (!name || !email || !password || !role) {
-                    this.showToast('Complete todos los campos principales', 'warning');
-                    return;
-                }
-                if (password.length < 6) {
-                    this.showToast('La contraseña debe tener al menos 6 caracteres', 'warning');
-                    return;
-                }
-                UserModel.add({ name, email, password, role, finca_id, predio_id });
-                this.showToast(`Usuario "${name}" creado exitosamente`, 'success');
-                this.closeModal();
-                this.loadSection('usuarios', user);
-            });
+        const roleSelect = document.getElementById('user-role');
+        const cargaFields = document.querySelectorAll('.user-carga-fields');
+        roleSelect?.addEventListener('change', () => {
+            const isCarga = roleSelect.value === 'Carga';
+            cargaFields.forEach(f => f.style.display = isCarga ? 'block' : 'none');
         });
-    }
 
-    // ── Modal ──
-    showModal(title, bodyHtml, footerHtml = '') {
-        document.getElementById('modal-title').textContent = title;
-        document.getElementById('modal-body').innerHTML = bodyHtml;
-        document.getElementById('modal-footer').innerHTML = footerHtml;
-        document.getElementById('modal-overlay').classList.add('show');
-    }
+        const fincaSelect = document.getElementById('user-finca');
+        const predioSelect = document.getElementById('user-predio');
+        fincaSelect?.addEventListener('change', () => {
+            const fid = fincaSelect.value;
+            const selectedFinca = fincas.find(f => f.id == fid);
+            const prediosInfo = selectedFinca ? PredioModel.getByFinca(fid) : [];
+            predioSelect.innerHTML = prediosInfo.length
+                ? prediosInfo.map(p => `<option value="${p.id}">${p.nombre || p.name}</option>`).join('')
+                : '<option value="">Sin predios</option>';
+            predioSelect.disabled = !fid;
+        });
 
-    closeModal() {
-        document.getElementById('modal-overlay').classList.remove('show');
-    }
+        document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
+        document.getElementById('modal-save')?.addEventListener('click', () => {
+            const name = document.getElementById('user-name').value;
+            const email = document.getElementById('user-email').value;
+            const password = document.getElementById('user-password').value;
+            const role = document.getElementById('user-role').value;
+            const finca_id = document.getElementById('user-finca').value;
+            const predio_id = document.getElementById('user-predio').value;
 
-    showNewLaborModal() {
-        const fincas = FincaModel.getActive();
-        const empleados = EmpleadoModel.getActive();
-        const body = `
+            if (!name || !email || !password || !role) {
+                this.showToast('Complete todos los campos principales', 'warning');
+                return;
+            }
+            if (password.length < 6) {
+                this.showToast('La contraseña debe tener al menos 6 caracteres', 'warning');
+                return;
+            }
+            UserModel.add({ name, email, password, role, finca_id, predio_id });
+            this.showToast(`Usuario "${name}" creado exitosamente`, 'success');
+            this.closeModal();
+            this.loadSection('usuarios', user);
+        });
+    });
+}
+
+// ── Modal ──
+showModal(title, bodyHtml, footerHtml = '') {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-body').innerHTML = bodyHtml;
+    document.getElementById('modal-footer').innerHTML = footerHtml;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+closeModal() {
+    document.getElementById('modal-overlay').classList.remove('show');
+}
+
+showNewLaborModal() {
+    const fincas = FincaModel.getActive();
+    const empleados = EmpleadoModel.getActive();
+    const body = `
       <form id="modal-labor-form">
         <div class="form-group">
           <label class="form-label">Fecha</label>
@@ -3527,356 +3463,356 @@ export class AppController {
         </div>
       </form>
     `;
-        const footer = `
+    const footer = `
       <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
       <button class="btn btn-primary" id="modal-save-labor">💾 Guardar Labor</button>
     `;
-        this.showModal('🔧 Nueva Labor de Campo', body, footer);
+    this.showModal('🔧 Nueva Labor de Campo', body, footer);
 
-        // Dynamic predio loading
-        const fincaSelect = document.getElementById('modal-labor-finca');
-        const predioSelect = document.getElementById('modal-labor-predio');
-        fincaSelect?.addEventListener('change', () => {
-            const finca = FincaModel.getAll().find(f => f.name === fincaSelect.value);
-            const predios = finca ? PredioModel.getByFinca(finca.id) : [];
-            predioSelect.innerHTML = predios.length
-                ? predios.map(p => `<option value="${p.name}">${p.name}</option>`).join('')
-                : '<option value="">Sin predios</option>';
-        });
+    // Dynamic predio loading
+    const fincaSelect = document.getElementById('modal-labor-finca');
+    const predioSelect = document.getElementById('modal-labor-predio');
+    fincaSelect?.addEventListener('change', () => {
+        const finca = FincaModel.getAll().find(f => f.name === fincaSelect.value);
+        const predios = finca ? PredioModel.getByFinca(finca.id) : [];
+        predioSelect.innerHTML = predios.length
+            ? predios.map(p => `<option value="${p.name}">${p.name}</option>`).join('')
+            : '<option value="">Sin predios</option>';
+    });
 
-        document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
-        document.getElementById('modal-save-labor')?.addEventListener('click', () => {
-            const date = document.getElementById('modal-labor-date').value;
-            const type = document.getElementById('modal-labor-type').value;
-            const finca = document.getElementById('modal-labor-finca').value;
-            const predio = document.getElementById('modal-labor-predio').value;
-            const employee = document.getElementById('modal-labor-employee').value;
-            const hours = parseInt(document.getElementById('modal-labor-hours').value);
-            const notes = document.getElementById('modal-labor-notes').value;
+    document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
+    document.getElementById('modal-save-labor')?.addEventListener('click', () => {
+        const date = document.getElementById('modal-labor-date').value;
+        const type = document.getElementById('modal-labor-type').value;
+        const finca = document.getElementById('modal-labor-finca').value;
+        const predio = document.getElementById('modal-labor-predio').value;
+        const employee = document.getElementById('modal-labor-employee').value;
+        const hours = parseInt(document.getElementById('modal-labor-hours').value);
+        const notes = document.getElementById('modal-labor-notes').value;
 
-            if (!type || !finca || !predio || !employee || !hours) {
-                this.showToast('Complete todos los campos obligatorios', 'warning');
+        if (!type || !finca || !predio || !employee || !hours) {
+            this.showToast('Complete todos los campos obligatorios', 'warning');
+            return;
+        }
+
+        LaborModel.add({ date, type, predio, finca, employee, hours, notes, status: 'completed' });
+        this.showToast('Labor registrada correctamente', 'success');
+        this.closeModal();
+        this.loadSection('labores', this.currentUser);
+    });
+}
+
+// ══════════════════════════════════════════════════
+// MÓDULO APLICACIONES SOFÍA
+// ══════════════════════════════════════════════════
+
+renderAplicacionesSofiaModule(container) {
+    // Destroy sofia charts
+    Object.keys(this.charts).filter(k => k.startsWith('sofia')).forEach(k => {
+        this.charts[k].destroy();
+        delete this.charts[k];
+    });
+
+    const cycles = SofiaImportModel.getAvailableCycles();
+    const fincas = SofiaImportModel.getFincas();
+
+    // Dynamic lists based on current selected finca
+    const predios = SofiaImportModel.getPredios(this.sofiaFilters.finca);
+    const variedades = SofiaImportModel.getVariedades(this.sofiaFilters.finca, this.sofiaFilters.predio);
+    const userRole = this.currentUser?.role || '';
+
+    // Default to latest cycle if current filter is invalid
+    if (cycles.length > 0 && (!this.sofiaFilters.ciclo || !cycles.includes(this.sofiaFilters.ciclo))) {
+        this.sofiaFilters.ciclo = cycles[0];
+    }
+
+    // Pass available varieties to the view
+    const viewFilters = { ...this.sofiaFilters, variedades };
+
+    container.innerHTML = renderInformeAplicaciones(cycles, fincas, predios, [], userRole, viewFilters);
+    this.bindSofiaEvents();
+    this.renderSofiaSubTab(this.sofiaSubTab);
+}
+
+async loadStaticSofiaData() {
+    // Always reload CSV data fresh (clear previous cache)
+    SofiaImportModel.REGISTROS = [];
+
+    const files = [
+        { name: 'EE_aplicaciones.csv', finca: 'El Espejo' },
+        { name: 'FV_aplicaciones.csv', finca: 'Fincas Viejas' }
+    ];
+
+    for (const file of files) {
+        try {
+            console.log(`[AppController] Fetching ${file.name}...`);
+            const response = await fetch(`/Fuentes/Aplicaciones/${file.name}?t=${Date.now()}`);
+            if (!response.ok) {
+                console.error(`[AppController] Error fetching ${file.name}: ${response.status} ${response.statusText}`);
+                continue;
+            }
+
+            const buffer = await response.arrayBuffer();
+            const decoder = new TextDecoder('iso-8859-1');
+            const csvText = decoder.decode(buffer);
+            console.log(`[AppController] Received ${csvText.length} chars from ${file.name}`);
+
+            const result = SofiaImportModel.parseCSV(csvText, file.finca);
+            if (!result.error) {
+                SofiaImportModel.importRows(result.rows);
+                console.log(`[AppController] Auto-loaded ${result.rows.length} rows from ${file.name} (${file.finca})`);
+            } else {
+                console.warn(`[AppController] Error parsing ${file.name}:`, result.error);
+            }
+        } catch (error) {
+            console.error(`[AppController] Exception loading ${file.name}:`, error);
+        }
+    }
+
+    // If we are already in the aplicaciones section, refresh it
+    if (this.currentSection === 'aplicaciones-sofia') {
+        const container = document.getElementById('page-content');
+        if (container) this.renderAplicacionesSofiaModule(container);
+    }
+}
+
+async autoLoadJornalesBudget() {
+    try {
+        const resp = await fetch(`/Fuentes/Auxiliares/PresupuestoJornales.csv?t=${Date.now()}`);
+        if (resp.ok) {
+            const csvText = await resp.text();
+            const result = JornalesBudgetModel.importFromCSV(csvText);
+            if (result.success) {
+                console.log('Auto-loaded PresupuestoJornales.csv');
+            }
+        }
+    } catch (e) {
+        console.error('Error auto-loading Jornales budget:', e);
+    }
+}
+
+bindSofiaEvents() {
+    // Standardized Filters Logic
+    const filterIds = ['filter-ciclo', 'filter-finca', 'filter-predio', 'filter-variedad'];
+    filterIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        el.addEventListener('change', () => {
+            const val = el.value;
+            if (id === 'filter-ciclo') this.sofiaFilters.ciclo = val;
+            if (id === 'filter-finca') {
+                this.sofiaFilters.finca = val;
+                this.sofiaFilters.predio = '';
+                this.sofiaFilters.variedad = '';
+                this.renderAplicacionesSofiaModule(document.getElementById('sofia-module-container') || this.app.querySelector('.dashboard-content'));
                 return;
             }
-
-            LaborModel.add({ date, type, predio, finca, employee, hours, notes, status: 'completed' });
-            this.showToast('Labor registrada correctamente', 'success');
-            this.closeModal();
-            this.loadSection('labores', this.currentUser);
-        });
-    }
-
-    // ══════════════════════════════════════════════════
-    // MÓDULO APLICACIONES SOFÍA
-    // ══════════════════════════════════════════════════
-
-    renderAplicacionesSofiaModule(container) {
-        // Destroy sofia charts
-        Object.keys(this.charts).filter(k => k.startsWith('sofia')).forEach(k => {
-            this.charts[k].destroy();
-            delete this.charts[k];
-        });
-
-        const cycles = SofiaImportModel.getAvailableCycles();
-        const fincas = SofiaImportModel.getFincas();
-
-        // Dynamic lists based on current selected finca
-        const predios = SofiaImportModel.getPredios(this.sofiaFilters.finca);
-        const variedades = SofiaImportModel.getVariedades(this.sofiaFilters.finca, this.sofiaFilters.predio);
-        const userRole = this.currentUser?.role || '';
-
-        // Default to latest cycle if current filter is invalid
-        if (cycles.length > 0 && (!this.sofiaFilters.ciclo || !cycles.includes(this.sofiaFilters.ciclo))) {
-            this.sofiaFilters.ciclo = cycles[0];
-        }
-
-        // Pass available varieties to the view
-        const viewFilters = { ...this.sofiaFilters, variedades };
-
-        container.innerHTML = renderInformeAplicaciones(cycles, fincas, predios, [], userRole, viewFilters);
-        this.bindSofiaEvents();
-        this.renderSofiaSubTab(this.sofiaSubTab);
-    }
-
-    async loadStaticSofiaData() {
-        // Always reload CSV data fresh (clear previous cache)
-        SofiaImportModel.REGISTROS = [];
-
-        const files = [
-            { name: 'EE_aplicaciones.csv', finca: 'El Espejo' },
-            { name: 'FV_aplicaciones.csv', finca: 'Fincas Viejas' }
-        ];
-
-        for (const file of files) {
-            try {
-                console.log(`[AppController] Fetching ${file.name}...`);
-                const response = await fetch(`/Fuentes/Aplicaciones/${file.name}?t=${Date.now()}`);
-                if (!response.ok) {
-                    console.error(`[AppController] Error fetching ${file.name}: ${response.status} ${response.statusText}`);
-                    continue;
-                }
-
-                const buffer = await response.arrayBuffer();
-                const decoder = new TextDecoder('iso-8859-1');
-                const csvText = decoder.decode(buffer);
-                console.log(`[AppController] Received ${csvText.length} chars from ${file.name}`);
-
-                const result = SofiaImportModel.parseCSV(csvText, file.finca);
-                if (!result.error) {
-                    SofiaImportModel.importRows(result.rows);
-                    console.log(`[AppController] Auto-loaded ${result.rows.length} rows from ${file.name} (${file.finca})`);
-                } else {
-                    console.warn(`[AppController] Error parsing ${file.name}:`, result.error);
-                }
-            } catch (error) {
-                console.error(`[AppController] Exception loading ${file.name}:`, error);
+            if (id === 'filter-predio') {
+                this.sofiaFilters.predio = val;
+                this.sofiaFilters.variedad = '';
+                this.renderAplicacionesSofiaModule(document.getElementById('sofia-module-container') || this.app.querySelector('.dashboard-content'));
+                return;
             }
-        }
+            if (id === 'filter-variedad') this.sofiaFilters.variedad = val;
 
-        // If we are already in the aplicaciones section, refresh it
-        if (this.currentSection === 'aplicaciones-sofia') {
-            const container = document.getElementById('page-content');
-            if (container) this.renderAplicacionesSofiaModule(container);
-        }
-    }
+            this.renderSofiaSubTab(this.sofiaSubTab);
+        });
+    });
 
-    async autoLoadJornalesBudget() {
-        try {
-            const resp = await fetch(`/Fuentes/Auxiliares/PresupuestoJornales.csv?t=${Date.now()}`);
-            if (resp.ok) {
-                const csvText = await resp.text();
-                const result = JornalesBudgetModel.importFromCSV(csvText);
-                if (result.success) {
-                    console.log('Auto-loaded PresupuestoJornales.csv');
-                }
-            }
-        } catch (e) {
-            console.error('Error auto-loading Jornales budget:', e);
-        }
-    }
+    // Sub-tabs
+    document.querySelectorAll('#sofia-subtabs .tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#sofia-subtabs .tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.sofiaSubTab = btn.dataset.subtab;
+            this.renderSofiaSubTab(this.sofiaSubTab);
+        });
+    });
+}
 
-    bindSofiaEvents() {
-        // Standardized Filters Logic
-        const filterIds = ['filter-ciclo', 'filter-finca', 'filter-predio', 'filter-variedad'];
-        filterIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (!el) return;
+renderSofiaSubTab(tab) {
+    const content = document.getElementById('sofia-subtab-content');
+    if (!content) return;
 
-            el.addEventListener('change', () => {
-                const val = el.value;
-                if (id === 'filter-ciclo') this.sofiaFilters.ciclo = val;
-                if (id === 'filter-finca') {
-                    this.sofiaFilters.finca = val;
-                    this.sofiaFilters.predio = '';
-                    this.sofiaFilters.variedad = '';
-                    this.renderAplicacionesSofiaModule(document.getElementById('sofia-module-container') || this.app.querySelector('.dashboard-content'));
-                    return;
-                }
-                if (id === 'filter-predio') {
-                    this.sofiaFilters.predio = val;
-                    this.sofiaFilters.variedad = '';
-                    this.renderAplicacionesSofiaModule(document.getElementById('sofia-module-container') || this.app.querySelector('.dashboard-content'));
-                    return;
-                }
-                if (id === 'filter-variedad') this.sofiaFilters.variedad = val;
+    // Destroy existing sofia charts
+    Object.keys(this.charts).filter(k => k.startsWith('sofia')).forEach(k => {
+        this.charts[k].destroy();
+        delete this.charts[k];
+    });
 
-                this.renderSofiaSubTab(this.sofiaSubTab);
+    const filters = this.sofiaFilters;
+
+    switch (tab) {
+        case 'resumen': {
+            const resumen = SofiaImportModel.getResumen(filters);
+            content.innerHTML = renderSofiaResumen(resumen);
+            requestAnimationFrame(() => {
+                this.renderSofiaDistChart(resumen.distribution);
+                this.renderSofiaCostChart(resumen.topProducts);
             });
-        });
-
-        // Sub-tabs
-        document.querySelectorAll('#sofia-subtabs .tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('#sofia-subtabs .tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.sofiaSubTab = btn.dataset.subtab;
-                this.renderSofiaSubTab(this.sofiaSubTab);
-            });
-        });
-    }
-
-    renderSofiaSubTab(tab) {
-        const content = document.getElementById('sofia-subtab-content');
-        if (!content) return;
-
-        // Destroy existing sofia charts
-        Object.keys(this.charts).filter(k => k.startsWith('sofia')).forEach(k => {
-            this.charts[k].destroy();
-            delete this.charts[k];
-        });
-
-        const filters = this.sofiaFilters;
-
-        switch (tab) {
-            case 'resumen': {
-                const resumen = SofiaImportModel.getResumen(filters);
-                content.innerHTML = renderSofiaResumen(resumen);
-                requestAnimationFrame(() => {
-                    this.renderSofiaDistChart(resumen.distribution);
-                    this.renderSofiaCostChart(resumen.topProducts);
-                });
-                break;
-            }
-            case 'foliares':
-                content.innerHTML = renderSofiaFoliares(SofiaImportModel.getFoliares(filters));
-                break;
-            case 'herbicidas':
-                content.innerHTML = renderSofiaHerbicidas(SofiaImportModel.getHerbicidas(filters));
-                break;
-            case 'fertilizacion': {
-                const comparativa = SofiaImportModel.getFertilizacionComparativa(filters);
-                content.innerHTML = renderFertilizacionComparativa(comparativa);
-                requestAnimationFrame(() => this.renderFertComparativaChart(comparativa));
-                break;
-            }
+            break;
+        }
+        case 'foliares':
+            content.innerHTML = renderSofiaFoliares(SofiaImportModel.getFoliares(filters));
+            break;
+        case 'herbicidas':
+            content.innerHTML = renderSofiaHerbicidas(SofiaImportModel.getHerbicidas(filters));
+            break;
+        case 'fertilizacion': {
+            const comparativa = SofiaImportModel.getFertilizacionComparativa(filters);
+            content.innerHTML = renderFertilizacionComparativa(comparativa);
+            requestAnimationFrame(() => this.renderFertComparativaChart(comparativa));
+            break;
         }
     }
+}
 
-    renderSofiaDistChart(distribution) {
-        const ctx = document.getElementById('chart-sofia-dist');
+renderSofiaDistChart(distribution) {
+    const ctx = document.getElementById('chart-sofia-dist');
+    if (!ctx) return;
+    const colors = [
+        'rgba(59, 130, 246, 0.8)', // Foliares (Blue)
+        'rgba(245, 158, 11, 0.8)', // Herbicidas (Amber)
+        'rgba(168, 85, 247, 0.8)', // Fertilizacion (Purple)
+        'rgba(148, 163, 184, 0.8)' // Otros (Gray)
+    ];
+    this.charts['sofia-dist'] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(distribution),
+            datasets: [{ data: Object.values(distribution), backgroundColor: colors, borderWidth: 0, hoverOffset: 8 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, cutout: '60%',
+            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 }, padding: 14 } } }
+        }
+    });
+}
+
+renderSofiaCostChart(topProducts) {
+    const ctx = document.getElementById('chart-sofia-cost');
+    if (!ctx) return;
+    const colors = ['rgba(16,185,129,0.7)', 'rgba(168,85,247,0.7)', 'rgba(245,158,11,0.7)',
+        'rgba(59,130,246,0.7)', 'rgba(239,68,68,0.7)', 'rgba(34,197,94,0.7)',
+        'rgba(192,132,252,0.7)', 'rgba(251,191,36,0.7)'];
+    this.charts['sofia-cost'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: topProducts.map(p => p.producto),
+            datasets: [{
+                label: 'Costo Total ($)', data: topProducts.map(p => p.costo),
+                backgroundColor: colors.slice(0, topProducts.length), borderWidth: 0, borderRadius: 6
+            }]
+        },
+        options: { ...this.getChartOptions('Costo ($)'), indexAxis: 'y' }
+    });
+}
+
+renderFertComparativaChart(data) {
+    // 0. Gráficos Comparativos por Finca (Espejo y Fincas Viejas)
+    const renderSplitChart = (canvasId, fincaName, chartKey, colorPre, colorReal) => {
+        const ctx = document.getElementById(canvasId);
         if (!ctx) return;
-        const colors = [
-            'rgba(59, 130, 246, 0.8)', // Foliares (Blue)
-            'rgba(245, 158, 11, 0.8)', // Herbicidas (Amber)
-            'rgba(168, 85, 247, 0.8)', // Fertilizacion (Purple)
-            'rgba(148, 163, 184, 0.8)' // Otros (Gray)
-        ];
-        this.charts['sofia-dist'] = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(distribution),
-                datasets: [{ data: Object.values(distribution), backgroundColor: colors, borderWidth: 0, hoverOffset: 8 }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, cutout: '60%',
-                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 }, padding: 14 } } }
+
+        // Get data filtering by CURRENT filters + specifically this Finca
+        const specificFilters = { ...this.sofiaFilters, finca: fincaName };
+
+        // If the currently selected predio doesn't belong to this fincaName,
+        // ignore it for this specific chart to avoid showing an empty graph
+        if (specificFilters.predio) {
+            const subPredios = SofiaImportModel.getPredios(fincaName);
+            if (!subPredios.includes(specificFilters.predio)) {
+                specificFilters.predio = '';
+                specificFilters.variedad = '';
             }
-        });
-    }
+        }
 
-    renderSofiaCostChart(topProducts) {
-        const ctx = document.getElementById('chart-sofia-cost');
-        if (!ctx) return;
-        const colors = ['rgba(16,185,129,0.7)', 'rgba(168,85,247,0.7)', 'rgba(245,158,11,0.7)',
-            'rgba(59,130,246,0.7)', 'rgba(239,68,68,0.7)', 'rgba(34,197,94,0.7)',
-            'rgba(192,132,252,0.7)', 'rgba(251,191,36,0.7)'];
-        this.charts['sofia-cost'] = new Chart(ctx, {
+        const prodData = SofiaImportModel.getProductComparison(specificFilters);
+        console.log(`[Chart Sort] ${fincaName}:`, prodData.map(d => `${d.clasifica}-${d.producto}`).slice(0, 3));
+
+        this.charts[chartKey] = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: topProducts.map(p => p.producto),
-                datasets: [{
-                    label: 'Costo Total ($)', data: topProducts.map(p => p.costo),
-                    backgroundColor: colors.slice(0, topProducts.length), borderWidth: 0, borderRadius: 6
-                }]
-            },
-            options: { ...this.getChartOptions('Costo ($)'), indexAxis: 'y' }
-        });
-    }
-
-    renderFertComparativaChart(data) {
-        // 0. Gráficos Comparativos por Finca (Espejo y Fincas Viejas)
-        const renderSplitChart = (canvasId, fincaName, chartKey, colorPre, colorReal) => {
-            const ctx = document.getElementById(canvasId);
-            if (!ctx) return;
-
-            // Get data filtering by CURRENT filters + specifically this Finca
-            const specificFilters = { ...this.sofiaFilters, finca: fincaName };
-
-            // If the currently selected predio doesn't belong to this fincaName, 
-            // ignore it for this specific chart to avoid showing an empty graph
-            if (specificFilters.predio) {
-                const subPredios = SofiaImportModel.getPredios(fincaName);
-                if (!subPredios.includes(specificFilters.predio)) {
-                    specificFilters.predio = '';
-                    specificFilters.variedad = '';
-                }
-            }
-
-            const prodData = SofiaImportModel.getProductComparison(specificFilters);
-            console.log(`[Chart Sort] ${fincaName}:`, prodData.map(d => `${d.clasifica}-${d.producto}`).slice(0, 3));
-
-            this.charts[chartKey] = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: prodData.map(d => `${d.clasifica} - ${d.producto}`),
-                    datasets: [
-                        {
-                            label: 'Comprado (Pre)', data: prodData.map(d => d.pre),
-                            backgroundColor: colorPre, borderColor: colorPre.replace('0.7', '1'),
-                            borderWidth: 1, borderRadius: 4
-                        },
-                        {
-                            label: 'Real Aplicado', data: prodData.map(d => d.real),
-                            backgroundColor: colorReal, borderColor: colorReal.replace('0.7', '1'),
-                            borderWidth: 1, borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    ...this.getChartOptions('Litros (L)'),
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: { position: 'top' },
-                        tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatCurrency(c.parsed.x)} L` } }
+                labels: prodData.map(d => `${d.clasifica} - ${d.producto}`),
+                datasets: [
+                    {
+                        label: 'Comprado (Pre)', data: prodData.map(d => d.pre),
+                        backgroundColor: colorPre, borderColor: colorPre.replace('0.7', '1'),
+                        borderWidth: 1, borderRadius: 4
+                    },
+                    {
+                        label: 'Real Aplicado', data: prodData.map(d => d.real),
+                        backgroundColor: colorReal, borderColor: colorReal.replace('0.7', '1'),
+                        borderWidth: 1, borderRadius: 4
                     }
+                ]
+            },
+            options: {
+                ...this.getChartOptions('Litros (L)'),
+                indexAxis: 'y',
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatCurrency(c.parsed.x)} L` } }
                 }
-            });
-        };
+            }
+        });
+    };
 
-        renderSplitChart('chart-fert-prod-espejo', 'El Espejo', 'sofia-fert-espejo', 'rgba(59, 130, 246, 0.7)', 'rgba(236, 72, 153, 0.7)');
-        renderSplitChart('chart-fert-prod-fincasviejas', 'Fincas Viejas', 'sofia-fert-fincasviejas', 'rgba(245, 158, 11, 0.7)', 'rgba(16, 185, 129, 0.7)');
+    renderSplitChart('chart-fert-prod-espejo', 'El Espejo', 'sofia-fert-espejo', 'rgba(59, 130, 246, 0.7)', 'rgba(236, 72, 153, 0.7)');
+    renderSplitChart('chart-fert-prod-fincasviejas', 'Fincas Viejas', 'sofia-fert-fincasviejas', 'rgba(245, 158, 11, 0.7)', 'rgba(16, 185, 129, 0.7)');
 
-        // 2. Timeline Charts (Weekly per-week Evolution) — one per finca with product + predio filter
-        const weeklyConfigs = [
-            { id: 'chart-fert-weekly-ee', filterId: 'filter-weekly-producto-ee', predioFilterId: 'filter-weekly-predio-ee', summaryId: 'weekly-summary-ee', finca: 'El Espejo', barColor: 'rgba(6, 182, 212, 0.7)', barBorder: 'rgba(6, 182, 212, 1)', lineColor: 'rgba(168, 85, 247, 1)' },
-            { id: 'chart-fert-weekly-fv', filterId: 'filter-weekly-producto-fv', predioFilterId: 'filter-weekly-predio-fv', summaryId: 'weekly-summary-fv', finca: 'Fincas Viejas', barColor: 'rgba(249, 115, 22, 0.7)', barBorder: 'rgba(249, 115, 22, 1)', lineColor: 'rgba(52, 211, 153, 1)' }
-        ];
+    // 2. Timeline Charts (Weekly per-week Evolution) — one per finca with product + predio filter
+    const weeklyConfigs = [
+        { id: 'chart-fert-weekly-ee', filterId: 'filter-weekly-producto-ee', predioFilterId: 'filter-weekly-predio-ee', summaryId: 'weekly-summary-ee', finca: 'El Espejo', barColor: 'rgba(6, 182, 212, 0.7)', barBorder: 'rgba(6, 182, 212, 1)', lineColor: 'rgba(168, 85, 247, 1)' },
+        { id: 'chart-fert-weekly-fv', filterId: 'filter-weekly-producto-fv', predioFilterId: 'filter-weekly-predio-fv', summaryId: 'weekly-summary-fv', finca: 'Fincas Viejas', barColor: 'rgba(249, 115, 22, 0.7)', barBorder: 'rgba(249, 115, 22, 1)', lineColor: 'rgba(52, 211, 153, 1)' }
+    ];
 
-        const renderWeeklyChart = (cfg) => {
-            const ctx = document.getElementById(cfg.id);
-            if (!ctx) return;
+    const renderWeeklyChart = (cfg) => {
+        const ctx = document.getElementById(cfg.id);
+        if (!ctx) return;
 
-            // Destroy existing chart if any
-            const chartKey = `sofia-${cfg.id}`;
-            if (this.charts[chartKey]) {
-                this.charts[chartKey].destroy();
-                delete this.charts[chartKey];
+        // Destroy existing chart if any
+        const chartKey = `sofia-${cfg.id}`;
+        if (this.charts[chartKey]) {
+            this.charts[chartKey].destroy();
+            delete this.charts[chartKey];
+        }
+
+        const filterEl = document.getElementById(cfg.filterId);
+        const productoFilter = filterEl ? filterEl.value : '';
+        const predioFilterEl = document.getElementById(cfg.predioFilterId);
+        const predioFilter = predioFilterEl ? predioFilterEl.value : '';
+        const weeklyData = SofiaImportModel.getWeeklyEvolution(this.sofiaFilters, cfg.finca, productoFilter, predioFilter);
+
+        // ── Update dynamic summary cards ──
+        const summaryEl = document.getElementById(cfg.summaryId);
+        if (summaryEl) {
+            const totalPptado = [...weeklyData.pptadoPre, ...weeklyData.pptadoPos].reduce((s, v) => s + (v || 0), 0);
+            const totalReal = weeklyData.realPre.reduce((s, v) => s + (v || 0), 0) + weeklyData.realPos.reduce((s, v) => s + (v || 0), 0);
+            const desvio = totalReal - totalPptado;
+            const desvioPct = totalPptado > 0 ? Math.round((desvio / totalPptado) * 100) : 0;
+            const fmt = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(v);
+
+            let estadoIcon, estadoColor, estadoBg, estadoBorder, estadoLabel;
+            if (desvio > 0) {
+                // Over budget → danger (red)
+                estadoIcon = '⛔'; estadoColor = '#ef4444';
+                estadoBg = 'rgba(239, 68, 68, 0.1)'; estadoBorder = 'rgba(239, 68, 68, 0.3)';
+                estadoLabel = 'Exceso';
+            } else if (desvio < 0) {
+                // Under budget → warning (amber)
+                estadoIcon = '⚠️'; estadoColor = '#f59e0b';
+                estadoBg = 'rgba(245, 158, 11, 0.1)'; estadoBorder = 'rgba(245, 158, 11, 0.3)';
+                estadoLabel = 'Falta';
+            } else {
+                // On target → green
+                estadoIcon = '✅'; estadoColor = '#10b981';
+                estadoBg = 'rgba(16, 185, 129, 0.1)'; estadoBorder = 'rgba(16, 185, 129, 0.3)';
+                estadoLabel = 'En objetivo';
             }
 
-            const filterEl = document.getElementById(cfg.filterId);
-            const productoFilter = filterEl ? filterEl.value : '';
-            const predioFilterEl = document.getElementById(cfg.predioFilterId);
-            const predioFilter = predioFilterEl ? predioFilterEl.value : '';
-            const weeklyData = SofiaImportModel.getWeeklyEvolution(this.sofiaFilters, cfg.finca, productoFilter, predioFilter);
-
-            // ── Update dynamic summary cards ──
-            const summaryEl = document.getElementById(cfg.summaryId);
-            if (summaryEl) {
-                const totalPptado = [...weeklyData.pptadoPre, ...weeklyData.pptadoPos].reduce((s, v) => s + (v || 0), 0);
-                const totalReal = weeklyData.realPre.reduce((s, v) => s + (v || 0), 0) + weeklyData.realPos.reduce((s, v) => s + (v || 0), 0);
-                const desvio = totalReal - totalPptado;
-                const desvioPct = totalPptado > 0 ? Math.round((desvio / totalPptado) * 100) : 0;
-                const fmt = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(v);
-
-                let estadoIcon, estadoColor, estadoBg, estadoBorder, estadoLabel;
-                if (desvio > 0) {
-                    // Over budget → danger (red)
-                    estadoIcon = '⛔'; estadoColor = '#ef4444';
-                    estadoBg = 'rgba(239, 68, 68, 0.1)'; estadoBorder = 'rgba(239, 68, 68, 0.3)';
-                    estadoLabel = 'Exceso';
-                } else if (desvio < 0) {
-                    // Under budget → warning (amber)
-                    estadoIcon = '⚠️'; estadoColor = '#f59e0b';
-                    estadoBg = 'rgba(245, 158, 11, 0.1)'; estadoBorder = 'rgba(245, 158, 11, 0.3)';
-                    estadoLabel = 'Falta';
-                } else {
-                    // On target → green
-                    estadoIcon = '✅'; estadoColor = '#10b981';
-                    estadoBg = 'rgba(16, 185, 129, 0.1)'; estadoBorder = 'rgba(16, 185, 129, 0.3)';
-                    estadoLabel = 'En objetivo';
-                }
-
-                summaryEl.innerHTML = `
+            summaryEl.innerHTML = `
                     <div style="flex: 1; min-width: 160px; background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 10px 16px;">
                         <div style="font-size: 0.7em; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">🎯 Total Presupuestado</div>
                         <div style="font-size: 1.3em; font-weight: 700; color: #10b981; font-family: 'Outfit';">${fmt(totalPptado)} <span style="font-size: 0.55em; font-weight: 400; color: var(--text-tertiary);">L</span></div>
@@ -3891,417 +3827,399 @@ export class AppController {
                         <div style="font-size: 0.7em; color: ${estadoColor}; font-weight: 600; margin-top: 2px;">${estadoLabel}</div>
                     </div>
                 `;
-            }
-
-            this.charts[chartKey] = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: weeklyData.labels,
-                    datasets: [
-                        {
-                            type: 'line',
-                            label: 'PPTO PRE',
-                            data: weeklyData.pptadoPre,
-                            borderColor: '#38bdf8', // Blue
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            tension: 0.1, fill: false,
-                            pointRadius: 0, pointHoverRadius: 4,
-                            order: 1
-                        },
-                        {
-                            type: 'line',
-                            label: 'PPTO POS',
-                            data: weeklyData.pptadoPos,
-                            borderColor: '#e879f9', // Pink
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            tension: 0.1, fill: false,
-                            pointRadius: 0, pointHoverRadius: 4,
-                            order: 1
-                        },
-                        {
-                            type: 'bar',
-                            label: 'Real PRE',
-                            data: weeklyData.realPre,
-                            backgroundColor: 'rgba(56, 189, 248, 0.4)',
-                            borderColor: 'rgba(56, 189, 248, 1)',
-                            borderWidth: 1, borderRadius: 2,
-                            stack: 'real',
-                            order: 2
-                        },
-                        {
-                            type: 'bar',
-                            label: 'Real POS (Bio-Crecimiento)',
-                            data: weeklyData.realPos,
-                            backgroundColor: 'rgba(232, 121, 249, 0.4)',
-                            borderColor: 'rgba(232, 121, 249, 1)',
-                            borderWidth: 1, borderRadius: 2,
-                            stack: 'real',
-                            order: 3
-                        }
-                    ]
-                },
-                options: {
-                    ...this.getChartOptions('Litros (L) por Semana'),
-                    interaction: { mode: 'index', intersect: false },
-                    scales: {
-                        x: {
-                            stacked: true,
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.5)',
-                                font: { size: 9, family: 'Inter' },
-                                maxRotation: 45, minRotation: 45
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            stacked: true,
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.55)',
-                                font: { size: 10 }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                color: 'rgba(255,255,255,0.75)',
-                                font: { family: 'Inter', size: 11, weight: '500' },
-                                usePointStyle: true, padding: 16
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: (c) => `${c.dataset.label}: ${formatCurrency(c.parsed.y)} L`
-                            }
-                        }
-                    }
-                }
-            });
-        };
-
-        weeklyConfigs.forEach(cfg => {
-            // Populate predio filter dropdown dynamically
-            const predioEl = document.getElementById(cfg.predioFilterId);
-            if (predioEl && predioEl.options.length <= 1) {
-                const predios = SofiaImportModel.getPredios(cfg.finca);
-                predios.forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p;
-                    opt.textContent = p;
-                    opt.style.color = '#000';
-                    predioEl.appendChild(opt);
-                });
-            }
-
-            renderWeeklyChart(cfg);
-            // Bind product filter change
-            const filterEl = document.getElementById(cfg.filterId);
-            if (filterEl) {
-                filterEl.addEventListener('change', () => renderWeeklyChart(cfg));
-            }
-            // Bind predio filter change
-            if (predioEl) {
-                predioEl.addEventListener('change', () => renderWeeklyChart(cfg));
-            }
-        });
-
-        this.renderFertUnidadesChart();
-    }
-
-    // ── Toast Notifications ──
-    showToast(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-
-        const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-      <span class="toast-icon">${icons[type]}</span>
-      <span class="toast-message">${message}</span>
-      <button class="toast-close">✕</button>
-    `;
-
-        container.appendChild(toast);
-
-        toast.querySelector('.toast-close').addEventListener('click', () => toast.remove());
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100px)';
-            toast.style.transition = '0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, 4000);
-    }
-
-    // -- Jornadas Chart --
-    renderJornadasChart(comparison) {
-        const ctx = document.getElementById('chart-jornadas-consumidas');
-        if (!ctx) return;
-
-        // Take top 8 labors for clarity
-        const labels = comparison.labels.slice(0, 8);
-        const realData = comparison.real.slice(0, 8);
-        const budgetData = comparison.budget.slice(0, 8);
-
-        if (this.charts['jornadas']) {
-            this.charts['jornadas'].destroy();
         }
 
-        this.charts['jornadas'] = new Chart(ctx, {
+        this.charts[chartKey] = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: weeklyData.labels,
                 datasets: [
                     {
-                        type: 'bar',
-                        label: 'Ejecutado (Real)',
-                        data: realData,
-                        backgroundColor: [
-                            'rgba(167, 139, 250, 0.8)',
-                            'rgba(52, 211, 153, 0.8)',
-                            'rgba(251, 191, 36, 0.8)',
-                            'rgba(96, 165, 250, 0.8)',
-                            'rgba(248, 113, 113, 0.8)',
-                            'rgba(168, 162, 158, 0.8)',
-                            'rgba(244, 114, 182, 0.8)',
-                            'rgba(45, 212, 191, 0.8)'
-                        ],
-                        borderRadius: 4
+                        type: 'line',
+                        label: 'PPTO PRE',
+                        data: weeklyData.pptadoPre,
+                        borderColor: '#38bdf8', // Blue
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.1, fill: false,
+                        pointRadius: 0, pointHoverRadius: 4,
+                        order: 1
                     },
                     {
                         type: 'line',
-                        label: 'Proyectado (Budget)',
-                        data: budgetData,
-                        backgroundColor: 'rgba(255, 255, 255, 1)',
-                        borderColor: 'rgba(255, 255, 255, 0.8)',
+                        label: 'PPTO POS',
+                        data: weeklyData.pptadoPos,
+                        borderColor: '#e879f9', // Pink
+                        backgroundColor: 'transparent',
                         borderWidth: 2,
-                        pointBackgroundColor: 'rgba(255, 255, 255, 1)',
-                        pointBorderColor: 'rgba(255, 255, 255, 1)',
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        tension: 0.3,
-                        fill: false,
-                        order: 1 // Drawn on top of bars
+                        borderDash: [5, 5],
+                        tension: 0.1, fill: false,
+                        pointRadius: 0, pointHoverRadius: 4,
+                        order: 1
+                    },
+                    {
+                        type: 'bar',
+                        label: 'Real PRE',
+                        data: weeklyData.realPre,
+                        backgroundColor: 'rgba(56, 189, 248, 0.4)',
+                        borderColor: 'rgba(56, 189, 248, 1)',
+                        borderWidth: 1, borderRadius: 2,
+                        stack: 'real',
+                        order: 2
+                    },
+                    {
+                        type: 'bar',
+                        label: 'Real POS (Bio-Crecimiento)',
+                        data: weeklyData.realPos,
+                        backgroundColor: 'rgba(232, 121, 249, 0.4)',
+                        borderColor: 'rgba(232, 121, 249, 1)',
+                        borderWidth: 1, borderRadius: 2,
+                        stack: 'real',
+                        order: 3
                     }
                 ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                ...this.getChartOptions('Litros (L) por Semana'),
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.5)',
+                            font: { size: 9, family: 'Inter' },
+                            maxRotation: 45, minRotation: 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        stacked: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.55)',
+                            font: { size: 10 }
+                        }
+                    }
+                },
                 plugins: {
                     legend: {
-                        display: true,
                         position: 'top',
-                        align: 'end',
                         labels: {
-                            color: 'rgba(255, 255, 255, 0.7)',
-                            font: { size: 10 },
-                            usePointStyle: true,
-                            boxWidth: 8
+                            color: 'rgba(255,255,255,0.75)',
+                            font: { family: 'Inter', size: 11, weight: '500' },
+                            usePointStyle: true, padding: 16
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (c) => `${c.dataset.label}: ${formatCurrency(c.parsed.y)} L`
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    weeklyConfigs.forEach(cfg => {
+        // Populate predio filter dropdown dynamically
+        const predioEl = document.getElementById(cfg.predioFilterId);
+        if (predioEl && predioEl.options.length <= 1) {
+            const predios = SofiaImportModel.getPredios(cfg.finca);
+            predios.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                opt.style.color = '#000';
+                predioEl.appendChild(opt);
+            });
+        }
+
+        renderWeeklyChart(cfg);
+        // Bind product filter change
+        const filterEl = document.getElementById(cfg.filterId);
+        if (filterEl) {
+            filterEl.addEventListener('change', () => renderWeeklyChart(cfg));
+        }
+        // Bind predio filter change
+        if (predioEl) {
+            predioEl.addEventListener('change', () => renderWeeklyChart(cfg));
+        }
+    });
+
+    this.renderFertUnidadesChart();
+}
+
+
+
+// -- Jornadas Chart --
+renderJornadasChart(comparison) {
+    const ctx = document.getElementById('chart-jornadas-consumidas');
+    if (!ctx) return;
+
+    // Take top 8 labors for clarity
+    const labels = comparison.labels.slice(0, 8);
+    const realData = comparison.real.slice(0, 8);
+    const budgetData = comparison.budget.slice(0, 8);
+
+    if (this.charts['jornadas']) {
+        this.charts['jornadas'].destroy();
+    }
+
+    this.charts['jornadas'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'Ejecutado (Real)',
+                    data: realData,
+                    backgroundColor: [
+                        'rgba(167, 139, 250, 0.8)',
+                        'rgba(52, 211, 153, 0.8)',
+                        'rgba(251, 191, 36, 0.8)',
+                        'rgba(96, 165, 250, 0.8)',
+                        'rgba(248, 113, 113, 0.8)',
+                        'rgba(168, 162, 158, 0.8)',
+                        'rgba(244, 114, 182, 0.8)',
+                        'rgba(45, 212, 191, 0.8)'
+                    ],
+                    borderRadius: 4
+                },
+                {
+                    type: 'line',
+                    label: 'Proyectado (Budget)',
+                    data: budgetData,
+                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    borderColor: 'rgba(255, 255, 255, 0.8)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(255, 255, 255, 1)',
+                    pointBorderColor: 'rgba(255, 255, 255, 1)',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.3,
+                    fill: false,
+                    order: 1 // Drawn on top of bars
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: { size: 10 },
+                        usePointStyle: true,
+                        boxWidth: 8
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 10 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        font: { size: 10 },
+                        callback: function (val) {
+                            const label = this.getLabelForValue(val);
+                            return label.length > 10 ? label.substr(0, 10) + '...' : label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+renderFertUnidadesChart() {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    const startYear = currentMonth >= 5 ? currentYear : currentYear - 1;
+    const currentCycle = `${startYear}-${startYear + 1}`;
+    const baseFilters = { ...this.sofiaFilters, ciclo: currentCycle };
+
+    const productos = SofiaImportModel.getProductosFertilizacion();
+
+    // Helper: populate & bind a product dropdown
+    const setupProductFilter = (selectId, filterKey) => {
+        const sel = document.getElementById(selectId);
+        if (!sel) return;
+        if (sel.options.length <= 1) {
+            productos.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                opt.style.color = '#000';
+                if (p === this[filterKey]) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+        if (!sel._bound) {
+            sel._bound = true;
+            sel.addEventListener('change', () => {
+                this[filterKey] = sel.value || '';
+                this.renderFertUnidadesChart();
+            });
+        }
+    };
+
+    setupProductFilter('filter-producto-ee', 'fertProductoEE');
+    setupProductFilter('filter-producto-fv', 'fertProductoFV');
+
+    // Build filters per finca
+    const filtersEE = { ...baseFilters, budgetType: 'pre' };
+    const filtersFV = { ...baseFilters, budgetType: 'pre' };
+    if (this.fertProductoEE) filtersEE.producto = this.fertProductoEE;
+    if (this.fertProductoFV) filtersFV.producto = this.fertProductoFV;
+
+    // POS-COSECHA filters
+    const filtersEEPos = { ...baseFilters, budgetType: 'pos' };
+    const filtersFVPos = { ...baseFilters, budgetType: 'pos' };
+    if (this.fertProductoEE) filtersEEPos.producto = this.fertProductoEE;
+    if (this.fertProductoFV) filtersFVPos.producto = this.fertProductoFV;
+
+    // Destroy all previous nutrient charts
+    ['n-ee', 'p-ee', 'k-ee', 'n-fv', 'p-fv', 'k-fv', 'n-ee-pos', 'n-fv-pos'].forEach(id => {
+        const key = `sofia-fert-unidades-${id}`;
+        if (this.charts[key]) {
+            this.charts[key].destroy();
+            delete this.charts[key];
+        }
+    });
+
+    // Get data for each finca and each budget type
+    const dataEE = SofiaImportModel.getFertilizacionUnidades(filtersEE, 'espejo');
+    const dataFV = SofiaImportModel.getFertilizacionUnidades(filtersFV, 'fincasviejas');
+    const dataEEPos = SofiaImportModel.getFertilizacionUnidades(filtersEEPos, 'espejo');
+    const dataFVPos = SofiaImportModel.getFertilizacionUnidades(filtersFVPos, 'fincasviejas');
+
+    // Nutrient config (colors)
+    const nutrients = {
+        n: {
+            budgetColor: 'rgba(52, 211, 153, 0.35)', budgetBorder: 'rgba(52, 211, 153, 0.8)',
+            realColor: 'rgba(52, 211, 153, 0.85)', realBorder: 'rgba(52, 211, 153, 1)',
+        },
+        p: {
+            budgetColor: 'rgba(234, 179, 8, 0.35)', budgetBorder: 'rgba(234, 179, 8, 0.8)',
+            realColor: 'rgba(234, 179, 8, 0.85)', realBorder: 'rgba(234, 179, 8, 1)',
+        },
+        k: {
+            budgetColor: 'rgba(167, 139, 250, 0.35)', budgetBorder: 'rgba(167, 139, 250, 0.8)',
+            realColor: 'rgba(167, 139, 250, 0.85)', realBorder: 'rgba(167, 139, 250, 1)',
+        }
+    };
+
+    const nutrientsPos = {
+        n: {
+            budgetColor: 'rgba(129, 140, 248, 0.35)', budgetBorder: 'rgba(129, 140, 248, 0.8)',
+            realColor: 'rgba(129, 140, 248, 0.85)', realBorder: 'rgba(129, 140, 248, 1)',
+        }
+    };
+
+    // Helper to create a single nutrient chart
+    const createChart = (canvasId, chartKey, data, colors) => {
+        const ctx = document.getElementById(canvasId);
+        if (!ctx) return;
+        if (!data || data.length === 0) {
+            // Optionally show "No data" message in canvas parent
+            return;
+        }
+
+        this.charts[chartKey] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.name),
+                datasets: [
+                    {
+                        label: 'Presupuestado',
+                        data: data.map(d => d.budget),
+                        backgroundColor: colors.budgetColor,
+                        borderColor: colors.budgetBorder,
+                        borderWidth: 2, borderRadius: 6, borderSkipped: false,
+                        categoryPercentage: 0.7, barPercentage: 0.85
+                    },
+                    {
+                        label: 'Real Aplicado',
+                        data: data.map(d => d.real),
+                        backgroundColor: colors.realColor,
+                        borderColor: colors.realBorder,
+                        borderWidth: 2, borderRadius: 6, borderSkipped: false,
+                        categoryPercentage: 0.7, barPercentage: 0.85
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 14, font: { family: 'Inter', size: 11, weight: '500' },
+                            color: 'rgba(255,255,255,0.75)', padding: 16,
+                            usePointStyle: true, pointStyle: 'rectRounded'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleFont: { family: 'Inter', size: 13, weight: '600' },
+                        bodyFont: { family: 'Inter', size: 12 },
+                        padding: 12, cornerRadius: 8,
+                        callbacks: {
+                            label: (c) => {
+                                const formatted = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(c.parsed.y);
+                                return `  ${c.dataset.label}: ${formatted} Unid.`;
+                            },
+                            afterBody: (items) => {
+                                if (items.length < 2) return '';
+                                const budget = items[0].parsed.y;
+                                const real = items[1].parsed.y;
+                                if (budget > 0) {
+                                    const pct = ((real / budget) * 100).toFixed(1);
+                                    return `\n  📊 Ejecución: ${pct}%`;
+                                }
+                                return '';
+                            }
                         }
                     }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 10 } }
-                    },
                     x: {
                         grid: { display: false },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.5)',
-                            font: { size: 10 },
-                            callback: function (val) {
-                                const label = this.getLabelForValue(val);
-                                return label.length > 10 ? label.substr(0, 10) + '...' : label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    renderFertUnidadesChart() {
-        const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth() + 1;
-        const startYear = currentMonth >= 5 ? currentYear : currentYear - 1;
-        const currentCycle = `${startYear}-${startYear + 1}`;
-        const baseFilters = { ...this.sofiaFilters, ciclo: currentCycle };
-
-        const productos = SofiaImportModel.getProductosFertilizacion();
-
-        // Helper: populate & bind a product dropdown
-        const setupProductFilter = (selectId, filterKey) => {
-            const sel = document.getElementById(selectId);
-            if (!sel) return;
-            if (sel.options.length <= 1) {
-                productos.forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p;
-                    opt.textContent = p;
-                    opt.style.color = '#000';
-                    if (p === this[filterKey]) opt.selected = true;
-                    sel.appendChild(opt);
-                });
-            }
-            if (!sel._bound) {
-                sel._bound = true;
-                sel.addEventListener('change', () => {
-                    this[filterKey] = sel.value || '';
-                    this.renderFertUnidadesChart();
-                });
-            }
-        };
-
-        setupProductFilter('filter-producto-ee', 'fertProductoEE');
-        setupProductFilter('filter-producto-fv', 'fertProductoFV');
-
-        // Build filters per finca
-        const filtersEE = { ...baseFilters, budgetType: 'pre' };
-        const filtersFV = { ...baseFilters, budgetType: 'pre' };
-        if (this.fertProductoEE) filtersEE.producto = this.fertProductoEE;
-        if (this.fertProductoFV) filtersFV.producto = this.fertProductoFV;
-
-        // POS-COSECHA filters
-        const filtersEEPos = { ...baseFilters, budgetType: 'pos' };
-        const filtersFVPos = { ...baseFilters, budgetType: 'pos' };
-        if (this.fertProductoEE) filtersEEPos.producto = this.fertProductoEE;
-        if (this.fertProductoFV) filtersFVPos.producto = this.fertProductoFV;
-
-        // Destroy all previous nutrient charts
-        ['n-ee', 'p-ee', 'k-ee', 'n-fv', 'p-fv', 'k-fv', 'n-ee-pos', 'n-fv-pos'].forEach(id => {
-            const key = `sofia-fert-unidades-${id}`;
-            if (this.charts[key]) {
-                this.charts[key].destroy();
-                delete this.charts[key];
-            }
-        });
-
-        // Get data for each finca and each budget type
-        const dataEE = SofiaImportModel.getFertilizacionUnidades(filtersEE, 'espejo');
-        const dataFV = SofiaImportModel.getFertilizacionUnidades(filtersFV, 'fincasviejas');
-        const dataEEPos = SofiaImportModel.getFertilizacionUnidades(filtersEEPos, 'espejo');
-        const dataFVPos = SofiaImportModel.getFertilizacionUnidades(filtersFVPos, 'fincasviejas');
-
-        // Nutrient config (colors)
-        const nutrients = {
-            n: {
-                budgetColor: 'rgba(52, 211, 153, 0.35)', budgetBorder: 'rgba(52, 211, 153, 0.8)',
-                realColor: 'rgba(52, 211, 153, 0.85)', realBorder: 'rgba(52, 211, 153, 1)',
-            },
-            p: {
-                budgetColor: 'rgba(234, 179, 8, 0.35)', budgetBorder: 'rgba(234, 179, 8, 0.8)',
-                realColor: 'rgba(234, 179, 8, 0.85)', realBorder: 'rgba(234, 179, 8, 1)',
-            },
-            k: {
-                budgetColor: 'rgba(167, 139, 250, 0.35)', budgetBorder: 'rgba(167, 139, 250, 0.8)',
-                realColor: 'rgba(167, 139, 250, 0.85)', realBorder: 'rgba(167, 139, 250, 1)',
-            }
-        };
-
-        const nutrientsPos = {
-            n: {
-                budgetColor: 'rgba(129, 140, 248, 0.35)', budgetBorder: 'rgba(129, 140, 248, 0.8)',
-                realColor: 'rgba(129, 140, 248, 0.85)', realBorder: 'rgba(129, 140, 248, 1)',
-            }
-        };
-
-        // Helper to create a single nutrient chart
-        const createChart = (canvasId, chartKey, data, colors) => {
-            const ctx = document.getElementById(canvasId);
-            if (!ctx) return;
-            if (!data || data.length === 0) {
-                // Optionally show "No data" message in canvas parent
-                return;
-            }
-
-            this.charts[chartKey] = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.map(d => d.name),
-                    datasets: [
-                        {
-                            label: 'Presupuestado',
-                            data: data.map(d => d.budget),
-                            backgroundColor: colors.budgetColor,
-                            borderColor: colors.budgetBorder,
-                            borderWidth: 2, borderRadius: 6, borderSkipped: false,
-                            categoryPercentage: 0.7, barPercentage: 0.85
-                        },
-                        {
-                            label: 'Real Aplicado',
-                            data: data.map(d => d.real),
-                            backgroundColor: colors.realColor,
-                            borderColor: colors.realBorder,
-                            borderWidth: 2, borderRadius: 6, borderSkipped: false,
-                            categoryPercentage: 0.7, barPercentage: 0.85
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                boxWidth: 14, font: { family: 'Inter', size: 11, weight: '500' },
-                                color: 'rgba(255,255,255,0.75)', padding: 16,
-                                usePointStyle: true, pointStyle: 'rectRounded'
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                            titleFont: { family: 'Inter', size: 13, weight: '600' },
-                            bodyFont: { family: 'Inter', size: 12 },
-                            padding: 12, cornerRadius: 8,
-                            callbacks: {
-                                label: (c) => {
-                                    const formatted = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(c.parsed.y);
-                                    return `  ${c.dataset.label}: ${formatted} Unid.`;
-                                },
-                                afterBody: (items) => {
-                                    if (items.length < 2) return '';
-                                    const budget = items[0].parsed.y;
-                                    const real = items[1].parsed.y;
-                                    if (budget > 0) {
-                                        const pct = ((real / budget) * 100).toFixed(1);
-                                        return `\n  📊 Ejecución: ${pct}%`;
-                                    }
-                                    return '';
-                                }
-                            }
+                        ticks: { 
+                            color: 'rgba(255,255,255,0.6)', 
+                            font: { family: 'Inter', size: 10, weight: '500' }, 
+                            maxRotation: 45, minRotation: 0 
                         }
                     },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: 'rgba(255,255,255,0.6)', font: { family: 'Inter', size: 10, weight: '500' }, maxRotation: 45, minRotation: 0 }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255,255,255,0.06)', lineWidth: 1 },
-                            ticks: {
-                                color: 'rgba(255,255,255,0.55)', font: { family: 'Inter', size: 10 },
-                                callback: function (value) {
-                                    if (value >= 1000) return (value / 1000).toFixed(1) + 'k';
-                                    return new Intl.NumberFormat('es-AR').format(value);
-                                }
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.06)', lineWidth: 1 },
+                        ticks: {
+                            color: 'rgba(255,255,255,0.55)', 
+                            font: { family: 'Inter', size: 10 },
+                            callback: function (value) {
+                                if (value >= 1000) return (value / 1000).toFixed(1) + 'k';
+                                return new Intl.NumberFormat('es-AR').format(value);
                             }
                         }
                     }
                 }
-            });
-        };
+            }
+        });
+    };
 
         // Render El Espejo charts (PRE)
         Object.entries(nutrients).forEach(([nut, colors]) => {
@@ -4423,8 +4341,8 @@ export class AppController {
                 const item = String(d[COL_ITEM] || '').trim();
                 const unif = String(d[COL_UNIF] || '').trim();
                 return (fFinca === 'all' || finca === fFinca) &&
-                       (fItem === 'all' || item === fItem) &&
-                       (fUnif === 'all' || unif === fUnif);
+                    (fItem === 'all' || item === fItem) &&
+                    (fUnif === 'all' || unif === fUnif);
             });
 
             // Aggregate by year
@@ -4685,14 +4603,14 @@ export class AppController {
         const refreshBtn = document.getElementById('refresh-control-carga');
         const cuartelSelect = document.getElementById('control-carga-cuartel');
         const container = document.getElementById('control-carga-tables-container');
-        
+
         this.currentControlCargaData = [];
 
         const populateCuarteles = (data) => {
             if (!cuartelSelect) return;
             const currentVal = cuartelSelect.value;
             const cuarteles = [...new Set(data.map(r => r.cuartel).filter(c => c))].sort();
-            
+
             let html = '<option value="all" style="background: var(--color-bg-sidebar);">Todos</option>';
             cuarteles.forEach(c => {
                 html += `<option value="${c}" style="background: var(--color-bg-sidebar);">${c}</option>`;
@@ -4722,7 +4640,7 @@ export class AppController {
                 const allData = await Promise.all(
                     fincas.map(finca => SofiaApiModel.fetchFromSofia(finca, selectedDate, selectedDate))
                 );
-                
+
                 this.currentControlCargaData = allData.flat();
                 populateCuarteles(this.currentControlCargaData);
                 this.updateControlCargaUI(this.currentControlCargaData);
@@ -4781,7 +4699,7 @@ export class AppController {
         // User might want to see global totals but table filtered. I'll use filtered for consistency in this view.
         let totalJornadas = 0;
         const prediosSet = new Set();
-        
+
         // Grouping logic: Finca -> Labor
         // If "all" is selected, we should aggregate by Persona so we don't separate by cuartel in rows
         const processedData = [];
@@ -4803,16 +4721,16 @@ export class AppController {
         const groupedData = processedData.reduce((acc, r) => {
             const finca = r.finca || 'Otros';
             const labor = r.labor || 'Otras Labores';
-            
+
             if (!acc[finca]) acc[finca] = {};
             if (!acc[finca][labor]) acc[finca][labor] = [];
-            
+
             acc[finca][labor].push(r);
-            
+
             // Stats (actually use raw data for accurate total jornadas)
             totalJornadas += parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
             prediosSet.add(r.clasificacion || r.clasifica || 'Sin Clasificar');
-            
+
             return acc;
         }, {});
 
@@ -4837,7 +4755,7 @@ export class AppController {
         // Generate a table for each Finca
         Object.entries(groupedData).forEach(([fincaName, labors]) => {
             const isCuartelHidden = (cuartelFilter === 'all');
-            
+
             let fincaHtml = `
                 <div class="card" style="margin-bottom: 2rem; padding: 0; overflow: hidden; background: var(--color-bg-sidebar); border: 1px solid var(--color-border);">
                     <div style="padding: 1rem 1.5rem; background: rgba(16, 185, 129, 0.1); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
@@ -4862,7 +4780,7 @@ export class AppController {
             // Group rows by Labor within the Finca table
             Object.entries(labors).forEach(([laborName, rows]) => {
                 const laborTotalJornadas = rows.reduce((s, r) => s + (parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0), 0);
-                
+
                 fincaHtml += `
                     <tr style="background: rgba(255,255,255,0.05);">
                         <td colspan="${isCuartelHidden ? 4 : 5}" style="padding: 0.8rem 1rem; font-weight: 700; color: var(--text-primary); border-top: 1px solid var(--color-border);">
@@ -4909,7 +4827,7 @@ export class AppController {
                 fetch(`${VITE_API_URL}/inventario/movimientos`).then(r => r.json()),
                 ADMIN_MODELS['admin-productos'].getAll()
             ]);
-            
+
             container.innerHTML = renderStockMovementView(movements, { productos: products }, this.currentUser);
             this.bindInventarioEvents(container, movements, { productos: products });
         } catch (e) {
@@ -4935,7 +4853,7 @@ export class AppController {
         document.getElementById('search-stock-moves')?.addEventListener('input', (e) => {
             const q = e.target.value.toLowerCase();
             document.querySelectorAll('#table-stock-moves tbody tr').forEach(row => {
-               row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
             });
         });
 
@@ -4965,10 +4883,10 @@ export class AppController {
                     modal.style.display = 'none';
                     refresh();
                 } else {
-                    alert('Error: ' + res.message);
+                    this.showAlert('Error: ' + res.message);
                 }
             } catch (err) {
-                alert('Error al registrar movimiento');
+                this.showAlert('Error al registrar movimiento');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '💾 Guardar Ingreso';
