@@ -101,6 +101,7 @@ export class SofiaApiModel {
     static _cyclesCache = new Map();
     static _dbPromise = null;
     static _csvData = null;
+    static _csvAuxiliaresData = null;
 
     // ── ALL CYCLES: desde CSV histórico hasta API actual ──
     static ALL_CYCLES = [
@@ -112,6 +113,66 @@ export class SofiaApiModel {
 
     // Ciclos que están cubiertos por la API de Sofía (solo el ciclo actual en curso)
     static API_CYCLES = ['2025-2026'];
+
+    static async loadCSVAuxiliares() {
+        if (this._csvAuxiliaresData) return this._csvAuxiliaresData;
+
+        const results = [];
+        const files = [
+            { path: '/Fuentes/Auxiliares/EE_aplicacion.csv', finca: 'El Espejo' },
+            { path: '/Fuentes/Auxiliares/FV_aplicacion.csv', finca: 'Fincas Viejas' }
+        ];
+
+        for (const file of files) {
+            try {
+                const response = await fetch(file.path);
+                if (!response.ok) continue;
+
+                const buffer = await response.arrayBuffer();
+                const text = new TextDecoder('iso-8859-1').decode(buffer);
+                const lines = text.split(/\r?\n/).filter(l => l.trim());
+                if (lines.length < 2) continue;
+
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = lines[i].split(';').map(c => c.replace(/^"|"$/g, '').trim());
+                    if (cols.length < 13) continue;
+
+                    let fechaStr = cols[2];
+                    if (!fechaStr) continue;
+                    fechaStr = fechaStr.replace(/\//g, '-');
+                    const parts = fechaStr.split('-');
+                    if (parts.length !== 3) continue;
+
+                    const y = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+                    const m = parts[1].padStart(2, '0');
+                    const d = parts[0].padStart(2, '0');
+                    const fecha = `${y}-${m}-${d}`; // Guaranteed YYYY-MM-DD
+
+                    let jVal = parseFloat((cols[12] || '0').replace(',', '.')) || 0;
+                    if (jVal === 0) jVal = 1;
+
+                    results.push({
+                        finca: file.finca,
+                        fecha: fecha,
+                        clasifica: cols[3],
+                        cuartel: cols[5],
+                        variedad: cols[7],
+                        labor: cols[9],
+                        jornada: jVal,
+                        rendimiento: 0,
+                        persona: cols[13] || cols[14] || cols[15] || '',
+                        valor_total_jornada: parseFloat((cols[10] || '0').replace('$', '').replace(/\./g, '').replace(',', '.')) || 0,
+                        origen_archivo: 'CSV Auxiliar'
+                    });
+                }
+            } catch (e) {
+                console.warn(`[Auxiliares] Error al cargar ${file.path}:`, e);
+            }
+        }
+
+        this._csvAuxiliaresData = results;
+        return results;
+    }
 
     /**
      * Carga y parsea el archivo CSV histórico Cosecha 13-25.csv
@@ -348,6 +409,17 @@ export class SofiaApiModel {
                     console.error(`Error fetching ${finca} ${range.desde}:`, e);
                 }
             }
+        }
+
+        // --- Include Auxiliares Data ---
+        try {
+            const auxiliares = await this.loadCSVAuxiliares();
+            const filteredAux = auxiliares.filter(row => {
+                return ranges.some(r => row.fecha >= r.desde && row.fecha <= r.hasta);
+            });
+            allJornales = allJornales.concat(filteredAux);
+        } catch (e) {
+            console.warn('Error loading auxiliares in fetchCycleData:', e);
         }
 
         // Deduplicate records (using composite signature)

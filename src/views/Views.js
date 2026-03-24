@@ -3130,6 +3130,28 @@ export function renderControlCargaView() {
             </div>
         </div>
 
+        <div id="control-carga-search-last" class="card animate-slide-up" style="margin-bottom: 2rem; padding: 1.5rem; border: 1px solid var(--color-border); background: var(--color-bg-sidebar);">
+            <h4 style="margin-top: 0; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">🔍 Buscar Última Vez de una Labor</h4>
+            <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; display: block;">Labor:</label>
+                    <select id="cc-search-labor" class="form-select" style="min-width: 250px; background: rgba(0,0,0,0.2);">
+                        <option value="">Cargando labores...</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; display: block;">Finca:</label>
+                    <select id="cc-search-finca" class="form-select" style="min-width: 150px; background: rgba(0,0,0,0.2);">
+                        <option value="">Todas las Fincas</option>
+                        <option value="El Espejo">El Espejo</option>
+                        <option value="Fincas Viejas">Fincas Viejas</option>
+                    </select>
+                </div>
+                <button id="btn-search-last-labor" class="btn btn-primary" style="padding: 0.6em 1.2em; height: 38px;">Buscar Última Fecha</button>
+            </div>
+            <div id="cc-search-result" style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--color-primary-500); font-size: 1.1em; color: var(--text-primary); display: none;"></div>
+        </div>
+
         <div id="control-carga-summary" class="dashboard-grid" style="margin-bottom: 2rem;">
             <div class="metric-card animate-slide-up">
                 <span class="metric-label">Total Registros</span>

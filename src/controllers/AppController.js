@@ -4606,6 +4606,131 @@ renderFertUnidadesChart() {
 
         this.currentControlCargaData = [];
 
+        // --- Búsqueda Histórica ---
+        const searchLaborBtn = document.getElementById('btn-search-last-labor');
+        const searchLaborSelect = document.getElementById('cc-search-labor');
+        const searchFincaSelect = document.getElementById('cc-search-finca');
+        const searchResult = document.getElementById('cc-search-result');
+
+        if (searchLaborSelect) {
+            let allLaborsSet = new Set();
+            
+            // Gather from DATA_JORNALES
+            if (SofiaApiModel.DATA_JORNALES) {
+                SofiaApiModel.DATA_JORNALES.forEach(r => allLaborsSet.add(r.labor_normalized || r.labor || r.Labor));
+            }
+
+            // Gather from ALL Cached Cycles
+            if (SofiaApiModel._cyclesCache) {
+                Object.values(SofiaApiModel._cyclesCache).forEach(cycleArr => {
+                    if (Array.isArray(cycleArr)) {
+                        cycleArr.forEach(r => allLaborsSet.add(r.labor_normalized || r.labor || r.Labor));
+                    }
+                });
+            }
+
+            // Fallback list to ensure all major labors are selectable
+            const fallbackLabors = [
+                'Poda', 'Cosecha', 'Desbrote', 'Atada', 'Limpieza', 'Desmalezado', 
+                'Levantado', 'Aplicación', 'Aplicacion manual', 'Bordeleza', 'Curada',
+                'Mantenimiento', 'Tractor', 'Riego', 'Manejo Canopia'
+            ];
+            fallbackLabors.forEach(l => allLaborsSet.add(l));
+
+            const allLabors = [...allLaborsSet].filter(l => l && typeof l === 'string' && l.trim() !== '').sort();
+            searchLaborSelect.innerHTML = '<option value="">Seleccione una labor...</option>' + 
+                allLabors.map(l => `<option value="${l}">${l}</option>`).join('');
+        }
+
+        if (searchLaborBtn) {
+            searchLaborBtn.addEventListener('click', async () => {
+                const labor = searchLaborSelect?.value;
+                const finca = searchFincaSelect?.value;
+                if (!labor) return;
+
+                // Disable button and show loading state
+                const originalBtnText = searchLaborBtn.innerHTML;
+                searchLaborBtn.disabled = true;
+                searchLaborBtn.innerHTML = '⏳ Buscando...';
+
+                // Collect all possible historcial records
+                let allHistoricals = [];
+                if (SofiaApiModel.DATA_JORNALES) {
+                    allHistoricals = allHistoricals.concat(SofiaApiModel.DATA_JORNALES);
+                }
+                if (SofiaApiModel._cyclesCache) {
+                    Object.values(SofiaApiModel._cyclesCache).forEach(cycleArr => {
+                        if (Array.isArray(cycleArr)) allHistoricals = allHistoricals.concat(cycleArr);
+                    });
+                }
+
+                if (allHistoricals.length === 0) {
+                    searchResult.innerHTML = '⏳ Descargando historial de la base de datos... esto podría tardar unos segundos.';
+                    searchResult.style.display = 'block';
+                    searchResult.style.borderLeftColor = 'var(--text-tertiary)';
+                    
+                    try {
+                        const defaultCycle = localStorage.getItem('sofia_current_cycle') || '2025-2026';
+                        await SofiaApiModel.fetchJornales({ cycle: defaultCycle });
+                        
+                        if (SofiaApiModel.DATA_JORNALES) {
+                            allHistoricals = allHistoricals.concat(SofiaApiModel.DATA_JORNALES);
+                        }
+                    } catch (err) {
+                        console.error("Error fetching historicals:", err);
+                    }
+                }
+
+                searchLaborBtn.disabled = false;
+                searchLaborBtn.innerHTML = originalBtnText;
+
+                if (allHistoricals.length === 0) {
+                    searchResult.innerHTML = 'Error: No se pudo cargar la base de datos histórica.';
+                    searchResult.style.display = 'block';
+                    searchResult.style.borderLeftColor = 'var(--color-error)';
+                    return;
+                }
+
+                let matches = allHistoricals.filter(r => (r.labor_normalized || r.labor || r.Labor) === labor);
+                if (finca) matches = matches.filter(r => r.finca === finca);
+
+                if (matches.length === 0) {
+                    searchResult.innerHTML = `No se encontraron registros en el ciclo actual para "<b>${labor}</b>".`;
+                    searchResult.style.display = 'block';
+                    searchResult.style.borderLeftColor = 'var(--color-error)';
+                    return;
+                }
+
+                matches.sort((a, b) => {
+                    const d1 = new Date(a.fecha || a.Fecha || a.date).getTime();
+                    const d2 = new Date(b.fecha || b.Fecha || b.date).getTime();
+                    return d2 - d1; // Descending
+                });
+
+                const lastMatch = matches[0];
+                const parts = lastMatch.fecha.split('-');
+                const formattedDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : lastMatch.fecha;
+                const parseJornadas = parseFloat(lastMatch.jornada || lastMatch.totalJornadas || 0);
+
+                searchResult.innerHTML = `Última vez cargada: <b style="font-size: 1.2em;">${formattedDate}</b> 
+                                          <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 8px;">
+                                              Finca: <span style="color: var(--text-primary);">${lastMatch.finca || '-'}</span> | 
+                                              Predio: <span style="color: var(--text-primary);">${lastMatch.clasifica || lastMatch.clasificacion || '-'}</span> | 
+                                              Jornadas ese día: <span style="color: var(--text-primary);">${parseJornadas.toFixed(2)}</span>
+                                          </div>`;
+                searchResult.style.display = 'block';
+                searchResult.style.borderLeftColor = 'var(--color-primary-500)';
+
+                // Auto set date for the main query
+                if (dateInput && parts.length === 3) {
+                    // Sofia format requires YYYY-MM-DD
+                    dateInput.value = lastMatch.fecha; 
+                    updateData();
+                }
+            });
+        }
+        // --------------------------
+
         const populateCuarteles = (data) => {
             if (!cuartelSelect) return;
             const currentVal = cuartelSelect.value;
@@ -4641,7 +4766,18 @@ renderFertUnidadesChart() {
                     fincas.map(finca => SofiaApiModel.fetchFromSofia(finca, selectedDate, selectedDate))
                 );
 
-                this.currentControlCargaData = allData.flat();
+                let flatData = allData.flat();
+
+                // --- Include Auxiliares Data in Control de Carga ---
+                try {
+                    const auxiliares = await SofiaApiModel.loadCSVAuxiliares();
+                    const filteredAux = auxiliares.filter(r => r.fecha === selectedDate);
+                    flatData = flatData.concat(filteredAux);
+                } catch (e) {
+                    console.warn('Error loading auxiliares in ControlCarga:', e);
+                }
+
+                this.currentControlCargaData = flatData;
                 populateCuarteles(this.currentControlCargaData);
                 this.updateControlCargaUI(this.currentControlCargaData);
             } catch (error) {
@@ -4720,12 +4856,12 @@ renderFertUnidadesChart() {
 
         const groupedData = processedData.reduce((acc, r) => {
             const finca = r.finca || 'Otros';
-            const labor = r.labor || 'Otras Labores';
+            const predio = r.clasificacion || r.clasifica || 'Sin Clasificar';
 
             if (!acc[finca]) acc[finca] = {};
-            if (!acc[finca][labor]) acc[finca][labor] = [];
+            if (!acc[finca][predio]) acc[finca][predio] = [];
 
-            acc[finca][labor].push(r);
+            acc[finca][predio].push(r);
 
             // Stats (actually use raw data for accurate total jornadas)
             totalJornadas += parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
@@ -4753,7 +4889,7 @@ renderFertUnidadesChart() {
         let finalHtml = '';
 
         // Generate a table for each Finca
-        Object.entries(groupedData).forEach(([fincaName, labors]) => {
+        Object.entries(groupedData).forEach(([fincaName, predios]) => {
             const isCuartelHidden = (cuartelFilter === 'all');
 
             let fincaHtml = `
@@ -4767,7 +4903,7 @@ renderFertUnidadesChart() {
                         <table class="data-table" style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr style="background: rgba(255,255,255,0.03);">
-                                    <th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 25%;">Predio / Clasif.</th>
+                                    <th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 25%;">Labor</th>
                                     ${!isCuartelHidden ? '<th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 10%;">Cuartel</th>' : ''}
                                     <th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 40%;">Persona</th>
                                     <th style="padding: 0.8rem 1rem; text-align: left; color: var(--text-secondary); width: 15%;">Jornada</th>
@@ -4777,17 +4913,17 @@ renderFertUnidadesChart() {
                             <tbody>
             `;
 
-            // Group rows by Labor within the Finca table
-            Object.entries(labors).forEach(([laborName, rows]) => {
-                const laborTotalJornadas = rows.reduce((s, r) => s + (parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0), 0);
+            // Group rows by Predio within the Finca table
+            Object.entries(predios).forEach(([predioName, rows]) => {
+                const predioTotalJornadas = rows.reduce((s, r) => s + (parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0), 0);
 
                 fincaHtml += `
                     <tr style="background: rgba(255,255,255,0.05);">
                         <td colspan="${isCuartelHidden ? 4 : 5}" style="padding: 0.8rem 1rem; font-weight: 700; color: var(--text-primary); border-top: 1px solid var(--color-border);">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span>🛠️ ${laborName}</span>
+                                <span>📍 Predio: ${predioName}</span>
                                 <span style="font-size: 0.85rem; background: rgba(129, 140, 248, 0.2); color: var(--accent-primary); padding: 2px 8px; border-radius: 6px;">
-                                    Subtotal: ${laborTotalJornadas.toFixed(2)} jornadas
+                                    Subtotal: ${predioTotalJornadas.toFixed(2)} jornadas
                                 </span>
                             </div>
                         </td>
@@ -4798,7 +4934,7 @@ renderFertUnidadesChart() {
                     const jornadas = parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
                     fincaHtml += `
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
-                            <td style="padding: 0.8rem 1rem; color: var(--text-secondary);">${r.clasificacion || r.clasifica || '-'}</td>
+                            <td style="padding: 0.8rem 1rem; color: var(--text-secondary);">${r.labor || 'Otras Labores'}</td>
                             ${!isCuartelHidden ? `<td style="padding: 0.8rem 1rem;">${r.cuartel || '-'}</td>` : ''}
                             <td style="padding: 0.8rem 1rem;">${r.persona || '-'}</td>
                             <td style="padding: 0.8rem 1rem; font-weight: 600;">${jornadas.toFixed(2)}</td>
