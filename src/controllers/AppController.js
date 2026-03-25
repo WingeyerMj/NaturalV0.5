@@ -36,11 +36,12 @@ import {
     renderHectareasPorPredio, renderEficienciaChartSection,
     renderCosechaLevantadoTable, renderAdminCrudView, renderWorkLogView,
     renderGastosView, renderSecaderosView, renderGastosHistoricosView,
-    renderControlCargaView
+    renderControlCargaView, renderPresupuestoProyeccionView
 } from '../views/Views.js';
 
 import { SecaderosController } from './SecaderosController.js';
 import { JornalesBudgetModel } from '../models/JornalesBudgetModel.js';
+import { PresupuestoModel as PresupuestoBudgetModel } from '../models/PresupuestoModel.js';
 
 // ── Constants ──
 const VITE_API_URL = '/api';
@@ -62,6 +63,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
+                { id: 'presupuesto', label: 'Presupuesto', icon: '📊' },
             ]
         },
         {
@@ -112,6 +114,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
+                { id: 'presupuesto', label: 'Presupuesto', icon: '📊' },
             ]
         },
     ],
@@ -433,6 +436,11 @@ export class AppController {
                 title.textContent = 'Control de Carga de Labores';
                 content.innerHTML = renderControlCargaView();
                 this.renderControlCarga(content);
+                break;
+            case 'presupuesto':
+                title.textContent = 'Presupuesto — Proyección de Ciclo';
+                content.innerHTML = renderPresupuestoProyeccionView();
+                this.initPresupuestoSection();
                 break;
             case 'usuarios':
                 title.textContent = 'Gestión de Usuarios';
@@ -3965,7 +3973,7 @@ renderFertComparativaChart(data) {
                 labels: prodData.map(d => `${d.clasifica} - ${d.producto}`),
                 datasets: [
                     {
-                        label: 'Comprado (Pre)', data: prodData.map(d => d.pre),
+                        label: 'Comprado (Total)', data: prodData.map(d => d.pre),
                         backgroundColor: colorPre, borderColor: colorPre.replace('0.7', '1'),
                         borderWidth: 1, borderRadius: 4
                     },
@@ -4319,7 +4327,7 @@ renderFertUnidadesChart() {
     if (this.fertProductoFV) filtersFVPos.producto = this.fertProductoFV;
 
     // Destroy all previous nutrient charts
-    ['n-ee', 'p-ee', 'k-ee', 'n-fv', 'p-fv', 'k-fv', 'n-ee-pos', 'n-fv-pos'].forEach(id => {
+    ['n-ee', 'p-ee', 'ca-ee', 'n-fv', 'p-fv', 'ca-fv', 'n-ee-pos', 'n-fv-pos'].forEach(id => {
         const key = `sofia-fert-unidades-${id}`;
         if (this.charts[key]) {
             this.charts[key].destroy();
@@ -4343,7 +4351,7 @@ renderFertUnidadesChart() {
             budgetColor: 'rgba(234, 179, 8, 0.35)', budgetBorder: 'rgba(234, 179, 8, 0.8)',
             realColor: 'rgba(234, 179, 8, 0.85)', realBorder: 'rgba(234, 179, 8, 1)',
         },
-        k: {
+        ca: {
             budgetColor: 'rgba(167, 139, 250, 0.35)', budgetBorder: 'rgba(167, 139, 250, 0.8)',
             realColor: 'rgba(167, 139, 250, 0.85)', realBorder: 'rgba(167, 139, 250, 1)',
         }
@@ -5256,5 +5264,372 @@ renderFertUnidadesChart() {
                 submitBtn.textContent = '💾 Guardar Ingreso';
             }
         });
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PRESUPUESTO (BUDGET) MODULE
+    // ═══════════════════════════════════════════════════════
+    initPresupuestoSection() {
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+        const fmtCurrency = (n) => '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+
+        // Tab switching
+        const tabJornales = document.getElementById('ppto-tab-jornales');
+        const tabGastos = document.getElementById('ppto-tab-gastos');
+        const contentJornales = document.getElementById('ppto-content-jornales');
+        const contentGastos = document.getElementById('ppto-content-gastos');
+
+        if (tabJornales && tabGastos) {
+            tabJornales.addEventListener('click', () => {
+                tabJornales.className = 'btn btn-primary';
+                tabGastos.className = 'btn btn-ghost';
+                contentJornales.style.display = '';
+                contentGastos.style.display = 'none';
+            });
+            tabGastos.addEventListener('click', () => {
+                tabGastos.className = 'btn btn-primary';
+                tabJornales.className = 'btn btn-ghost';
+                contentGastos.style.display = '';
+                contentJornales.style.display = 'none';
+            });
+        }
+
+        // State
+        let jornalesData = [];
+        let gastosData = { byCategoria: [], byProducto: [], totals: {} };
+        let jornalesSummary = { byLabor: [], byPredio: [], totals: {} };
+
+        // Load button
+        const btnLoad = document.getElementById('btn-ppto-load');
+        if (btnLoad) {
+            btnLoad.addEventListener('click', async () => {
+                btnLoad.disabled = true;
+                btnLoad.textContent = '⏳ Cargando...';
+                try {
+                    await this.loadPresupuestoData();
+                } finally {
+                    btnLoad.disabled = false;
+                    btnLoad.textContent = '📊 Generar Presupuesto';
+                }
+            });
+        }
+
+        this.loadPresupuestoData = async () => {
+            const cicloBase = document.getElementById('ppto-ciclo-base')?.value || '2025-2026';
+            const cicloDestino = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
+            const finca = document.getElementById('ppto-finca')?.value || '';
+
+            // 1. Load Jornales
+            const filters = { ciclo: cicloBase };
+            if (finca) filters.finca = finca;
+            const rawJornales = await SofiaApiModel.fetchJornales(filters);
+            jornalesSummary = PresupuestoBudgetModel.buildJornalesSummary(rawJornales);
+
+            // 2. Load Gastos (from CSV aplicaciones)
+            await this.loadStaticSofiaData();
+            gastosData = PresupuestoBudgetModel.buildGastosSummary(cicloBase);
+
+            // 3. Load saved projections
+            const saved = PresupuestoBudgetModel.load(cicloDestino);
+
+            // 4. Update Summary Cards
+            const el = (id) => document.getElementById(id);
+            if (el('ppto-total-jornales')) el('ppto-total-jornales').textContent = fmt(jornalesSummary.totals.totalJornales);
+            if (el('ppto-total-costo-mo')) el('ppto-total-costo-mo').textContent = fmtCurrency(jornalesSummary.totals.totalCostoArs);
+            if (el('ppto-total-insumos')) el('ppto-total-insumos').textContent = fmt(gastosData.totals.totalCantidad);
+            if (el('ppto-total-costo-insumos')) el('ppto-total-costo-insumos').textContent = fmtCurrency(gastosData.totals.totalCosto);
+
+            // 5. Render Jornales Table
+            this.renderPresupuestoJornalesTable(jornalesSummary, saved, cicloBase);
+
+            // 6. Render Gastos Table
+            this.renderPresupuestoGastosTable(gastosData, saved, cicloBase);
+
+            // 7. Render Charts
+            this.renderPresupuestoCharts(jornalesSummary, gastosData, saved);
+        };
+
+        // Save
+        document.getElementById('btn-ppto-save')?.addEventListener('click', () => {
+            const cicloDestino = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
+            const jornalesProj = {};
+            const gastosProj = {};
+
+            document.querySelectorAll('[data-ppto-labor]').forEach(input => {
+                jornalesProj[input.dataset.pptoLabor] = parseFloat(input.value) || 0;
+            });
+            document.querySelectorAll('[data-ppto-producto]').forEach(input => {
+                gastosProj[input.dataset.pptoProducto] = parseFloat(input.value) || 0;
+            });
+
+            PresupuestoBudgetModel.save(cicloDestino, { jornales: jornalesProj, gastos: gastosProj });
+            this.showAlert('✅ Presupuesto guardado correctamente', 'success');
+        });
+
+        // Export
+        document.getElementById('btn-ppto-export')?.addEventListener('click', () => {
+            const cicloDestino = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
+            const jRows = jornalesSummary.byLabor.map(r => {
+                const input = document.querySelector(`[data-ppto-labor="${r.labor}"]`);
+                const projected = input ? parseFloat(input.value) || r.jornales : r.jornales;
+                return { labor: r.labor, real: r.jornales, projected, costoArs: r.costoArs };
+            });
+            const gRows = gastosData.byProducto.map(r => {
+                const input = document.querySelector(`[data-ppto-producto="${r.producto}"]`);
+                const projectedQty = input ? parseFloat(input.value) || r.cantidad : r.cantidad;
+                return { categoria: r.categoria, producto: r.producto, realQty: r.cantidad, projectedQty, realCosto: r.costo };
+            });
+            PresupuestoBudgetModel.exportCSV(cicloDestino, jRows, gRows);
+        });
+
+        // Global adjustment buttons
+        document.getElementById('btn-ppto-adjust-jornales')?.addEventListener('click', () => {
+            const pct = prompt('Ingrese el porcentaje de ajuste global para jornales (ej: 5 para +5%, -3 para -3%):', '0');
+            if (pct === null) return;
+            const factor = 1 + (parseFloat(pct) / 100);
+            document.querySelectorAll('[data-ppto-labor]').forEach(input => {
+                input.value = (parseFloat(input.value) * factor).toFixed(1);
+                input.dispatchEvent(new Event('input'));
+            });
+        });
+        document.getElementById('btn-ppto-adjust-gastos')?.addEventListener('click', () => {
+            const pct = prompt('Ingrese el porcentaje de ajuste global para consumos (ej: 5 para +5%, -3 para -3%):', '0');
+            if (pct === null) return;
+            const factor = 1 + (parseFloat(pct) / 100);
+            document.querySelectorAll('[data-ppto-producto]').forEach(input => {
+                input.value = (parseFloat(input.value) * factor).toFixed(1);
+                input.dispatchEvent(new Event('input'));
+            });
+        });
+    }
+
+    renderPresupuestoJornalesTable(summary, saved, cicloBase) {
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+        const fmtCur = (n) => '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+        const tbody = document.getElementById('tbody-ppto-jornales');
+        const tfoot = document.getElementById('tfoot-ppto-jornales');
+        if (!tbody) return;
+
+        let totalReal = 0, totalProy = 0, totalCostoReal = 0, totalCostoProy = 0;
+        const rows = summary.byLabor.filter(r => r.jornales > 0);
+
+        tbody.innerHTML = rows.map(r => {
+            const savedVal = saved?.jornales?.[r.labor];
+            const projected = savedVal !== undefined ? savedVal : r.jornales;
+            const delta = r.jornales > 0 ? ((projected - r.jornales) / r.jornales * 100) : 0;
+            const costoProy = r.jornales > 0 ? (r.costoArs * (projected / r.jornales)) : 0;
+            const deltaClass = delta > 0 ? 'color: var(--color-success)' : delta < 0 ? 'color: var(--color-error)' : '';
+
+            totalReal += r.jornales;
+            totalProy += projected;
+            totalCostoReal += r.costoArs;
+            totalCostoProy += costoProy;
+
+            return `<tr>
+                <td style="font-weight: 500;">${r.labor}</td>
+                <td style="text-align: right;">${fmt(r.jornales)}</td>
+                <td style="text-align: right;">
+                    <input type="number" step="0.1" value="${projected.toFixed(1)}"
+                        data-ppto-labor="${r.labor}" data-real="${r.jornales}" data-costo="${r.costoArs}"
+                        class="form-input ppto-input" style="width: 100px; text-align: right; background: var(--bg-tertiary); padding: 4px 8px;" />
+                </td>
+                <td style="text-align: right; ${deltaClass}">${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%</td>
+                <td style="text-align: right;">${fmtCur(r.costoArs)}</td>
+                <td style="text-align: right;">${fmtCur(costoProy)}</td>
+            </tr>`;
+        }).join('');
+
+        tfoot.innerHTML = `<tr style="font-weight: 700; border-top: 2px solid var(--color-border);">
+            <td>TOTAL</td>
+            <td style="text-align: right;">${fmt(totalReal)}</td>
+            <td style="text-align: right;">${fmt(totalProy)}</td>
+            <td style="text-align: right;">${totalReal > 0 ? ((totalProy - totalReal) / totalReal * 100).toFixed(1) : 0}%</td>
+            <td style="text-align: right;">${fmtCur(totalCostoReal)}</td>
+            <td style="text-align: right;" id="ppto-total-costo-proy">${fmtCur(totalCostoProy)}</td>
+        </tr>`;
+
+        // Live recalculation on input change
+        tbody.querySelectorAll('.ppto-input').forEach(input => {
+            input.addEventListener('input', () => {
+                const real = parseFloat(input.dataset.real) || 0;
+                const costo = parseFloat(input.dataset.costo) || 0;
+                const proj = parseFloat(input.value) || 0;
+                const row = input.closest('tr');
+                const cells = row.querySelectorAll('td');
+                const delta = real > 0 ? ((proj - real) / real * 100) : 0;
+                const costoProy = real > 0 ? (costo * (proj / real)) : 0;
+                cells[3].textContent = `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%`;
+                cells[3].style.color = delta > 0 ? 'var(--color-success)' : delta < 0 ? 'var(--color-error)' : '';
+                cells[5].textContent = '$' + costoProy.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+            });
+        });
+    }
+
+    renderPresupuestoGastosTable(gastosData, saved, cicloBase) {
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+        const fmtCur = (n) => '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+        const tbody = document.getElementById('tbody-ppto-gastos');
+        const tfoot = document.getElementById('tfoot-ppto-gastos');
+        if (!tbody) return;
+
+        let totalRealQty = 0, totalProjQty = 0, totalRealCosto = 0, totalProjCosto = 0;
+        const rows = gastosData.byProducto.filter(r => r.cantidad > 0);
+
+        tbody.innerHTML = rows.map(r => {
+            const savedVal = saved?.gastos?.[r.producto];
+            const projected = savedVal !== undefined ? savedVal : r.cantidad;
+            const delta = r.cantidad > 0 ? ((projected - r.cantidad) / r.cantidad * 100) : 0;
+            const costoProy = r.cantidad > 0 ? (r.costo * (projected / r.cantidad)) : 0;
+            const deltaClass = delta > 0 ? 'color: var(--color-success)' : delta < 0 ? 'color: var(--color-error)' : '';
+
+            totalRealQty += r.cantidad;
+            totalProjQty += projected;
+            totalRealCosto += r.costo;
+            totalProjCosto += costoProy;
+
+            return `<tr>
+                <td><span style="font-size: 0.75rem; color: var(--text-tertiary);">${r.categoria}</span></td>
+                <td style="font-weight: 500;">${r.producto}</td>
+                <td style="text-align: right;">${fmt(r.cantidad)}</td>
+                <td style="text-align: right;">
+                    <input type="number" step="0.1" value="${projected.toFixed(1)}"
+                        data-ppto-producto="${r.producto}" data-real="${r.cantidad}" data-costo="${r.costo}"
+                        class="form-input ppto-input-gastos" style="width: 100px; text-align: right; background: var(--bg-tertiary); padding: 4px 8px;" />
+                </td>
+                <td style="text-align: right; ${deltaClass}">${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%</td>
+                <td style="text-align: right;">${fmtCur(r.costo)}</td>
+                <td style="text-align: right;">${fmtCur(costoProy)}</td>
+            </tr>`;
+        }).join('');
+
+        tfoot.innerHTML = `<tr style="font-weight: 700; border-top: 2px solid var(--color-border);">
+            <td colspan="2">TOTAL</td>
+            <td style="text-align: right;">${fmt(totalRealQty)}</td>
+            <td style="text-align: right;">${fmt(totalProjQty)}</td>
+            <td style="text-align: right;">${totalRealQty > 0 ? ((totalProjQty - totalRealQty) / totalRealQty * 100).toFixed(1) : 0}%</td>
+            <td style="text-align: right;">${fmtCur(totalRealCosto)}</td>
+            <td style="text-align: right;">${fmtCur(totalProjCosto)}</td>
+        </tr>`;
+
+        // Live recalculation on input change
+        tbody.querySelectorAll('.ppto-input-gastos').forEach(input => {
+            input.addEventListener('input', () => {
+                const real = parseFloat(input.dataset.real) || 0;
+                const costo = parseFloat(input.dataset.costo) || 0;
+                const proj = parseFloat(input.value) || 0;
+                const row = input.closest('tr');
+                const cells = row.querySelectorAll('td');
+                const delta = real > 0 ? ((proj - real) / real * 100) : 0;
+                const costoProy = real > 0 ? (costo * (proj / real)) : 0;
+                cells[4].textContent = `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%`;
+                cells[4].style.color = delta > 0 ? 'var(--color-success)' : delta < 0 ? 'var(--color-error)' : '';
+                cells[6].textContent = '$' + costoProy.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+            });
+        });
+    }
+
+    renderPresupuestoCharts(jornalesSummary, gastosData, saved) {
+        // Destroy existing ppto charts
+        ['chart-ppto-jornales-labor', 'chart-ppto-jornales-predio', 'chart-ppto-gastos-cat', 'chart-ppto-gastos-prod'].forEach(id => {
+            if (this.charts[id]) { try { this.charts[id].destroy(); } catch (e) {} }
+        });
+
+        const chartOpts = (horizontal = false) => ({
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: horizontal ? 'y' : 'x',
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+            },
+            plugins: {
+                legend: { labels: { color: '#e2e8f0', font: { size: 11 } } },
+                datalabels: { display: false }
+            }
+        });
+
+        // 1. Jornales por Labor (top 10)
+        const topLabors = jornalesSummary.byLabor.slice(0, 10);
+        const ctx1 = document.getElementById('chart-ppto-jornales-labor');
+        if (ctx1 && topLabors.length > 0) {
+            const projValues = topLabors.map(r => {
+                const input = document.querySelector(`[data-ppto-labor="${r.labor}"]`);
+                return input ? parseFloat(input.value) || r.jornales : r.jornales;
+            });
+            this.charts['chart-ppto-jornales-labor'] = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: topLabors.map(r => r.labor.length > 18 ? r.labor.substring(0, 18) + '…' : r.labor),
+                    datasets: [
+                        { label: 'Real (Base)', data: topLabors.map(r => r.jornales), backgroundColor: 'rgba(59,130,246,0.6)', borderColor: 'rgba(59,130,246,1)', borderWidth: 1, borderRadius: 4 },
+                        { label: 'Proyectado', data: projValues, backgroundColor: 'rgba(34,197,94,0.6)', borderColor: 'rgba(34,197,94,1)', borderWidth: 1, borderRadius: 4 }
+                    ]
+                },
+                options: chartOpts()
+            });
+        }
+
+        // 2. Jornales por Predio
+        const topPredios = jornalesSummary.byPredio.slice(0, 10);
+        const ctx2 = document.getElementById('chart-ppto-jornales-predio');
+        if (ctx2 && topPredios.length > 0) {
+            this.charts['chart-ppto-jornales-predio'] = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: topPredios.map(r => r.predio),
+                    datasets: [
+                        { label: 'Real (Base)', data: topPredios.map(r => r.jornales), backgroundColor: 'rgba(168,85,247,0.6)', borderColor: 'rgba(168,85,247,1)', borderWidth: 1, borderRadius: 4 },
+                        { label: 'Proyectado', data: topPredios.map(r => r.jornales), backgroundColor: 'rgba(245,158,11,0.6)', borderColor: 'rgba(245,158,11,1)', borderWidth: 1, borderRadius: 4 }
+                    ]
+                },
+                options: chartOpts()
+            });
+        }
+
+        // 3. Gastos por Categoría
+        const cats = gastosData.byCategoria;
+        const ctx3 = document.getElementById('chart-ppto-gastos-cat');
+        if (ctx3 && cats.length > 0) {
+            const catColors = ['rgba(34,197,94,0.6)', 'rgba(59,130,246,0.6)', 'rgba(168,85,247,0.6)', 'rgba(245,158,11,0.6)', 'rgba(239,68,68,0.6)'];
+            this.charts['chart-ppto-gastos-cat'] = new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: cats.map(c => c.categoria),
+                    datasets: [{
+                        data: cats.map(c => c.cantidad),
+                        backgroundColor: catColors.slice(0, cats.length),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#e2e8f0', font: { size: 11 } } },
+                        datalabels: { display: false }
+                    }
+                }
+            });
+        }
+
+        // 4. Top Productos por Cantidad
+        const topProds = gastosData.byProducto.slice(0, 10);
+        const ctx4 = document.getElementById('chart-ppto-gastos-prod');
+        if (ctx4 && topProds.length > 0) {
+            const projProds = topProds.map(r => {
+                const input = document.querySelector(`[data-ppto-producto="${r.producto}"]`);
+                return input ? parseFloat(input.value) || r.cantidad : r.cantidad;
+            });
+            this.charts['chart-ppto-gastos-prod'] = new Chart(ctx4, {
+                type: 'bar',
+                data: {
+                    labels: topProds.map(r => r.producto.length > 18 ? r.producto.substring(0, 18) + '…' : r.producto),
+                    datasets: [
+                        { label: 'Real (Base)', data: topProds.map(r => r.cantidad), backgroundColor: 'rgba(59,130,246,0.6)', borderColor: 'rgba(59,130,246,1)', borderWidth: 1, borderRadius: 4 },
+                        { label: 'Proyectado', data: projProds, backgroundColor: 'rgba(34,197,94,0.6)', borderColor: 'rgba(34,197,94,1)', borderWidth: 1, borderRadius: 4 }
+                    ]
+                },
+                options: chartOpts(true)
+            });
+        }
     }
 }

@@ -2445,10 +2445,10 @@ export function renderFertilizacionComparativa(data) {
         </div>
         <div class="chart-container" style="min-height: 380px; padding: var(--space-6);">
             <div class="chart-header" style="color: #a78bfa;">
-              <span class="chart-title">⚗️ Potasio (K)</span>
+              <span class="chart-title">⚗️ Calcio (Ca)</span>
               <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Unidades</span>
             </div>
-            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-k-ee"></canvas></div>
+            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-ca-ee"></canvas></div>
         </div>
       </div>
 
@@ -2498,10 +2498,10 @@ export function renderFertilizacionComparativa(data) {
         </div>
         <div class="chart-container" style="min-height: 380px; padding: var(--space-6);">
             <div class="chart-header" style="color: #a78bfa;">
-              <span class="chart-title">⚗️ Potasio (K)</span>
+              <span class="chart-title">⚗️ Calcio (Ca)</span>
               <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Unidades</span>
             </div>
-            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-k-fv"></canvas></div>
+            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-ca-fv"></canvas></div>
         </div>
       </div>
 
@@ -2942,6 +2942,188 @@ export function renderAdminCrudView(config, data, catalogs = {}, sectionId = '')
           </div>
         </form>
       </div>
+    </div>
+  `;
+}
+
+// ── Presupuesto (Budget) View ──
+export function renderPresupuestoProyeccionView() {
+  return `
+    <div class="animate-fade-in">
+        <!-- Filters -->
+        <div class="sofia-filters" style="margin-bottom: var(--space-6);">
+            <div class="filter-group">
+                <label class="form-label">CICLO BASE (Real)</label>
+                <select class="form-select sofia-filter-select" id="ppto-ciclo-base">
+                    <option value="2025-2026" selected>2025-2026</option>
+                    <option value="2024-2025">2024-2025</option>
+                    <option value="2023-2024">2023-2024</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">CICLO DESTINO</label>
+                <select class="form-select sofia-filter-select" id="ppto-ciclo-destino">
+                    <option value="2026-2027" selected>2026-2027</option>
+                    <option value="2027-2028">2027-2028</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">FINCA</label>
+                <select class="form-select sofia-filter-select" id="ppto-finca">
+                    <option value="">Todas</option>
+                    <option value="El Espejo">El Espejo</option>
+                    <option value="Fincas Viejas">Fincas Viejas</option>
+                </select>
+            </div>
+            <div class="filter-group" style="display: flex; align-items: flex-end; gap: var(--space-2);">
+                <button class="btn btn-primary" id="btn-ppto-load" style="white-space: nowrap;">
+                    📊 Generar Presupuesto
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div id="ppto-summary" class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="metric-card">
+                <div class="metric-card-header"><div class="metric-card-icon green">👷</div></div>
+                <div class="metric-value" id="ppto-total-jornales">—</div>
+                <div class="metric-label">TOTAL JORNALES (Real)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header"><div class="metric-card-icon amber">💵</div></div>
+                <div class="metric-value" id="ppto-total-costo-mo">—</div>
+                <div class="metric-label">COSTO MANO DE OBRA (ARS)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header"><div class="metric-card-icon purple">📦</div></div>
+                <div class="metric-value" id="ppto-total-insumos">—</div>
+                <div class="metric-label">REGISTROS INSUMOS</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header"><div class="metric-card-icon blue">💰</div></div>
+                <div class="metric-value" id="ppto-total-costo-insumos">—</div>
+                <div class="metric-label">COSTO INSUMOS (USD)</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2);">
+            <button class="btn btn-primary" id="ppto-tab-jornales" style="border-radius: 8px 8px 0 0;">👷 Jornales</button>
+            <button class="btn btn-ghost" id="ppto-tab-gastos" style="border-radius: 8px 8px 0 0;">📦 Gastos y Consumos</button>
+        </div>
+
+        <!-- Tab Content: Jornales -->
+        <div id="ppto-content-jornales">
+            <div class="charts-row" style="margin-bottom: var(--space-6);">
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Comparativa Jornales por Labor</span>
+                    </div>
+                    <div style="height: 350px; position: relative;">
+                        <canvas id="chart-ppto-jornales-labor"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Comparativa Jornales por Predio</span>
+                    </div>
+                    <div style="height: 350px; position: relative;">
+                        <canvas id="chart-ppto-jornales-predio"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <h3 style="margin: 0; color: var(--text-primary);">📋 Detalle por Labor</h3>
+                    <div style="display: flex; gap: var(--space-2);">
+                        <button class="btn btn-ghost btn-sm" id="btn-ppto-adjust-jornales" title="Aplicar ajuste % a toda la proyección">
+                            ⚙️ Ajuste Global %
+                        </button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-jornales">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 180px;">Labor</th>
+                                <th style="text-align: right;">Real (Base)</th>
+                                <th style="text-align: right; min-width: 120px;">Proyectado</th>
+                                <th style="text-align: right;">Δ %</th>
+                                <th style="text-align: right;">Costo Real (ARS)</th>
+                                <th style="text-align: right;">Costo Proy. (ARS)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-jornales">
+                            <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Presione "Generar Presupuesto" para cargar datos
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-jornales"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Gastos -->
+        <div id="ppto-content-gastos" style="display: none;">
+            <div class="charts-row" style="margin-bottom: var(--space-6);">
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Comparativa por Categoría</span>
+                    </div>
+                    <div style="height: 350px; position: relative;">
+                        <canvas id="chart-ppto-gastos-cat"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Top Productos por Cantidad</span>
+                    </div>
+                    <div style="height: 350px; position: relative;">
+                        <canvas id="chart-ppto-gastos-prod"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <h3 style="margin: 0; color: var(--text-primary);">📋 Detalle por Producto</h3>
+                    <div style="display: flex; gap: var(--space-2);">
+                        <button class="btn btn-ghost btn-sm" id="btn-ppto-adjust-gastos" title="Aplicar ajuste % a toda la proyección">
+                            ⚙️ Ajuste Global %
+                        </button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-gastos">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 140px;">Categoría</th>
+                                <th style="min-width: 180px;">Producto</th>
+                                <th style="text-align: right;">Cant. Real</th>
+                                <th style="text-align: right; min-width: 120px;">Cant. Proy.</th>
+                                <th style="text-align: right;">Δ %</th>
+                                <th style="text-align: right;">Costo Real (USD)</th>
+                                <th style="text-align: right;">Costo Proy. (USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-gastos">
+                            <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Presione "Generar Presupuesto" para cargar datos
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-gastos"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-4); padding-bottom: var(--space-8);">
+            <button class="btn btn-ghost" id="btn-ppto-export">📄 Exportar CSV</button>
+            <button class="btn btn-primary" id="btn-ppto-save">💾 Guardar Presupuesto</button>
+        </div>
     </div>
   `;
 }

@@ -26,8 +26,25 @@ export class SofiaApiModel {
 
         let ha = 0;
         if (haMatch) {
-            // Remove dots (thousands) and fix comma to dot (decimal)
-            ha = parseFloat(haMatch[1].replace(/\./g, '').replace(',', '.')) || 0;
+            let val = haMatch[1];
+            // Sofia's Cuartel string often contains hectares like "2.200" (meaning 2.2) 
+            // or "144.830" (meaning 144.83).
+            // If we have a dot and no comma, it's ALMOST CERTAINLY a decimal.
+            if (!val.includes(',') && val.includes('.')) {
+                // If there's exactly one dot, treat it as decimal regardless of digits count
+                // (parseFloat handles this naturally)
+                ha = parseFloat(val) || 0;
+            } else if (val.includes(',') && val.includes('.')) {
+                // Classic format: 1.234,56 -> remove dot, change comma to dot
+                ha = parseFloat(val.replace(/\./g, '').replace(',', '.')) || 0;
+            } else {
+                // Only comma: 2,2 -> 2.2
+                ha = parseFloat(val.replace(',', '.')) || 0;
+            }
+            
+            // SECURITY CHECK: If resulting HA is suspiciously high (thousands), and originated from a dot-format, 
+            // it's likely a misinterpretation of a 3-digit decimal as thousands.
+            // But we already handle that in the first condition.
         }
 
         let pl = 0;
@@ -631,16 +648,17 @@ export class SofiaApiModel {
             // 2. Track Unique Physical Area (Denominator)
             // Use Cuartel as unique identifier for area
             if (r.cuartel && !uniqueCuarteles.has(r.cuartel)) {
-                uniqueCuarteles.set(r.cuartel, { ha: r.hectareas, predio: predioName });
+                const info = this.parseCuartelInfo(r.cuartel);
+                uniqueCuarteles.set(r.cuartel, { ha: info.ha, predio: predioName });
 
                 // Skip "Gral" cuarteles from El Espejo for hectares count
                 const isGralEspejo = groupName === 'El Espejo' && r.cuartel.toLowerCase().includes('gral');
                 if (!isGralEspejo) {
                     // Add to Aggregates
-                    if (groupStats[groupName]) groupStats[groupName].area += r.hectareas;
+                    if (groupStats[groupName]) groupStats[groupName].area += info.ha;
 
                     if (!predioStats[predioName]) predioStats[predioName] = { jornales: 0, area: 0, costoArs: 0, name: predioName, group: groupName };
-                    predioStats[predioName].area += r.hectareas;
+                    predioStats[predioName].area += info.ha;
                 }
             }
 
@@ -705,7 +723,7 @@ export class SofiaApiModel {
                 if (!predioMap[config.name]) {
                     predioMap[config.name] = { name: config.name, group: config.group, hectareas: 0, cuarteles: 0, plantas: 0, cuartelesList: [] };
                 }
-                const ha = r.hectareas || info.ha;
+                const ha = info.ha || r.hectareas;
                 predioMap[config.name].hectareas += ha;
                 predioMap[config.name].cuarteles += 1;
                 predioMap[config.name].plantas += info.pl;
