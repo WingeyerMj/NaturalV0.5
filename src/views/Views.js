@@ -1764,13 +1764,13 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
     <!-- EVOLUCIÓN PASA CHART -->
     <div class="data-table-container animate-fade-in animate-delay-1" style="padding: var(--space-6); margin-bottom: var(--space-6);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
-            <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📈 Cosecha Fresco vs Levantado Pasa (Mensual - Sólo Producción Propia)</h4>
+            <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📈 Cosecha Fresco vs Levantado Pasa (Por Predio - Sólo Producción Propia)</h4>
         </div>
         <div style="height: 350px; position: relative;">
             <canvas id="chart-cosecha-pasa-evolucion"></canvas>
         </div>
         <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
-            Comparativa agregada por mes de cosecha en fresco y pasa. Incluye exclusivamente kilos de los 6 predios principales, excluyendo uva de terceros.
+            Comparativa agregada por predio de cosecha en fresco y pasa. Incluye exclusivamente kilos de los 6 predios principales.
         </p>
     </div>
 

@@ -1056,12 +1056,12 @@ export class AppController {
             // Apply ONLY local finca filter (ignore global predio/variedades for this section as it's grouped)
             const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, { finca: clFiltersState.finca });
             const clStats = SofiaApiModel.getCosechaLevantadoStats(fullFiltered);
-            const pasaEvolStats = SofiaApiModel.getCosechaMensualComparativaPropia(fullFiltered); // FIXED METHOD NAME
+            const pasaEvolStats = SofiaApiModel.getCosechaComparativaPorPredio(fullFiltered); // FIXED METHOD NAME
 
             container.innerHTML = renderCosechaLevantadoTable(clStats, clFiltersState.finca, clFiltersState.ciclo);
             
             // Render the new chart manually
-            this.renderCosechaPasaEvolucionChart(pasaEvolStats);
+            this.renderCosechaPasaPrediosChart(pasaEvolStats);
 
             // Re-bind local elements
             document.getElementById('filter-cl-finca')?.addEventListener('change', e => {
@@ -1099,7 +1099,7 @@ export class AppController {
         });
     }
 
-    renderCosechaPasaEvolucionChart(stats) {
+    renderCosechaPasaPrediosChart(stats) {
         const ctx = document.getElementById('chart-cosecha-pasa-evolucion');
         if (!ctx) return;
 
@@ -1123,16 +1123,13 @@ export class AppController {
                         borderRadius: 4
                     },
                     {
-                        type: 'line',
+                        type: 'bar',
                         label: 'Levantado de Pasa (Kg)',
                         data: stats.pasa,
+                        backgroundColor: 'rgba(168, 85, 247, 0.7)',
                         borderColor: 'rgba(168, 85, 247, 1)',
-                        backgroundColor: 'rgba(168, 85, 247, 0.15)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: 'rgba(168, 85, 247, 1)',
-                        pointRadius: 4
+                        borderWidth: 1,
+                        borderRadius: 4
                     }
                 ]
             },

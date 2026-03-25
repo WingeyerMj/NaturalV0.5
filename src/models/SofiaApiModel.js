@@ -975,23 +975,25 @@ export class SofiaApiModel {
     }
 
     /**
-     * Gets monthly comparative evolution of "fresco" vs "pasa" (levantado)
-     * exclusively for the 6 own sub-farms (avoiding 3rd party grapes).
+     * Gets comparative evolution of "fresco" vs "pasa" (levantado)
+     * grouped BY PREDIO, exclusively for the 6 own sub-farms.
      */
-    static getCosechaMensualComparativaPropia(fullCycleData) {
+    static getCosechaComparativaPorPredio(fullCycleData) {
         const PREDIO_CONFIG = [
-            { keyword: 'Camino Truncado' }, { keyword: 'La Chimbera' }, { keyword: 'Puente Alto' },
-            { keyword: 'EEIII' }, { keyword: 'EEII' }, { keyword: 'EEI' }
+            { keyword: 'Camino Truncado', name: 'Camino Truncado' }, 
+            { keyword: 'La Chimbera', name: 'La Chimbera' }, 
+            { keyword: 'Puente Alto', name: 'Puente Alto' },
+            { keyword: 'EEIII', name: 'El Espejo 3' }, 
+            { keyword: 'EEII', name: 'El Espejo 2' }, 
+            { keyword: 'EEI', name: 'El Espejo 1' }
         ];
 
-        const monthlyData = {};
-        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        const predioData = {};
         
         fullCycleData.forEach(r => {
-            // Include ONLY the 6 own predios
             const rawPredio = r.clasifica || '';
-            const isOwn = PREDIO_CONFIG.some(c => rawPredio.includes(c.keyword));
-            if (!isOwn) return;
+            const predioObj = PREDIO_CONFIG.find(c => rawPredio.includes(c.keyword));
+            if (!predioObj) return;
 
             const labor = (r.labor || '').toLowerCase().trim();
             let isFresco = labor.includes('cosecha kg');
@@ -1002,35 +1004,25 @@ export class SofiaApiModel {
             const kg = r.rendimiento_val || 0;
             if (kg <= 0) return;
             
-            let dateStr = r.fecha || r.Fecha || r.date;
-            if (!dateStr) return;
+            const predioKey = predioObj.name;
             
-            if (dateStr.includes('-') && dateStr.split('-')[0].length === 2) {
-                const parts = dateStr.split('-');
-                dateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
-            }
-            
-            const timeObj = new Date(dateStr);
-            if (isNaN(timeObj.getTime())) return;
-            
-            // Group by year and month
-            const monthKey = `${timeObj.getFullYear()}-${String(timeObj.getMonth() + 1).padStart(2, '0')}`;
-            
-            if (!monthlyData[monthKey]) {
-                monthlyData[monthKey] = { 
-                    sortKey: monthKey, 
-                    label: `${monthNames[timeObj.getMonth()]} ${timeObj.getFullYear()}`, 
+            if (!predioData[predioKey]) {
+                predioData[predioKey] = { 
+                    label: predioKey, 
                     fresco: 0, 
                     pasa: 0 
                 };
             }
             
-            if (isFresco) monthlyData[monthKey].fresco += kg;
-            if (isPasa) monthlyData[monthKey].pasa += kg;
+            if (isFresco) predioData[predioKey].fresco += kg;
+            if (isPasa) predioData[predioKey].pasa += kg;
         });
         
-        const sorted = Object.values(monthlyData).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
-        
+        // Match the predefined order above for logical sorting
+        const sorted = PREDIO_CONFIG.map(p => predioData[p.name] || { label: p.name, fresco: 0, pasa: 0 })
+                                    .reverse(); // Reverse if you want EE1 first, etc. Let's do alphabetical or just reverse index.
+        sorted.sort((a, b) => a.label.localeCompare(b.label)); // Alphabetical sorting guarantees standard order
+
         return {
             labels: sorted.map(d => d.label),
             fresco: sorted.map(d => Math.round(d.fresco)),
