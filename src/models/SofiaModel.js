@@ -346,6 +346,68 @@ export class SofiaImportModel {
         return this.applyFilters(this.REGISTROS.filter(r => r.categoria === 'Foliares'), filters);
     }
 
+    static getCategoriaPorPredioStats(categoria, filters = {}) {
+        const all = this.applyFilters(this.REGISTROS.filter(r => r.categoria === categoria), filters);
+        const predioMap = {};
+        
+        all.forEach(r => {
+            const finca = r.finca_original || r.finca || 'Otros';
+            const predio = r.clasifica || 'Sin Clasifica';
+            const key = `${finca}|${predio}`;
+            
+            if (!predioMap[key]) {
+                predioMap[key] = { finca, predio, costo: 0, cantidad: 0 };
+            }
+            
+            predioMap[key].costo += (r.costo_total || 0);
+            predioMap[key].cantidad += (r.cantidad || 0);
+        });
+
+        const sorted = Object.values(predioMap).sort((a,b) => {
+            if (a.finca !== b.finca) return a.finca.localeCompare(b.finca);
+            return a.predio.localeCompare(b.predio);
+        });
+
+        return {
+            labels: sorted.map(s => `${s.finca}: ${s.predio}`),
+            costos: sorted.map(s => s.costo),
+            cantidades: sorted.map(s => s.cantidad)
+        };
+    }
+
+    static getFoliaresPorPredioStats(filters = {}) {
+        return this.getCategoriaPorPredioStats('Foliares', filters);
+    }
+
+    static getHerbicidasPorPredioStats(filters = {}) {
+        return this.getCategoriaPorPredioStats('Herbicidas', filters);
+    }
+
+    static getCategoriaPorProductoStats(categoria, filters = {}) {
+        const all = this.applyFilters(this.REGISTROS.filter(r => r.categoria === categoria), filters);
+        const prodMap = {};
+        
+        all.forEach(r => {
+            const prod = r.producto || 'Desconocido';
+            
+            if (!prodMap[prod]) {
+                prodMap[prod] = { producto: prod, costo: 0, cantidad: 0 };
+            }
+            
+            prodMap[prod].costo += (r.costo_total || 0);
+            prodMap[prod].cantidad += (r.cantidad || 0);
+        });
+
+        // Sort by quantity descending
+        const sorted = Object.values(prodMap).sort((a,b) => b.cantidad - a.cantidad);
+
+        return {
+            labels: sorted.map(s => s.producto),
+            costos: sorted.map(s => s.costo),
+            cantidades: sorted.map(s => Math.round(s.cantidad * 100) / 100)
+        };
+    }
+
     static getHerbicidas(filters = {}) {
         return this.applyFilters(this.REGISTROS.filter(r => r.categoria === 'Herbicidas'), filters);
     }
@@ -609,17 +671,16 @@ export class SofiaImportModel {
                 // Use a more unique index if available or just don't deduplicate if they are from CSV
                 const uniqueKey = `${r.clasifica}-${r.cod_cuartel}-${r.producto}-${r.variedad}-${r.ciclo}-${tipo}-${r.fecha_aplicacion}-${r.cantidad}`;
 
-                // Get nutrient units: use explicit columns if available, otherwise derive from composition
+                // Get nutrient units: extract first from CSV, then override ONLY if our strict composition dictionary specifies a >0 multiplier
                 let nUnits = r.n_units || 0;
                 let pUnits = r.p_units || 0;
                 let kUnits = r.k_units || 0;
 
-                // If no explicit units, calculate from known compositions
-                if (nUnits === 0 && pUnits === 0 && kUnits === 0 && compositions[prod]) {
+                if (compositions[prod]) {
                     const comp = compositions[prod];
-                    nUnits = r.cantidad * comp.n;
-                    pUnits = r.cantidad * comp.p;
-                    kUnits = r.cantidad * comp.k;
+                    if (comp.n > 0) nUnits = r.cantidad * comp.n;
+                    if (comp.p > 0) pUnits = r.cantidad * comp.p;
+                    if (comp.k > 0) kUnits = r.cantidad * comp.k;
                 }
 
                 if (nUnits > 0 || pUnits > 0 || kUnits > 0) {

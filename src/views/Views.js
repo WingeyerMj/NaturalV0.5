@@ -1761,6 +1761,19 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
       </div>
     </div>
 
+    <!-- EVOLUCIÓN PASA CHART -->
+    <div class="data-table-container animate-fade-in animate-delay-1" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+            <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📈 Cosecha Fresco vs Levantado Pasa (Mensual - Sólo Producción Propia)</h4>
+        </div>
+        <div style="height: 350px; position: relative;">
+            <canvas id="chart-cosecha-pasa-evolucion"></canvas>
+        </div>
+        <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
+            Comparativa agregada por mes de cosecha en fresco y pasa. Incluye exclusivamente kilos de los 6 predios principales, excluyendo uva de terceros.
+        </p>
+    </div>
+
     ${clStats.groups.map(g => {
     const colors = groupColors[g.name] || groupColors['El Espejo'];
     if (g.predios.length === 0) return '';
@@ -2234,6 +2247,25 @@ export function renderSofiaFoliares(data) {
           <span class="status-badge active"><span class="status-dot"></span> ${data.length} registros</span>
         </div>
       </div>
+      
+      <!-- FOLIAR CHARTS CONTAINER -->
+      <div style="padding: var(--space-6); border-bottom: 1px solid var(--border-subtle); margin-bottom: var(--space-4);">
+          <div style="display: flex; flex-direction: column; gap: var(--space-8);">
+              <div>
+                  <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin-bottom: var(--space-4); font-size: 0.9em;">📊 Costo Operativo por Predio</h4>
+                  <div style="height: 350px; position: relative; width: 100%;">
+                      <canvas id="chart-sofia-foliares"></canvas>
+                  </div>
+              </div>
+              <div>
+                  <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin-bottom: var(--space-4); font-size: 0.9em;">🧪 Productos Aplicados (Cantidades Totales)</h4>
+                  <div style="height: 350px; position: relative; width: 100%;">
+                      <canvas id="chart-sofia-foliares-productos"></canvas>
+                  </div>
+              </div>
+          </div>
+      </div>
+
       <table class="data-table">
         <thead><tr>
           <th>Predio / Cuartel</th><th>Fecha</th><th>Labor</th><th>Producto</th>
@@ -2286,6 +2318,25 @@ export function renderSofiaHerbicidas(data) {
           <span class="status-badge pending"><span class="status-dot"></span> ${data.length} registros</span>
         </div>
       </div>
+      
+      <!-- HERBICIDAS CHARTS CONTAINER -->
+      <div style="padding: var(--space-6); border-bottom: 1px solid var(--border-subtle); margin-bottom: var(--space-4);">
+          <div style="display: flex; flex-direction: column; gap: var(--space-8);">
+              <div>
+                  <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin-bottom: var(--space-4); font-size: 0.9em;">📊 Costo Operativo por Predio</h4>
+                  <div style="height: 350px; position: relative; width: 100%;">
+                      <canvas id="chart-sofia-herbicidas"></canvas>
+                  </div>
+              </div>
+              <div>
+                  <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin-bottom: var(--space-4); font-size: 0.9em;">🧪 Productos Aplicados (Cantidades Totales)</h4>
+                  <div style="height: 350px; position: relative; width: 100%;">
+                      <canvas id="chart-sofia-herbicidas-productos"></canvas>
+                  </div>
+              </div>
+          </div>
+      </div>
+
       <table class="data-table">
         <thead><tr>
           <th>Predio / Cuartel</th><th>Fecha</th><th>Labor</th><th>Producto</th>

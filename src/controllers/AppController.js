@@ -1056,8 +1056,12 @@ export class AppController {
             // Apply ONLY local finca filter (ignore global predio/variedades for this section as it's grouped)
             const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, { finca: clFiltersState.finca });
             const clStats = SofiaApiModel.getCosechaLevantadoStats(fullFiltered);
+            const pasaEvolStats = SofiaApiModel.getCosechaMensualComparativaPropia(fullFiltered); // FIXED METHOD NAME
 
             container.innerHTML = renderCosechaLevantadoTable(clStats, clFiltersState.finca, clFiltersState.ciclo);
+            
+            // Render the new chart manually
+            this.renderCosechaPasaEvolucionChart(pasaEvolStats);
 
             // Re-bind local elements
             document.getElementById('filter-cl-finca')?.addEventListener('change', e => {
@@ -1090,6 +1094,56 @@ export class AppController {
                 plugins: {
                     ...this.getChartOptions().plugins,
                     legend: { display: false }
+                }
+            }
+        });
+    }
+
+    renderCosechaPasaEvolucionChart(stats) {
+        const ctx = document.getElementById('chart-cosecha-pasa-evolucion');
+        if (!ctx) return;
+
+        if (this.charts.cosechaPasaEvolucion) {
+            this.charts.cosechaPasaEvolucion.destroy();
+        }
+
+        // @ts-ignore
+        this.charts.cosechaPasaEvolucion = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: stats.labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Cosechado en Fresco (Kg)',
+                        data: stats.fresco,
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    {
+                        type: 'line',
+                        label: 'Levantado de Pasa (Kg)',
+                        data: stats.pasa,
+                        borderColor: 'rgba(168, 85, 247, 1)',
+                        backgroundColor: 'rgba(168, 85, 247, 0.15)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(168, 85, 247, 1)',
+                        pointRadius: 4
+                    }
+                ]
+            },
+            options: {
+                ...this.getChartOptions('Kilos (Kg)'),
+                plugins: {
+                    ...this.getChartOptions().plugins,
+                    legend: { display: true, position: 'top' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
                 }
             }
         });
@@ -3653,12 +3707,26 @@ renderSofiaSubTab(tab) {
             });
             break;
         }
-        case 'foliares':
+        case 'foliares': {
+            const foliaresStats = SofiaImportModel.getFoliaresPorPredioStats(filters);
+            const productosStats = SofiaImportModel.getCategoriaPorProductoStats('Foliares', filters);
             content.innerHTML = renderSofiaFoliares(SofiaImportModel.getFoliares(filters));
+            requestAnimationFrame(() => {
+                this.renderFoliaresChart(foliaresStats);
+                this.renderFoliaresProductosChart(productosStats);
+            });
             break;
-        case 'herbicidas':
+        }
+        case 'herbicidas': {
+            const herbiStats = SofiaImportModel.getHerbicidasPorPredioStats(filters);
+            const productosStats = SofiaImportModel.getCategoriaPorProductoStats('Herbicidas', filters);
             content.innerHTML = renderSofiaHerbicidas(SofiaImportModel.getHerbicidas(filters));
+            requestAnimationFrame(() => {
+                this.renderHerbicidasChart(herbiStats);
+                this.renderHerbicidasProductosChart(productosStats);
+            });
             break;
+        }
         case 'fertilizacion': {
             const comparativa = SofiaImportModel.getFertilizacionComparativa(filters);
             content.innerHTML = renderFertilizacionComparativa(comparativa);
@@ -3706,6 +3774,140 @@ renderSofiaCostChart(topProducts) {
             }]
         },
         options: { ...this.getChartOptions('Costo ($)'), indexAxis: 'y' }
+    });
+}
+
+renderFoliaresChart(stats) {
+    const ctx = document.getElementById('chart-sofia-foliares');
+    if (!ctx) return;
+
+    if (this.charts['sofia-foliares']) {
+        this.charts['sofia-foliares'].destroy();
+    }
+
+    // @ts-ignore
+    this.charts['sofia-foliares'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: stats.labels,
+            datasets: [
+                {
+                    label: 'Costo Operativo ($)',
+                    data: stats.costos,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            ...this.getChartOptions('Costo Total ($)'),
+            plugins: {
+                ...this.getChartOptions().plugins,
+                legend: { display: false }
+            }
+        }
+    });
+}
+
+renderHerbicidasChart(stats) {
+    const ctx = document.getElementById('chart-sofia-herbicidas');
+    if (!ctx) return;
+
+    if (this.charts['sofia-herbicidas']) {
+        this.charts['sofia-herbicidas'].destroy();
+    }
+
+    // @ts-ignore
+    this.charts['sofia-herbicidas'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: stats.labels,
+            datasets: [
+                {
+                    label: 'Costo Operativo ($)',
+                    data: stats.costos,
+                    backgroundColor: 'rgba(245, 158, 11, 0.7)', // Amber tint for Herbicides
+                    borderColor: 'rgba(245, 158, 11, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            ...this.getChartOptions('Costo Total ($)'),
+            plugins: {
+                ...this.getChartOptions().plugins,
+                legend: { display: false }
+            }
+        }
+    });
+}
+
+renderFoliaresProductosChart(stats) {
+    const ctx = document.getElementById('chart-sofia-foliares-productos');
+    if (!ctx) return;
+
+    if (this.charts['sofia-foliares-productos']) {
+        this.charts['sofia-foliares-productos'].destroy();
+    }
+
+    this.charts['sofia-foliares-productos'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: stats.labels.slice(0, 15), // Show top 15 max
+            datasets: [
+                {
+                    label: 'Cantidad Aplicada',
+                    data: stats.cantidades.slice(0, 15),
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)', // Emerald
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            ...this.getChartOptions('Unidades de Medida'),
+            plugins: {
+                ...this.getChartOptions().plugins,
+                legend: { display: false }
+            }
+        }
+    });
+}
+
+renderHerbicidasProductosChart(stats) {
+    const ctx = document.getElementById('chart-sofia-herbicidas-productos');
+    if (!ctx) return;
+
+    if (this.charts['sofia-herbicidas-productos']) {
+        this.charts['sofia-herbicidas-productos'].destroy();
+    }
+
+    this.charts['sofia-herbicidas-productos'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: stats.labels.slice(0, 15), // Show top 15 max
+            datasets: [
+                {
+                    label: 'Cantidad Aplicada',
+                    data: stats.cantidades.slice(0, 15),
+                    backgroundColor: 'rgba(168, 85, 247, 0.7)', // Purple
+                    borderColor: 'rgba(168, 85, 247, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            ...this.getChartOptions('Unidades de Medida'),
+            plugins: {
+                ...this.getChartOptions().plugins,
+                legend: { display: false }
+            }
+        }
     });
 }
 

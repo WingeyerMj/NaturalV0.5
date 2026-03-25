@@ -975,6 +975,70 @@ export class SofiaApiModel {
     }
 
     /**
+     * Gets monthly comparative evolution of "fresco" vs "pasa" (levantado)
+     * exclusively for the 6 own sub-farms (avoiding 3rd party grapes).
+     */
+    static getCosechaMensualComparativaPropia(fullCycleData) {
+        const PREDIO_CONFIG = [
+            { keyword: 'Camino Truncado' }, { keyword: 'La Chimbera' }, { keyword: 'Puente Alto' },
+            { keyword: 'EEIII' }, { keyword: 'EEII' }, { keyword: 'EEI' }
+        ];
+
+        const monthlyData = {};
+        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        
+        fullCycleData.forEach(r => {
+            // Include ONLY the 6 own predios
+            const rawPredio = r.clasifica || '';
+            const isOwn = PREDIO_CONFIG.some(c => rawPredio.includes(c.keyword));
+            if (!isOwn) return;
+
+            const labor = (r.labor || '').toLowerCase().trim();
+            let isFresco = labor.includes('cosecha kg');
+            let isPasa = labor.includes('levantado');
+            
+            if (!isFresco && !isPasa) return;
+            
+            const kg = r.rendimiento_val || 0;
+            if (kg <= 0) return;
+            
+            let dateStr = r.fecha || r.Fecha || r.date;
+            if (!dateStr) return;
+            
+            if (dateStr.includes('-') && dateStr.split('-')[0].length === 2) {
+                const parts = dateStr.split('-');
+                dateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            
+            const timeObj = new Date(dateStr);
+            if (isNaN(timeObj.getTime())) return;
+            
+            // Group by year and month
+            const monthKey = `${timeObj.getFullYear()}-${String(timeObj.getMonth() + 1).padStart(2, '0')}`;
+            
+            if (!monthlyData[monthKey]) {
+                monthlyData[monthKey] = { 
+                    sortKey: monthKey, 
+                    label: `${monthNames[timeObj.getMonth()]} ${timeObj.getFullYear()}`, 
+                    fresco: 0, 
+                    pasa: 0 
+                };
+            }
+            
+            if (isFresco) monthlyData[monthKey].fresco += kg;
+            if (isPasa) monthlyData[monthKey].pasa += kg;
+        });
+        
+        const sorted = Object.values(monthlyData).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+        
+        return {
+            labels: sorted.map(d => d.label),
+            fresco: sorted.map(d => Math.round(d.fresco)),
+            pasa: sorted.map(d => Math.round(d.pasa))
+        };
+    }
+
+    /**
      * Fetches and aggregates data for multiple cycles for comparison
      * Returns Chart.js compatible partial data structure
      */
