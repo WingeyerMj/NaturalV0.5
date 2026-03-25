@@ -1120,7 +1120,20 @@ export class AppController {
                         backgroundColor: 'rgba(16, 185, 129, 0.7)',
                         borderColor: 'rgba(16, 185, 129, 1)',
                         borderWidth: 1,
-                        borderRadius: 4
+                        borderRadius: 4,
+                        // @ts-ignore
+                        datalabels: {
+                            display: true,
+                            color: '#ffffff',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 4,
+                            font: { size: 10, weight: 'bold', family: 'Outfit' },
+                            formatter: (value, context) => {
+                                const factor = stats.factors[context.dataIndex];
+                                return `${value.toLocaleString()} (${factor}x)`;
+                            }
+                        }
                     },
                     {
                         type: 'bar',
@@ -1129,7 +1142,17 @@ export class AppController {
                         backgroundColor: 'rgba(168, 85, 247, 0.7)',
                         borderColor: 'rgba(168, 85, 247, 1)',
                         borderWidth: 1,
-                        borderRadius: 4
+                        borderRadius: 4,
+                        // @ts-ignore
+                        datalabels: {
+                            display: true,
+                            color: '#ffffff',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 4,
+                            font: { size: 10, weight: 'bold', family: 'Outfit' },
+                            formatter: (value) => value > 0 ? value.toLocaleString() : ''
+                        }
                     }
                 ]
             },
@@ -1137,10 +1160,16 @@ export class AppController {
                 ...this.getChartOptions('Kilos (Kg)'),
                 plugins: {
                     ...this.getChartOptions().plugins,
-                    legend: { display: true, position: 'top' }
+                    legend: { display: true, position: 'top' },
+                    // @ts-ignore
+                    datalabels: { display: true }
                 },
                 scales: {
-                    y: { beginAtZero: true }
+                    y: { 
+                        beginAtZero: true,
+                        // Add some padding for labels at the top
+                        suggestedMax: Math.max(...(stats.fresco.length ? stats.fresco : [1000])) * 1.15
+                    }
                 }
             }
         });
@@ -4554,7 +4583,7 @@ renderFertUnidadesChart() {
                 let rawUsd = String(d[COL_USD] || '0').trim();
                 const usd = parseFloat(rawUsd.replace(/\./g, '').replace(',', '.')) || 0;
                 let rawHas = String(d[COL_HAS] || '0').trim();
-                const has = parseFloat(rawHas.replace(',', '.')) || 0;
+                const has = parseFloat(rawHas.replace(/\./g, '').replace(',', '.')) || 0;
                 const finca = normFinca(d[COL_FINCA]);
                 const item = String(d[COL_ITEM] || 'Otros').trim();
 

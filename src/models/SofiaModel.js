@@ -120,17 +120,12 @@ export class SofiaImportModel {
                     .trim();
             }
 
-            // Helper to parse Spanish numbers (1.234,56 -> 1234.56)
+            // Helper to parse Spanish numbers (1.234,56 -> 1234.56 or 1.500 -> 1500)
             const parseNum = (val) => {
-                if (!val) return 0;
-                let clean = val.toString().replace(/[$\s]/g, '');
-                // If it has both . and , assume . is thousands
-                if (clean.includes('.') && clean.includes(',')) {
-                    clean = clean.replace(/\./g, '').replace(',', '.');
-                } else if (clean.includes(',')) {
-                    // If only comma, assume it is decimal
-                    clean = clean.replace(',', '.');
-                }
+                if (val === undefined || val === null || val === '') return 0;
+                let str = val.toString().trim().replace(/[$\s]/g, '');
+                // Standard Spanish format from Sofia: . is thousands, , is decimals
+                let clean = str.replace(/\./g, '').replace(',', '.');
                 return parseFloat(clean) || 0;
             };
 
@@ -415,14 +410,25 @@ export class SofiaImportModel {
     static getFertilizacionComparativa(filters = {}) {
         const all = this.applyFilters(this.REGISTROS.filter(r => r.categoria === 'Fertilizacion'), filters);
         const groups = {};
+        const processedBudgets = new Set();
+        
         all.forEach(r => {
             const clasifica = r.clasifica || 'Sin Clasifica';
             const key = `${clasifica}|${r.producto}|${r.finca}`;
             if (!groups[key]) groups[key] = { cuartel: clasifica, finca: r.finca_original || r.finca, producto: r.producto, clasifica, pre: 0, pos: 0, real: 0 };
+            
             const tr = (r.tipo_registro || '').toLowerCase();
-            if (tr === 'presupuestado-pre') groups[key].pre += r.cantidad;
-            else if (tr === 'presupuestado-pos') groups[key].pos += r.cantidad;
-            else if (tr === 'real') groups[key].real += r.cantidad;
+            
+            if (tr.includes('presupuestado')) {
+                const budgetKey = `${clasifica}-${r.producto}-${tr}-${r.ciclo}`;
+                if (!processedBudgets.has(budgetKey)) {
+                    processedBudgets.add(budgetKey);
+                    if (tr === 'presupuestado-pre') groups[key].pre += r.cantidad;
+                    else if (tr === 'presupuestado-pos') groups[key].pos += r.cantidad;
+                }
+            } else if (tr === 'real') {
+                groups[key].real += r.cantidad;
+            }
         });
 
         // Solo items con presupuesto (pre o pos)
@@ -451,12 +457,25 @@ export class SofiaImportModel {
     static getProductComparison(filters = {}) {
         const all = this.applyFilters(this.REGISTROS.filter(r => r.categoria === 'Fertilizacion'), filters);
         const groups = {};
+        const processedBudgets = new Set();
+        
         all.forEach(r => {
-            const key = `${r.clasifica || 'Sin Clasifica'}|${r.producto}`;
-            if (!groups[key]) groups[key] = { producto: r.producto, clasifica: r.clasifica || 'Sin Clasifica', pre: 0, real: 0 };
+            const clasificaKey = r.clasifica || 'Sin Clasifica';
+            const key = `${clasificaKey}|${r.producto}`;
+            if (!groups[key]) groups[key] = { producto: r.producto, clasifica: clasificaKey, pre: 0, real: 0 };
+            
             const tipo = (r.tipo_registro || '').toLowerCase();
-            if (tipo.includes('presupuestado')) groups[key].pre += r.cantidad;
-            else if (tipo === 'real') groups[key].real += r.cantidad;
+            
+            if (tipo.includes('presupuestado')) {
+                // Deduplicate budget rows by Predio, Producto, and Tipo
+                const budgetKey = `${clasificaKey}-${r.producto}-${tipo}-${r.ciclo}`;
+                if (!processedBudgets.has(budgetKey)) {
+                    processedBudgets.add(budgetKey);
+                    groups[key].pre += r.cantidad;
+                }
+            } else if (tipo === 'real') {
+                groups[key].real += r.cantidad;
+            }
         });
 
         // Solo items con presupuesto
@@ -668,8 +687,13 @@ export class SofiaImportModel {
 
             if (r.cantidad > 0) {
                 const key = getGroupKey(r);
-                // Use a more unique index if available or just don't deduplicate if they are from CSV
-                const uniqueKey = `${r.clasifica}-${r.cod_cuartel}-${r.producto}-${r.variedad}-${r.ciclo}-${tipo}-${r.fecha_aplicacion}-${r.cantidad}`;
+                
+                // CRITICAL FIX: Sofia exports budget rows redundantly for every 'cuartel' or 'variedad'.
+                // Since the user defined budgets "por predio" (Fincas Viejas) or "por cuartel" (Espejo),
+                // we MUST deduplicate the budget based on the aggregation key, product, cycle, and budget type.
+                const uniqueKey = `${key}-${prod}-${tipo}-${r.ciclo}`;
+                if (processedBudgets.has(uniqueKey)) return; // Skip duplicate budget rows!
+                processedBudgets.add(uniqueKey);
 
                 // Get nutrient units: extract first from CSV, then override ONLY if our strict composition dictionary specifies a >0 multiplier
                 let nUnits = r.n_units || 0;

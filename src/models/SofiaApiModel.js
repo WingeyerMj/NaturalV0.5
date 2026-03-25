@@ -26,11 +26,13 @@ export class SofiaApiModel {
 
         let ha = 0;
         if (haMatch) {
-            ha = parseFloat(haMatch[1].replace(',', '.')) || 0;
+            // Remove dots (thousands) and fix comma to dot (decimal)
+            ha = parseFloat(haMatch[1].replace(/\./g, '').replace(',', '.')) || 0;
         }
 
         let pl = 0;
         if (plMatch) {
+            // Remove both dots and commas for plant counts
             pl = parseInt(plMatch[1].replace(/[.,]/g, '')) || 0;
         }
 
@@ -1026,7 +1028,8 @@ export class SofiaApiModel {
         return {
             labels: sorted.map(d => d.label),
             fresco: sorted.map(d => Math.round(d.fresco)),
-            pasa: sorted.map(d => Math.round(d.pasa))
+            pasa: sorted.map(d => Math.round(d.pasa)),
+            factors: sorted.map(d => d.pasa > 0 ? (d.fresco / d.pasa).toFixed(1) : '0')
         };
     }
 
