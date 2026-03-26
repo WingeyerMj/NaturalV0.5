@@ -1753,6 +1753,10 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
   };
   const globalFactor = clStats.grandTotalLevantado > 0 ? (clStats.grandTotalCosecha / clStats.grandTotalLevantado) : 0;
 
+  const getFColor = (f) => f > 0 ? (f <= 4.4 ? '#10b981' : '#ef4444') : '#f59e0b';
+  const getFBg = (f) => f > 0 ? (f <= 4.4 ? 'rgba(16, 185, 129, 0.06)' : 'rgba(239, 68, 68, 0.06)') : 'rgba(245, 158, 11, 0.06)';
+  const getFBadge = (f) => f > 0 ? (f <= 4.4 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)') : 'rgba(245, 158, 11, 0.1)';
+
   return `
     <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-4);">
@@ -1793,9 +1797,9 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
         <div class="metric-value" style="font-size: 1.8em;">${fmt(clStats.grandTotalLevantado)} <small style="font-size: 0.35em; color: var(--text-tertiary);">kg</small></div>
         <div class="metric-label">Total Levantado (Pasa)</div>
       </div>
-      <div class="metric-card" style="padding: var(--space-5); border-left: 4px solid #f59e0b;">
-        <div class="metric-card-header"><div class="metric-card-icon amber">⚖️</div></div>
-        <div class="metric-value" style="font-size: 1.8em;">${globalFactor.toFixed(2)}</div>
+      <div class="metric-card" style="padding: var(--space-5); border-left: 4px solid ${getFColor(globalFactor)};">
+        <div class="metric-card-header"><div class="metric-card-icon amber" style="background:${getFBadge(globalFactor)}; color:${getFColor(globalFactor)};">⚖️</div></div>
+        <div class="metric-value" style="font-size: 1.8em; color: ${getFColor(globalFactor)};">${globalFactor.toFixed(2)}</div>
         <div class="metric-label">Factor de Reducción Global</div>
       </div>
     </div>
@@ -1826,7 +1830,7 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
           <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
             <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">🍇 ${fmt(g.totalCosecha)} kg</div>
             <div style="background: rgba(168, 85, 247, 0.1); color: var(--color-accent-400); padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">🫘 ${fmt(g.totalLevantado)} kg</div>
-            <div style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">⚖️ Factor: ${gFactor.toFixed(2)}</div>
+            <div style="background: ${getFBadge(gFactor)}; color: ${getFColor(gFactor)}; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">⚖️ Factor: ${gFactor.toFixed(2)}</div>
           </div>
         </div>
         <div style="overflow-x: auto;">
@@ -1848,7 +1852,7 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
         '<td style="font-size: 0.8em; color: #10b981; font-weight: 600;">🍇 Fresco</td>' +
         p.cosecha.map(v => '<td style="text-align: right; ' + (v > 0 ? 'color: #10b981; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;') + '">' + (v > 0 ? fmt(v) : '—') + '</td>').join('') +
         '<td style="text-align: right; font-weight: 700; color: #059669;">' + fmt(p.totalCosecha) + '</td>' +
-        '<td rowspan="3" style="text-align: center; vertical-align: middle; font-size: 1.3em; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.06); border-bottom: 2px solid var(--border-subtle);">' + pFactor.toFixed(2) + '</td>' +
+        '<td rowspan="3" style="text-align: center; vertical-align: middle; font-size: 1.3em; font-weight: 800; color: ' + getFColor(pFactor) + '; background: ' + getFBg(pFactor) + '; border-bottom: 2px solid var(--border-subtle);">' + pFactor.toFixed(2) + '</td>' +
         '</tr>' +
         '<tr style="border-bottom: none;">' +
         '<td style="font-size: 0.8em; color: var(--color-accent-400); font-weight: 600;">🫘 Pasa</td>' +
@@ -1861,9 +1865,9 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
           const l = p.levantado[i];
           const f = l > 0 ? (c / l) : 0;
           const hasData = c > 0 && l > 0;
-          return '<td style="text-align: right; ' + (hasData ? 'color: #f59e0b; font-weight: 700;' : 'color: var(--text-tertiary); opacity: 0.5;') + '">' + (hasData ? f.toFixed(2) : '—') + '</td>';
+          return '<td style="text-align: right; ' + (hasData ? 'color: ' + getFColor(f) + '; font-weight: 700;' : 'color: var(--text-tertiary); opacity: 0.5;') + '">' + (hasData ? f.toFixed(2) : '—') + '</td>';
         }).join('') +
-        '<td style="text-align: right; font-weight: 700; color: #f59e0b;">' + (pFactor > 0 ? pFactor.toFixed(2) : '—') + '</td>' +
+        '<td style="text-align: right; font-weight: 700; color: ' + getFColor(pFactor) + ';">' + (pFactor > 0 ? pFactor.toFixed(2) : '—') + '</td>' +
         '</tr>';
     }).join('')}
             </tbody>
@@ -1873,7 +1877,7 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
                 <td style="font-size: 0.8em;">🍇</td>
                 ${g.cosechaPasses.map(v => '<td style="text-align: right; color: #10b981;">' + (v > 0 ? fmt(v) : '—') + '</td>').join('')}
                 <td style="text-align: right; color: #059669;">${fmt(g.totalCosecha)}</td>
-                <td rowspan="3" style="text-align: center; vertical-align: middle; font-size: 1.3em; font-weight: 800; color: #f59e0b;">${gFactor.toFixed(2)}</td>
+                <td rowspan="3" style="text-align: center; vertical-align: middle; font-size: 1.3em; font-weight: 800; color: ${getFColor(gFactor)};">${gFactor.toFixed(2)}</td>
               </tr>
               <tr style="border-bottom: none;">
                 <td style="font-size: 0.8em;">🫘</td>
@@ -1885,9 +1889,9 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
                 ${g.cosechaPasses.map((c, i) => {
       const l = g.levantadoPasses[i];
       const f = l > 0 ? (c / l) : 0;
-      return '<td style="text-align: right; color: #f59e0b;">' + (c > 0 && l > 0 ? f.toFixed(2) : '—') + '</td>';
+      return '<td style="text-align: right; color: ' + (c > 0 && l > 0 ? getFColor(f) : '#f59e0b') + ';">' + (c > 0 && l > 0 ? f.toFixed(2) : '—') + '</td>';
     }).join('')}
-                <td style="text-align: right; color: #f59e0b;">${gFactor > 0 ? gFactor.toFixed(2) : '—'}</td>
+                <td style="text-align: right; color: ${getFColor(gFactor)};">${gFactor > 0 ? gFactor.toFixed(2) : '—'}</td>
               </tr>
             </tfoot>
           </table>
@@ -1942,6 +1946,10 @@ export function renderLevantadoPorPlaya(playaStats) {
   const globalFactor = playaStats.grandTotalKg > 0 && playaStats.grandTotalKgFresco > 0 
     ? (playaStats.grandTotalKgFresco / playaStats.grandTotalKg) : 0;
 
+  const getFColor = (f) => f > 0 ? (f <= 4.4 ? '#10b981' : '#ef4444') : '#f59e0b';
+  const getFBg = (f) => f > 0 ? (f <= 4.4 ? 'rgba(16, 185, 129, 0.06)' : 'rgba(239, 68, 68, 0.06)') : 'rgba(245, 158, 11, 0.06)';
+  const getFBadge = (f) => f > 0 ? (f <= 4.4 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)') : 'rgba(245, 158, 11, 0.1)';
+
   return `
     <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
     <div style="margin-bottom: var(--space-4);">
@@ -1951,7 +1959,7 @@ export function renderLevantadoPorPlaya(playaStats) {
       <p style="color: var(--text-tertiary); font-size: 0.85em; margin: 0;">
         Detalle de las playas (secaderos) donde se tiende la pasa, agrupado por finca y predio. Total general: <strong style="color: var(--color-accent-400);">${fmt(playaStats.grandTotalKg)} kg</strong>
         ${playaStats.grandTotalKgFresco > 0 ? ` · Cosecha Fresco: <strong style="color: #10b981;">${fmt(playaStats.grandTotalKgFresco)} kg</strong>` : ''}
-        ${globalFactor > 0 ? ` · Factor Global: <strong style="color: #f59e0b;">${globalFactor.toFixed(2)}</strong>` : ''}
+        ${globalFactor > 0 ? ` · Factor Global: <strong style="color: ${getFColor(globalFactor)};">${globalFactor.toFixed(2)}</strong>` : ''}
       </p>
     </div>
 
@@ -1990,7 +1998,7 @@ export function renderLevantadoPorPlaya(playaStats) {
             <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
               🍇 ${fmt(fData.totalKgFresco)} kg fresco
             </div>
-            <div style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
+            <div style="background: ${getFBadge(fincaFactor)}; color: ${getFColor(fincaFactor)}; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
               ⚖️ Factor: ${fincaFactor.toFixed(2)}
             </div>` : ''}
             <div style="background: rgba(59, 130, 246, 0.1); color: var(--color-primary-400); padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
@@ -2042,10 +2050,10 @@ export function renderLevantadoPorPlaya(playaStats) {
                 const playaRows = predioPlayas.map(playa => {
                   const hasPlayaCosecha = (playa.kgFresco || 0) > 0;
                   const hasPlayaPasaHumeda = (playa.kgPasaHumeda || 0) > 0;
-                  const totalPlayaKg = (playa.kg || 0) + (playa.kgPasaHumeda || 0);
+                  const totalPlayaKg = (playa.kg || 0);
                   const playaRowsCount = 1 + (hasPlayaCosecha ? 1 : 0) + (hasPlayaPasaHumeda ? 1 : 0);
 
-                  const pct = playaStats.grandTotalKg > 0 ? (totalPlayaKg / (playaStats.grandTotalKg + (playaStats.grandTotalKgPasaHumeda || 0)) * 100) : 0;
+                  const pct = playaStats.grandTotalKg > 0 ? (totalPlayaKg / playaStats.grandTotalKg * 100) : 0;
                   const playaFactor = totalPlayaKg > 0 && playa.kgFresco > 0 
                     ? (playa.kgFresco / totalPlayaKg) : 0;
 
@@ -2067,7 +2075,7 @@ export function renderLevantadoPorPlaya(playaStats) {
                       return `<td style="text-align: right; ${val > 0 ? 'color: var(--color-accent-400); font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
                     }).join('')}
                     <td style="text-align: right; font-weight: 700; color: var(--color-accent-500);">${fmt(playa.kg)}</td>
-                    <td rowspan="${playaRowsCount}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.06); border-bottom: 2px solid var(--border-subtle);">${playaFactor > 0 ? playaFactor.toFixed(2) : '—'}</td>
+                    <td rowspan="${playaRowsCount}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: ${getFColor(playaFactor)}; background: ${getFBg(playaFactor)}; border-bottom: 2px solid var(--border-subtle);">${playaFactor > 0 ? playaFactor.toFixed(2) : '—'}</td>
                     <td rowspan="${playaRowsCount}" style="text-align: right; vertical-align: middle; border-bottom: 2px solid var(--border-subtle);">
                       <div style="display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2);">
                         <div style="width: 60px; height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden;">
@@ -2119,7 +2127,7 @@ export function renderLevantadoPorPlaya(playaStats) {
                     return `<td style="text-align: right; color: ${pColor}; font-size: 0.9em;">${sub > 0 ? fmt(sub) : '—'}</td>`;
                   }).join('')}
                   <td style="text-align: right; color: ${pColor};">${fmt(pData.totalKg)}</td>
-                  <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.06); ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">${predioFactor > 0 ? predioFactor.toFixed(2) : '—'}</td>
+                  <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-weight: 800; color: ${getFColor(predioFactor)}; background: ${getFBg(predioFactor)}; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">${predioFactor > 0 ? predioFactor.toFixed(2) : '—'}</td>
                   <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="text-align: right; color: var(--text-secondary); font-size: 0.85em; vertical-align: middle; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">
                     ${fmtDec(playaStats.grandTotalKg > 0 ? (pData.totalKg / playaStats.grandTotalKg * 100) : 0)}%
                   </td>
@@ -2146,7 +2154,7 @@ export function renderLevantadoPorPlaya(playaStats) {
                   return `<td style="text-align: right; color: var(--color-accent-500);">${subtotal > 0 ? fmt(subtotal) : '—'}</td>`;
                 }).join('')}
                 <td style="text-align: right; color: var(--color-accent-600);">${fmt(fData.totalKg)}</td>
-                <td rowspan="${hasCosechaData ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: #f59e0b;">${fincaFactor > 0 ? fincaFactor.toFixed(2) : '—'}</td>
+                <td rowspan="${hasCosechaData ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: ${getFColor(fincaFactor)};">${fincaFactor > 0 ? fincaFactor.toFixed(2) : '—'}</td>
                 <td rowspan="${hasCosechaData ? '2' : '1'}" style="text-align: right; color: var(--text-secondary); vertical-align: middle;">
                   ${fmtDec(playaStats.grandTotalKg > 0 ? (fData.totalKg / playaStats.grandTotalKg * 100) : 0)}%
                 </td>

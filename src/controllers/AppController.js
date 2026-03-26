@@ -1138,10 +1138,7 @@ export class AppController {
                             align: 'top',
                             offset: 4,
                             font: { size: 10, weight: 'bold', family: 'Outfit' },
-                            formatter: (value, context) => {
-                                const factor = stats.factors[context.dataIndex];
-                                return `${value.toLocaleString()} (${factor}x)`;
-                            }
+                            formatter: (value) => value > 0 ? value.toLocaleString() : ''
                         }
                     },
                     {
@@ -1154,13 +1151,30 @@ export class AppController {
                         borderRadius: 4,
                         // @ts-ignore
                         datalabels: {
-                            display: true,
-                            color: '#ffffff',
-                            anchor: 'end',
-                            align: 'top',
-                            offset: 4,
-                            font: { size: 10, weight: 'bold', family: 'Outfit' },
-                            formatter: (value) => value > 0 ? value.toLocaleString() : ''
+                            labels: {
+                                value: {
+                                    color: '#ffffff',
+                                    anchor: 'end',
+                                    align: 'top',
+                                    offset: 4,
+                                    font: { size: 10, weight: 'bold', family: 'Outfit' },
+                                    formatter: (value) => value > 0 ? value.toLocaleString() : ''
+                                },
+                                factor: {
+                                    color: (context) => {
+                                        const f = parseFloat(stats.factors[context.dataIndex]);
+                                        return f > 0 ? (f <= 4.4 ? '#10b981' : '#ef4444') : '#f59e0b';
+                                    },
+                                    anchor: 'end',
+                                    align: 'top',
+                                    offset: 50,
+                                    font: { size: 32, weight: '900', family: 'Outfit' },
+                                    formatter: (value, context) => {
+                                        const factor = stats.factors[context.dataIndex];
+                                        return factor && factor !== '0' ? `${factor}x` : '';
+                                    }
+                                }
+                            }
                         }
                     }
                 ]
@@ -1177,7 +1191,7 @@ export class AppController {
                     y: { 
                         beginAtZero: true,
                         // Add some padding for labels at the top
-                        suggestedMax: Math.max(...(stats.fresco.length ? stats.fresco : [1000])) * 1.15
+                        suggestedMax: Math.max(...(stats.fresco.length ? stats.fresco : [1000])) * 1.25
                     }
                 }
             }
