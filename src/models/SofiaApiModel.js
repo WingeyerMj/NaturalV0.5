@@ -21,13 +21,30 @@ export class SofiaApiModel {
         const predio = parts[1] || '';
         const variedad = parts[2] && !parts[2].includes('Ha:') ? parts[2] : '';
 
-        const haMatch = cuartelStr.match(/Ha:([\d.,]+)/);
+        const haMatch = cuartelStr.match(/Ha:([\d.]+)/);
         const plMatch = cuartelStr.match(/Pl:([\d.,]+)/);
 
         let ha = 0;
         if (haMatch) {
-            // Remove dots (thousands) and fix comma to dot (decimal)
-            ha = parseFloat(haMatch[1].replace(/\./g, '').replace(',', '.')) || 0;
+            let val = haMatch[1];
+            // Sofia's Cuartel string often contains hectares like "2.200" (meaning 2.2) 
+            // or "144.830" (meaning 144.83).
+            // If we have a dot and no comma, it's ALMOST CERTAINLY a decimal.
+            if (!val.includes(',') && val.includes('.')) {
+                // If there's exactly one dot, treat it as decimal regardless of digits count
+                // (parseFloat handles this naturally)
+                ha = parseFloat(val) || 0;
+            } else if (val.includes(',') && val.includes('.')) {
+                // Classic format: 1.234,56 -> remove dot, change comma to dot
+                ha = parseFloat(val.replace(/\./g, '').replace(',', '.')) || 0;
+            } else {
+                // Only comma: 2,2 -> 2.2
+                ha = parseFloat(val.replace(',', '.')) || 0;
+            }
+            
+            // SECURITY CHECK: If resulting HA is suspiciously high (thousands), and originated from a dot-format, 
+            // it's likely a misinterpretation of a 3-digit decimal as thousands.
+            // But we already handle that in the first condition.
         }
 
         let pl = 0;
@@ -631,16 +648,18 @@ export class SofiaApiModel {
             // 2. Track Unique Physical Area (Denominator)
             // Use Cuartel as unique identifier for area
             if (r.cuartel && !uniqueCuarteles.has(r.cuartel)) {
-                uniqueCuarteles.set(r.cuartel, { ha: r.hectareas, predio: predioName });
+                const info = this.parseCuartelInfo(r.cuartel);
+                uniqueCuarteles.set(r.cuartel, { ha: info.ha, predio: predioName });
 
-                // Skip "Gral" cuarteles from El Espejo for hectares count
-                const isGralEspejo = groupName === 'El Espejo' && r.cuartel.toLowerCase().includes('gral');
-                if (!isGralEspejo) {
+                // Skip "Gral" (General) or aggregate cuarteles for area calculation 
+                // typically used for overhead/administration tasks in Sofia
+                const isGeneral = r.cuartel.toLowerCase().includes('gral');
+                if (!isGeneral) {
                     // Add to Aggregates
-                    if (groupStats[groupName]) groupStats[groupName].area += r.hectareas;
+                    if (groupStats[groupName]) groupStats[groupName].area += info.ha;
 
                     if (!predioStats[predioName]) predioStats[predioName] = { jornales: 0, area: 0, costoArs: 0, name: predioName, group: groupName };
-                    predioStats[predioName].area += r.hectareas;
+                    predioStats[predioName].area += info.ha;
                 }
             }
 
@@ -696,16 +715,16 @@ export class SofiaApiModel {
             if (r.cuartel && !uniqueCuarteles.has(r.cuartel)) {
                 uniqueCuarteles.add(r.cuartel);
 
-                // Skip "Gral" (General) cuarteles for El Espejo — they are overhead, not physical area
-                const cuartelLower = r.cuartel.toLowerCase();
-                if (config.group === 'El Espejo' && cuartelLower.includes('gral')) return;
+                // Skip "Gral" (General) or aggregate cuarteles — they are overhead, not physical area
+                const isGeneral = r.cuartel.toLowerCase().includes('gral');
+                if (isGeneral) return;
 
                 const info = this.parseCuartelInfo(r.cuartel);
 
                 if (!predioMap[config.name]) {
                     predioMap[config.name] = { name: config.name, group: config.group, hectareas: 0, cuarteles: 0, plantas: 0, cuartelesList: [] };
                 }
-                const ha = r.hectareas || info.ha;
+                const ha = info.ha || r.hectareas;
                 predioMap[config.name].hectareas += ha;
                 predioMap[config.name].cuarteles += 1;
                 predioMap[config.name].plantas += info.pl;
@@ -723,7 +742,18 @@ export class SofiaApiModel {
         const groups = groupOrder.map(groupName => {
             const predios = Object.values(predioMap)
                 .filter(p => p.group === groupName)
-                .sort((a, b) => b.hectareas - a.hectareas);
+                .sort((a, b) => a.name.localeCompare(b.name));
+
+            predios.forEach(p => {
+                if (p.cuartelesList) {
+                    p.cuartelesList.sort((a, b) => {
+                        const numA = parseInt(a.numero.match(/\d+/)) || 0;
+                        const numB = parseInt(b.numero.match(/\d+/)) || 0;
+                        if (numA !== numB) return numA - numB;
+                        return a.numero.localeCompare(b.numero);
+                    });
+                }
+            });
 
             return {
                 name: groupName,
@@ -973,6 +1003,86 @@ export class SofiaApiModel {
             groups,
             grandTotalCosecha: groups.reduce((s, g) => s + g.totalCosecha, 0),
             grandTotalLevantado: groups.reduce((s, g) => s + g.totalLevantado, 0)
+        };
+    }
+
+    /**
+     * Groups Levantado records by Playa de Secadero (from 'nombre' field).
+     * Shows where the raisins are dried, aggregated by playa per predio/finca.
+     * Returns: { playas: [ { nombre, finca, predio, kg, jornadas, pasadas: {1: kg, 2: kg, ...} } ], 
+     *            byFinca: { fincaName: { totalKg, playas: [...] } },
+     *            grandTotalKg }
+     */
+    static getLevantadoPorPlayaStats(fullCycleData) {
+        const PREDIO_CONFIG = [
+            { keyword: 'Camino Truncado', group: 'Fincas Viejas', name: 'Camino Truncado' },
+            { keyword: 'La Chimbera', group: 'Fincas Viejas', name: 'La Chimbera' },
+            { keyword: 'Puente Alto', group: 'Fincas Viejas', name: 'Puente Alto' },
+            { keyword: 'EEIII', group: 'El Espejo', name: 'El Espejo 3' },
+            { keyword: 'EEII', group: 'El Espejo', name: 'El Espejo 2' },
+            { keyword: 'EEI', group: 'El Espejo', name: 'El Espejo 1' }
+        ];
+
+        // Key: "finca|playa", Value: { nombre, finca, predio, kg, jornadas, pasadas }
+        const playaMap = {};
+
+        fullCycleData.forEach(r => {
+            const labor = (r.labor || '').toLowerCase().trim();
+            if (!labor.includes('levantado')) return;
+
+            const nombre = (r.nombre || '').trim();
+            if (!nombre) return;
+
+            const rawPredio = r.clasifica || '';
+            const config = PREDIO_CONFIG.find(c => rawPredio.includes(c.keyword));
+            const predioName = config ? config.name : rawPredio;
+            const fincaName = r.finca || 'Sin Finca';
+
+            // Detect pass number
+            const passMatch = labor.match(/levantado\s*(\d+)/i);
+            const passNum = passMatch ? parseInt(passMatch[1]) : 1;
+
+            const kg = r.rendimiento_val || 0;
+            const jornadas = r.totalJornadas || 0;
+
+            const key = `${fincaName}|${nombre}`;
+            if (!playaMap[key]) {
+                playaMap[key] = {
+                    nombre,
+                    finca: fincaName,
+                    predio: predioName,
+                    kg: 0,
+                    jornadas: 0,
+                    pasadas: {}
+                };
+            }
+
+            playaMap[key].kg += kg;
+            playaMap[key].jornadas += jornadas;
+            
+            if (!playaMap[key].pasadas[passNum]) {
+                playaMap[key].pasadas[passNum] = 0;
+            }
+            playaMap[key].pasadas[passNum] += kg;
+        });
+
+        const playas = Object.values(playaMap).sort((a, b) => b.kg - a.kg);
+
+        // Group by finca
+        const byFinca = {};
+        playas.forEach(p => {
+            if (!byFinca[p.finca]) {
+                byFinca[p.finca] = { totalKg: 0, totalJornadas: 0, playas: [] };
+            }
+            byFinca[p.finca].totalKg += p.kg;
+            byFinca[p.finca].totalJornadas += p.jornadas;
+            byFinca[p.finca].playas.push(p);
+        });
+
+        return {
+            playas,
+            byFinca,
+            grandTotalKg: playas.reduce((s, p) => s + p.kg, 0)
         };
     }
 

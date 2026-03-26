@@ -17,10 +17,10 @@ const COLUMNS_MAP = {
     'Estado': ['Estado', 'Status', 'Situación'],
     'Variedad': ['Variedad', 'Cepa', 'Grape Variety'],
     'Costo': ['Total Producto', 'Costo', 'Cost', 'Importe', 'Monto USD', 'Monto en USD', 'Total USD', 'Monto en USDO'],
-    'N': ['Unidades N', 'N', 'Nitrogeno', 'Units N', 'Unid N', 'Nitrógeno'],
-    'P': ['Unidades P', 'P', 'Fosforo', 'Units P', 'Unid P', 'Fósforo', 'P2O5'],
-    'K': ['Unidades K', 'K', 'Unidades K2O', 'K20', 'K2O', 'Potasio', 'Units K', 'Unid K'],
-    'Ca': ['Unidades Ca', 'Ca', 'Calcio', 'Calcium'],
+    'N': ['unidades n', 'Unidades N', 'N', 'Nitrogeno', 'Units N', 'Unid N', 'Nitrógeno'],
+    'P': ['unidades p', 'Unidades P', 'P', 'Fosforo', 'Units P', 'Unid P', 'Fósforo', 'P2O5'],
+    'K': ['Potasio', 'Units K', 'Unid K', 'K2O'],
+    'Ca': ['unidades k', 'Unidades K', 'Unidades Ca', 'Ca', 'Calcio', 'Calcium'],
     'Has': ['Has Totales', 'Hectáreas', 'Area', 'Hectareas', 'Ha']
 };
 
@@ -220,6 +220,7 @@ export class SofiaImportModel {
             });
         }
         console.log(`[SofiaModel] Parse complete: ${rows.length} rows kept, ${skippedEmpty} empty/invalid skipped, ${skippedPendiente} pendientes skipped.`);
+        this.importRows(rows);
         return { rows };
     }
 
@@ -296,9 +297,9 @@ export class SofiaImportModel {
 
     static applyFilters(data, filters = {}) {
         return data.filter(r => {
-            if (filters.finca && r.finca_original !== filters.finca) return false;
+            if (filters.finca && (r.finca_original || '').toLowerCase() !== filters.finca.toLowerCase()) return false;
             if (filters.ciclo && r.ciclo !== filters.ciclo) return false;
-            if (filters.predio && r.clasifica !== filters.predio) return false;
+            if (filters.predio && (r.clasifica || '').toLowerCase() !== filters.predio.toLowerCase()) return false;
             if (filters.variedad && r.variedad !== filters.variedad) return false;
             if (filters.cuartel && r.cuartel !== filters.cuartel) return false;
             return true;
@@ -419,15 +420,17 @@ export class SofiaImportModel {
             
             const tr = (r.tipo_registro || '').toLowerCase();
             
+            // Deduplicate budget rows by Predio, Cuartel, Producto, and Type
+            // Deduplicate budget rows by including original_index to allow multiple rows per product/cuartel if they exist in the file
             if (tr.includes('presupuestado')) {
-                const budgetKey = `${clasifica}-${r.producto}-${tr}-${r.ciclo}`;
+                const budgetKey = `${clasifica}-${r.cuartel}-${r.producto}-${tr}-${r.ciclo}-${r.original_index}`;
                 if (!processedBudgets.has(budgetKey)) {
                     processedBudgets.add(budgetKey);
                     if (tr === 'presupuestado-pre') groups[key].pre += r.cantidad;
                     else if (tr === 'presupuestado-pos') groups[key].pos += r.cantidad;
                 }
-            } else if (tr === 'real') {
-                groups[key].real += r.cantidad;
+            } else {
+                if (tr === 'real') groups[key].real += r.cantidad;
             }
         });
 
@@ -467,13 +470,13 @@ export class SofiaImportModel {
             const tipo = (r.tipo_registro || '').toLowerCase();
             
             if (tipo.includes('presupuestado')) {
-                // Deduplicate budget rows by Predio, Producto, and Tipo
-                const budgetKey = `${clasificaKey}-${r.producto}-${tipo}-${r.ciclo}`;
+                // Deduplicate budget rows by including original_index to allow additive rows
+                const budgetKey = `${clasificaKey}-${r.cuartel}-${r.producto}-${tipo}-${r.ciclo}-${r.original_index}`;
                 if (!processedBudgets.has(budgetKey)) {
                     processedBudgets.add(budgetKey);
                     groups[key].pre += r.cantidad;
                 }
-            } else if (tipo === 'real') {
+            } else {
                 groups[key].real += r.cantidad;
             }
         });
@@ -628,14 +631,14 @@ export class SofiaImportModel {
 
     static getFertilizacionUnidades(filters = {}, fincaGroup = 'espejo') {
         const compositions = {
-            'NITRATO DE CALCIO': { n: 0.155, k: 0, p: 0 },
-            'NUTRI 1075 M': { n: 0.0048868, k: 0.0029810, p: 0 },
-            'NUTRI 1683 M': { n: 0.0126, k: 0.0284, p: 0 },
-            'NUTRI 1684 M': { n: 0.0062, k: 0.0125, p: 0 },
-            'SULFATO DE POTASIO': { n: 0, k: 0.50, p: 0 },
-            'UREA': { n: 0.46, k: 0, p: 0 },
-            'BIO-CRECIMIENTO': { n: 0.1, k: 0, p: 0 },
-            'NITRON 27': { n: 0.27, k: 0, p: 0 }
+            // Hardcoded compositions are now only used as fallback if CSV headers are missing or values are 0
+            'NITRATO DE CALCIO': { n: 0.155, ca: 0.26, k: 0, p: 0 }, 
+            'UREA': { n: 0.46, k: 0, p: 0, ca: 0 },
+            'BIO-CRECIMIENTO': { n: 0.1, k: 0, p: 0, ca: 0 },
+            'NITRON 27': { n: 0.27, k: 0, p: 0, ca: 0 },
+            'NUTRI 1075 M': { n: 0, p: 0, k: 0, ca: 0 },
+            'NUTRI 1683 M': { n: 0, p: 0, k: 0, ca: 0 },
+            'NUTRI 1684 M': { n: 0, p: 0, k: 0, ca: 0 }
         };
         const nutrientDensities = {};
         const budgetStats = {};
@@ -688,45 +691,50 @@ export class SofiaImportModel {
             if (r.cantidad > 0) {
                 const key = getGroupKey(r);
                 
-                // CRITICAL FIX: Sofia exports budget rows redundantly for every 'cuartel' or 'variedad'.
-                // Since the user defined budgets "por predio" (Fincas Viejas) or "por cuartel" (Espejo),
-                // we MUST deduplicate the budget based on the aggregation key, product, cycle, and budget type.
-                const uniqueKey = `${key}-${prod}-${tipo}-${r.ciclo}`;
-                if (processedBudgets.has(uniqueKey)) return; // Skip duplicate budget rows!
+                // CRITICAL FIX: Sofia exports budget rows which may be additive (one per block or operation).
+                // We include original_index to ensure every row from the source file is counted.
+                const uniqueKey = `${r.clasifica}-${r.cuartel}-${prod}-${r.ciclo}-${r.original_index}`;
+                if (processedBudgets.has(uniqueKey)) return; 
                 processedBudgets.add(uniqueKey);
 
                 // Get nutrient units: extract first from CSV, then override ONLY if our strict composition dictionary specifies a >0 multiplier
+                // Get nutrient units: extract first from CSV
                 let nUnits = r.n_units || 0;
                 let pUnits = r.p_units || 0;
                 let kUnits = r.k_units || 0;
+                let caUnits = r.ca_units || 0;
 
-                if (compositions[prod]) {
+                // ONLY use hardcoded compositions if CSV units are zero AND it's a Budget row
+                // (Real rows never have units, but we calculate them via ratio later)
+                if (nUnits === 0 && pUnits === 0 && kUnits === 0 && caUnits === 0 && compositions[prod]) {
                     const comp = compositions[prod];
                     if (comp.n > 0) nUnits = r.cantidad * comp.n;
                     if (comp.p > 0) pUnits = r.cantidad * comp.p;
                     if (comp.k > 0) kUnits = r.cantidad * comp.k;
+                    if (comp.ca > 0) caUnits = r.cantidad * comp.ca;
                 }
 
-                if (nUnits > 0 || pUnits > 0 || kUnits > 0) {
+                if (nUnits > 0 || pUnits > 0 || kUnits > 0 || caUnits > 0) {
                     const cycleMatch = !filters.ciclo || r.ciclo === filters.ciclo || r.ciclo === 'Unknown';
-                    const fincaMatch = !filters.finca || r.finca_original === filters.finca;
-                    const predioMatch = !filters.predio || r.clasifica === filters.predio;
-
+                    const fincaMatch = !filters.finca || (r.finca_original || '').toLowerCase() === filters.finca.toLowerCase();
+                    const predioMatch = !filters.predio || (r.clasifica || '').toLowerCase() === filters.predio.toLowerCase();
                     // Store per-group+product ratio for real calculations
                     const ratioKey = `${key}|${prod}`;
                     if (!nutrientDensities[ratioKey]) {
-                        nutrientDensities[ratioKey] = { n: 0, p: 0, k: 0, totalQty: 0 };
+                        nutrientDensities[ratioKey] = { n: 0, p: 0, k: 0, ca: 0, totalQty: 0 };
                     }
                     nutrientDensities[ratioKey].n += nUnits;
                     nutrientDensities[ratioKey].p += pUnits;
                     nutrientDensities[ratioKey].k += kUnits;
+                    nutrientDensities[ratioKey].ca += caUnits;
                     nutrientDensities[ratioKey].totalQty += r.cantidad;
 
                     if (cycleMatch && fincaMatch && predioMatch) {
-                        if (!budgetStats[key]) budgetStats[key] = { n: 0, p: 0, k: 0 };
+                        if (!budgetStats[key]) budgetStats[key] = { n: 0, p: 0, k: 0, ca: 0 };
                         budgetStats[key].n += nUnits;
                         budgetStats[key].p += pUnits;
                         budgetStats[key].k += kUnits;
+                        budgetStats[key].ca += caUnits;
                     }
                 }
             }
@@ -739,6 +747,7 @@ export class SofiaImportModel {
                 let rN = sums.n / sums.totalQty;
                 let rP = sums.p / sums.totalQty;
                 let rK = sums.k / sums.totalQty;
+                let rCa = sums.ca / sums.totalQty;
 
                 // Sanity Check: If Sofia export has percentage instead of absolute units (e.g. "10" for 10%), 
                 // the ratio would be e.g. 10. We cap it to reasonable levels based on known maxes.
@@ -747,8 +756,9 @@ export class SofiaImportModel {
                 if (rN > 0.8) rN = rN / 100;
                 if (rP > 0.8) rP = rP / 100;
                 if (rK > 0.8) rK = rK / 100;
+                if (rCa > 0.8) rCa = rCa / 100;
 
-                groupProductRatios[ratioKey] = { n: rN, p: rP, k: rK };
+                groupProductRatios[ratioKey] = { n: rN, p: rP, k: rK, ca: rCa };
             }
         });
 
@@ -767,9 +777,9 @@ export class SofiaImportModel {
             if (filters.budgetType === 'pre' && prod === 'BIO-CRECIMIENTO') return;
 
             const key = getGroupKey(r);
-            if (!realStats[key]) realStats[key] = { n: 0, p: 0, k: 0 };
+            if (!realStats[key]) realStats[key] = { n: 0, p: 0, k: 0, ca: 0 };
 
-            let appliedN = 0, appliedP = 0, appliedK = 0;
+            let appliedN = 0, appliedP = 0, appliedK = 0, appliedCa = 0;
 
             const ratioKey = `${key}|${prod}`;
             // Hierarchy: 1. Specific key (Cuartel/Parcela) -> 2. Predio level -> 3. Global average
@@ -778,12 +788,14 @@ export class SofiaImportModel {
                 appliedN = r.cantidad * ratios.n;
                 appliedP = r.cantidad * ratios.p;
                 appliedK = r.cantidad * ratios.k;
+                appliedCa = r.cantidad * ratios.ca;
             } else if (groupProductRatios[`${r.clasifica}|${prod}`]) {
                 // Try to use the ratio from the broader "Predio" (Clasifica) if Cuartel specific ratio is missing
                 const ratios = groupProductRatios[`${r.clasifica}|${prod}`];
                 appliedN = r.cantidad * ratios.n;
                 appliedP = r.cantidad * ratios.p;
                 appliedK = r.cantidad * ratios.k;
+                appliedCa = r.cantidad * ratios.ca;
             } else {
                 // Fallback: average ratio from other groups that have this product
                 const prodRatios = Object.entries(groupProductRatios)
@@ -794,15 +806,18 @@ export class SofiaImportModel {
                     const avgN = prodRatios.reduce((s, r) => s + r.n, 0) / prodRatios.length;
                     const avgP = prodRatios.reduce((s, r) => s + r.p, 0) / prodRatios.length;
                     const avgK = prodRatios.reduce((s, r) => s + r.k, 0) / prodRatios.length;
+                    const avgCa = prodRatios.reduce((s, r) => s + r.ca, 0) / prodRatios.length;
                     appliedN = r.cantidad * avgN;
                     appliedP = r.cantidad * avgP;
                     appliedK = r.cantidad * avgK;
+                    appliedCa = r.cantidad * avgCa;
                 }
             }
 
             realStats[key].n += appliedN;
             realStats[key].p += appliedP;
             realStats[key].k += appliedK;
+            realStats[key].ca += appliedCa;
         });
 
         // ── 3. Merge and return ──
@@ -813,6 +828,7 @@ export class SofiaImportModel {
             n: { budget: parseFloat((budgetStats[name]?.n || 0).toFixed(2)), real: parseFloat((realStats[name]?.n || 0).toFixed(2)) },
             p: { budget: parseFloat((budgetStats[name]?.p || 0).toFixed(2)), real: parseFloat((realStats[name]?.p || 0).toFixed(2)) },
             k: { budget: parseFloat((budgetStats[name]?.k || 0).toFixed(2)), real: parseFloat((realStats[name]?.k || 0).toFixed(2)) },
+            ca: { budget: parseFloat((budgetStats[name]?.ca || 0).toFixed(2)), real: parseFloat((realStats[name]?.ca || 0).toFixed(2)) },
         })).sort((a, b) => a.name.localeCompare(b.name));
     }
 }
