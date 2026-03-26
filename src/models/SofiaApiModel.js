@@ -138,8 +138,9 @@ export class SofiaApiModel {
 
         const results = [];
         const files = [
-            { path: '/Fuentes/Auxiliares/EE_aplicacion.csv', finca: 'El Espejo' },
-            { path: '/Fuentes/Auxiliares/FV_aplicacion.csv', finca: 'Fincas Viejas' }
+            { path: '/Fuentes/Auxiliares/EE_aplicacion.csv', finca: 'El Espejo', type: 'aplicacion' },
+            { path: '/Fuentes/Auxiliares/FV_aplicacion.csv', finca: 'Fincas Viejas', type: 'aplicacion' },
+            { path: '/Fuentes/Auxiliares/pasaHumeda_EE.csv', finca: 'El Espejo', type: 'pasa_humeda' }
         ];
 
         for (const file of files) {
@@ -154,35 +155,79 @@ export class SofiaApiModel {
 
                 for (let i = 1; i < lines.length; i++) {
                     const cols = lines[i].split(';').map(c => c.replace(/^"|"$/g, '').trim());
-                    if (cols.length < 13) continue;
+                    
+                    if (file.type === 'pasa_humeda') {
+                        if (cols.length < 10) continue;
+                        
+                        let fechaStr = cols[2];
+                        if (!fechaStr) continue;
+                        fechaStr = fechaStr.replace(/\//g, '-');
+                        const parts = fechaStr.split('-');
+                        if (parts.length !== 3) continue;
+                        const y = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+                        const m = parts[1].padStart(2, '0');
+                        const d = parts[0].padStart(2, '0');
+                        const fecha = `${y}-${m}-${d}`;
 
-                    let fechaStr = cols[2];
-                    if (!fechaStr) continue;
-                    fechaStr = fechaStr.replace(/\//g, '-');
-                    const parts = fechaStr.split('-');
-                    if (parts.length !== 3) continue;
+                        const qty = parseFloat((cols[9] || '0').replace(/\./g, '').replace(',', '.')) || 0;
+                        const jornadas = parseFloat((cols[18] || '0').replace(',', '.')) || 0;
+                        
+                        // Extract sector name (e.g. "001")
+                        const cuartelParts = cols[4].split('-');
+                        const sectorCode = cuartelParts[0].trim();
+                        const nombre = `Sector ${sectorCode}`;
 
-                    const y = parts[2].length === 2 ? '20' + parts[2] : parts[2];
-                    const m = parts[1].padStart(2, '0');
-                    const d = parts[0].padStart(2, '0');
-                    const fecha = `${y}-${m}-${d}`; // Guaranteed YYYY-MM-DD
+                        results.push({
+                            finca: file.finca,
+                            fecha: fecha,
+                            clasifica: cols[3], // "Pasa Húmeda"
+                            cuartel: cols[4],
+                            nombre: nombre,
+                            variedad: cols[5] || '',
+                            labor: cols[7],
+                            jornada: jornadas,
+                            rendimiento: qty,
+                            persona: cols[17] || '',
+                            valor_total_jornada: 0,
+                            origen_archivo: 'CSV Pasa Humeda',
+                            isPasaHumeda: true
+                        });
+                    } else {
+                        if (cols.length < 13) continue;
 
-                    let jVal = parseFloat((cols[12] || '0').replace(',', '.')) || 0;
-                    if (jVal === 0) jVal = 1;
+                        let fechaStr = cols[2];
+                        if (!fechaStr) continue;
+                        fechaStr = fechaStr.replace(/\//g, '-');
+                        const parts = fechaStr.split('-');
+                        if (parts.length !== 3) continue;
+                        const y = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+                        const m = parts[1].padStart(2, '0');
+                        const d = parts[0].padStart(2, '0');
+                        const fecha = `${y}-${m}-${d}`;
 
-                    results.push({
-                        finca: file.finca,
-                        fecha: fecha,
-                        clasifica: cols[3],
-                        cuartel: cols[5],
-                        variedad: cols[7],
-                        labor: cols[9],
-                        jornada: jVal,
-                        rendimiento: 0,
-                        persona: cols[13] || cols[14] || cols[15] || '',
-                        valor_total_jornada: parseFloat((cols[10] || '0').replace('$', '').replace(/\./g, '').replace(',', '.')) || 0,
-                        origen_archivo: 'CSV Auxiliar'
-                    });
+                        let jVal = parseFloat((cols[12] || '0').replace(',', '.')) || 0;
+                        if (jVal === 0) jVal = 1;
+
+                        // Also extract sector name for applications if needed (not strictly for harvest but better consistency)
+                        const cuartelParts = cols[5].split('-');
+                        const sectorCode = cuartelParts[0].trim();
+                        const nombre = sectorCode.includes('Playa') ? sectorCode : `Sector ${sectorCode}`;
+
+                        results.push({
+                            finca: file.finca,
+                            fecha: fecha,
+                            clasifica: cols[3],
+                            cuartel: cols[5],
+                            nombre: nombre,
+                            variedad: cols[7],
+                            labor: cols[9],
+                            jornada: jVal,
+                            rendimiento: 0,
+                            persona: cols[13] || cols[14] || cols[15] || '',
+                            valor_total_jornada: parseFloat((cols[10] || '0').replace('$', '').replace(/\./g, '').replace(',', '.')) || 0,
+                            origen_archivo: 'CSV Auxiliar'
+                        });
+                    }
                 }
             } catch (e) {
                 console.warn(`[Auxiliares] Error al cargar ${file.path}:`, e);
@@ -1017,18 +1062,20 @@ export class SofiaApiModel {
         const PREDIO_CONFIG = [
             { keyword: 'Camino Truncado', group: 'Fincas Viejas', name: 'Camino Truncado' },
             { keyword: 'La Chimbera', group: 'Fincas Viejas', name: 'La Chimbera' },
-            { keyword: 'Puente Alto', group: 'Fincas Viejas', name: 'Puente Alto' },
-            { keyword: 'EEIII', group: 'El Espejo', name: 'El Espejo 3' },
-            { keyword: 'EEII', group: 'El Espejo', name: 'El Espejo 2' },
-            { keyword: 'EEI', group: 'El Espejo', name: 'El Espejo 1' }
+            { keyword: 'Puente Alto', group: 'Fincas Viejas', name: 'Camino Truncado' },
+            { keyword: 'EEIII', group: 'El Espejo', name: 'El Espejo' },
+            { keyword: 'EEII', group: 'El Espejo', name: 'El Espejo' },
+            { keyword: 'EEI', group: 'El Espejo', name: 'El Espejo' }
         ];
 
-        // Key: "finca|playa", Value: { nombre, finca, predio, kg, jornadas, pasadas }
+        // Key: "finca|playa", Value: { nombre, finca, predio, kg, kgFresco, jornadas, pasadas, cosechaPasadas }
         const playaMap = {};
 
         fullCycleData.forEach(r => {
             const labor = (r.labor || '').toLowerCase().trim();
-            if (!labor.includes('levantado')) return;
+            const isLevantado = labor.includes('levantado');
+            const isCosechaKg = labor.includes('cosecha kg');
+            if (!isLevantado && !isCosechaKg) return;
 
             const nombre = (r.nombre || '').trim();
             if (!nombre) return;
@@ -1037,10 +1084,6 @@ export class SofiaApiModel {
             const config = PREDIO_CONFIG.find(c => rawPredio.includes(c.keyword));
             const predioName = config ? config.name : rawPredio;
             const fincaName = r.finca || 'Sin Finca';
-
-            // Detect pass number
-            const passMatch = labor.match(/levantado\s*(\d+)/i);
-            const passNum = passMatch ? parseInt(passMatch[1]) : 1;
 
             const kg = r.rendimiento_val || 0;
             const jornadas = r.totalJornadas || 0;
@@ -1052,18 +1095,48 @@ export class SofiaApiModel {
                     finca: fincaName,
                     predio: predioName,
                     kg: 0,
+                    kgFresco: 0,
+                    kgPasaHumeda: 0,
                     jornadas: 0,
-                    pasadas: {}
+                    jornadasPasaHumeda: 0,
+                    pasadas: {},
+                    cosechaPasadas: {},
+                    pasaHumedaPasadas: {}
                 };
             }
 
-            playaMap[key].kg += kg;
-            playaMap[key].jornadas += jornadas;
-            
-            if (!playaMap[key].pasadas[passNum]) {
-                playaMap[key].pasadas[passNum] = 0;
+            if (isLevantado) {
+                // Detect pass number for levantado
+                const passMatch = labor.match(/levantado\s*(\d+)/i);
+                const passNum = passMatch ? parseInt(passMatch[1]) : 1;
+
+                if (r.isPasaHumeda) {
+                    playaMap[key].kgPasaHumeda += kg;
+                    playaMap[key].jornadasPasaHumeda += jornadas;
+                    if (!playaMap[key].pasaHumedaPasadas[passNum]) {
+                        playaMap[key].pasaHumedaPasadas[passNum] = 0;
+                    }
+                    playaMap[key].pasaHumedaPasadas[passNum] += kg;
+                } else {
+                    playaMap[key].kg += kg;
+                    playaMap[key].jornadas += jornadas;
+                    if (!playaMap[key].pasadas[passNum]) {
+                        playaMap[key].pasadas[passNum] = 0;
+                    }
+                    playaMap[key].pasadas[passNum] += kg;
+                }
+            } else if (isCosechaKg) {
+                // Detect pass number for cosecha
+                const passMatch = labor.match(/cosecha\s*kg\s*(\d+)/i);
+                const passNum = passMatch ? parseInt(passMatch[1]) : 1;
+
+                playaMap[key].kgFresco += kg;
+                
+                if (!playaMap[key].cosechaPasadas[passNum]) {
+                    playaMap[key].cosechaPasadas[passNum] = 0;
+                }
+                playaMap[key].cosechaPasadas[passNum] += kg;
             }
-            playaMap[key].pasadas[passNum] += kg;
         });
 
         const playas = Object.values(playaMap).sort((a, b) => b.kg - a.kg);
@@ -1072,17 +1145,25 @@ export class SofiaApiModel {
         const byFinca = {};
         playas.forEach(p => {
             if (!byFinca[p.finca]) {
-                byFinca[p.finca] = { totalKg: 0, totalJornadas: 0, playas: [] };
+                byFinca[p.finca] = { totalKg: 0, totalKgFresco: 0, totalKgPasaHumeda: 0, totalJornadas: 0, playas: [] };
             }
             byFinca[p.finca].totalKg += p.kg;
-            byFinca[p.finca].totalJornadas += p.jornadas;
+            byFinca[p.finca].totalKgFresco += p.kgFresco;
+            byFinca[p.finca].totalKgPasaHumeda += p.kgPasaHumeda;
+            byFinca[p.finca].totalJornadas += (p.jornadas + p.jornadasPasaHumeda);
             byFinca[p.finca].playas.push(p);
         });
+
+        const grandTotalKg = playas.reduce((s, p) => s + p.kg, 0);
+        const grandTotalKgFresco = playas.reduce((s, p) => s + p.kgFresco, 0);
+        const grandTotalKgPasaHumeda = playas.reduce((s, p) => s + p.kgPasaHumeda, 0);
 
         return {
             playas,
             byFinca,
-            grandTotalKg: playas.reduce((s, p) => s + p.kg, 0)
+            grandTotalKg,
+            grandTotalKgFresco,
+            grandTotalKgPasaHumeda
         };
     }
 

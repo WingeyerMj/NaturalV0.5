@@ -1913,10 +1913,11 @@ export function renderLevantadoPorPlaya(playaStats) {
 
   const fincaNames = Object.keys(playaStats.byFinca).sort();
   
-  // Find all unique pass numbers across all playas
+  // Find all unique pass numbers across all playas (both levantado and cosecha)
   const allPasses = new Set();
   playaStats.playas.forEach(p => {
     Object.keys(p.pasadas).forEach(k => allPasses.add(parseInt(k)));
+    Object.keys(p.cosechaPasadas || {}).forEach(k => allPasses.add(parseInt(k)));
   });
   const passes = Array.from(allPasses).sort((a, b) => a - b);
 
@@ -1937,7 +1938,9 @@ export function renderLevantadoPorPlaya(playaStats) {
     '#10b981', '#3b82f6', '#a855f7', '#f59e0b', '#ec4899', '#06b6d4'
   ];
 
-  const colCount = 2 + passes.length + 2; // playa + predio + passes + total + %
+  // Compute global factor 
+  const globalFactor = playaStats.grandTotalKg > 0 && playaStats.grandTotalKgFresco > 0 
+    ? (playaStats.grandTotalKgFresco / playaStats.grandTotalKg) : 0;
 
   return `
     <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
@@ -1947,23 +1950,31 @@ export function renderLevantadoPorPlaya(playaStats) {
       </h3>
       <p style="color: var(--text-tertiary); font-size: 0.85em; margin: 0;">
         Detalle de las playas (secaderos) donde se tiende la pasa, agrupado por finca y predio. Total general: <strong style="color: var(--color-accent-400);">${fmt(playaStats.grandTotalKg)} kg</strong>
+        ${playaStats.grandTotalKgFresco > 0 ? ` · Cosecha Fresco: <strong style="color: #10b981;">${fmt(playaStats.grandTotalKgFresco)} kg</strong>` : ''}
+        ${globalFactor > 0 ? ` · Factor Global: <strong style="color: #f59e0b;">${globalFactor.toFixed(2)}</strong>` : ''}
       </p>
     </div>
 
     ${fincaNames.map(fincaName => {
       const fData = playaStats.byFinca[fincaName];
       const colors = fincaColors[fincaName] || fincaColors['Fincas Viejas'];
+      const fincaFactor = fData.totalKg > 0 && fData.totalKgFresco > 0 
+        ? (fData.totalKgFresco / fData.totalKg) : 0;
       
       // Group playas by predio within this finca
       const byPredio = {};
       fData.playas.forEach(p => {
         const pName = p.predio || 'Sin Predio';
-        if (!byPredio[pName]) byPredio[pName] = { playas: [], totalKg: 0 };
+        if (!byPredio[pName]) byPredio[pName] = { playas: [], totalKg: 0, totalKgFresco: 0 };
         byPredio[pName].playas.push(p);
         byPredio[pName].totalKg += p.kg;
+        byPredio[pName].totalKgFresco += (p.kgFresco || 0);
       });
       // Sort predios by name
       const predioNames = Object.keys(byPredio).sort();
+
+      // Check if there's any cosecha data in this finca
+      const hasCosechaData = fData.totalKgFresco > 0;
 
       return `
       <div class="data-table-container animate-fade-in animate-delay-1" style="padding: var(--space-6); border-left: 4px solid ${colors.accent}; margin-bottom: var(--space-6);">
@@ -1975,18 +1986,27 @@ export function renderLevantadoPorPlaya(playaStats) {
             <div style="background: rgba(168, 85, 247, 0.1); color: var(--color-accent-400); padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
               🫘 ${fmt(fData.totalKg)} kg total
             </div>
+            ${hasCosechaData ? `
+            <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
+              🍇 ${fmt(fData.totalKgFresco)} kg fresco
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
+              ⚖️ Factor: ${fincaFactor.toFixed(2)}
+            </div>` : ''}
             <div style="background: rgba(59, 130, 246, 0.1); color: var(--color-primary-400); padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
               📍 ${fData.playas.length} playas · ${predioNames.length} predios
             </div>
           </div>
         </div>
         <div style="overflow-x: auto;">
-          <table class="data-table" style="margin: 0; min-width: 600px;">
+          <table class="data-table" style="margin: 0; min-width: 750px;">
             <thead>
               <tr>
                 <th style="min-width: 180px;">Playa de Secadero</th>
-                ${passes.map(n => `<th style="text-align: right; font-size: 0.8em; text-transform: uppercase; white-space: nowrap;">Levantado ${n}</th>`).join('')}
+                <th style="min-width: 60px; font-size: 0.8em;">Tipo</th>
+                ${passes.map(n => `<th style="text-align: right; font-size: 0.8em; text-transform: uppercase; white-space: nowrap;">Pasada ${n}</th>`).join('')}
                 <th style="text-align: right;">Total Kg</th>
+                <th style="text-align: center; min-width: 70px; background: rgba(245, 158, 11, 0.06);">Factor</th>
                 <th style="text-align: right;">% del Total</th>
               </tr>
             </thead>
@@ -1995,12 +2015,22 @@ export function renderLevantadoPorPlaya(playaStats) {
                 const pData = byPredio[predioName];
                 const pColor = predioTextColors[pi % predioTextColors.length];
                 const pBg = predioColors[pi % predioColors.length];
-                const predioPlayas = pData.playas.sort((a, b) => b.kg - a.kg);
+                const predioPlayas = pData.playas.sort((a, b) => {
+                  if (fincaName === 'El Espejo' || fincaName === 'Fincas Viejas') {
+                    return a.nombre.localeCompare(b.nombre, undefined, { numeric: true });
+                  }
+                  return b.kg - a.kg;
+                });
+                const predioFactor = pData.totalKg > 0 && pData.totalKgFresco > 0 
+                  ? (pData.totalKgFresco / pData.totalKg) : 0;
                 
+                // Skip predio header/footer if it's El Espejo or a single predio matching finca name
+                const isSingleGroup = fincaName === 'El Espejo' || (predioNames.length === 1 && predioName === fincaName);
+
                 // Predio sub-header row
-                const predioHeader = `
+                const predioHeader = isSingleGroup ? '' : `
                 <tr>
-                  <td colspan="${1 + passes.length + 2}" style="background: ${pBg}; padding: 8px 16px; border-bottom: 2px solid ${pColor}30;">
+                  <td colspan="${2 + passes.length + 3}" style="background: ${pBg}; padding: 8px 16px; border-bottom: 2px solid ${pColor}30;">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
                       <strong style="color: ${pColor}; font-size: 0.95em;">📋 ${predioName}</strong>
                       <span style="color: ${pColor}; font-size: 0.8em; font-weight: 600;">${fmt(pData.totalKg)} kg · ${predioPlayas.length} playas</span>
@@ -2008,23 +2038,37 @@ export function renderLevantadoPorPlaya(playaStats) {
                   </td>
                 </tr>`;
                 
-                // Playa rows for this predio
+                // Playa rows for this predio - now with 2 rows per playa (Pasa + Fresco)
                 const playaRows = predioPlayas.map(playa => {
-                  const pct = playaStats.grandTotalKg > 0 ? (playa.kg / playaStats.grandTotalKg * 100) : 0;
-                  return `
-                  <tr>
-                    <td style="padding-left: 28px;">
+                  const hasPlayaCosecha = (playa.kgFresco || 0) > 0;
+                  const hasPlayaPasaHumeda = (playa.kgPasaHumeda || 0) > 0;
+                  const totalPlayaKg = (playa.kg || 0) + (playa.kgPasaHumeda || 0);
+                  const playaRowsCount = 1 + (hasPlayaCosecha ? 1 : 0) + (hasPlayaPasaHumeda ? 1 : 0);
+
+                  const pct = playaStats.grandTotalKg > 0 ? (totalPlayaKg / (playaStats.grandTotalKg + (playaStats.grandTotalKgPasaHumeda || 0)) * 100) : 0;
+                  const playaFactor = totalPlayaKg > 0 && playa.kgFresco > 0 
+                    ? (playa.kgFresco / totalPlayaKg) : 0;
+
+                  const borderStyle = (isLast) => isLast ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: none;';
+
+                  // Row 1: Levantado (Pasa)
+                  const isPasaLast = !hasPlayaCosecha && !hasPlayaPasaHumeda;
+                  let rows = `
+                  <tr style="${borderStyle(isPasaLast)}">
+                    <td rowspan="${playaRowsCount}" style="padding-left: 28px; vertical-align: middle; border-bottom: 2px solid var(--border-subtle);">
                       <div style="display: flex; align-items: center; gap: var(--space-2);">
                         <span style="color: #f97316; font-size: 1.1em;">🏖️</span>
                         <strong>${playa.nombre}</strong>
                       </div>
                     </td>
+                    <td style="font-size: 0.8em; color: var(--color-accent-400); font-weight: 600;">🫘 Pasa</td>
                     ${passes.map(n => {
                       const val = playa.pasadas[n] || 0;
                       return `<td style="text-align: right; ${val > 0 ? 'color: var(--color-accent-400); font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
                     }).join('')}
                     <td style="text-align: right; font-weight: 700; color: var(--color-accent-500);">${fmt(playa.kg)}</td>
-                    <td style="text-align: right;">
+                    <td rowspan="${playaRowsCount}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.06); border-bottom: 2px solid var(--border-subtle);">${playaFactor > 0 ? playaFactor.toFixed(2) : '—'}</td>
+                    <td rowspan="${playaRowsCount}" style="text-align: right; vertical-align: middle; border-bottom: 2px solid var(--border-subtle);">
                       <div style="display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2);">
                         <div style="width: 60px; height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden;">
                           <div style="width: ${Math.min(pct, 100)}%; height: 100%; background: var(--color-accent-500); border-radius: 3px;"></div>
@@ -2033,37 +2077,89 @@ export function renderLevantadoPorPlaya(playaStats) {
                       </div>
                     </td>
                   </tr>`;
+
+                  // Row 2: Cosecha (Fresco)
+                  if (hasPlayaCosecha) {
+                    const isFrescoLast = !hasPlayaPasaHumeda;
+                    rows += `
+                    <tr style="${borderStyle(isFrescoLast)}">
+                      <td style="font-size: 0.8em; color: #10b981; font-weight: 600;">🍇 Fresco</td>
+                      ${passes.map(n => {
+                        const val = (playa.cosechaPasadas || {})[n] || 0;
+                        return `<td style="text-align: right; ${val > 0 ? 'color: #10b981; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
+                      }).join('')}
+                      <td style="text-align: right; font-weight: 700; color: #059669;">${fmt(playa.kgFresco)}</td>
+                    </tr>`;
+                  }
+
+                  // Row 3: Pasa Húmeda
+                  if (hasPlayaPasaHumeda) {
+                    rows += `
+                    <tr style="border-bottom: 2px solid var(--border-subtle);">
+                      <td style="font-size: 0.8em; color: #3b82f6; font-weight: 600;">💧 Pasa Húm.</td>
+                      ${passes.map(n => {
+                        const val = (playa.pasaHumedaPasadas || {})[n] || 0;
+                        return `<td style="text-align: right; ${val > 0 ? 'color: #3b82f6; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
+                      }).join('')}
+                      <td style="text-align: right; font-weight: 700; color: #2563eb;">${fmt(playa.kgPasaHumeda)}</td>
+                    </tr>`;
+                  }
+
+                  return rows;
                 }).join('');
 
-                // Predio subtotal row
-                const predioSubtotal = `
-                <tr style="background: ${pBg}; font-weight: 600; border-bottom: 2px solid var(--border-subtle);">
-                  <td style="padding-left: 28px; color: ${pColor}; font-size: 0.85em;">Subtotal ${predioName}</td>
+                // Predio subtotal row  
+                const predioSubFresco = predioPlayas.reduce((s, p) => s + (p.kgFresco || 0), 0);
+                const predioSubtotal = isSingleGroup ? '' : `
+                <tr style="background: ${pBg}; font-weight: 600; border-bottom: none;">
+                  <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="padding-left: 28px; color: ${pColor}; font-size: 0.85em; vertical-align: middle; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">Subtotal ${predioName}</td>
+                  <td style="font-size: 0.75em;">🫘</td>
                   ${passes.map(n => {
                     const sub = predioPlayas.reduce((s, p) => s + (p.pasadas[n] || 0), 0);
                     return `<td style="text-align: right; color: ${pColor}; font-size: 0.9em;">${sub > 0 ? fmt(sub) : '—'}</td>`;
                   }).join('')}
                   <td style="text-align: right; color: ${pColor};">${fmt(pData.totalKg)}</td>
-                  <td style="text-align: right; color: var(--text-secondary); font-size: 0.85em;">
+                  <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.06); ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">${predioFactor > 0 ? predioFactor.toFixed(2) : '—'}</td>
+                  <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="text-align: right; color: var(--text-secondary); font-size: 0.85em; vertical-align: middle; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">
                     ${fmtDec(playaStats.grandTotalKg > 0 ? (pData.totalKg / playaStats.grandTotalKg * 100) : 0)}%
                   </td>
-                </tr>`;
+                </tr>
+                ${predioSubFresco > 0 ? `
+                <tr style="background: ${pBg}; font-weight: 600; border-bottom: 2px solid var(--border-subtle);">
+                  <td style="font-size: 0.75em;">🍇</td>
+                  ${passes.map(n => {
+                    const sub = predioPlayas.reduce((s, p) => s + ((p.cosechaPasadas || {})[n] || 0), 0);
+                    return `<td style="text-align: right; color: #10b981; font-size: 0.9em;">${sub > 0 ? fmt(sub) : '—'}</td>`;
+                  }).join('')}
+                  <td style="text-align: right; color: #059669;">${fmt(predioSubFresco)}</td>
+                </tr>` : ''}`;
                 
                 return predioHeader + playaRows + predioSubtotal;
               }).join('')}
             </tbody>
             <tfoot style="background: ${colors.bg}; font-weight: 700;">
-              <tr>
-                <td>Total ${fincaName}</td>
+              <tr style="border-bottom: none;">
+                <td rowspan="${hasCosechaData ? '2' : '1'}" style="vertical-align: middle;">Total ${fincaName}</td>
+                <td style="font-size: 0.75em;">🫘</td>
                 ${passes.map(n => {
                   const subtotal = fData.playas.reduce((s, p) => s + (p.pasadas[n] || 0), 0);
                   return `<td style="text-align: right; color: var(--color-accent-500);">${subtotal > 0 ? fmt(subtotal) : '—'}</td>`;
                 }).join('')}
                 <td style="text-align: right; color: var(--color-accent-600);">${fmt(fData.totalKg)}</td>
-                <td style="text-align: right; color: var(--text-secondary);">
+                <td rowspan="${hasCosechaData ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: #f59e0b;">${fincaFactor > 0 ? fincaFactor.toFixed(2) : '—'}</td>
+                <td rowspan="${hasCosechaData ? '2' : '1'}" style="text-align: right; color: var(--text-secondary); vertical-align: middle;">
                   ${fmtDec(playaStats.grandTotalKg > 0 ? (fData.totalKg / playaStats.grandTotalKg * 100) : 0)}%
                 </td>
               </tr>
+              ${hasCosechaData ? `
+              <tr>
+                <td style="font-size: 0.75em;">🍇</td>
+                ${passes.map(n => {
+                  const subtotal = fData.playas.reduce((s, p) => s + ((p.cosechaPasadas || {})[n] || 0), 0);
+                  return `<td style="text-align: right; color: #10b981;">${subtotal > 0 ? fmt(subtotal) : '—'}</td>`;
+                }).join('')}
+                <td style="text-align: right; color: #059669;">${fmt(fData.totalKgFresco)}</td>
+              </tr>` : ''}
             </tfoot>
           </table>
         </div>
@@ -2071,6 +2167,7 @@ export function renderLevantadoPorPlaya(playaStats) {
     }).join('')}
   `;
 }
+
 
 export function renderWorkLogView(data, catalogs) {
   const { fincas, predios, cuarteles, faenas, empleados, productos } = catalogs;
