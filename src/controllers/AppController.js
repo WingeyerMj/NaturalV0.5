@@ -34,7 +34,7 @@ import {
     renderInformeAplicaciones, renderSofiaResumen, renderSofiaFoliares,
     renderSofiaHerbicidas, renderFertilizacionComparativa, formatCurrency,
     renderHectareasPorPredio, renderEficienciaChartSection,
-    renderCosechaLevantadoTable, renderAdminCrudView, renderWorkLogView,
+    renderCosechaLevantadoTable, renderLevantadoPorPlaya, renderAdminCrudView, renderWorkLogView,
     renderGastosView, renderSecaderosView, renderGastosHistoricosView,
     renderControlCargaView, renderPresupuestoProyeccionView
 } from '../views/Views.js';
@@ -1065,8 +1065,9 @@ export class AppController {
             const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, { finca: clFiltersState.finca });
             const clStats = SofiaApiModel.getCosechaLevantadoStats(fullFiltered);
             const pasaEvolStats = SofiaApiModel.getCosechaComparativaPorPredio(fullFiltered); // FIXED METHOD NAME
+            const playaStats = SofiaApiModel.getLevantadoPorPlayaStats(fullFiltered);
 
-            container.innerHTML = renderCosechaLevantadoTable(clStats, clFiltersState.finca, clFiltersState.ciclo);
+            container.innerHTML = renderCosechaLevantadoTable(clStats, clFiltersState.finca, clFiltersState.ciclo) + renderLevantadoPorPlaya(playaStats);
             
             // Render the new chart manually
             this.renderCosechaPasaPrediosChart(pasaEvolStats);
