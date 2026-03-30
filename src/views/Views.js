@@ -1546,6 +1546,11 @@ export function renderCosechaDashboard(stats, userRole = 'Administrador') {
   const isAdmin = userRole === 'Administrador';
 
   return `
+    <!-- Power BI Embed -->
+    <div style="width: 100%; height: 800px; margin-bottom: var(--space-8); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+        <iframe title="Power BI Dashboard" width="100%" height="100%" src="https://app.powerbi.com/view?r=eyJrIjoiNTRjODBhMzktYTQzOC00MDQzLTgxYzktODM4ZmFmZWNjYWI3IiwidCI6ImNmMDc4MjNiLTc3NjAtNGYwZS05OTA0LWZjYmZhOTViZGE4NSJ9" frameborder="0" allowFullScreen="true"></iframe>
+    </div>
+
     <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6);">
       <!-- Metric Cards -->
       <div class="metric-card">
@@ -3361,25 +3366,46 @@ export function renderPresupuestoProyeccionView() {
                         </button>
                     </div>
                 </div>
-                <div style="overflow-x: auto;">
-                    <table class="data-table" id="tbl-ppto-jornales">
-                        <thead>
-                            <tr>
-                                <th style="min-width: 180px;">Labor</th>
-                                <th style="text-align: right;">Real (Base)</th>
-                                <th style="text-align: right; min-width: 120px;">Proyectado</th>
-                                <th style="text-align: right;">Δ %</th>
-                                <th style="text-align: right;">Costo Real (ARS)</th>
-                                <th style="text-align: right;">Costo Proy. (ARS)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-ppto-jornales">
-                            <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
-                                Presione "Generar Presupuesto" para cargar datos
-                            </td></tr>
-                        </tbody>
-                        <tfoot id="tfoot-ppto-jornales"></tfoot>
-                    </table>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <!-- Quantity Table -->
+                    <div style="overflow-x: auto;">
+                        <h4 style="margin-bottom: var(--space-2); color: var(--text-secondary);">👷 Jornadas Cuantitativas</h4>
+                        <table class="data-table" id="tbl-ppto-jornales-qty">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 140px;">Labor</th>
+                                    <th style="text-align: right;">Real (Base)</th>
+                                    <th style="text-align: right; min-width: 100px;">Proyectado</th>
+                                    <th style="text-align: right;">Δ %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-ppto-jornales-qty">
+                                <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                    Presione "Generar Presupuesto" para cargar datos
+                                </td></tr>
+                            </tbody>
+                            <tfoot id="tfoot-ppto-jornales-qty"></tfoot>
+                        </table>
+                    </div>
+                    <!-- Cost Table -->
+                    <div style="overflow-x: auto;">
+                        <h4 style="margin-bottom: var(--space-2); color: var(--text-secondary);">💵 Costo Financiero</h4>
+                        <table class="data-table" id="tbl-ppto-jornales-costo">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 140px;">Labor</th>
+                                    <th style="text-align: right;">Costo Real (ARS)</th>
+                                    <th style="text-align: right;">Costo Proy. (ARS)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-ppto-jornales-costo">
+                                <tr><td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                    Esperando cálculo...
+                                </td></tr>
+                            </tbody>
+                            <tfoot id="tfoot-ppto-jornales-costo"></tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -401,6 +401,7 @@ export class SofiaApiModel {
         }
 
         const activeCycle = this.getCurrentCycle();
+        let allJornales = [];
         const isManualHistorical = localStorage.getItem(`manualHistory_${ciclo}`) === 'true';
         const isHistorical = (ciclo !== activeCycle) || isManualHistorical;
 
@@ -449,69 +450,71 @@ export class SofiaApiModel {
             // Fallback a IndexedDB Local
             const localData = await this.getLocalCycle(ciclo);
             if (localData && localData.length > 0) {
-                console.log(`[Base de Datos] Cargado el ciclo histórico ${ciclo} de la tabla local.`);
-                this._cyclesCache.set(ciclo, localData);
-                return localData;
+                console.log(`[Base de Datos] Cargado el ciclo ${ciclo} de la tabla local. Reprocesando etiquetas...`);
+                allJornales = localData;
             }
         }
 
-        console.log(`[API] Obteniendo datos de las APIs del sistema Sofía para el periodo ${ciclo}...`);
-        const ranges = this.getCycleRanges(ciclo);
-        let allJornales = []; // Consolidate results here
-
-        const fincas = Object.keys(this.API_KEYS);
-
-        // Fetch all ranges
-        for (const finca of fincas) {
-            for (const range of ranges) {
-                try {
-                    const results = await this.fetchFromSofia(finca, range.desde, range.hasta);
-                    if (Array.isArray(results)) {
-                        allJornales = allJornales.concat(results);
+        if (allJornales.length === 0) {
+            console.log(`[API] Obteniendo datos de las APIs del sistema Sofía para el periodo ${ciclo}...`);
+            const fincas = Object.keys(this.API_KEYS);
+            const ranges = this.getCycleRanges(ciclo);
+            // Fetch all ranges
+            for (const finca of fincas) {
+                for (const range of ranges) {
+                    try {
+                        const results = await this.fetchFromSofia(finca, range.desde, range.hasta);
+                        if (Array.isArray(results)) {
+                            allJornales = allJornales.concat(results);
+                        }
+                    } catch (e) {
+                        console.error(`Error fetching ${finca} ${range.desde}:`, e);
                     }
-                } catch (e) {
-                    console.error(`Error fetching ${finca} ${range.desde}:`, e);
                 }
             }
-        }
 
-        // --- Include Auxiliares Data ---
-        try {
-            const auxiliares = await this.loadCSVAuxiliares();
-            const filteredAux = auxiliares.filter(row => {
-                return ranges.some(r => row.fecha >= r.desde && row.fecha <= r.hasta);
-            });
-            allJornales = allJornales.concat(filteredAux);
-        } catch (e) {
-            console.warn('Error loading auxiliares in fetchCycleData:', e);
-        }
-
-        // Deduplicate records (using composite signature)
-        // This is necessary because API calls with overlapping ranges or multiple calls for same cycle can return duplicate data
-        const uniqueRecords = new Map();
-        allJornales.forEach(r => {
-            const signature = `${r.finca}-${r.fecha}-${r.labor || ''}-${r.cuartel || ''}-${r.persona || ''}-${r.rendimiento || 0}-${r.jornada || 0}`;
-            if (!uniqueRecords.has(signature)) {
-                uniqueRecords.set(signature, r);
+            // --- Include Auxiliares Data ---
+            try {
+                const auxiliares = await this.loadCSVAuxiliares();
+                const filteredAux = auxiliares.filter(row => {
+                    return ranges.some(r => row.fecha >= r.desde && row.fecha <= r.hasta);
+                });
+                allJornales = allJornales.concat(filteredAux);
+            } catch (e) {
+                console.warn('Error loading auxiliares in fetchCycleData:', e);
             }
-        });
+        }
 
         const cycleStartYear = parseInt(ciclo.split('-')[0]);
+
+        // Deduplicate records (using composite signature)
+        const uniqueRecords = new Map();
+        allJornales.forEach(r => {
+            const f = (r.finca || '').trim();
+            const d = (r.fecha || '').trim();
+            const l = (r.labor || '').trim().toLowerCase();
+            const c = (r.cuartel || '').trim().toLowerCase();
+            const p = (r.persona || '').trim().toLowerCase();
+            const rVal = parseFloat(r.rendimiento) || 0;
+            const jVal = parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
+
+            const signature = `${f}|${d}|${l}|${c}|${p}|${rVal.toFixed(2)}|${jVal.toFixed(2)}`;
+            if (!uniqueRecords.has(signature)) uniqueRecords.set(signature, r);
+        });
 
         // Add normalized fields and clean up previous cycle's "Levantado" tails
         const processedData = Array.from(uniqueRecords.values()).map(r => {
             const rendition = parseFloat(r.rendimiento) || 0;
-            // User sample shows "jornada" as the field name for jornadas
             const jornadas = parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
             const costo = parseFloat(r.valor_total_jornada) || 0;
             
-            // Refined Harvest detection: either by name or by Sofia's type code 'C'
-            const laborLower = (r.labor || '').toLowerCase();
-            const isCosecha = laborLower.includes('cosecha') || r.id_tipo_faena === 'C' || r.tipo_faena === 'Cosecha';
+            // EXCLUYENDO explícitamente "levantado" para evitar falsos positivos
+            const laborLower = (r.labor || '').toLowerCase().trim();
+            const isHarvestPattern = laborLower.match(/cosech[a-z]*\s*kg\s*[1-5]/i) !== null;
+            const isCosechaManual = laborLower.includes('cosecha manual') || (laborLower === 'cosecha' && rendition > 0) || (laborLower === 'cosechado' && rendition > 0);
+            const isCosecha = (isHarvestPattern || isCosechaManual) && !laborLower.includes('levantado');
 
-            // Extract Ha for this record from cuartel string
             const info = this.parseCuartelInfo(r.cuartel);
-
             return {
                 ...r,
                 ciclo,
@@ -533,20 +536,15 @@ export class SofiaApiModel {
                 })()
             };
         }).filter(r => {
-            // EXCLUSION RULE:
-            // If the labor is 'cosecha' or 'levantado' and it happens in May/June of the START year,
-            // it's actually the tail from the PREVIOUS cycle. We exclude it so it doesn't inflate this cycle.
-            // But we keep 'Poda' or other labres so the hectares of those cuarteles get counted correctly.
             const laborStr = r.labor ? r.labor.toLowerCase() : '';
-            const isHarvestOrLevantado = laborStr.includes('cosecha') || laborStr.includes('levantado');
+            const isHarvestStrict = laborStr.match(/cosech[a-z]*\s*kg\s*[1-5]/i) !== null || laborStr.includes('cosecha manual');
+            const isLevantado = laborStr.includes('levantado');
 
-            if (isHarvestOrLevantado && r.fecha) {
+            if ((isHarvestStrict || isLevantado) && r.fecha) {
                 const dateObj = new Date(r.fecha);
                 const yr = dateObj.getFullYear();
-                const mo = dateObj.getMonth(); // 0-indexed (4=May, 5=Jun)
-                if (yr === cycleStartYear && (mo === 4 || mo === 5)) {
-                    return false;
-                }
+                const mo = dateObj.getMonth();
+                if (isLevantado && yr === cycleStartYear && mo < 11) return false;
             }
             return true;
         });
@@ -836,8 +834,16 @@ export class SofiaApiModel {
             if (!fincas[r.finca]) fincas[r.finca] = 0;
             fincas[r.finca] += kilos;
 
-            // Predios
-            const predioKey = r.clasifica || 'Sin Clasificar';
+            // Predios (Mapeo Estricto de Nombres PBI)
+            const clasif = (r.clasifica || '').toUpperCase();
+            let predioKey = 'Otros';
+            if (clasif.includes('CAMINO TRUNCADO') || clasif.includes('TRUNCADO')) predioKey = 'Camino Truncado';
+            else if (clasif.includes('CHIMBERA')) predioKey = 'La Chimbera';
+            else if (clasif.includes('PUENTE ALTO') || clasif.includes('P. ALTO') || clasif.includes('P.ALTO')) predioKey = 'Puente Alto';
+            else if (clasif.includes('EEIII')) predioKey = 'El Espejo 3';
+            else if (clasif.includes('EEII')) predioKey = 'El Espejo 2';
+            else if (clasif.includes('EEI')) predioKey = 'El Espejo 1';
+            
             if (!predios[predioKey]) predios[predioKey] = 0;
             predios[predioKey] += kilos;
 
@@ -857,7 +863,8 @@ export class SofiaApiModel {
             variedades[r.variedad] += kilos;
         });
 
-        const PROPIA_KEYWORDS = ['Camino Truncado', 'EEI', 'EEII', 'EEIII', 'La Chimbera', 'Puente Alto'];
+        const PROPIA_KEYWORDS = ['CAMINO TRUNCADO', 'TRUNCADO', 'EEI', 'EEII', 'EEIII', 'CHIMBERA', 'PUENTE ALTO', 'P. ALTO', 'P.ALTO'];
+        const ESPECIALES = ['MIRANDA', 'SAN JUAN'];
         const origen = { propia: 0, terceros: 0, propiaHa: 0, promedioPropia: 0 };
         const cuartelesPropios = new Set();
 
@@ -865,8 +872,10 @@ export class SofiaApiModel {
             const kilos = r.rendimiento_val || 0;
             const clasif = (r.clasifica || '').toUpperCase();
 
-            const isPropia = PROPIA_KEYWORDS.some(k => clasif.includes(k.toUpperCase()));
-            if (isPropia) {
+            const isPropia = PROPIA_KEYWORDS.some(k => clasif.includes(k));
+            const isEspecial = ESPECIALES.some(k => clasif.includes(k));
+
+            if (isPropia && !isEspecial) {
                 origen.propia += kilos;
                 if (r.cuartel && !cuartelesPropios.has(r.cuartel)) {
                     cuartelesPropios.add(r.cuartel);
@@ -907,7 +916,17 @@ export class SofiaApiModel {
         const predioMap = {}; // name -> { kg: 0, ha: 0, cuarteles: Set }
 
         data.forEach(r => {
-            const predioName = r.clasifica || 'Sin Clasificar';
+            // NORMALIZED PREDIO MAPPING FOR CHART
+            const clasif = (r.clasifica || '').toUpperCase();
+            let predioName = 'Otros';
+            if (clasif.includes('CAMINO TRUNCADO') || clasif.includes('TRUNCADO')) predioName = 'Camino Truncado';
+            else if (clasif.includes('CHIMBERA')) predioName = 'La Chimbera';
+            else if (clasif.includes('PUENTE ALTO') || clasif.includes('P. ALTO') || clasif.includes('P.ALTO')) predioName = 'Puente Alto';
+            else if (clasif.includes('EEIII')) predioName = 'El Espejo 3';
+            else if (clasif.includes('EEII')) predioName = 'El Espejo 2';
+            else if (clasif.includes('EEI')) predioName = 'El Espejo 1';
+            else predioName = r.clasifica || 'Sin Clasificar';
+
             if (!predioMap[predioName]) {
                 predioMap[predioName] = { kg: 0, ha: 0, cuarteles: new Set() };
             }
@@ -991,11 +1010,11 @@ export class SofiaApiModel {
             let type = null;
             let passNum = 0;
 
-            if (labor.includes('cosecha kg')) {
+            if (labor.match(/cosech[a-z]*\s*kg\s*[1-5]/i)) {
                 type = 'cosecha';
-                const match = labor.match(/cosecha\s*kg\s*(\d+)/i);
+                const match = labor.match(/cosech[a-z]*\s*kg\s*(\d+)/i);
                 passNum = match ? parseInt(match[1]) : 1;
-            } else if (labor.includes('levantado')) {
+            } else if (labor.match(/levantado\s*[1-5]/i)) {
                 type = 'levantado';
                 const match = labor.match(/levantado\s*(\d+)/i);
                 passNum = match ? parseInt(match[1]) : 1;
@@ -1073,8 +1092,8 @@ export class SofiaApiModel {
 
         fullCycleData.forEach(r => {
             const labor = (r.labor || '').toLowerCase().trim();
-            const isLevantado = labor.includes('levantado');
-            const isCosechaKg = labor.includes('cosecha kg');
+            const isLevantado = labor.match(/levantado\s*[1-5]/i) !== null;
+            const isCosechaKg = labor.match(/cosech[a-z]*\s*kg\s*[1-5]/i) !== null;
             if (!isLevantado && !isCosechaKg) return;
 
             const nombre = (r.nombre || '').trim();
@@ -1127,7 +1146,7 @@ export class SofiaApiModel {
                 }
             } else if (isCosechaKg) {
                 // Detect pass number for cosecha
-                const passMatch = labor.match(/cosecha\s*kg\s*(\d+)/i);
+                const passMatch = labor.match(/cosech[a-z]*\s*kg\s*(\d+)/i);
                 const passNum = passMatch ? parseInt(passMatch[1]) : 1;
 
                 playaMap[key].kgFresco += kg;
@@ -1189,8 +1208,8 @@ export class SofiaApiModel {
             if (!predioObj) return;
 
             const labor = (r.labor || '').toLowerCase().trim();
-            let isFresco = labor.includes('cosecha kg');
-            let isPasa = labor.includes('levantado');
+            const isFresco = labor.match(/cosech[a-z]*\s*kg\s*[1-5]/i) !== null;
+            const isPasa = labor.match(/levantado\s*[1-5]/i) !== null;
             
             if (!isFresco && !isPasa) return;
             
@@ -1514,7 +1533,7 @@ export class SofiaApiModel {
      */
     static async getHistoricalYieldEvolution(baseFilters = {}) {
         const csvData = await this.loadCSVHistorico();
-        const PROPIA_KEYWORDS = ['Camino Truncado', 'EEI', 'EEII', 'EEIII', 'La Chimbera', 'Puente Alto'];
+        const PROPIA_KEYWORDS = ['Camino Truncado', 'EEI', 'EEII', 'EEIII', 'La Chimbera', 'CHIMBERA', 'Puente Alto', 'P. ALTO', 'P.ALTO'];
         const cycles = this.ALL_CYCLES;
 
         // We will collect yield stats for each predio over all cycles

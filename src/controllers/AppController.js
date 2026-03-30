@@ -63,7 +63,6 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
-                { id: 'presupuesto', label: 'Presupuesto', icon: '📊' },
             ]
         },
         {
@@ -81,6 +80,7 @@ const ROLE_MENUS = {
                 { id: 'admin-labor', label: 'Labor', icon: '🔨' },
                 { id: 'admin-productos', label: 'Productos', icon: '📦' },
                 { id: 'admin-institucional', label: 'Institucional', icon: '🏛️' },
+                { id: 'presupuesto', label: 'Presupuesto', icon: '📊' },
                 { id: 'admin-planificacion', label: 'Planificación', icon: '📅' },
             ]
         },
@@ -114,7 +114,6 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
-                { id: 'presupuesto', label: 'Presupuesto', icon: '📊' },
             ]
         },
     ],
@@ -5421,14 +5420,20 @@ renderFertUnidadesChart() {
     renderPresupuestoJornalesTable(summary, saved, cicloBase) {
         const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
         const fmtCur = (n) => '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
-        const tbody = document.getElementById('tbody-ppto-jornales');
-        const tfoot = document.getElementById('tfoot-ppto-jornales');
-        if (!tbody) return;
+        
+        const tbodyQty = document.getElementById('tbody-ppto-jornales-qty');
+        const tfootQty = document.getElementById('tfoot-ppto-jornales-qty');
+        const tbodyCost = document.getElementById('tbody-ppto-jornales-costo');
+        const tfootCost = document.getElementById('tfoot-ppto-jornales-costo');
+        if (!tbodyQty || !tbodyCost) return;
 
         let totalReal = 0, totalProy = 0, totalCostoReal = 0, totalCostoProy = 0;
         const rows = summary.byLabor.filter(r => r.jornales > 0);
 
-        tbody.innerHTML = rows.map(r => {
+        tbodyQty.innerHTML = '';
+        tbodyCost.innerHTML = '';
+
+        rows.forEach(r => {
             const savedVal = saved?.jornales?.[r.labor];
             const projected = savedVal !== undefined ? savedVal : r.jornales;
             const delta = r.jornales > 0 ? ((projected - r.jornales) / r.jornales * 100) : 0;
@@ -5440,7 +5445,8 @@ renderFertUnidadesChart() {
             totalCostoReal += r.costoArs;
             totalCostoProy += costoProy;
 
-            return `<tr>
+            // Qty Table
+            tbodyQty.innerHTML += `<tr>
                 <td style="font-weight: 500;">${r.labor}</td>
                 <td style="text-align: right;">${fmt(r.jornales)}</td>
                 <td style="text-align: right;">
@@ -5448,34 +5454,75 @@ renderFertUnidadesChart() {
                         data-ppto-labor="${r.labor}" data-real="${r.jornales}" data-costo="${r.costoArs}"
                         class="form-input ppto-input" style="width: 100px; text-align: right; background: var(--bg-tertiary); padding: 4px 8px;" />
                 </td>
-                <td style="text-align: right; ${deltaClass}">${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%</td>
-                <td style="text-align: right;">${fmtCur(r.costoArs)}</td>
-                <td style="text-align: right;">${fmtCur(costoProy)}</td>
+                <td style="text-align: right; ${deltaClass}" class="ppto-delta-cell">${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%</td>
             </tr>`;
-        }).join('');
 
-        tfoot.innerHTML = `<tr style="font-weight: 700; border-top: 2px solid var(--color-border);">
+            // Cost Table
+            tbodyCost.innerHTML += `<tr>
+                <td style="font-weight: 500;">${r.labor}</td>
+                <td style="text-align: right;">${fmtCur(r.costoArs)}</td>
+                <td style="text-align: right;" id="cost-proy-${r.labor.replace(/[\s\/.]+/g,'-')}">${fmtCur(costoProy)}</td>
+            </tr>`;
+        });
+
+        tfootQty.innerHTML = `<tr style="font-weight: 700; border-top: 2px solid var(--color-border);">
             <td>TOTAL</td>
             <td style="text-align: right;">${fmt(totalReal)}</td>
-            <td style="text-align: right;">${fmt(totalProy)}</td>
-            <td style="text-align: right;">${totalReal > 0 ? ((totalProy - totalReal) / totalReal * 100).toFixed(1) : 0}%</td>
+            <td style="text-align: right;" id="qty-total-proy">${fmt(totalProy)}</td>
+            <td style="text-align: right;" id="qty-total-delta">${totalReal > 0 ? ((totalProy - totalReal) / totalReal * 100).toFixed(1) : 0}%</td>
+        </tr>`;
+
+        tfootCost.innerHTML = `<tr style="font-weight: 700; border-top: 2px solid var(--color-border);">
+            <td>TOTAL</td>
             <td style="text-align: right;">${fmtCur(totalCostoReal)}</td>
             <td style="text-align: right;" id="ppto-total-costo-proy">${fmtCur(totalCostoProy)}</td>
         </tr>`;
 
         // Live recalculation on input change
-        tbody.querySelectorAll('.ppto-input').forEach(input => {
+        tbodyQty.querySelectorAll('.ppto-input').forEach(input => {
             input.addEventListener('input', () => {
                 const real = parseFloat(input.dataset.real) || 0;
                 const costo = parseFloat(input.dataset.costo) || 0;
                 const proj = parseFloat(input.value) || 0;
-                const row = input.closest('tr');
-                const cells = row.querySelectorAll('td');
+                
                 const delta = real > 0 ? ((proj - real) / real * 100) : 0;
                 const costoProy = real > 0 ? (costo * (proj / real)) : 0;
-                cells[3].textContent = `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%`;
-                cells[3].style.color = delta > 0 ? 'var(--color-success)' : delta < 0 ? 'var(--color-error)' : '';
-                cells[5].textContent = '$' + costoProy.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+                
+                // Update row delta qty
+                const row = input.closest('tr');
+                const deltaCell = row.querySelector('.ppto-delta-cell');
+                if (deltaCell) {
+                    deltaCell.textContent = `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%`;
+                    deltaCell.style.color = delta > 0 ? 'var(--color-success)' : delta < 0 ? 'var(--color-error)' : '';
+                }
+                
+                // Update cost table cell
+                const laborKey = input.dataset.pptoLabor.replace(/[\s\/.]+/g,'-');
+                const costCell = document.getElementById('cost-proy-' + laborKey);
+                if(costCell) {
+                    costCell.textContent = '$' + costoProy.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+                }
+
+                // Update totals
+                let newTotalProy = 0;
+                let newTotalCostoProy = 0;
+                tbodyQty.querySelectorAll('.ppto-input').forEach(inp => {
+                    const iReal = parseFloat(inp.dataset.real) || 0;
+                    const iProj = parseFloat(inp.value) || 0;
+                    const iCosto = parseFloat(inp.dataset.costo) || 0;
+                    newTotalProy += iProj;
+                    if(iReal > 0) newTotalCostoProy += (iCosto * (iProj / iReal));
+                });
+                
+                const qtyTotalSpan = document.getElementById('qty-total-proy');
+                if (qtyTotalSpan) qtyTotalSpan.textContent = newTotalProy.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+                
+                const totalDelta = totalReal > 0 ? ((newTotalProy - totalReal) / totalReal * 100) : 0;
+                const qtyDeltaSpan = document.getElementById('qty-total-delta');
+                if (qtyDeltaSpan) qtyDeltaSpan.textContent = `${totalDelta >= 0 ? '+' : ''}${totalDelta.toFixed(1)}%`;
+                
+                const costTotalSpan = document.getElementById('ppto-total-costo-proy');
+                if (costTotalSpan) costTotalSpan.textContent = '$' + newTotalCostoProy.toLocaleString('es-AR', { maximumFractionDigits: 0 });
             });
         });
     }
