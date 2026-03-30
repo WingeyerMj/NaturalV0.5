@@ -487,26 +487,14 @@ export class SofiaApiModel {
         }
 
         // Deduplicate records (using composite signature)
-        // Signature-based deduplication after all sources are merged
+        // This is necessary because API calls with overlapping ranges or multiple calls for same cycle can return duplicate data
         const uniqueRecords = new Map();
         allJornales.forEach(r => {
-            // Normalize strings to avoid encoding-based duplication
-            const finca = (r.finca || '').replace(/Ãº/g, 'ú').toLowerCase().trim();
-            const labor = (r.labor || '').replace(/Ãº/g, 'ú').toLowerCase().trim();
-            const clasifica = (r.clasifica || '').replace(/Ãº/g, 'ú').trim();
-            const cuartel = (r.cuartel || '').trim();
-            const persona = (r.persona || '').toLowerCase().trim();
-            
-            r.finca = finca === 'el espejo' ? 'El Espejo' : (finca === 'fincas viejas' ? 'Fincas Viejas' : r.finca);
-            r.clasifica = clasifica;
-
-            const signature = `${finca}-${r.fecha}-${labor}-${cuartel}-${persona}-${r.rendimiento || 0}-${r.jornada || 0}`;
+            const signature = `${r.finca}-${r.fecha}-${r.labor || ''}-${r.cuartel || ''}-${r.persona || ''}-${r.rendimiento || 0}-${r.jornada || 0}`;
             if (!uniqueRecords.has(signature)) {
                 uniqueRecords.set(signature, r);
             }
         });
-
-        allJornales = Array.from(uniqueRecords.values());
 
         const cycleStartYear = parseInt(ciclo.split('-')[0]);
 
@@ -518,12 +506,8 @@ export class SofiaApiModel {
             const costo = parseFloat(r.valor_total_jornada) || 0;
             
             // Refined Harvest detection: either by name or by Sofia's type code 'C'
-            const laborLower = (r.labor || '').toLowerCase().trim();
-            const workerLower = (r.nombre || r.Trabajador || r.trabajador || '').toLowerCase();
-            // User specifies only Cosecha Kg 1-5 should be considered as yield.
-            // Matches labor labels that START with 'cosecha kg' and number 1-5.
-            // Excludes "PLAYA" virtual workers to avoid double-counting with individual worker entries.
-            const isCosecha = /^cosecha\s+kg[\s.]*[1-5]\b/i.test(laborLower) && !workerLower.includes('playa');
+            const laborLower = (r.labor || '').toLowerCase();
+            const isCosecha = laborLower.includes('cosecha') || r.id_tipo_faena === 'C' || r.tipo_faena === 'Cosecha';
 
             // Extract Ha for this record from cuartel string
             const info = this.parseCuartelInfo(r.cuartel);
@@ -1078,10 +1062,10 @@ export class SofiaApiModel {
         const PREDIO_CONFIG = [
             { keyword: 'Camino Truncado', group: 'Fincas Viejas', name: 'Camino Truncado' },
             { keyword: 'La Chimbera', group: 'Fincas Viejas', name: 'La Chimbera' },
-            { keyword: 'Puente Alto', group: 'Fincas Viejas', name: 'Puente Alto' },
-            { keyword: 'EEIII', group: 'El Espejo', name: 'EEIII' },
-            { keyword: 'EEII', group: 'El Espejo', name: 'EEII' },
-            { keyword: 'EEI', group: 'El Espejo', name: 'EEI' }
+            { keyword: 'Puente Alto', group: 'Fincas Viejas', name: 'Camino Truncado' },
+            { keyword: 'EEIII', group: 'El Espejo', name: 'El Espejo' },
+            { keyword: 'EEII', group: 'El Espejo', name: 'El Espejo' },
+            { keyword: 'EEI', group: 'El Espejo', name: 'El Espejo' }
         ];
 
         // Key: "finca|playa", Value: { nombre, finca, predio, kg, kgFresco, jornadas, pasadas, cosechaPasadas }
@@ -1192,9 +1176,9 @@ export class SofiaApiModel {
             { keyword: 'Camino Truncado', name: 'Camino Truncado' }, 
             { keyword: 'La Chimbera', name: 'La Chimbera' }, 
             { keyword: 'Puente Alto', name: 'Puente Alto' },
-            { keyword: 'EEIII', name: 'EEIII' }, 
-            { keyword: 'EEII', name: 'EEII' }, 
-            { keyword: 'EEI', name: 'EEI' }
+            { keyword: 'EEIII', name: 'El Espejo 3' }, 
+            { keyword: 'EEII', name: 'El Espejo 2' }, 
+            { keyword: 'EEI', name: 'El Espejo 1' }
         ];
 
         const predioData = {};
