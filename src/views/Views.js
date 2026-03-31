@@ -283,15 +283,26 @@ export function renderLoginPage() {
 // ── Dashboard Layout ──
 export function renderDashboardLayout(user, menuItems, activeSection) {
   return `
-    <div id="loading-overlay" class="loading-overlay hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-        <div class="loading-content" style="background: var(--bg-secondary); padding: 40px; border-radius: 16px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
-            <div class="spinner-large" style="width: 50px; height: 50px; border: 4px solid var(--bg-tertiary); border-top: 4px solid var(--color-primary-500); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h3 style="margin-bottom: 10px; font-family: 'Outfit'; color: var(--text-primary);">Conectando con Sofía...</h3>
-            <p id="loading-message" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9em;">Iniciando descarga de datos históricos</p>
-            <div class="progress-bar-container" style="width: 100%; height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden;">
-                <div class="progress-bar" id="loading-progress" style="width: 0%; height: 100%; background: var(--color-primary-500); transition: width 0.3s ease;"></div>
+    <div id="loading-overlay" class="loading-overlay hidden" style="position: fixed; inset: 0; background: var(--bg-primary); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <!-- Top Left Logo during loading -->
+        <div style="position: absolute; top: var(--space-6); left: var(--space-6); display: flex; align-items: center; gap: var(--space-4);">
+            <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 48px; height: 48px; animation: coinFlip 4s ease-in-out infinite;">
+            <span style="font-family: var(--font-display); font-weight: 700; color: var(--text-primary); letter-spacing: 1px;">NATURALFOOD</span>
+        </div>
+
+        <div class="loading-content" style="background: transparent; border: none; box-shadow: none; text-align: center; max-width: 500px; width: 90%;">
+            <div style="margin-bottom: 40px;">
+                <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 120px; height: 120px; animation: coinFlip 4s ease-in-out infinite; filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.2));">
             </div>
-            <div id="loading-details" style="margin-top: 10px; font-size: 0.8em; color: var(--text-tertiary);">0%</div>
+            <h3 style="margin-bottom: 15px; font-family: 'Outfit'; color: var(--text-primary); font-size: 1.8rem;">Conectando con Sofía...</h3>
+            <p id="loading-message" style="color: var(--text-secondary); margin-bottom: 30px; font-size: 1.1rem; opacity: 0.8;">Iniciando descarga de datos históricos</p>
+            
+            <div style="max-width: 300px; margin: 0 auto;">
+                <div class="progress-bar-container" style="width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; margin-bottom: 12px;">
+                    <div class="progress-bar" id="loading-progress" style="width: 0%; height: 100%; background: var(--color-primary-500); box-shadow: 0 0 15px var(--color-primary-500); transition: width 0.3s ease;"></div>
+                </div>
+                <div id="loading-details" style="font-size: 0.9rem; font-weight: 600; color: var(--color-primary-400); font-family: 'Outfit';">0%</div>
+            </div>
         </div>
     </div>
     <div class="dashboard-layout">
@@ -426,7 +437,10 @@ function renderSidebarMenu(menuItems, activeSection) {
     }
 
     if (item.submenu) {
-      const isExpanded = item.submenu.some(s => s.id === activeSection) || activeSection === item.id;
+      // Use activeSection comparison but DON'T expand by default if we want them contracted
+      // UNLESS the user explicitly requested a section within that submenu during navigation.
+      // But for initial load (where activeSection is default), we keep them closed.
+      const isExpanded = false; // Forced false to keep menus closed on load
       html += `
         <button class="sidebar-item sidebar-dropdown-toggle ${isExpanded ? 'expanded' : ''}" data-toggle="${item.id}">
           <span class="sidebar-item-icon">${item.icon}</span>
@@ -458,114 +472,16 @@ function renderSidebarMenu(menuItems, activeSection) {
 }
 
 // ── Dashboard Home Content ──
-export function renderDashboardHome(metrics) {
+export function renderDashboardHome() {
   return `
-    <div class="dashboard-grid animate-fade-in">
-      <div class="metric-card">
-        <div class="metric-card-header">
-          <div class="metric-card-icon green">🌿</div>
-          <div class="metric-badge up">↑ 12%</div>
-        </div>
-        <div class="metric-value">${metrics.totalHectares}</div>
-        <div class="metric-label">Hectáreas Activas</div>
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center; color: var(--text-secondary);">
+      <div style="margin-bottom: var(--space-8);">
+          <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 150px; height: 150px; animation: coinFlip 6s ease-in-out infinite; filter: drop-shadow(0 0 40px rgba(16, 185, 129, 0.15));">
       </div>
-
-      <div class="metric-card">
-        <div class="metric-card-header">
-          <div class="metric-card-icon purple">🏘️</div>
-          <div class="metric-badge up">↑ 2</div>
-        </div>
-        <div class="metric-value">${metrics.totalFincas}</div>
-        <div class="metric-label">Fincas en Operación</div>
-      </div>
-
-      <div class="metric-card">
-        <div class="metric-card-header">
-          <div class="metric-card-icon amber">👥</div>
-          <div class="metric-badge up">↑ 5%</div>
-        </div>
-        <div class="metric-value">${metrics.totalEmpleados}</div>
-        <div class="metric-label">Empleados Activos</div>
-      </div>
-
-      <div class="metric-card">
-        <div class="metric-card-header">
-          <div class="metric-card-icon blue">💰</div>
-          <div class="metric-badge ${metrics.budgetExecution > 100 ? 'down' : 'up'}">${metrics.budgetExecution}%</div>
-        </div>
-        <div class="metric-value">${metrics.budgetExecution}%</div>
-        <div class="metric-label">Ejecución Presupuestaria</div>
-      </div>
-    </div>
-
-    <div class="charts-row animate-fade-in animate-delay-1">
-      <div class="chart-container">
-        <div class="chart-header">
-          <span class="chart-title">Ejecución Presupuestaria por Categoría</span>
-          <div class="chart-actions">
-            <button class="btn btn-sm btn-ghost">Enero</button>
-            <button class="btn btn-sm btn-ghost">Febrero</button>
-          </div>
-        </div>
-        <div class="chart-canvas-wrapper">
-          <canvas id="chart-budget"></canvas>
-        </div>
-      </div>
-
-      <div class="chart-container">
-        <div class="chart-header">
-          <span class="chart-title">Distribución de Labores</span>
-        </div>
-        <div class="chart-canvas-wrapper">
-          <canvas id="chart-labores"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <div class="chart-container animate-fade-in animate-delay-2">
-      <div class="chart-header">
-        <span class="chart-title">Horas de Trabajo por Finca</span>
-      </div>
-      <div class="chart-canvas-wrapper">
-        <canvas id="chart-hours"></canvas>
-      </div>
-    </div>
-
-    <div class="data-table-container animate-fade-in animate-delay-3">
-      <div class="table-header">
-        <h3>Últimas Labores Registradas</h3>
-      </div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Predio</th>
-            <th>Finca</th>
-            <th>Empleado</th>
-            <th>Horas</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${metrics.recentLabores.map(l => `
-            <tr>
-              <td>${formatDate(l.date)}</td>
-              <td>${l.type}</td>
-              <td>${l.predio}</td>
-              <td>${l.finca}</td>
-              <td>${l.employee}</td>
-              <td>${l.hours}h</td>
-              <td>
-                <span class="status-badge ${l.status === 'completed' ? 'active' : 'pending'}">
-                  <span class="status-dot"></span>
-                  ${l.status === 'completed' ? 'Completado' : 'Pendiente'}
-                </span>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+      <h2 style="font-family: 'Outfit'; color: var(--text-primary); font-size: 2.5rem; margin-bottom: var(--space-4);">¡Bienvenido a NaturalFood!</h2>
+      <p style="font-size: 1.1rem; max-width: 500px; margin: 0 auto; opacity: 0.7; line-height: 1.6;">
+        Selecciona una sección en el menú lateral para <br> comenzar a gestionar tu producción.
+      </p>
     </div>
   `;
 }

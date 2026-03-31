@@ -80,10 +80,11 @@ export class UserModel {
       let url = `${BASE_API_URL}/users`;
       if (options.includePending) url += '?includePending=true';
       const resp = await fetch(url);
-      return await resp.json();
+      const data = await resp.json();
+      return Array.isArray(data) ? data : (data.users && Array.isArray(data.users) ? data.users : []);
     } catch (e) {
       console.warn('Backend reach error, using static fallback:', e);
-      let users = [...this.CACHE];
+      let users = Array.isArray(this.CACHE) ? [...this.CACHE] : [];
       if (!options.includePending) {
         users = users.filter(u => !u.pending && u.active);
       }

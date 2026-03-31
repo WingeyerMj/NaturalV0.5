@@ -847,7 +847,8 @@ export class SofiaApiModel {
 
             // Predios (Mapeo Estricto de Nombres PBI)
             const clasif = (r.clasifica || '').toUpperCase();
-            let predioKey = 'Otros';
+            let predioKey = r.clasifica || 'Otros'; // Default to original name instead of "Otros"
+            
             if (clasif.includes('CAMINO TRUNCADO') || clasif.includes('TRUNCADO')) predioKey = 'Camino Truncado';
             else if (clasif.includes('CHIMBERA')) predioKey = 'La Chimbera';
             else if (clasif.includes('PUENTE ALTO') || clasif.includes('P. ALTO') || clasif.includes('P.ALTO')) predioKey = 'Puente Alto';
@@ -929,14 +930,13 @@ export class SofiaApiModel {
         data.forEach(r => {
             // NORMALIZED PREDIO MAPPING FOR CHART
             const clasif = (r.clasifica || '').toUpperCase();
-            let predioName = 'Otros';
+            let predioName = r.clasifica || 'Otros'; // Default to original for detailed view
             if (clasif.includes('CAMINO TRUNCADO') || clasif.includes('TRUNCADO')) predioName = 'Camino Truncado';
             else if (clasif.includes('CHIMBERA')) predioName = 'La Chimbera';
             else if (clasif.includes('PUENTE ALTO') || clasif.includes('P. ALTO') || clasif.includes('P.ALTO')) predioName = 'Puente Alto';
             else if (clasif.includes('EEIII')) predioName = 'El Espejo 3';
             else if (clasif.includes('EEII')) predioName = 'El Espejo 2';
             else if (clasif.includes('EEI')) predioName = 'El Espejo 1';
-            else predioName = r.clasifica || 'Sin Clasificar';
 
             if (!predioMap[predioName]) {
                 predioMap[predioName] = { kg: 0, ha: 0, cuarteles: new Set() };
@@ -1628,5 +1628,22 @@ export class SofiaApiModel {
             labels: cycles,
             datasets: validDatasets
         };
+    }
+    static async syncBackgroundCyclesAsync(currentCycle) {
+        setTimeout(async () => {
+            const cycles = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
+            console.log("Background sync started for remaining cycles...");
+            for (const c of cycles) {
+                if (c !== currentCycle) {
+                    try {
+                        await this.fetchCycleData(c);
+                        console.log(`Cycle ${c} synced in background.`);
+                    } catch (e) {
+                        console.warn(`Error syncing cycle ${c} in background:`, e);
+                    }
+                }
+            }
+            console.log("Background sync completed.");
+        }, 1000);
     }
 }

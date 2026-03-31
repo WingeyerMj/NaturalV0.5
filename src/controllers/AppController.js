@@ -283,8 +283,8 @@ export class AppController {
         // Load static Sofia files automatically
         await this.loadStaticSofiaData();
 
-        // Default section is 'informe-gastos-historicos'
-        if (!section) section = 'informe-gastos-historicos';
+        // Default section is 'home'
+        if (!section) section = 'home';
         this.currentSection = section;
 
         // Render layout first so overlay exists
@@ -352,14 +352,7 @@ export class AppController {
                 await SofiaApiModel.fetchCycleData(currentCycle);
 
                 // Iniciamos la descarga/carga de la BD local del resto de los ciclos en segundo plano
-                setTimeout(async () => {
-                    const cycles = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
-                    for (const c of cycles) {
-                        if (c !== currentCycle) {
-                            await SofiaApiModel.fetchCycleData(c);
-                        }
-                    }
-                }, 500);
+                SofiaApiModel.syncBackgroundCyclesAsync(currentCycle);
 
                 // Complete
                 if (progressBar) progressBar.style.width = '100%';
@@ -388,6 +381,10 @@ export class AppController {
 
         try {
             switch (section) {
+            case 'home':
+                title.textContent = 'Bienvenido';
+                content.innerHTML = renderDashboardHome();
+                break;
             case 'jornales':
                 title.textContent = 'Informe de Jornales';
                 await this.renderJornalesSection(content);
@@ -455,7 +452,8 @@ export class AppController {
                 break;
             case 'usuarios':
                 title.textContent = 'Gestión de Usuarios';
-                this.renderUsuariosSection(content);
+                content.innerHTML = ''; // Clear previous content to avoid collisions
+                await this.renderUsuariosSection(content);
                 break;
             case 'admin-carga-trabajo':
                 title.textContent = 'Carga de Trabajo de Campo';
@@ -1429,23 +1427,35 @@ export class AppController {
             btnSave.disabled = true;
             btnSave.textContent = '...';
 
-            if (editId) {
-                // If editing, preserve active status if it was inactive (optional enhancement could be added)
-                const existing = users.find(u => u.id === parseInt(editId));
-                if (existing) userData.active = existing.active;
-                await UserModel.update(parseInt(editId), userData);
-            } else {
-                if (!password) {
-                    alert('La contraseña es obligatoria para usuarios nuevos.');
-                    btnSave.disabled = false;
-                    btnSave.textContent = originalText;
-                    return;
+            try {
+                if (editId) {
+                    // If editing, preserve current data and update with new fields
+                    const existing = users.find(u => u.id === parseInt(editId));
+                    if (existing) {
+                        userData.active = existing.active;
+                        // If password field is empty, don't send it to preserve current password
+                        if (!password) delete userData.password;
+                        await UserModel.update(parseInt(editId), userData);
+                        this.showNotification('Usuario actualizado con éxito', 'success');
+                    }
+                } else {
+                    if (!password) {
+                        alert('La contraseña es obligatoria para usuarios nuevos.');
+                        btnSave.disabled = false;
+                        btnSave.textContent = originalText;
+                        return;
+                    }
+                    await UserModel.add(userData);
+                    this.showNotification('Usuario creado con éxito', 'success');
                 }
-                await UserModel.add(userData); // Now async
+                hideModal();
+                refreshTable();
+            } catch (err) {
+                console.error("Error saving user:", err);
+                this.showNotification('Error al guardar el usuario. Inténtelo de nuevo.', 'error');
+                btnSave.disabled = false;
+                btnSave.textContent = originalText;
             }
-
-            hideModal();
-            refreshTable();
         });
 
         // Editar

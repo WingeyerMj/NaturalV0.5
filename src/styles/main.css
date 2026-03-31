@@ -2716,23 +2716,68 @@ img {
 .global-loader-overlay.active {
     display: flex;
 }
-.loader-nf-logo {
-    width: 150px;
-    height: 150px;
-    animation: nf-loader-spin 2.5s linear infinite;
-    filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.3));
+.loader-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-@keyframes nf-loader-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+
+.loader-nf-logo-bg {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    opacity: 0.1;
+    filter: grayscale(1) brightness(0.5);
 }
+
+.loader-nf-logo-fill-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    overflow: hidden;
+    mask-image: url('/logo.svg');
+    -webkit-mask-image: url('/logo.svg');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+}
+
+.loader-nf-wave-fill {
+    position: absolute;
+    bottom: -20%;
+    left: -50%;
+    width: 200%;
+    height: 150%;
+    background: linear-gradient(to top, var(--color-primary-600), var(--color-primary-400));
+    animation: wave-rise 3.5s ease-in-out infinite, wave-move 2s linear infinite;
+    border-radius: 40%;
+}
+
+@keyframes wave-rise {
+    0% { transform: translateY(100%) rotate(0deg); }
+    50% { transform: translateY(10%) rotate(180deg); }
+    100% { transform: translateY(100%) rotate(360deg); }
+}
+
+@keyframes wave-move {
+    0% { margin-left: 0; }
+    100% { margin-left: -50px; }
+}
+
 .loader-nf-text {
     font-family: var(--font-display);
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
     font-weight: 600;
     color: var(--color-primary-400);
-    letter-spacing: 0.15em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
+    margin-top: 1rem;
     animation: nf-pulse 1.5s ease-in-out infinite;
 }
 @keyframes nf-pulse {
