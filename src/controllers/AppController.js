@@ -1373,21 +1373,60 @@ export class AppController {
             const title = document.getElementById('user-modal-title');
             overlay.style.display = 'flex';
 
-            if (editing) {
-                title.textContent = '✏️ Editar Usuario';
-                document.getElementById('user-edit-id').value = editing.id;
-                document.getElementById('user-name').value = editing.name;
-                document.getElementById('user-email').value = editing.email;
-                document.getElementById('user-password').value = '';
-                document.getElementById('user-password').placeholder = '(dejar vacío para no cambiar)';
-                document.getElementById('user-role').value = editing.role;
-            } else {
-                title.textContent = '➕ Nuevo Usuario';
-                document.getElementById('user-edit-id').value = '';
-                document.getElementById('form-usuario').reset();
-                document.getElementById('user-password').placeholder = 'Contraseña';
-            }
-        };
+                const updatePreview = (imgName) => {
+                    const preview = document.getElementById('user-avatar-preview');
+                    if (preview) {
+                        preview.innerHTML = `<img src="/img/usuarios/${imgName}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    }
+                };
+
+                const initialAvatar = editing ? (editing.avatar || 'ingeniero.png') : 'ingeniero.png';
+                if (editing) {
+                    title.textContent = '✏️ Editar Usuario';
+                    document.getElementById('user-edit-id').value = editing.id;
+                    document.getElementById('user-name').value = editing.name;
+                    document.getElementById('user-email').value = editing.email;
+                    document.getElementById('user-password').value = '';
+                    document.getElementById('user-password').placeholder = '(dejar vacío para no cambiar)';
+                    document.getElementById('user-role').value = editing.role;
+                    
+                    const avatarInput = document.getElementById('user-avatar');
+                    if (avatarInput) avatarInput.value = initialAvatar;
+                    updatePreview(initialAvatar);
+                } else {
+                    title.textContent = '➕ Nuevo Usuario';
+                    document.getElementById('user-edit-id').value = '';
+                    document.getElementById('form-usuario').reset();
+                    document.getElementById('user-password').placeholder = 'Contraseña';
+                    
+                    const avatarInput = document.getElementById('user-avatar');
+                    if (avatarInput) avatarInput.value = 'ingeniero.png';
+                    updatePreview('ingeniero.png');
+                }
+
+                // Initial highlight
+                overlay.querySelectorAll('.avatar-option-admin').forEach(opt => {
+                    const selected = opt.dataset.img === (editing ? (editing.avatar || 'ingeniero.png') : 'ingeniero.png');
+                    opt.style.borderColor = selected ? 'var(--color-primary-500)' : 'transparent';
+                    opt.style.boxShadow = selected ? '0 0 10px var(--color-primary-500)' : 'none';
+                });
+
+                // Bind selection click
+                overlay.querySelectorAll('.avatar-option-admin').forEach(opt => {
+                    opt.onclick = () => {
+                        const img = opt.dataset.img;
+                        document.getElementById('user-avatar').value = img;
+                        updatePreview(img);
+                        
+                        overlay.querySelectorAll('.avatar-option-admin').forEach(o => {
+                            o.style.borderColor = 'transparent';
+                            o.style.boxShadow = 'none';
+                        });
+                        opt.style.borderColor = 'var(--color-primary-500)';
+                        opt.style.boxShadow = '0 0 10px var(--color-primary-500)';
+                    };
+                });
+            };
 
         const hideModal = () => {
             document.getElementById('user-modal-overlay').style.display = 'none';
@@ -1415,10 +1454,14 @@ export class AppController {
             const originalText = btnSave.textContent;
 
             const editId = document.getElementById('user-edit-id').value;
+            const email = document.getElementById('user-email').value.trim();
+            const avatar = (email === 'admin@naturalfood.com') ? 'gerencia.png' : document.getElementById('user-avatar').value;
+
             const userData = {
                 name: document.getElementById('user-name').value.trim(),
-                email: document.getElementById('user-email').value.trim(),
+                email: email,
                 role: document.getElementById('user-role').value,
+                avatar: avatar,
                 active: true // Default to active on edit/create
             };
             const password = document.getElementById('user-password').value.trim();
@@ -2816,7 +2859,7 @@ bindLoginEvents() {
 
         // -- EMERGENCY BYPASS --
         if (email === 'admin@naturalfood.com' && password === 'N4tur4lf00d$') {
-            const adminUser = { id: 1, name: 'José Miguel Orb', email: 'admin@naturalfood.com', role: 'Administrador', active: true };
+            const adminUser = { id: 1, name: 'José Miguel Orb', email: 'admin@naturalfood.com', role: 'Administrador', avatar: 'gerencia.png', active: true };
             localStorage.setItem('nf_session', JSON.stringify(adminUser));
             this.loadDashboard(adminUser);
             return;
@@ -2855,6 +2898,36 @@ bindLoginEvents() {
         if (bsRegisterModal) bsRegisterModal.hide();
     });
 
+    // ── Avatar Selector logic in Registration Form ──
+    const avatarGrid = document.getElementById('register-avatar-selector');
+    const avatarPreviewContainer = document.getElementById('register-avatar-preview-container');
+    const avatarPreviewImg = document.querySelector('#register-avatar-preview img');
+    const btnChangeAvatar = document.getElementById('btn-change-avatar');
+    const inputAvatar = document.getElementById('register-avatar');
+
+    if (avatarGrid && avatarPreviewContainer && btnChangeAvatar && inputAvatar) {
+        // Toggle grid when clicking "Elegir otro diferente"
+        btnChangeAvatar.addEventListener('click', (e) => {
+            e.preventDefault();
+            avatarGrid.style.display = 'grid';
+            avatarPreviewContainer.style.display = 'none';
+        });
+
+        // Handle selection within grid
+        avatarGrid.querySelectorAll('.avatar-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                const img = opt.dataset.img;
+                inputAvatar.value = img;
+                if (avatarPreviewImg) avatarPreviewImg.src = `/img/usuarios/${img}`;
+                
+                // Show preview and hide selector
+                avatarGrid.style.display = 'none';
+                avatarPreviewContainer.style.display = 'flex';
+                this.showToast('Avatar seleccionado', 'success');
+            });
+        });
+    }
+
 
     // ── Registration Form Submit ──
     document.getElementById('form-register')?.addEventListener('submit', async (e) => {
@@ -2882,7 +2955,10 @@ bindLoginEvents() {
 
         if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.textContent = 'Procesando...'; }
 
-        const result = await UserModel.register(name, email, password);
+        // Get avatar from hidden input
+        const avatar = document.getElementById('register-avatar')?.value || 'ingeniero.png';
+
+        const result = await UserModel.register(name, email, password, avatar);
 
         if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.textContent = originalBtnText; }
 
@@ -2935,7 +3011,7 @@ bindDashboardEvents(user) {
     // Logout
     document.getElementById('btn-logout')?.addEventListener('click', () => {
         UserModel.logout();
-        this.loadLanding();
+        window.location.reload(); // Hard reload to clear all states/charts
     });
 
     // Mobile menu

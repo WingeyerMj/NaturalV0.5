@@ -103,7 +103,8 @@ export class UserModel {
         body: JSON.stringify({
           name: userData.name,
           email: userData.email,
-          password: userData.password || '123456' // Default if not provided
+          password: userData.password || '123456', // Default if not provided
+          avatar: userData.avatar || 'ingeniero.png'
         })
       });
       const data = await resp.json();
@@ -125,12 +126,12 @@ export class UserModel {
     }
   }
 
-  static async register(name, email, password) {
+  static async register(name, email, password, avatar = 'ingeniero.png') {
     try {
       const resp = await fetch(`${BASE_API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password, avatar })
       });
       return await resp.json();
     } catch (e) {

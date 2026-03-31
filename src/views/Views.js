@@ -242,13 +242,38 @@ export function renderLoginPage() {
                     <span class="form-input-icon">👤</span>
                   </div>
                 </div>
-                <div class="form-group" style="margin-bottom: var(--space-4);">
-                  <label class="form-label" for="register-email">Correo Electrónico</label>
-                  <div class="form-input-wrapper">
-                    <input type="email" id="register-email" class="form-input" placeholder="tucorreo@ejemplo.com" required />
-                    <span class="form-input-icon">📧</span>
+                  <div class="form-group" style="margin-bottom: var(--space-4);">
+                    <label class="form-label">Elegir Avatar</label>
+                    
+                    <!-- Avatar Selection Grid (Shown first) -->
+                    <div id="register-avatar-selector" class="avatar-selector-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border-subtle); max-height: 180px; overflow-y: auto; margin-bottom: var(--space-3);">
+                      ${['admin.png', 'admin1.png', 'gerencia.png', 'gerencia2.png', 'gerenciaf.png', 'gerenciafe.png', 'ingeniero.png', 'ingeniero1.png', 'ingeniero2.png', 'rrhh.png', 'rrhh1.png', 'soporteit.png', 'soporteit1.png', 'soporteit2.png', 'soporteit3.png', 'soporteit4.png'].map(img => `
+                        <div class="avatar-option" data-img="${img}" style="cursor: pointer; transition: all 0.2s ease; border-radius: 50%; overflow: hidden; border: 2px solid transparent; width: 44px; height: 44px; margin: 0 auto;">
+                          <img src="/img/usuarios/${img}" alt="${img}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                      `).join('')}
+                    </div>
+
+                    <!-- Avatar Preview (Visible after selection) -->
+                    <div id="register-avatar-preview-container" style="display: none; align-items: center; gap: var(--space-4); padding: 10px; background: rgba(16, 185, 129, 0.05); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                      <div id="register-avatar-preview" style="width: 54px; height: 54px; border-radius: 50%; border: 2px solid var(--color-success); overflow: hidden; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        <img src="/img/usuarios/ingeniero.png" style="width: 100%; height: 100%; object-fit: cover;">
+                      </div>
+                      <div style="flex: 1;">
+                        <div style="font-size: 0.85em; font-weight: 700; color: var(--color-success); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">✓ Avatar Seleccionado</div>
+                        <button type="button" id="btn-change-avatar" style="background: none; border: none; color: var(--text-tertiary); font-size: 0.75em; padding: 0; cursor: pointer; text-decoration: underline;">Elegir otro diferente</button>
+                      </div>
+                    </div>
+
+                    <input type="hidden" id="register-avatar" value="">
                   </div>
-                </div>
+                  <div class="form-group" style="margin-bottom: var(--space-4);">
+                    <label class="form-label" for="register-email">Correo Electrónico</label>
+                    <div class="form-input-wrapper">
+                      <input type="email" id="register-email" class="form-input" placeholder="tucorreo@ejemplo.com" required />
+                      <span class="form-input-icon">📧</span>
+                    </div>
+                  </div>
                 <div class="form-group" style="margin-bottom: var(--space-4);">
                   <label class="form-label" for="register-password">Contraseña</label>
                   <div class="form-input-wrapper">
@@ -2938,8 +2963,8 @@ export function renderUsuariosView(users, roles) {
           ${regularUsers.map(u => `
             <tr data-id="${u.id}">
               <td>
-                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8em; color: white;">
-                  ${u.avatar}
+                <div style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border-subtle); overflow: hidden; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center;">
+                  ${u.avatar && u.avatar.includes('.') ? `<img src="/img/usuarios/${u.avatar}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="font-weight: 700;">${u.avatar || u.name.charAt(0)}</span>`}
                 </div>
               </td>
               <td><strong>${u.name}</strong></td>
@@ -2990,6 +3015,25 @@ export function renderUsuariosView(users, roles) {
           <div class="form-group" style="margin-bottom: var(--space-4);">
             <label class="form-label" for="user-password">Contraseña</label>
             <input type="text" id="user-password" class="form-input" style="padding-left: var(--space-4);" placeholder="••••••••" />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label">Elegir Avatar</label>
+            <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-3);">
+              <div id="user-avatar-preview" style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--color-primary-500); overflow: hidden; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                <img src="/img/usuarios/ingeniero.png" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div style="flex: 1; font-size: 0.85em; color: var(--text-tertiary);">
+                Seleccione una imagen para el perfil del usuario.
+              </div>
+            </div>
+            <div class="avatar-selector-grid-admin" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; padding: 12px; background: rgba(0,0,0,0.15); border-radius: 12px; border: 1px solid var(--border-subtle); max-height: 150px; overflow-y: auto;">
+              ${['admin.png', 'admin1.png', 'gerencia.png', 'gerencia2.png', 'gerenciaf.png', 'gerenciafe.png', 'ingeniero.png', 'ingeniero1.png', 'ingeniero2.png', 'rrhh.png', 'rrhh1.png', 'soporteit.png', 'soporteit1.png', 'soporteit2.png', 'soporteit3.png', 'soporteit4.png'].map(img => `
+                <div class="avatar-option-admin" data-img="${img}" style="cursor: pointer; transition: all 0.2s ease; border-radius: 50%; overflow: hidden; border: 2px solid transparent; width: 40px; height: 40px; margin: 0 auto;">
+                  <img src="/img/usuarios/${img}" alt="${img}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+              `).join('')}
+            </div>
+            <input type="hidden" id="user-avatar" value="ingeniero.png">
           </div>
           <div class="form-group" style="margin-bottom: var(--space-6);">
             <label class="form-label" for="user-role">Rol</label>

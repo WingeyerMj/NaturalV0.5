@@ -841,13 +841,9 @@ export class SofiaApiModel {
             const kilos = r.rendimiento_val || 0;
             totalKilos += kilos;
 
-            // Fincas
-            if (!fincas[r.finca]) fincas[r.finca] = 0;
-            fincas[r.finca] += kilos;
-
-            // Predios (Mapeo Estricto de Nombres PBI)
+            // --- PREDIO MAPPING (Normalized names) ---
             const clasif = (r.clasifica || '').toUpperCase();
-            let predioKey = r.clasifica || 'Otros'; // Default to original name instead of "Otros"
+            let predioKey = r.clasifica || 'Otros';
             
             if (clasif.includes('CAMINO TRUNCADO') || clasif.includes('TRUNCADO')) predioKey = 'Camino Truncado';
             else if (clasif.includes('CHIMBERA')) predioKey = 'La Chimbera';
@@ -859,7 +855,21 @@ export class SofiaApiModel {
             if (!predios[predioKey]) predios[predioKey] = 0;
             predios[predioKey] += kilos;
 
-            // Cuarteles
+            // --- FINCA GROUPING (REFACTORED) ---
+            // Fincas Viejas = Camino Truncado + La Chimbera + Puente Alto
+            // El Espejo = EEI + EEII + EEIII
+            // Terceros = everything else
+            let fincaKey = 'Terceros';
+            if (['Camino Truncado', 'La Chimbera', 'Puente Alto'].includes(predioKey)) {
+                fincaKey = 'Fincas Viejas';
+            } else if (['El Espejo 1', 'El Espejo 2', 'El Espejo 3'].includes(predioKey)) {
+                fincaKey = 'El Espejo';
+            }
+
+            if (!fincas[fincaKey]) fincas[fincaKey] = 0;
+            fincas[fincaKey] += kilos;
+
+            // --- OTHER STATS ---
             if (!cuarteles[r.cuartel]) {
                 cuarteles[r.cuartel] = 0;
                 const isGralEspejo = r.finca === 'El Espejo' && r.cuartel && r.cuartel.toLowerCase().includes('gral');
@@ -870,7 +880,6 @@ export class SofiaApiModel {
             }
             cuarteles[r.cuartel] += kilos;
 
-            // Variedades
             if (!variedades[r.variedad]) variedades[r.variedad] = 0;
             variedades[r.variedad] += kilos;
         });

@@ -54,6 +54,7 @@ app.post('/api/login', async (req, res) => {
                 name: 'José Miguel Orb', 
                 email: 'admin@naturalfood.com', 
                 role: 'Administrador',
+                avatar: 'gerencia.png',
                 active: 1
             } 
         });
@@ -79,9 +80,9 @@ app.post('/api/login', async (req, res) => {
 
 // Register
 app.post('/api/register', async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, avatar } = req.body;
     try {
-        const result = await pool.query('SELECT * FROM sp_register_user($1, $2, $3)', [name, email, password]);
+        const result = await pool.query('SELECT * FROM sp_register_user($1, $2, $3, $4)', [name, email, password, avatar || 'ingeniero.png']);
         const statusData = result.rows[0];
 
         if (statusData && statusData.status === 'OK') {
@@ -150,10 +151,10 @@ app.post('/api/users/reject', async (req, res) => {
 // Update User (Full edit)
 app.put('/api/users/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, email, role, password, active } = req.body;
+    const { name, email, role, password, active, avatar } = req.body;
     try {
-        await pool.query('SELECT * FROM sp_update_user($1, $2, $3, $4, $5, $6)', [
-            id, name, email, role, password || null, active ? 1 : 0
+        await pool.query('SELECT * FROM sp_update_user($1, $2, $3, $4, $5, $6, $7)', [
+            id, name, email, role, password || null, active ? 1 : 0, avatar || null
         ]);
         res.json({ success: true, message: 'Usuario actualizado con éxito.' });
     } catch (error) {
