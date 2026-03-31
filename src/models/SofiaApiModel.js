@@ -395,8 +395,8 @@ export class SofiaApiModel {
     }
 
     static async fetchCycleData(ciclo, forceRefresh = false) {
-        // 1. Omitir red si ya está en Memoria RAM
-        if (this._cyclesCache.has(ciclo) && !forceRefresh) {
+        // 1. Omitir red si ya está en Memoria RAM (TEMPORALMENTE DESHABILITADO PARA SYNC PBI)
+        if (false && this._cyclesCache.has(ciclo) && !forceRefresh) {
             return this._cyclesCache.get(ciclo);
         }
 
@@ -489,7 +489,7 @@ export class SofiaApiModel {
 
         // Deduplicate records (using composite signature)
         const uniqueRecords = new Map();
-        allJornales.forEach(r => {
+        allJornales.forEach((r, idx) => {
             const f = (r.finca || '').trim();
             const d = (r.fecha || '').trim();
             const l = (r.labor || '').trim().toLowerCase();
@@ -498,7 +498,15 @@ export class SofiaApiModel {
             const rVal = parseFloat(r.rendimiento) || 0;
             const jVal = parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
 
-            const signature = `${f}|${d}|${l}|${c}|${p}|${rVal.toFixed(2)}|${jVal.toFixed(2)}`;
+            // Para COSECHA, permitimos múltiples registros idénticos si vienen de la API
+            // (cada uno es un bin/cajón distinto). Solo deduplicamos trabajos operativos.
+            const laborLower = (r.labor || '').toLowerCase();
+            const isHarvestPattern = laborLower.includes('cosech') && !laborLower.includes('levantado');
+            
+            const signature = isHarvestPattern 
+                ? `${f}|${d}|${l}|${c}|${p}|${rVal.toFixed(2)}|${jVal.toFixed(2)}|row_${idx}` 
+                : `${f}|${d}|${l}|${c}|${p}|${rVal.toFixed(2)}|${jVal.toFixed(2)}`;
+
             if (!uniqueRecords.has(signature)) uniqueRecords.set(signature, r);
         });
 
@@ -508,11 +516,13 @@ export class SofiaApiModel {
             const jornadas = parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
             const costo = parseFloat(r.valor_total_jornada) || 0;
             
-            // EXCLUYENDO explícitamente "levantado" para evitar falsos positivos
+            // EXCLUYENDO explícitamente "levantado", "pasa" y "humeda" para evitar falsos positivos en La Chimbera
             const laborLower = (r.labor || '').toLowerCase().trim();
             const isHarvestPattern = laborLower.match(/cosech[a-z]*\s*kg\s*[1-5]/i) !== null;
             const isCosechaManual = laborLower.includes('cosecha manual') || (laborLower === 'cosecha' && rendition > 0) || (laborLower === 'cosechado' && rendition > 0);
-            const isCosecha = (isHarvestPattern || isCosechaManual) && !laborLower.includes('levantado');
+            
+            const hasExclusion = laborLower.includes('levantado') || laborLower.includes('pasa') || laborLower.includes('humeda');
+            const isCosecha = (isHarvestPattern || isCosechaManual) && !hasExclusion && !r.isPasaHumeda;
 
             const info = this.parseCuartelInfo(r.cuartel);
             return {
