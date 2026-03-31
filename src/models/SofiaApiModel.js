@@ -866,8 +866,11 @@ export class SofiaApiModel {
                 fincaKey = 'El Espejo';
             }
 
-            if (!fincas[fincaKey]) fincas[fincaKey] = 0;
-            fincas[fincaKey] += kilos;
+            const isPasaHumeda = clasif.includes('PASA H') || clasif.includes('HUMEDA');
+            if (!(fincaKey === 'Terceros' && isPasaHumeda)) {
+                if (!fincas[fincaKey]) fincas[fincaKey] = 0;
+                fincas[fincaKey] += kilos;
+            }
 
             // --- OTHER STATS ---
             if (!cuarteles[r.cuartel]) {
