@@ -602,9 +602,10 @@ export class SofiaApiModel {
             if (filters.hasta && new Date(r.fecha) > new Date(filters.hasta)) return false;
 
             if (filters.origen) {
-                const PROPIA_KEYWORDS = ['Camino Truncado', 'EEI', 'EEII', 'EEIII', 'La Chimbera', 'Puente Alto'];
+                const PROPIA_KEYWORDS = ['CAMINO TRUNCADO', 'TRUNCADO', 'EEI', 'EEII', 'EEIII', 'CHIMBERA', 'PUENTE ALTO', 'P. ALTO', 'P.ALTO'];
+                const ESPECIALES = ['MIRANDA', 'SAN JUAN'];
                 const clasif = (r.clasifica || '').toUpperCase();
-                const isPropia = PROPIA_KEYWORDS.some(k => clasif.includes(k.toUpperCase()));
+                const isPropia = PROPIA_KEYWORDS.some(k => clasif.includes(k)) && !ESPECIALES.some(k => clasif.includes(k));
 
                 if (filters.origen === 'propia' && !isPropia) return false;
                 if (filters.origen === 'terceros' && isPropia) return false;
@@ -1543,7 +1544,7 @@ export class SofiaApiModel {
      */
     static async getHistoricalYieldEvolution(baseFilters = {}) {
         const csvData = await this.loadCSVHistorico();
-        const PROPIA_KEYWORDS = ['Camino Truncado', 'EEI', 'EEII', 'EEIII', 'La Chimbera', 'CHIMBERA', 'Puente Alto', 'P. ALTO', 'P.ALTO'];
+        const PROPIA_KEYWORDS = ['CAMINO TRUNCADO', 'TRUNCADO', 'EEI', 'EEII', 'EEIII', 'CHIMBERA', 'PUENTE ALTO', 'P. ALTO', 'P.ALTO'];
         const cycles = this.ALL_CYCLES;
 
         // We will collect yield stats for each predio over all cycles

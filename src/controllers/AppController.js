@@ -152,6 +152,16 @@ export class AppController {
         this.sofiaSubTab = 'resumen';
     }
 
+    showLoader() {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.classList.add('active');
+    }
+
+    hideLoader() {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.classList.remove('active');
+    }
+
     async showConfirmModal(title, message) {
         return new Promise((resolve) => {
             const modalEl = document.getElementById('confirmDeleteModal');
@@ -368,6 +378,7 @@ export class AppController {
     }
 
     async loadSection(section, user) {
+        this.showLoader();
         const content = document.getElementById('page-content');
         const title = document.getElementById('page-title');
 
@@ -375,18 +386,19 @@ export class AppController {
         Object.values(this.charts).forEach(c => { try { c.destroy(); } catch (e) { } });
         this.charts = {};
 
-        switch (section) {
+        try {
+            switch (section) {
             case 'jornales':
                 title.textContent = 'Informe de Jornales';
-                this.renderJornalesSection(content);
+                await this.renderJornalesSection(content);
                 break;
             case 'cosecha':
                 title.textContent = 'Informe de Cosecha';
-                this.renderCosechaSection(content);
+                await this.renderCosechaSection(content);
                 break;
             case 'fincas':
                 title.textContent = 'Informe de Fincas';
-                this.renderFincasSection(content);
+                await this.renderFincasSection(content);
                 break;
             case 'aplicaciones-sofia':
                 title.textContent = 'Informe de Aplicaciones';
@@ -461,6 +473,12 @@ export class AppController {
                     this.renderAdminCrudSection(content, section);
                 }
                 break;
+            }
+        } catch (error) {
+            console.error('Error loading section:', error);
+            content.innerHTML = `<div class="error-msg" style="padding:2rem; color:var(--color-error);">Error al cargar secciÃ³n: ${error.message}</div>`;
+        } finally {
+            setTimeout(() => this.hideLoader(), 400);
         }
 
         // Update active sidebar item

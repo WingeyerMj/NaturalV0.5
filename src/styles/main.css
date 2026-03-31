@@ -2698,3 +2698,44 @@ img {
 .btn-close {
   filter: invert(1) brightness(200%);
 }
+
+/* -- Global Loading Overlay (NF Spinning Logo) -- */
+.global-loader-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(10, 15, 26, 0.9);
+    backdrop-filter: blur(15px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2rem;
+    transition: all 0.3s ease-out;
+}
+.global-loader-overlay.active {
+    display: flex;
+}
+.loader-nf-logo {
+    width: 150px;
+    height: 150px;
+    animation: nf-loader-spin 2.5s linear infinite;
+    filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.3));
+}
+@keyframes nf-loader-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.loader-nf-text {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-primary-400);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: nf-pulse 1.5s ease-in-out infinite;
+}
+@keyframes nf-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1.02); }
+}
