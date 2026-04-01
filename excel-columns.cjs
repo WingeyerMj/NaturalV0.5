@@ -1,0 +1,1 @@
+const XLSX = require('xlsx'); const wb = XLSX.readFile('Fuentes/Presupuestos/Prueba de Gral.xlsx'); const ws = wb.Sheets['Compilado']; const data = XLSX.utils.sheet_to_json(ws, {header:1}); console.log(JSON.stringify(data[0]));

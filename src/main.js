@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    window.addEventListener('scroll', handleScroll, true); // Use capture to catch internal scrolls
+    window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
 
     // Mobile Menu Toggle for New Landing (delegation since it's dynamic)
     document.addEventListener('click', (e) => {
@@ -42,16 +42,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Check for charts and show mobile portrait rotation suggestion
-    setInterval(() => {
+    // Use MutationObserver instead of setInterval for better performance
+    const observer = new MutationObserver(() => {
         const suggestion = document.getElementById('rotate-device-suggestion');
         if (!suggestion || suggestion.style.display === 'none') return;
 
-        // If a canvas is present, we assume charts are being shown
         const hasCharts = document.querySelector('canvas') || document.querySelector('.chart-container');
         if (hasCharts) {
             suggestion.classList.add('active');
         } else {
             suggestion.classList.remove('active');
         }
-    }, 1000);
+    });
+    observer.observe(document.getElementById('app'), { childList: true, subtree: true });
 });

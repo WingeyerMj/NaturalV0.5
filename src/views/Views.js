@@ -1489,7 +1489,7 @@ export function renderCosechaDashboard(stats, userRole = 'Administrador') {
   return `
     <!-- Power BI Embed -->
     <div style="width: 100%; height: 800px; margin-bottom: var(--space-8); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-        <iframe title="Power BI Dashboard" width="100%" height="100%" src="https://app.powerbi.com/view?r=eyJrIjoiNTRjODBhMzktYTQzOC00MDQzLTgxYzktODM4ZmFmZWNjYWI3IiwidCI6ImNmMDc4MjNiLTc3NjAtNGYwZS05OTA0LWZjYmZhOTViZGE4NSJ9" frameborder="0" allowFullScreen="true"></iframe>
+        <iframe title="Cosecha 2026" width="100%" height="100%" src="https://app.powerbi.com/view?r=eyJrIjoiNTRjODBhMzktYTQzOC00MDQzLTgxYzktODM4ZmFmZWNjYWI3IiwidCI6ImNmMDc4MjNiLTc3NjAtNGYwZS05OTA0LWZjYmZhOTViZGE4NSJ9" frameborder="0" allowFullScreen="true" loading="lazy"></iframe>
     </div>
 
     <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6);">
@@ -3292,18 +3292,20 @@ export function renderPresupuestoProyeccionView() {
 
         <!-- Tabs -->
         <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2);">
-            <button class="btn btn-primary" id="ppto-tab-jornales" style="border-radius: 8px 8px 0 0;">👷 Jornales</button>
+            <button class="btn btn-primary" id="ppto-tab-jornales-cant" style="border-radius: 8px 8px 0 0;">👷 Jornales (Cant.)</button>
+            <button class="btn btn-ghost" id="ppto-tab-jornales-costo" style="border-radius: 8px 8px 0 0;">💵 Jornales (Costo)</button>
             <button class="btn btn-ghost" id="ppto-tab-gastos" style="border-radius: 8px 8px 0 0;">📦 Gastos y Consumos</button>
+            <button class="btn btn-ghost" id="ppto-tab-excel" style="border-radius: 8px 8px 0 0;">📊 Presupuesto General (Excel)</button>
         </div>
 
-        <!-- Tab Content: Jornales -->
-        <div id="ppto-content-jornales">
+        <!-- Tab Content: Jornales Cantidad -->
+        <div id="ppto-content-jornales-cant">
             <div class="charts-row" style="margin-bottom: var(--space-6);">
                 <div class="chart-container" style="flex: 1;">
                     <div class="chart-header">
                         <span class="chart-title">📊 Comparativa Jornales por Labor</span>
                     </div>
-                    <div style="height: 350px; position: relative;">
+                    <div style="height: 250px; position: relative;">
                         <canvas id="chart-ppto-jornales-labor"></canvas>
                     </div>
                 </div>
@@ -3311,7 +3313,7 @@ export function renderPresupuestoProyeccionView() {
                     <div class="chart-header">
                         <span class="chart-title">📊 Comparativa Jornales por Predio</span>
                     </div>
-                    <div style="height: 350px; position: relative;">
+                    <div style="height: 250px; position: relative;">
                         <canvas id="chart-ppto-jornales-predio"></canvas>
                     </div>
                 </div>
@@ -3319,53 +3321,56 @@ export function renderPresupuestoProyeccionView() {
 
             <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
-                    <h3 style="margin: 0; color: var(--text-primary);">📋 Detalle por Labor</h3>
+                    <h3 style="margin: 0; color: var(--text-primary);">👷 Detalle Cuantitativo de Jornadas</h3>
                     <div style="display: flex; gap: var(--space-2);">
-                        <button class="btn btn-ghost btn-sm" id="btn-ppto-adjust-jornales" title="Aplicar ajuste % a toda la proyección">
-                            ⚙️ Ajuste Global %
-                        </button>
+                        <button class="btn btn-ghost btn-sm" id="btn-ppto-adjust-jornales-cant">⚙️ Ajuste Global %</button>
                     </div>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-                    <!-- Quantity Table -->
-                    <div style="overflow-x: auto;">
-                        <h4 style="margin-bottom: var(--space-2); color: var(--text-secondary);">👷 Jornadas Cuantitativas</h4>
-                        <table class="data-table" id="tbl-ppto-jornales-qty">
-                            <thead>
-                                <tr>
-                                    <th style="min-width: 140px;">Labor</th>
-                                    <th style="text-align: right;">Real (Base)</th>
-                                    <th style="text-align: right; min-width: 100px;">Proyectado</th>
-                                    <th style="text-align: right;">Δ %</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-ppto-jornales-qty">
-                                <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
-                                    Presione "Generar Presupuesto" para cargar datos
-                                </td></tr>
-                            </tbody>
-                            <tfoot id="tfoot-ppto-jornales-qty"></tfoot>
-                        </table>
-                    </div>
-                    <!-- Cost Table -->
-                    <div style="overflow-x: auto;">
-                        <h4 style="margin-bottom: var(--space-2); color: var(--text-secondary);">💵 Costo Financiero</h4>
-                        <table class="data-table" id="tbl-ppto-jornales-costo">
-                            <thead>
-                                <tr>
-                                    <th style="min-width: 140px;">Labor</th>
-                                    <th style="text-align: right;">Costo Real (ARS)</th>
-                                    <th style="text-align: right;">Costo Proy. (ARS)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-ppto-jornales-costo">
-                                <tr><td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
-                                    Esperando cálculo...
-                                </td></tr>
-                            </tbody>
-                            <tfoot id="tfoot-ppto-jornales-costo"></tfoot>
-                        </table>
-                    </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-jornales-qty">
+                        <thead>
+                            <tr>
+                                <th>Categoría</th>
+                                <th style="min-width: 140px;">Labor</th>
+                                <th style="text-align: right;">Real (Base)</th>
+                                <th style="text-align: right; min-width: 100px;">Proyectado</th>
+                                <th style="text-align: right;">Δ %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-jornales-qty">
+                            <tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Presione "Generar Presupuesto" para cargar datos
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-jornales-qty"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Jornales Costo -->
+        <div id="ppto-content-jornales-costo" style="display: none;">
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <h3 style="margin: 0; color: #10b981;">💵 Valorización Monetaria de M.O.</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-jornales-costo">
+                        <thead>
+                            <tr>
+                                <th>Categoría</th>
+                                <th style="min-width: 140px;">Labor</th>
+                                <th style="text-align: right;">Costo Real (ARS)</th>
+                                <th style="text-align: right;">Costo Proy. (ARS)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-jornales-costo">
+                            <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Esperando cálculo...
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-jornales-costo"></tfoot>
+                    </table>
                 </div>
             </div>
         </div>
@@ -3424,10 +3429,41 @@ export function renderPresupuestoProyeccionView() {
             </div>
         </div>
 
+        <!-- Tab Content: Presupuesto General (Excel) -->
+        <div id="ppto-content-excel" style="display: none;">
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <h3 style="margin: 0; color: var(--text-primary);">📊 Compilado Presupuesto General</h3>
+                </div>
+                <div id="excel-budget-container">
+                    <div style="text-align: center; padding: 3rem; color: var(--text-tertiary);">
+                        <p>Presione "Generar Presupuesto" para cargar el archivo Excel</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div style="display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-4); padding-bottom: var(--space-8);">
             <button class="btn btn-ghost" id="btn-ppto-export">📄 Exportar CSV</button>
             <button class="btn btn-primary" id="btn-ppto-save">💾 Guardar Presupuesto</button>
+        </div>
+
+        <!-- NEW: Mixed Budget Export Section -->
+        <div class="card" style="margin-top: var(--space-8); padding: var(--space-6); background: var(--bg-secondary); border: 1px dashed var(--color-primary);">
+             <div style="display: flex; justify-content: space-between; align-items: center;">
+                 <div>
+                     <h3 style="margin: 0 0 var(--space-1) 0; color: var(--color-primary);">📦 Generar Presupuesto Mixto (Sofia + Excel)</h3>
+                     <p style="margin: 0; color: var(--text-tertiary); font-size: 0.9rem;">
+                         Combina Labores de Sofia con Gastos Generales del Excel actual.
+                     </p>
+                 </div>
+                 <div style="display: flex; gap: var(--space-2);">
+                     <button class="btn btn-sm btn-ghost" id="btn-ppto-mixed-pdf" style="border: 1px solid #ef4444; color: #ef4444;">📕 Descargar PDF</button>
+                     <button class="btn btn-sm btn-ghost" id="btn-ppto-mixed-xlsx" style="border: 1px solid #22c55e; color: #22c55e;">📗 Descargar Excel</button>
+                     <button class="btn btn-sm btn-ghost" id="btn-ppto-mixed-csv" style="border: 1px solid #3b82f6; color: #3b82f6;">📘 Descargar CSV</button>
+                 </div>
+             </div>
         </div>
     </div>
   `;
@@ -3834,3 +3870,47 @@ export function renderStockMovementView(movements, catalogs, user) {
     `;
 }
 
+
+/**
+ * Helper to render the Excel budget summary.
+ */
+export function renderExcelBudgetSummary(data) {
+    if (!data || !data.byFinca) return '<div class="alert alert-info">Sin datos para mostrar.</div>';
+
+    return `
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>FINCA</th>
+                        <th style="text-align: right;">Presupuesto USD</th>
+                        <th style="text-align: right;">Presupuesto ARS</th>
+                        <th style="text-align: right;">Items Registrados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.byFinca.map(f => `
+                        <tr>
+                            <td style="font-weight: 600;">${f.finca}</td>
+                            <td style="text-align: right; color: var(--color-success);">${f.usd.toLocaleString('es-AR', { style: 'currency', currency: 'USD' })}</td>
+                            <td style="text-align: right; color: var(--text-tertiary);">${f.ars.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })}</td>
+                            <td style="text-align: right;">${f.items.length}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot style="font-weight: 700; border-top: 2px solid var(--color-border);">
+                    <tr>
+                        <td>TOTAL GENERAL</td>
+                        <td style="text-align: right; color: var(--color-success);">
+                            ${data.byFinca.reduce((s, f) => s + f.usd, 0).toLocaleString('es-AR', { style: 'currency', currency: 'USD' })}
+                        </td>
+                        <td style="text-align: right;">
+                            ${data.byFinca.reduce((s, f) => s + f.ars, 0).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })}
+                        </td>
+                        <td style="text-align: right;">${data.raw.length}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    `;
+}

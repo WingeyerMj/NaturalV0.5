@@ -11,7 +11,8 @@ function serveFuentesPlugin() {
             server.middlewares.use('/Fuentes', (req, res, next) => {
                 const filePath = path.join(fuentesDir, decodeURIComponent(req.url.split('?')[0]));
                 if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-                    res.setHeader('Cache-Control', 'no-cache');
+                    // Cache static data files for 5 minutes to avoid re-downloads
+                    res.setHeader('Cache-Control', 'public, max-age=300');
                     fs.createReadStream(filePath).pipe(res);
                 } else {
                     next();
@@ -43,6 +44,20 @@ export default defineConfig({
                 changeOrigin: true
             }
         }
+    },
+    build: {
+        // Optimize chunk splitting for faster loads
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'chart': ['chart.js', 'chartjs-plugin-datalabels'],
+                    'xlsx': ['xlsx'],
+                    'vendor': ['papaparse']
+                }
+            }
+        },
+        // Increase chunk size warning limit (our Views.js is large by design)
+        chunkSizeWarningLimit: 500
     },
     preview: {
         allowedHosts: ['proyectonatura.onrender.com']

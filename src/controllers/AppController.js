@@ -36,7 +36,7 @@ import {
     renderHectareasPorPredio, renderEficienciaChartSection,
     renderCosechaLevantadoTable, renderLevantadoPorPlaya, renderAdminCrudView, renderWorkLogView,
     renderGastosView, renderSecaderosView, renderGastosHistoricosView,
-    renderControlCargaView, renderPresupuestoProyeccionView
+    renderControlCargaView, renderPresupuestoProyeccionView, renderExcelBudgetSummary
 } from '../views/Views.js';
 
 import { SecaderosController } from './SecaderosController.js';
@@ -277,11 +277,12 @@ export class AppController {
 
         // Load budget data from storage
         JornalesBudgetModel.loadFromStorage();
-        // Try to auto-load budget CSV if it exists in Fuentes
+        // Try to auto-load budget CSV if it exists in Fuentes (non-blocking)
         this.autoLoadJornalesBudget();
 
-        // Load static Sofia files automatically
-        await this.loadStaticSofiaData();
+        // Defer static Sofia CSV files to background (don't block dashboard load)
+        // They will be loaded when the aplicaciones section is actually opened
+        this._sofiaDataLoaded = false;
 
         // Default section is 'home'
         if (!section) section = 'home';
@@ -322,7 +323,7 @@ export class AppController {
                     }
                     if (progressDetails) progressDetails.textContent = 'Modo offline activado por falla de conexión.';
 
-                    await new Promise(r => setTimeout(r, 10000));
+                    await new Promise(r => setTimeout(r, 2000));
                     throw new Error("El Servidor de Sofia está caído o no resuelve.");
                 }
 
@@ -344,7 +345,7 @@ export class AppController {
                     AplicacionModel.sync()
                 ]);
 
-                await new Promise(r => setTimeout(r, 1000)); // Reduced wait for Sofia and local sync
+                // No artificial delay — proceed immediately after sync
                 if (progressBar) progressBar.style.width = `80%`;
                 if (progressDetails) progressDetails.textContent = `Optimizando base de datos`;
 
@@ -357,7 +358,7 @@ export class AppController {
                 // Complete
                 if (progressBar) progressBar.style.width = '100%';
                 if (progressMessage) progressMessage.textContent = 'Procesando datos...';
-                await new Promise(r => setTimeout(r, 300)); // Short delay for visual completion
+                // Removed artificial delay for faster load
 
             } catch (error) {
                 console.error("Error loading historical data:", error);
@@ -399,7 +400,10 @@ export class AppController {
                 break;
             case 'aplicaciones-sofia':
                 title.textContent = 'Informe de Aplicaciones';
-                await this.loadStaticSofiaData();
+                if (!this._sofiaDataLoaded) {
+                    await this.loadStaticSofiaData();
+                    this._sofiaDataLoaded = true;
+                }
                 this.renderAplicacionesSofiaModule(content);
                 break;
             case 'informe-gastos':
@@ -476,7 +480,7 @@ export class AppController {
             console.error('Error loading section:', error);
             content.innerHTML = `<div class="error-msg" style="padding:2rem; color:var(--color-error);">Error al cargar secciÃ³n: ${error.message}</div>`;
         } finally {
-            setTimeout(() => this.hideLoader(), 400);
+            setTimeout(() => this.hideLoader(), 50);
         }
 
         // Update active sidebar item
@@ -2700,7 +2704,10 @@ async renderInformeTab(tab) {
             );
             break;
         case 'aplicaciones':
-            await this.loadStaticSofiaData();
+            if (!this._sofiaDataLoaded) {
+                await this.loadStaticSofiaData();
+                this._sofiaDataLoaded = true;
+            }
             this.renderAplicacionesSofiaModule(content);
             break;
         case 'gastos':
@@ -3749,7 +3756,11 @@ renderAplicacionesSofiaModule(container) {
 }
 
 async loadStaticSofiaData() {
-    // Always reload CSV data fresh (clear previous cache)
+    // Skip if already loaded this session
+    if (this._sofiaDataLoaded && SofiaImportModel.REGISTROS.length > 0) {
+        return;
+    }
+
     SofiaImportModel.REGISTROS = [];
 
     const files = [
@@ -3757,31 +3768,40 @@ async loadStaticSofiaData() {
         { name: 'FV_aplicaciones.csv', finca: 'Fincas Viejas' }
     ];
 
-    for (const file of files) {
-        try {
-            console.log(`[AppController] Fetching ${file.name}...`);
-            const response = await fetch(`/Fuentes/Aplicaciones/${file.name}?t=${Date.now()}`);
-            if (!response.ok) {
-                console.error(`[AppController] Error fetching ${file.name}: ${response.status} ${response.statusText}`);
-                continue;
+    // Load both CSVs in PARALLEL instead of sequentially
+    const results = await Promise.allSettled(
+        files.map(async (file) => {
+            try {
+                const response = await fetch(`/Fuentes/Aplicaciones/${file.name}`);
+                if (!response.ok) {
+                    console.error(`[AppController] Error fetching ${file.name}: ${response.status}`);
+                    return null;
+                }
+                const buffer = await response.arrayBuffer();
+                const csvText = new TextDecoder('iso-8859-1').decode(buffer);
+                const result = SofiaImportModel.parseCSV(csvText, file.finca);
+                if (!result.error) {
+                    return { rows: result.rows, file };
+                } else {
+                    console.warn(`[AppController] Error parsing ${file.name}:`, result.error);
+                    return null;
+                }
+            } catch (error) {
+                console.error(`[AppController] Exception loading ${file.name}:`, error);
+                return null;
             }
+        })
+    );
 
-            const buffer = await response.arrayBuffer();
-            const decoder = new TextDecoder('iso-8859-1');
-            const csvText = decoder.decode(buffer);
-            console.log(`[AppController] Received ${csvText.length} chars from ${file.name}`);
-
-            const result = SofiaImportModel.parseCSV(csvText, file.finca);
-            if (!result.error) {
-                SofiaImportModel.importRows(result.rows);
-                console.log(`[AppController] Auto-loaded ${result.rows.length} rows from ${file.name} (${file.finca})`);
-            } else {
-                console.warn(`[AppController] Error parsing ${file.name}:`, result.error);
-            }
-        } catch (error) {
-            console.error(`[AppController] Exception loading ${file.name}:`, error);
+    // Import all results
+    for (const result of results) {
+        if (result.status === 'fulfilled' && result.value) {
+            SofiaImportModel.importRows(result.value.rows);
+            console.log(`[AppController] Loaded ${result.value.rows.length} rows from ${result.value.file.name}`);
         }
     }
+
+    this._sofiaDataLoaded = true;
 
     // If we are already in the aplicaciones section, refresh it
     if (this.currentSection === 'aplicaciones-sofia') {
@@ -5400,30 +5420,38 @@ renderFertUnidadesChart() {
         const fmtCurrency = (n) => '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
 
         // Tab switching
-        const tabJornales = document.getElementById('ppto-tab-jornales');
+        const tabJornalesCant = document.getElementById('ppto-tab-jornales-cant');
+        const tabJornalesCosto = document.getElementById('ppto-tab-jornales-costo');
         const tabGastos = document.getElementById('ppto-tab-gastos');
-        const contentJornales = document.getElementById('ppto-content-jornales');
+        const tabExcel = document.getElementById('ppto-tab-excel');
+        
+        const contentJornalesCant = document.getElementById('ppto-content-jornales-cant');
+        const contentJornalesCosto = document.getElementById('ppto-content-jornales-costo');
         const contentGastos = document.getElementById('ppto-content-gastos');
+        const contentExcel = document.getElementById('ppto-content-excel');
 
-        if (tabJornales && tabGastos) {
-            tabJornales.addEventListener('click', () => {
-                tabJornales.className = 'btn btn-primary';
-                tabGastos.className = 'btn btn-ghost';
-                contentJornales.style.display = '';
-                contentGastos.style.display = 'none';
-            });
-            tabGastos.addEventListener('click', () => {
-                tabGastos.className = 'btn btn-primary';
-                tabJornales.className = 'btn btn-ghost';
-                contentGastos.style.display = '';
-                contentJornales.style.display = 'none';
-            });
+        if (tabJornalesCant && tabJornalesCosto && tabGastos && tabExcel) {
+            const tabs = [tabJornalesCant, tabJornalesCosto, tabGastos, tabExcel];
+            const contents = [contentJornalesCant, contentJornalesCosto, contentGastos, contentExcel];
+
+            const switchTab = (activeTab, activeContent) => {
+                tabs.forEach(t => t.className = 'btn btn-ghost');
+                contents.forEach(c => c.style.display = 'none');
+                activeTab.className = 'btn btn-primary';
+                activeContent.style.display = '';
+            };
+
+            tabJornalesCant.addEventListener('click', () => switchTab(tabJornalesCant, contentJornalesCant));
+            tabJornalesCosto.addEventListener('click', () => switchTab(tabJornalesCosto, contentJornalesCosto));
+            tabGastos.addEventListener('click', () => switchTab(tabGastos, contentGastos));
+            tabExcel.addEventListener('click', () => switchTab(tabExcel, contentExcel));
         }
 
         // State
         let jornalesData = [];
         let gastosData = { byCategoria: [], byProducto: [], totals: {} };
         let jornalesSummary = { byLabor: [], byPredio: [], totals: {} };
+        let excelBudgetData = null;
 
         // Load button
         const btnLoad = document.getElementById('btn-ppto-load');
@@ -5451,8 +5479,11 @@ renderFertUnidadesChart() {
             const rawJornales = await SofiaApiModel.fetchJornales(filters);
             jornalesSummary = PresupuestoBudgetModel.buildJornalesSummary(rawJornales);
 
-            // 2. Load Gastos (from CSV aplicaciones)
-            await this.loadStaticSofiaData();
+            // 2. Load Gastos (from CSV aplicaciones — cached after first load)
+            if (!this._sofiaDataLoaded) {
+                await this.loadStaticSofiaData();
+                this._sofiaDataLoaded = true;
+            }
             gastosData = PresupuestoBudgetModel.buildGastosSummary(cicloBase);
 
             // 3. Load saved projections
@@ -5473,6 +5504,20 @@ renderFertUnidadesChart() {
 
             // 7. Render Charts
             this.renderPresupuestoCharts(jornalesSummary, gastosData, saved);
+
+            // 8. Load and Render Excel Budget (Manual/General)
+            try {
+                const excelContainer = document.getElementById('excel-budget-container');
+                if (excelContainer) {
+                    excelContainer.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="spinner" style="margin: 0 auto 1rem;"></div><p>Cargando Excel "Prueba de Gral"...</p></div>';
+                    excelBudgetData = await PresupuestoBudgetModel.loadExcelBudget();
+                    excelContainer.innerHTML = renderExcelBudgetSummary(excelBudgetData);
+                }
+            } catch (err) {
+                console.error("Error loading Excel budget:", err);
+                const excelContainer = document.getElementById('excel-budget-container');
+                if (excelContainer) excelContainer.innerHTML = `<div class="alert alert-error">Error al cargar Excel: ${err.message}</div>`;
+            }
         };
 
         // Save
@@ -5509,7 +5554,7 @@ renderFertUnidadesChart() {
         });
 
         // Global adjustment buttons
-        document.getElementById('btn-ppto-adjust-jornales')?.addEventListener('click', () => {
+        document.getElementById('btn-ppto-adjust-jornales-cant')?.addEventListener('click', () => {
             const pct = prompt('Ingrese el porcentaje de ajuste global para jornales (ej: 5 para +5%, -3 para -3%):', '0');
             if (pct === null) return;
             const factor = 1 + (parseFloat(pct) / 100);
@@ -5526,6 +5571,64 @@ renderFertUnidadesChart() {
                 input.value = (parseFloat(input.value) * factor).toFixed(1);
                 input.dispatchEvent(new Event('input'));
             });
+        });
+
+        // ── Mixed Budget Generation & Downloads ──
+
+        const getMixedData = async () => {
+            const ciclo = document.getElementById('ppto-ciclo-base')?.value || '2025-2026';
+            const finca = document.getElementById('ppto-finca')?.value || '';
+            this.showLoader();
+            try {
+                return await PresupuestoBudgetModel.buildMixedBudget(ciclo, finca);
+            } finally {
+                this.hideLoader();
+            }
+        };
+
+        document.getElementById('btn-ppto-mixed-pdf')?.addEventListener('click', async () => {
+            const data = await getMixedData();
+            // Simple PDF approach: Render to a temporary hidden div and print, or use a new window
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <html><head><title>Presupuesto Mixto ${data.ciclo}</title>
+                <style>
+                    body { font-family: sans-serif; padding: 40px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background: #f4f4f4; }
+                    h1 { color: #2c3e50; }
+                    h2 { border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 40px; }
+                </style></head>
+                <body>
+                    <h1>Presupuesto NaturalFood - Ciclo ${data.ciclo}</h1>
+                    <p>Finca: ${data.finca}</p>
+                    
+                    <h2>1. Labores y Faenas (Reales Sofia)</h2>
+                    <table>
+                        <thead><tr><th>Labor</th><th>Jornales</th><th>Costo Est. ARS</th></tr></thead>
+                        <tbody>${data.jornales.map(l => `<tr><td>${l.labor}</td><td>${l.jornales.toFixed(1)}</td><td>$${l.costoArs.toLocaleString()}</td></tr>`).join('')}</tbody>
+                    </table>
+
+                    <h2>2. Gastos Generales (Presupuesto Excel)</h2>
+                    <table>
+                        <thead><tr><th>Finca</th><th>Gasto</th><th>Mes</th><th>USD</th><th>ARS</th></tr></thead>
+                        <tbody>${data.gastosGral.map(g => `<tr><td>${g.finca}</td><td>${g.gasto}</td><td>${g.mes}</td><td>$${g.usd.toFixed(1)}</td><td>$${g.importeArs.toLocaleString()}</td></tr>`).join('')}</tbody>
+                    </table>
+                </body></html>
+            `);
+            win.document.close();
+            win.print();
+        });
+
+        document.getElementById('btn-ppto-mixed-xlsx')?.addEventListener('click', async () => {
+            const data = await getMixedData();
+            PresupuestoBudgetModel.exportToExcel(data, `Presupuesto_Mixto_${data.ciclo}.xlsx`);
+        });
+
+        document.getElementById('btn-ppto-mixed-csv')?.addEventListener('click', async () => {
+            const data = await getMixedData();
+            PresupuestoBudgetModel.exportToCSV(data);
         });
     }
 
@@ -5559,6 +5662,7 @@ renderFertUnidadesChart() {
 
             // Qty Table
             tbodyQty.innerHTML += `<tr>
+                <td><span style="font-size: 0.7rem; background: var(--bg-secondary); color: var(--text-tertiary); padding: 2px 5px; border-radius: 4px;">${r.categoria}</span></td>
                 <td style="font-weight: 500;">${r.labor}</td>
                 <td style="text-align: right;">${fmt(r.jornales)}</td>
                 <td style="text-align: right;">
@@ -5571,6 +5675,7 @@ renderFertUnidadesChart() {
 
             // Cost Table
             tbodyCost.innerHTML += `<tr>
+                <td><span style="font-size: 0.7rem; background: #10b98120; color: #10b981; padding: 2px 5px; border-radius: 4px;">${r.categoria}</span></td>
                 <td style="font-weight: 500;">${r.labor}</td>
                 <td style="text-align: right;">${fmtCur(r.costoArs)}</td>
                 <td style="text-align: right;" id="cost-proy-${r.labor.replace(/[\s\/.]+/g,'-')}">${fmtCur(costoProy)}</td>
