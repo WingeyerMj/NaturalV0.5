@@ -854,52 +854,11 @@ export class AppController {
     // ── Sección 2: COSECHA ──
     // ── Sección 2: COSECHA ──
     async renderCosechaSection(container) {
-        container.innerHTML = `
-        <div class="sofia-filters animate-fade-in">
-          <div class="filter-group">
-            <label class="form-label">Ciclo Producción</label>
-            <select class="form-select sofia-filter-select" id="filter-cosecha-ciclo" style="padding-left:var(--space-4);">
-              <option value="2025-2026">2025-2026</option>
-              <option value="2024-2025">2024-2025</option>
-              <option value="2023-2024">2023-2024</option>
-              <option value="2022-2023">2022-2023</option>
-              <option value="2021-2022">2021-2022</option>
-              <option value="2020-2021">2020-2021</option>
-              <option value="2019-2020">2019-2020</option>
-              <option value="2018-2019">2018-2019</option>
-              <option value="2017-2018">2017-2018</option>
-              <option value="2016-2017">2016-2017</option>
-              <option value="2015-2016">2015-2016</option>
-              <option value="2014-2015">2014-2015</option>
-              <option value="2013-2014">2013-2014</option>
-              <option value="2012-2013">2012-2013</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="form-label">Finca</label>
-            <select class="form-select sofia-filter-select" id="filter-cosecha-finca" style="padding-left:var(--space-4);">
-              <option value="">Todas</option>
-              <option value="El Espejo">El Espejo</option>
-              <option value="Fincas Viejas">Fincas Viejas</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="form-label">Clasificación</label>
-            <select class="form-select sofia-filter-select" id="filter-cosecha-predio" style="padding-left:var(--space-4);">
-              <option value="">Todos</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="form-label">Variedad</label>
-            <select class="form-select sofia-filter-select" id="filter-cosecha-variedad" style="padding-left:var(--space-4);">
-              <option value="">Todas</option>
-            </select>
-          </div>
-          ${this.currentUser?.role === 'Administrador' ? `<div class="filter-group" style="display: flex; align-items: flex-end;">
-            <button id="btn-cerrar-ciclo" class="btn btn-primary" style="height: 42px; background-color: var(--color-error); border-color: var(--color-error);">Archivar Ciclo</button>
-          </div>` : ''}
-        </div>
+        // Unified filters state for the section - Move to the top
+        const clFiltersState = { finca: '', ciclo: '2025-2026', predio: '', variedad: '', cuartel: '' };
 
+        container.innerHTML = `
+        <div id="cosecha-filters-container"></div>
         <div id="cosecha-dashboard-container">
             <div style="padding: var(--space-20); text-align: center; color: var(--text-tertiary);">
                 <div class="spinner" style="margin: 0 auto var(--space-4);"></div>
@@ -909,197 +868,163 @@ export class AppController {
         </div>
         `;
 
-        const filters = {
-            ciclo: document.getElementById('filter-cosecha-ciclo').value,
-            finca: '', predio: '', variedad: ''
-        };
-
-        const dashboard = document.getElementById('cosecha-dashboard-container');
-        if (!dashboard) return;
-
-        // Populate filter lists dynamically based on active data
         const updateFilterList = (id, key, allData) => {
             const sel = document.getElementById(id);
             if (!sel) return;
-            const currentVal = filters[key];
+            const currentVal = clFiltersState[key];
 
             let subData = allData;
-            if (filters.finca) subData = subData.filter(r => r.finca === filters.finca);
+            // Apply partial filters for the dropdown context
+            if (clFiltersState.finca) subData = subData.filter(r => r.finca === clFiltersState.finca);
+            if (key === 'cuartel' && clFiltersState.predio) {
+                subData = subData.filter(r => (r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica) === clFiltersState.predio);
+            }
 
             const uniqueVals = [...new Set(subData.map(r => {
                 if (key === 'predio') return r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica;
                 if (key === 'variedad') return r.variedad || r.variedades || r.Variedad || r.Variedades;
-                return r[key];
-            }))].filter(v => v !== null && v !== undefined && v !== '').sort();
+                if (key === 'cuartel') return r.cuartel || r.Cuartel; // Already normalized in model usually
+                return r[key] || r[key.charAt(0).toUpperCase() + key.slice(1)];
+            }))].filter(v => v !== null && v !== undefined && v !== '').sort((a,b) => {
+                // Numeric sort for cuarteles if possible
+                if (key === 'cuartel') {
+                    const na = parseInt(a);
+                    const nb = parseInt(b);
+                    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                }
+                return String(a).localeCompare(String(b));
+            });
 
-
-            sel.innerHTML = `<option value="">${key === 'predio' ? 'Todos' : 'Todas'}</option>` +
+            sel.innerHTML = `<option value="">${['predio', 'variedad', 'cuartel'].includes(key) ? 'Todos' : 'Todas'}</option>` +
                 uniqueVals.map(v => `<option value="${v}" ${v === currentVal ? 'selected' : ''}>${v}</option>`).join('');
         };
 
-        // ── updateDashboard: re-filter & re-render ──
+        const updateCosechaLevantadoWidget = async () => {
+            const wrapper = document.getElementById('cosecha-levantado-wrapper');
+            if (!wrapper) return;
+
+            const fullCycleData = await SofiaApiModel.fetchCycleData(clFiltersState.ciclo || '2025-2026');
+            const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, clFiltersState);
+            const clStats = SofiaApiModel.getCosechaLevantadoStats(fullFiltered);
+            const pasaEvolStats = SofiaApiModel.getCosechaComparativaPorPredio(fullFiltered);
+            const playaStats = SofiaApiModel.getLevantadoPorPlayaStats(fullFiltered);
+
+            const filtersHtml = `
+            <div class="sofia-filters animate-fade-in" style="margin-bottom: var(--space-6); background: var(--bg-secondary); padding: var(--space-4); border-radius: 12px; border: 1px solid var(--border-subtle);">
+                <div class="filter-group">
+                    <label class="form-label">Ciclo Producción</label>
+                    <select class="form-select sofia-filter-select" id="filter-cosecha-ciclo">
+                        ${['2025-2026','2024-2025','2023-2024','2022-2023','2021-2022','2020-2021','2019-2020','2018-2019','2017-2018','2016-2017','2015-2016','2014-2015','2013-2014','2012-2013'].map(c=>`<option value="${c}" ${c===clFiltersState.ciclo?'selected':''}>${c}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="form-label">Finca</label>
+                    <select class="form-select sofia-filter-select" id="filter-cosecha-finca">
+                        <option value="">Todas</option>
+                        <option value="El Espejo" ${clFiltersState.finca==='El Espejo'?'selected':''}>El Espejo</option>
+                        <option value="Fincas Viejas" ${clFiltersState.finca==='Fincas Viejas'?'selected':''}>Fincas Viejas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="form-label">Clasificación</label>
+                    <select class="form-select sofia-filter-select" id="filter-cosecha-predio">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="form-label">Cuartel</label>
+                    <select class="form-select sofia-filter-select" id="filter-cosecha-cuartel">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="form-label">Variedad</label>
+                    <select class="form-select sofia-filter-select" id="filter-cosecha-variedad">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+            </div>`;
+
+            wrapper.innerHTML = filtersHtml + renderCosechaLevantadoTable(clStats, clFiltersState.finca, clFiltersState.ciclo) + renderLevantadoPorPlaya(playaStats);
+            
+            // Re-render the specific chart
+            this.renderCosechaPasaPrediosChart(pasaEvolStats);
+
+            // Update nested filter options based on current available data
+            const activeData = SofiaApiModel.applyFilters(fullCycleData, { ciclo: clFiltersState.ciclo, finca: clFiltersState.finca });
+            updateFilterList('filter-cosecha-predio', 'predio', activeData);
+            updateFilterList('filter-cosecha-variedad', 'variedad', activeData);
+            updateFilterList('filter-cosecha-cuartel', 'cuartel', activeData);
+
+            // Re-bind change events
+            ['ciclo', 'finca', 'predio', 'variedad', 'cuartel'].forEach(key => {
+                const el = document.getElementById(`filter-cosecha-${key}`);
+                if (el) {
+                    el.addEventListener('change', e => {
+                        clFiltersState[key] = e.target.value;
+                        if (key === 'finca') { clFiltersState.predio = ''; clFiltersState.cuartel = ''; }
+                        if (key === 'predio') { clFiltersState.cuartel = ''; }
+                        
+                        updateDashboard();
+                    });
+                }
+            });
+        };
+
         const updateDashboard = async () => {
             const dashboard = document.getElementById('cosecha-dashboard-container');
             if (!dashboard) return;
 
-            // Re-fetch if cycle changed, otherwise use cached data
-            const data = await SofiaApiModel.fetchCosecha(filters);
-            const filtered = SofiaApiModel.applyFilters(data, filters);
+            const data = await SofiaApiModel.fetchCosecha(clFiltersState);
+            const filtered = SofiaApiModel.applyFilters(data, clFiltersState);
             const stats = SofiaApiModel.getCosechaDashboardStats(filtered);
-
-
 
             const clWrapper = document.getElementById('cosecha-levantado-wrapper');
             if (!clWrapper) {
-                // First pass, add wrapper
                 dashboard.innerHTML = renderCosechaDashboard(stats, this.currentUser?.role) + '<div id="cosecha-levantado-wrapper"></div>';
                 updateCosechaLevantadoWidget();
             } else {
-                // Sub-components are already there, just replace the top dashboard
-                // We must use a temporary container to swap the HTML while preserving the wrapper
                 const tmp = document.createElement('div');
                 tmp.innerHTML = renderCosechaDashboard(stats, this.currentUser?.role);
-
-                // Clear all nodes in dashboard except the wrappers we want to preserve
                 Array.from(dashboard.childNodes).forEach(node => {
-                    if (node.id !== 'cosecha-levantado-wrapper') {
-                        node.remove();
-                    }
+                    if (node.id !== 'cosecha-levantado-wrapper') node.remove();
                 });
-
-                // Prepend new top content
-                while (tmp.firstChild) {
-                    dashboard.insertBefore(tmp.firstChild, clWrapper);
-                }
+                while (tmp.firstChild) dashboard.insertBefore(tmp.firstChild, clWrapper);
             }
 
-
-
-            // Update dynamic filter options
-            updateFilterList('filter-cosecha-predio', 'predio', data);
-            updateFilterList('filter-cosecha-variedad', 'variedad', data);
-
-            // Rebind origin filter for historical chart
+            // Rebind historical chart origin filter
             const originFilter = document.getElementById('filter-cosecha-historico-origen');
             if (originFilter) {
                 originFilter.addEventListener('change', async (e) => {
-                    const histStats = await SofiaApiModel.getHistoricalCosechaStats({ ...filters, origen: e.target.value });
+                    const histStats = await SofiaApiModel.getHistoricalCosechaStats({ ...clFiltersState, origen: e.target.value });
                     this.renderCosechaHistoryChart(histStats);
                 });
             }
 
-            // Bind cycle filter for rendement chart
-            const rendementCycleFilter = document.getElementById('filter-cosecha-rendimiento-ciclo');
-            if (rendementCycleFilter) {
-                rendementCycleFilter.value = filters.ciclo;
-                const updateLabel = (val) => {
-                    const label = document.getElementById('label-rendimiento-ciclo');
-                    if (label) label.textContent = val;
+            // Rendimiento charts specific logic
+            const rendCycleSel = document.getElementById('filter-cosecha-rendimiento-ciclo');
+            if (rendCycleSel) {
+                rendCycleSel.value = clFiltersState.ciclo;
+                const updateLabel = (v) => {
+                   const lbl = document.getElementById('label-rendimiento-ciclo');
+                   if (lbl) lbl.textContent = v;
                 };
-                updateLabel(filters.ciclo);
-
-                rendementCycleFilter.addEventListener('change', async (e) => {
-                    const localCycle = e.target.value;
-                    updateLabel(localCycle);
-                    const localFullData = await SofiaApiModel.fetchCycleData(localCycle);
-                    const localFullFiltered = SofiaApiModel.applyFilters(localFullData, { ...filters, ciclo: localCycle });
-                    const rendementStats = SofiaApiModel.getRendimientoPredioStats(localFullFiltered);
-                    this.renderCosechaRendimientoPredioChart(rendementStats);
+                updateLabel(clFiltersState.ciclo);
+                rendCycleSel.addEventListener('change', async (e) => {
+                    const val = e.target.value;
+                    updateLabel(val);
+                    const d = await SofiaApiModel.fetchCycleData(val);
+                    const f = SofiaApiModel.applyFilters(d, { ...clFiltersState, ciclo: val });
+                    this.renderCosechaRendimientoPredioChart(SofiaApiModel.getRendimientoPredioStats(f));
                 });
             }
 
-            // Re-render charts
-            const fullCycleData = await SofiaApiModel.fetchCycleData(filters.ciclo);
-            const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, filters);
-            const rendimientoStats = SofiaApiModel.getRendimientoPredioStats(fullFiltered);
-            this.renderCosechaRendimientoPredioChart(rendimientoStats);
-
-            const evolucionStats = await SofiaApiModel.getHistoricalYieldEvolution(filters);
-            this.renderCosechaEvolucionRendimientoChart(evolucionStats);
-
-            const histStats = await SofiaApiModel.getHistoricalCosechaStats(filters);
-            this.renderCosechaHistoryChart(histStats);
-        };
-
-        const bind = (id, key) => {
-            document.getElementById(id)?.addEventListener('change', (e) => {
-                filters[key] = e.target.value;
-                if (key === 'finca') { filters.predio = ''; filters.variedad = ''; }
-                updateDashboard();
-            });
-        };
-
-        bind('filter-cosecha-ciclo', 'ciclo');
-        bind('filter-cosecha-finca', 'finca');
-        bind('filter-cosecha-predio', 'predio');
-        bind('filter-cosecha-variedad', 'variedad');
-
-        const btnCerrarCiclo = document.getElementById('btn-cerrar-ciclo');
-        if (btnCerrarCiclo) {
-            btnCerrarCiclo.addEventListener('click', async () => {
-                const currentCycle = document.getElementById('filter-cosecha-ciclo').value;
-                if (confirm(`¿Estás seguro que deseas pasar el ciclo ${currentCycle} a histórico (Archivarlo)?\nSe guardará localmente para mejorar el rendimiento, se almacenará en la base de datos histórica y dejará de actualizarse desde Sofía.`)) {
-                    // Force refresh from API one last time before converting it to manual historical
-                    const btnOriginalText = btnCerrarCiclo.textContent;
-                    btnCerrarCiclo.textContent = 'Archivando...';
-                    btnCerrarCiclo.disabled = true;
-                    try {
-                        const dataToArchive = await SofiaApiModel.fetchCycleData(currentCycle, true);
-                        
-                        // Guardar en la base de datos de PostgreSQL
-                        const archiveResponse = await fetch('/api/archive-cycle', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ ciclo: currentCycle, data: dataToArchive })
-                        });
-                        const archiveResult = await archiveResponse.json();
-                        
-                        if (!archiveResponse.ok || !archiveResult.success) {
-                            throw new Error(archiveResult.message || 'Error del servidor al archivar');
-                        }
-
-                        localStorage.setItem(`manualHistory_${currentCycle}`, 'true');
-                        alert(`Ciclo ${currentCycle} guardado en base de datos histórica exitosamente.`);
-                        updateDashboard();
-                    } catch (e) {
-                        alert("Error archivando el ciclo: " + e.message);
-                    } finally {
-                        btnCerrarCiclo.textContent = btnOriginalText;
-                        btnCerrarCiclo.disabled = false;
-                    }
-                }
-            });
-        }
-
-        // State for inner widget
-        const clFiltersState = { finca: '', ciclo: filters.ciclo };
-
-        const updateCosechaLevantadoWidget = async () => {
-            const container = document.getElementById('cosecha-levantado-wrapper');
-            if (!container) return;
-
-            // Get full cycle data (ignoring top-level 'desde/hasta', just using local filter 'ciclo')
-            const fullCycleData = await SofiaApiModel.fetchCycleData(clFiltersState.ciclo || '2025-2026');
-            // Apply ONLY local finca filter (ignore global predio/variedades for this section as it's grouped)
-            const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, { finca: clFiltersState.finca });
-            const clStats = SofiaApiModel.getCosechaLevantadoStats(fullFiltered);
-            const pasaEvolStats = SofiaApiModel.getCosechaComparativaPorPredio(fullFiltered); // FIXED METHOD NAME
-            const playaStats = SofiaApiModel.getLevantadoPorPlayaStats(fullFiltered);
-
-            container.innerHTML = renderCosechaLevantadoTable(clStats, clFiltersState.finca, clFiltersState.ciclo) + renderLevantadoPorPlaya(playaStats);
-            
-            // Render the new chart manually
-            this.renderCosechaPasaPrediosChart(pasaEvolStats);
-
-            // Re-bind local elements
-            document.getElementById('filter-cl-finca')?.addEventListener('change', e => {
-                clFiltersState.finca = e.target.value;
-                updateCosechaLevantadoWidget();
-            });
-            document.getElementById('filter-cl-ciclo')?.addEventListener('change', e => {
-                clFiltersState.ciclo = e.target.value;
-                updateCosechaLevantadoWidget();
-            });
+            // Global Charts re-render
+            const fullCycleData = await SofiaApiModel.fetchCycleData(clFiltersState.ciclo);
+            const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, clFiltersState);
+            this.renderCosechaRendimientoPredioChart(SofiaApiModel.getRendimientoPredioStats(fullFiltered));
+            this.renderCosechaEvolucionRendimientoChart(await SofiaApiModel.getHistoricalYieldEvolution(clFiltersState));
+            this.renderCosechaHistoryChart(await SofiaApiModel.getHistoricalCosechaStats(clFiltersState));
         };
 
         await updateDashboard();
@@ -1419,8 +1344,11 @@ export class AppController {
                 overlay.querySelectorAll('.avatar-option-admin').forEach(opt => {
                     opt.onclick = () => {
                         const img = opt.dataset.img;
-                        document.getElementById('user-avatar').value = img;
-                        updatePreview(img);
+                        const avatarInput = document.getElementById('user-avatar');
+                        if (avatarInput) {
+                            avatarInput.value = img;
+                            updatePreview(img);
+                        }
                         
                         overlay.querySelectorAll('.avatar-option-admin').forEach(o => {
                             o.style.borderColor = 'transparent';
@@ -1459,7 +1387,7 @@ export class AppController {
 
             const editId = document.getElementById('user-edit-id').value;
             const email = document.getElementById('user-email').value.trim();
-            const avatar = (email === 'admin@naturalfood.com') ? 'gerencia.png' : document.getElementById('user-avatar').value;
+            const avatar = document.getElementById('user-avatar').value || 'ingeniero.png';
 
             const userData = {
                 name: document.getElementById('user-name').value.trim(),
@@ -1483,7 +1411,15 @@ export class AppController {
                         // If password field is empty, don't send it to preserve current password
                         if (!password) delete userData.password;
                         await UserModel.update(parseInt(editId), userData);
-                        this.showNotification('Usuario actualizado con éxito', 'success');
+                        this.showToast('Usuario actualizado con éxito', 'success');
+
+                        // Actualizar sesión si es el usuario actual
+                        if (this.currentUser && (this.currentUser.id === parseInt(editId) || this.currentUser.email === userData.email)) {
+                            const updatedUser = { ...this.currentUser, ...userData };
+                            this.currentUser = updatedUser;
+                            localStorage.setItem('nf_session', JSON.stringify(updatedUser));
+                            this.refreshSidebarProfile(updatedUser);
+                        }
                     }
                 } else {
                     if (!password) {
@@ -1493,13 +1429,13 @@ export class AppController {
                         return;
                     }
                     await UserModel.add(userData);
-                    this.showNotification('Usuario creado con éxito', 'success');
+                    this.showToast('Usuario creado con éxito', 'success');
                 }
                 hideModal();
                 refreshTable();
             } catch (err) {
                 console.error("Error saving user:", err);
-                this.showNotification('Error al guardar el usuario. Inténtelo de nuevo.', 'error');
+                this.showToast('Error al guardar el usuario. Inténtelo de nuevo.', 'error');
                 btnSave.disabled = false;
                 btnSave.textContent = originalText;
             }
@@ -3036,7 +2972,25 @@ bindDashboardEvents(user) {
     this.bindNotificationBell();
 }
 
-// ── Notification Bell ──
+    // ── Update UI parts ──
+    refreshSidebarProfile(user) {
+        const sidebarAvatar = document.querySelector('#sidebar-user-menu img');
+        const sidebarName = document.querySelector('.sidebar-user-name');
+        const sidebarRole = document.querySelector('.sidebar-user-role');
+
+        if (sidebarAvatar) {
+            sidebarAvatar.src = `/img/usuarios/${user.avatar || 'ingeniero.png'}`;
+        }
+        if (sidebarName) {
+            sidebarName.textContent = user.name;
+        }
+        if (sidebarRole) {
+            sidebarRole.textContent = user.role;
+        }
+    }
+
+    // ── Notification Bell ──
+
 bindNotificationBell() {
     const bell = document.querySelector('.notification-bell');
     if (!bell) return;

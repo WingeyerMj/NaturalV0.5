@@ -343,7 +343,12 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
 
         <div class="sidebar-footer">
           <div class="sidebar-user" id="sidebar-user-menu">
-            <div class="sidebar-avatar">${user.avatar}</div>
+            <div class="sidebar-avatar">
+              <img src="/img/usuarios/${user.avatar || 'ingeniero.png'}" 
+                   alt="Avatar" 
+                   onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random'"
+                   style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            </div>
             <div class="sidebar-user-info">
               <div class="sidebar-user-name">${user.name}</div>
               <div class="sidebar-user-role">${user.role}</div>
@@ -1705,29 +1710,6 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
 
   return `
     <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-4);">
-      <div>
-        <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-3);">
-          🍇 Cosecha en Fresco vs. Levantado de Pasa
-        </h3>
-        <p style="color: var(--text-tertiary); font-size: 0.85em; margin: 0;">
-          Comparación de kg cosechados en fresco y pasa levantada. Factor = (Fresco/Pasa).
-        </p>
-      </div>
-      <div style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
-         <label class="form-label" style="margin:0; font-size: 0.85em;">Clasificación:</label>
-         <select class="form-select sofia-filter-select" id="filter-cl-finca" style="padding: 4px 12px; font-size: 0.9em; min-width: 130px;">
-            <option value="" ${currentFinca === '' ? 'selected' : ''}>Ambas Fincas</option>
-            <option value="El Espejo" ${currentFinca === 'El Espejo' ? 'selected' : ''}>El Espejo</option>
-            <option value="Fincas Viejas" ${currentFinca === 'Fincas Viejas' ? 'selected' : ''}>Fincas Viejas</option>
-         </select>
-         <label class="form-label" style="margin:0; margin-left: var(--space-2); font-size: 0.85em;">Ciclo:</label>
-         <select class="form-select sofia-filter-select" id="filter-cl-ciclo" style="padding: 4px 12px; font-size: 0.9em;">
-            ${['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022', '2020-2021', '2019-2020', '2018-2019', '2017-2018', '2016-2017', '2015-2016', '2014-2015', '2013-2014', '2012-2013'].map(c =>
-    `<option value="${c}" ${currentCiclo === c ? 'selected' : ''}>${c}</option>`
-  ).join('')}
-         </select>
-      </div>
     </div>
 
 

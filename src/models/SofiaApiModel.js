@@ -533,8 +533,10 @@ export class SofiaApiModel {
                 costo_ars: costo,
                 hectareas: info.ha,
                 clasifica: r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica || info.predio,
+                cuartel: r.cuartel || r.Cuartel || info.code,
                 variedad: r.variedad || r.variedades || r.Variedad || r.Variedades || info.variedad,
                 isCosecha,
+                isPasaHumeda: hasExclusion || !!r.isPasaHumeda,
                 labor_normalized: (r.finca === 'El Espejo' && (r.labor === 'Poda' || r.labor === 'Poda dov')) ? 'Poda' : r.labor,
                 fecha: (() => {
                     let d = r.fecha || r.Fecha || r.date || r.Date;
@@ -595,11 +597,19 @@ export class SofiaApiModel {
 
     static applyFilters(data, filters) {
         return data.filter(r => {
-            if (filters.finca && r.finca !== filters.finca) return false;
-            if (filters.predio && r.clasifica !== filters.predio) return false;
-            if (filters.variedad && r.variedad !== filters.variedad) return false;
-            if (filters.desde && new Date(r.fecha) < new Date(filters.desde)) return false;
-            if (filters.hasta && new Date(r.fecha) > new Date(filters.hasta)) return false;
+            const rFinca = r.finca || r.Finca;
+            const rPredio = r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica;
+            const rCuartel = r.cuartel || r.Cuartel;
+            const rVariedad = r.variedad || r.variedades || r.Variedad || r.Variedades;
+
+            if (filters.finca && rFinca !== filters.finca) return false;
+            if (filters.predio && rPredio !== filters.predio) return false;
+            if (filters.variedad && rVariedad !== filters.variedad) return false;
+            if (filters.cuartel && rCuartel !== filters.cuartel) return false;
+            
+            const rFecha = r.fecha || r.Fecha || r.date || r.Date;
+            if (filters.desde && new Date(rFecha) < new Date(filters.desde)) return false;
+            if (filters.hasta && new Date(rFecha) > new Date(filters.hasta)) return false;
 
             if (filters.origen) {
                 const PROPIA_KEYWORDS = ['CAMINO TRUNCADO', 'TRUNCADO', 'EEI', 'EEII', 'EEIII', 'CHIMBERA', 'PUENTE ALTO', 'P. ALTO', 'P.ALTO'];
@@ -838,11 +848,14 @@ export class SofiaApiModel {
         const variedades = {};
 
         data.forEach(r => {
+            const clasif = (r.clasifica || '').toUpperCase();
+            const isPasaHumeda = r.isPasaHumeda;
+            if (isPasaHumeda) return; // Skip "pasa humeda" for dashboard totals
+
             const kilos = r.rendimiento_val || 0;
             totalKilos += kilos;
 
             // --- PREDIO MAPPING (Normalized names) ---
-            const clasif = (r.clasifica || '').toUpperCase();
             let predioKey = r.clasifica || 'Otros';
             
             if (clasif.includes('CAMINO TRUNCADO') || clasif.includes('TRUNCADO')) predioKey = 'Camino Truncado';
@@ -866,7 +879,7 @@ export class SofiaApiModel {
                 fincaKey = 'El Espejo';
             }
 
-            const isPasaHumeda = clasif.includes('PASA H') || clasif.includes('HUMEDA');
+            // use existing isPasaHumeda
             if (!(fincaKey === 'Terceros' && isPasaHumeda)) {
                 if (!fincas[fincaKey]) fincas[fincaKey] = 0;
                 fincas[fincaKey] += kilos;
@@ -893,6 +906,8 @@ export class SofiaApiModel {
         const cuartelesPropios = new Set();
 
         data.forEach(r => {
+            if (r.isPasaHumeda) return; // Skip "pasa humeda" here too
+            
             const kilos = r.rendimiento_val || 0;
             const clasif = (r.clasifica || '').toUpperCase();
 
@@ -1028,6 +1043,9 @@ export class SofiaApiModel {
             const rawPredio = r.clasifica || '';
             const config = PREDIO_CONFIG.find(c => rawPredio.includes(c.keyword));
             if (!config) return;
+
+            const clasif = (r.clasifica || '').toUpperCase();
+            if (clasif.includes('PASA H') || clasif.includes('HUMEDA')) return;
 
             // Detect labor type and pass number
             let type = null;
@@ -1229,6 +1247,9 @@ export class SofiaApiModel {
             const rawPredio = r.clasifica || '';
             const predioObj = PREDIO_CONFIG.find(c => rawPredio.includes(c.keyword));
             if (!predioObj) return;
+
+            const clasifNormalized = (r.clasifica || '').toUpperCase();
+            if (clasifNormalized.includes('PASA H') || clasifNormalized.includes('HUMEDA')) return;
 
             const labor = (r.labor || '').toLowerCase().trim();
             const isFresco = labor.match(/cosech[a-z]*\s*kg\s*[1-5]/i) !== null;
