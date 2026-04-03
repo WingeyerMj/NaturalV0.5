@@ -3273,11 +3273,13 @@ export function renderPresupuestoProyeccionView() {
         </div>
 
         <!-- Tabs -->
-        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2);">
+        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); flex-wrap: wrap;">
             <button class="btn btn-primary" id="ppto-tab-jornales-cant" style="border-radius: 8px 8px 0 0;">👷 Jornales (Cant.)</button>
             <button class="btn btn-ghost" id="ppto-tab-jornales-costo" style="border-radius: 8px 8px 0 0;">💵 Jornales (Costo)</button>
             <button class="btn btn-ghost" id="ppto-tab-gastos" style="border-radius: 8px 8px 0 0;">📦 Gastos y Consumos</button>
-            <button class="btn btn-ghost" id="ppto-tab-excel" style="border-radius: 8px 8px 0 0;">📊 Presupuesto General (Excel)</button>
+            <button class="btn btn-ghost" id="ppto-tab-produccion" style="border-radius: 8px 8px 0 0;">🍇 Producción Estimada</button>
+            <button class="btn btn-ghost" id="ppto-tab-excel" style="border-radius: 8px 8px 0 0;">📊 Ppto General (Excel)</button>
+            <button class="btn btn-ghost" id="ppto-tab-ejecucion" style="border-radius: 8px 8px 0 0;">📈 Ejecución vs Plan</button>
         </div>
 
         <!-- Tab Content: Jornales Cantidad -->
@@ -3411,6 +3413,144 @@ export function renderPresupuestoProyeccionView() {
             </div>
         </div>
 
+        <!-- Tab Content: Producción Estimada (UVA → PASA) -->
+        <div id="ppto-content-produccion" style="display: none;">
+            <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6); border: 1px solid rgba(139, 92, 246, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <div>
+                        <h3 style="margin: 0; color: #8b5cf6; display: flex; align-items: center; gap: 8px;">
+                            🍇 Estimación de Producción por Predio
+                        </h3>
+                        <p style="margin: var(--space-1) 0 0; color: var(--text-tertiary); font-size: 0.85em;">
+                            Defina los Kg de uva estimados por hectárea para cada predio. La producción de pasas se calcula dividiendo por 4.
+                        </p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" id="btn-ppto-save-produccion" style="border: 1px solid #8b5cf6; color: #8b5cf6;">
+                        💾 Guardar Estimaciones
+                    </button>
+                </div>
+
+                <div class="charts-row" style="margin-bottom: var(--space-6);">
+                    <div class="chart-container" style="flex: 1;">
+                        <div class="chart-header">
+                            <span class="chart-title">📊 Producción Estimada: Uva vs Pasa por Predio</span>
+                        </div>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="chart-ppto-produccion"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-produccion">
+                        <thead>
+                            <tr style="background: rgba(139, 92, 246, 0.1);">
+                                <th>Finca</th>
+                                <th>Predio</th>
+                                <th style="text-align: right;">Hectáreas</th>
+                                <th style="text-align: right; min-width: 150px;">Kg Uva/Ha (estimado)</th>
+                                <th style="text-align: right;">Total Kg Uva</th>
+                                <th style="text-align: right;">Kg Pasa Estimado (÷4)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-produccion">
+                            <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Presione "Generar Presupuesto" para cargar datos de predios
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-produccion"></tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Conteo de Racimos Post-Floración -->
+            <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6); border: 1px solid rgba(245, 158, 11, 0.3); background: linear-gradient(135deg, rgba(245, 158, 11, 0.03), transparent);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); cursor: pointer;" id="btn-toggle-racimos">
+                    <div>
+                        <h3 style="margin: 0; color: #f59e0b; display: flex; align-items: center; gap: 8px;">
+                            🌸 Conteo de Racimos Post-Floración
+                            <span style="font-size: 0.65em; padding: 3px 10px; border-radius: 12px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; font-weight: 500;">Análisis del Ingeniero</span>
+                        </h3>
+                        <p style="margin: var(--space-1) 0 0; color: var(--text-tertiary); font-size: 0.85em;">
+                            Después de la floración, se cuentan los racimos por planta para estimar rendimiento por cuartel.
+                            El ingeniero decide si aplicar esta estimación al presupuesto.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: var(--space-2); align-items: center;">
+                        <button class="btn btn-ghost btn-sm" id="btn-ppto-save-racimos" style="border: 1px solid #f59e0b; color: #f59e0b;">
+                            💾 Guardar Conteo
+                        </button>
+                        <button class="btn btn-ghost btn-sm" id="btn-ppto-apply-racimos" style="border: 1px solid #10b981; color: #10b981;" title="Aplica las estimaciones marcadas a la tabla de Kg Uva/Ha">
+                            ✅ Aplicar al Presupuesto
+                        </button>
+                        <span id="racimos-toggle-icon" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>
+                    </div>
+                </div>
+
+                <div id="racimos-content-wrapper" style="display: none;">
+                    <div style="display: flex; gap: var(--space-4); margin-bottom: var(--space-4); flex-wrap: wrap;">
+                        <div class="metric-card" style="flex: 1; min-width: 180px; border-left: 3px solid #f59e0b;">
+                            <div class="metric-label">PESO PROMEDIO POR RACIMO</div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="number" id="racimos-peso-default" value="0.35" step="0.05" min="0.1" max="2"
+                                    style="width: 80px; text-align: right; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 8px; color: var(--text-primary); font-size: 1.1em; font-weight: 600;"
+                                />
+                                <span style="color: var(--text-tertiary); font-size: 0.85em;">kg/racimo</span>
+                            </div>
+                            <div style="font-size: 0.75em; color: var(--text-tertiary); margin-top: 4px;">Valor base para todos los cuarteles</div>
+                        </div>
+                        <div class="metric-card" style="flex: 1; min-width: 180px; border-left: 3px solid #8b5cf6;">
+                            <div class="metric-label">CUARTELES CON CONTEO</div>
+                            <div class="metric-value" id="racimos-cuarteles-count" style="font-size: 1.4em;">0</div>
+                        </div>
+                        <div class="metric-card" style="flex: 1; min-width: 180px; border-left: 3px solid #10b981;">
+                            <div class="metric-label">ESTIMACIÓN TOTAL UVA</div>
+                            <div class="metric-value" id="racimos-total-uva" style="font-size: 1.4em;">0 kg</div>
+                        </div>
+                        <div class="metric-card" style="flex: 1; min-width: 180px; border-left: 3px solid #6366f1;">
+                            <div class="metric-label">ESTIMACIÓN TOTAL PASA</div>
+                            <div class="metric-value" id="racimos-total-pasa" style="font-size: 1.4em;">0 kg</div>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="tbl-ppto-racimos">
+                            <thead>
+                                <tr style="background: rgba(245, 158, 11, 0.1);">
+                                    <th>Finca</th>
+                                    <th>Predio</th>
+                                    <th>Cuartel</th>
+                                    <th style="text-align: right;">Plantas</th>
+                                    <th style="text-align: right;">Ha</th>
+                                    <th style="text-align: right; min-width: 120px;">Racimos/Planta</th>
+                                    <th style="text-align: right; min-width: 100px;">Peso/Racimo (kg)</th>
+                                    <th style="text-align: right;">Kg Uva Est.</th>
+                                    <th style="text-align: right;">Kg/Ha Est.</th>
+                                    <th style="text-align: right;">Kg Pasa Est.</th>
+                                    <th style="text-align: center; min-width: 70px;" title="Marque para aplicar esta estimación al presupuesto">Aplicar</th>
+                                    <th style="min-width: 150px;">Notas Ingeniero</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-ppto-racimos">
+                                <tr><td colspan="12" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                    Presione "Generar Presupuesto" para cargar datos de cuarteles
+                                </td></tr>
+                            </tbody>
+                            <tfoot id="tfoot-ppto-racimos"></tfoot>
+                        </table>
+                    </div>
+
+                    <div style="margin-top: var(--space-4); padding: var(--space-3); background: rgba(245, 158, 11, 0.05); border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.15);">
+                        <p style="margin: 0; font-size: 0.8em; color: var(--text-tertiary); line-height: 1.6;">
+                            <strong style="color: #f59e0b;">ℹ️ Metodología:</strong> Racimos/Planta × Peso/Racimo × Plantas = Kg Uva Cuartel.
+                            Al marcar "Aplicar", la estimación por conteo de racimos reemplaza el valor manual de Kg/Ha en la tabla de producción del predio correspondiente.
+                            El ingeniero puede ajustar el peso por racimo y las notas según su análisis de campo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Tab Content: Presupuesto General (Excel) -->
         <div id="ppto-content-excel" style="display: none;">
             <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
@@ -3425,10 +3565,35 @@ export function renderPresupuestoProyeccionView() {
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div style="display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-4); padding-bottom: var(--space-8);">
-            <button class="btn btn-ghost" id="btn-ppto-export">📄 Exportar CSV</button>
-            <button class="btn btn-primary" id="btn-ppto-save">💾 Guardar Presupuesto</button>
+        <!-- Tab Content: Ejecución vs Plan -->
+        <div id="ppto-content-ejecucion" style="display: none;">
+            <div id="ppto-ejecucion-container">
+                <div class="card" style="padding: 3rem; text-align: center; color: var(--text-tertiary); border: 1px dashed var(--color-border);">
+                    <div style="font-size: 3em; margin-bottom: var(--space-4);">📋</div>
+                    <h3 style="margin: 0 0 var(--space-2); color: var(--text-secondary);">Presupuesto No Confirmado</h3>
+                    <p style="margin: 0;">Para ver la ejecución real vs planificada, primero confirme el presupuesto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Badge + Action Buttons -->
+        <div style="display: flex; gap: var(--space-3); justify-content: space-between; align-items: center; margin-top: var(--space-4); padding-bottom: var(--space-4);">
+            <div id="ppto-status-badge" style="display: flex; align-items: center; gap: var(--space-3);">
+                <span id="ppto-status-text" style="padding: 6px 16px; border-radius: 20px; font-size: 0.85em; font-weight: 600; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);">
+                    🔧 En Construcción
+                </span>
+                <span id="ppto-confirmed-date" style="font-size: 0.8em; color: var(--text-tertiary); display: none;"></span>
+            </div>
+            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+                <button class="btn btn-ghost" id="btn-ppto-export">📄 Exportar CSV</button>
+                <button class="btn btn-primary" id="btn-ppto-save">💾 Guardar Borrador</button>
+                <button class="btn" id="btn-ppto-confirm" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; font-weight: 600; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                    ✅ Confirmar Presupuesto
+                </button>
+                <button class="btn btn-ghost" id="btn-ppto-unconfirm" style="display: none; border: 1px solid #ef4444; color: #ef4444;">
+                    🔓 Desbloquear
+                </button>
+            </div>
         </div>
 
         <!-- NEW: Mixed Budget Export Section -->
@@ -3449,6 +3614,131 @@ export function renderPresupuestoProyeccionView() {
         </div>
     </div>
   `;
+}
+
+// ── Render Execution View (Planificado vs Real) ──
+export function renderEjecucionPresupuesto(comparison) {
+    if (!comparison) return '';
+    const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+    const fmtDec = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+    const pctColor = (pct) => pct > 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
+    const estadoIcon = (estado) => estado === 'excedido' || estado === 'superado' ? '🔴' : estado === 'alerta' || estado === 'bueno' ? '🟡' : '🟢';
+
+    const t = comparison.totals;
+    const jPct = t.jornalesPlan > 0 ? (t.jornalesReal / t.jornalesPlan * 100) : 0;
+    const gPct = t.gastosPlan > 0 ? (t.gastosReal / t.gastosPlan * 100) : 0;
+    const uPct = t.uvaPlan > 0 ? (t.uvaReal / t.uvaPlan * 100) : 0;
+    const pPct = t.pasaPlan > 0 ? (t.pasaReal / t.pasaPlan * 100) : 0;
+
+    return `
+    <div class="animate-fade-in">
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="metric-card" style="border-left: 4px solid ${pctColor(jPct)};">
+                <div class="metric-label">JORNALES</div>
+                <div class="metric-value" style="font-size: 1.4em;">${fmtDec(jPct)}%</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">${fmt(t.jornalesReal)} / ${fmt(t.jornalesPlan)} plan</div>
+                <div style="margin-top: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; height: 6px; overflow: hidden;">
+                    <div style="height: 100%; width: ${Math.min(jPct, 100)}%; background: ${pctColor(jPct)}; border-radius: 6px; transition: width 1s ease;"></div>
+                </div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid ${pctColor(gPct)};">
+                <div class="metric-label">CONSUMOS / INSUMOS</div>
+                <div class="metric-value" style="font-size: 1.4em;">${fmtDec(gPct)}%</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">${fmt(t.gastosReal)} / ${fmt(t.gastosPlan)} plan</div>
+                <div style="margin-top: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; height: 6px; overflow: hidden;">
+                    <div style="height: 100%; width: ${Math.min(gPct, 100)}%; background: ${pctColor(gPct)}; border-radius: 6px; transition: width 1s ease;"></div>
+                </div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid ${pctColor(uPct)};">
+                <div class="metric-label">PRODUCCIÓN UVA</div>
+                <div class="metric-value" style="font-size: 1.4em;">${fmtDec(uPct)}%</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">${fmt(t.uvaReal)} / ${fmt(t.uvaPlan)} kg plan</div>
+                <div style="margin-top: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; height: 6px; overflow: hidden;">
+                    <div style="height: 100%; width: ${Math.min(uPct, 100)}%; background: ${pctColor(uPct)}; border-radius: 6px; transition: width 1s ease;"></div>
+                </div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid ${pctColor(pPct)};">
+                <div class="metric-label">PRODUCCIÓN PASA</div>
+                <div class="metric-value" style="font-size: 1.4em;">${fmtDec(pPct)}%</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">${fmt(t.pasaReal)} / ${fmt(t.pasaPlan)} kg plan</div>
+                <div style="margin-top: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; height: 6px; overflow: hidden;">
+                    <div style="height: 100%; width: ${Math.min(pPct, 100)}%; background: ${pctColor(pPct)}; border-radius: 6px; transition: width 1s ease;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-row" style="margin-bottom: var(--space-6);">
+            <div class="chart-container" style="flex: 1;">
+                <div class="chart-header"><span class="chart-title">📊 Jornales: Planificado vs Consumido</span></div>
+                <div style="height: 300px; position: relative;"><canvas id="chart-ejecucion-jornales"></canvas></div>
+            </div>
+            <div class="chart-container" style="flex: 1;">
+                <div class="chart-header"><span class="chart-title">🍇 Producción: Plan vs Real por Predio</span></div>
+                <div style="height: 300px; position: relative;"><canvas id="chart-ejecucion-produccion"></canvas></div>
+            </div>
+        </div>
+
+        ${comparison.jornales.length > 0 ? `
+        <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+            <h3 style="margin: 0 0 var(--space-4); color: var(--text-primary);">👷 Ejecución de Jornales</h3>
+            <div style="overflow-x: auto;"><table class="data-table">
+                <thead><tr>
+                    <th>Labor</th><th style="text-align: right;">Planificado</th><th style="text-align: right;">Consumido</th>
+                    <th style="text-align: right;">Diferencia</th><th style="text-align: center; min-width: 120px;">Avance</th><th style="text-align: center;">Estado</th>
+                </tr></thead>
+                <tbody>
+                    ${comparison.jornales.map(j => `<tr>
+                        <td style="font-weight: 500;">${j.labor}</td>
+                        <td style="text-align: right;">${fmtDec(j.planificado)}</td>
+                        <td style="text-align: right; font-weight: 600;">${fmtDec(j.consumido)}</td>
+                        <td style="text-align: right; color: ${j.diferencia > 0 ? '#ef4444' : '#10b981'};">${j.diferencia > 0 ? '+' : ''}${fmtDec(j.diferencia)}</td>
+                        <td style="text-align: center;"><div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+                            <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 4px; height: 8px; max-width: 80px; overflow: hidden;">
+                                <div style="height: 100%; width: ${Math.min(j.porcentaje, 100)}%; background: ${pctColor(j.porcentaje)}; border-radius: 4px;"></div>
+                            </div>
+                            <span style="font-size: 0.85em; font-weight: 600; color: ${pctColor(j.porcentaje)};">${fmtDec(j.porcentaje)}%</span>
+                        </div></td>
+                        <td style="text-align: center;">${estadoIcon(j.estado)}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table></div>
+        </div>` : ''}
+
+        ${comparison.produccion.length > 0 ? `
+        <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6); border: 1px solid rgba(139, 92, 246, 0.2);">
+            <h3 style="margin: 0 0 var(--space-4); color: #8b5cf6;">🍇 Ejecución de Producción por Predio</h3>
+            <div style="overflow-x: auto;"><table class="data-table">
+                <thead><tr style="background: rgba(139, 92, 246, 0.08);">
+                    <th>Finca</th><th>Predio</th><th style="text-align: right;">Ha</th>
+                    <th style="text-align: right;">Kg Uva Plan</th><th style="text-align: right;">Kg Uva Real</th>
+                    <th style="text-align: right;">Kg Pasa Plan</th><th style="text-align: right;">Kg Pasa Real</th>
+                    <th style="text-align: center; min-width: 120px;">Avance</th>
+                </tr></thead>
+                <tbody>
+                    ${comparison.produccion.map(p => `<tr>
+                        <td style="color: var(--text-tertiary); font-size: 0.85em;">${p.group}</td>
+                        <td style="font-weight: 600;">${p.predio}</td>
+                        <td style="text-align: right;">${fmtDec(p.hectareas)}</td>
+                        <td style="text-align: right;">${fmt(p.planificadoUva)}</td>
+                        <td style="text-align: right; font-weight: 600; color: ${pctColor(p.pctUva)};">${fmt(p.realUva)}</td>
+                        <td style="text-align: right;">${fmt(p.planificadoPasa)}</td>
+                        <td style="text-align: right; font-weight: 600;">${fmt(p.realPasa)}</td>
+                        <td style="text-align: center;"><div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+                            <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 4px; height: 8px; max-width: 80px; overflow: hidden;">
+                                <div style="height: 100%; width: ${Math.min(p.pctUva, 100)}%; background: ${pctColor(p.pctUva)}; border-radius: 4px;"></div>
+                            </div>
+                            <span style="font-size: 0.85em; font-weight: 600; color: ${pctColor(p.pctUva)};">${fmtDec(p.pctUva)}%</span>
+                        </div></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table></div>
+        </div>` : ''}
+
+        <div style="text-align: center; padding: var(--space-3); color: var(--text-tertiary); font-size: 0.8em;">
+            Presupuesto confirmado el ${comparison.confirmedAt ? new Date(comparison.confirmedAt).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' }) : ''}
+        </div>
+    </div>
+    `;
 }
 
 // ── Gastos View ──

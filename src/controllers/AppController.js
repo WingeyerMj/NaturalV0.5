@@ -36,7 +36,8 @@ import {
     renderHectareasPorPredio, renderEficienciaChartSection,
     renderCosechaLevantadoTable, renderLevantadoPorPlaya, renderAdminCrudView, renderWorkLogView,
     renderGastosView, renderSecaderosView, renderGastosHistoricosView,
-    renderControlCargaView, renderPresupuestoProyeccionView, renderExcelBudgetSummary
+    renderControlCargaView, renderPresupuestoProyeccionView, renderExcelBudgetSummary,
+    renderEjecucionPresupuesto
 } from '../views/Views.js';
 
 import { SecaderosController } from './SecaderosController.js';
@@ -5377,16 +5378,20 @@ renderFertUnidadesChart() {
         const tabJornalesCant = document.getElementById('ppto-tab-jornales-cant');
         const tabJornalesCosto = document.getElementById('ppto-tab-jornales-costo');
         const tabGastos = document.getElementById('ppto-tab-gastos');
+        const tabProduccion = document.getElementById('ppto-tab-produccion');
         const tabExcel = document.getElementById('ppto-tab-excel');
+        const tabEjecucion = document.getElementById('ppto-tab-ejecucion');
         
         const contentJornalesCant = document.getElementById('ppto-content-jornales-cant');
         const contentJornalesCosto = document.getElementById('ppto-content-jornales-costo');
         const contentGastos = document.getElementById('ppto-content-gastos');
+        const contentProduccion = document.getElementById('ppto-content-produccion');
         const contentExcel = document.getElementById('ppto-content-excel');
+        const contentEjecucion = document.getElementById('ppto-content-ejecucion');
 
         if (tabJornalesCant && tabJornalesCosto && tabGastos && tabExcel) {
-            const tabs = [tabJornalesCant, tabJornalesCosto, tabGastos, tabExcel];
-            const contents = [contentJornalesCant, contentJornalesCosto, contentGastos, contentExcel];
+            const tabs = [tabJornalesCant, tabJornalesCosto, tabGastos, tabProduccion, tabExcel, tabEjecucion].filter(Boolean);
+            const contents = [contentJornalesCant, contentJornalesCosto, contentGastos, contentProduccion, contentExcel, contentEjecucion].filter(Boolean);
 
             const switchTab = (activeTab, activeContent) => {
                 tabs.forEach(t => t.className = 'btn btn-ghost');
@@ -5398,7 +5403,9 @@ renderFertUnidadesChart() {
             tabJornalesCant.addEventListener('click', () => switchTab(tabJornalesCant, contentJornalesCant));
             tabJornalesCosto.addEventListener('click', () => switchTab(tabJornalesCosto, contentJornalesCosto));
             tabGastos.addEventListener('click', () => switchTab(tabGastos, contentGastos));
+            if (tabProduccion) tabProduccion.addEventListener('click', () => switchTab(tabProduccion, contentProduccion));
             tabExcel.addEventListener('click', () => switchTab(tabExcel, contentExcel));
+            if (tabEjecucion) tabEjecucion.addEventListener('click', () => switchTab(tabEjecucion, contentEjecucion));
         }
 
         // State
@@ -5406,6 +5413,7 @@ renderFertUnidadesChart() {
         let gastosData = { byCategoria: [], byProducto: [], totals: {} };
         let jornalesSummary = { byLabor: [], byPredio: [], totals: {} };
         let excelBudgetData = null;
+        let hectareasData = null;
 
         // Load button
         const btnLoad = document.getElementById('btn-ppto-load');
@@ -5472,6 +5480,37 @@ renderFertUnidadesChart() {
                 const excelContainer = document.getElementById('excel-budget-container');
                 if (excelContainer) excelContainer.innerHTML = `<div class="alert alert-error">Error al cargar Excel: ${err.message}</div>`;
             }
+
+            // 9. Load Production Estimation (Hectáreas per Predio)
+            try {
+                const allCycleData = await SofiaApiModel.fetchCycleData(cicloBase);
+                hectareasData = SofiaApiModel.getHectareasPorPredio(allCycleData);
+                this.renderProductionEstimationTable(cicloDestino, hectareasData);
+            } catch (err) {
+                console.warn('Error loading hectareas data for production', err);
+            }
+
+            // 10. Update Status Badge
+            this.updatePresupuestoStatus(cicloDestino);
+
+            // 11. Load Execution Comparison if confirmed
+            if (PresupuestoBudgetModel.isConfirmed(cicloDestino)) {
+                try {
+                    const realCycleData = await SofiaApiModel.fetchCycleData(cicloDestino.split('-')[0] + '-' + cicloDestino.split('-')[1]);
+                    const realJornales = PresupuestoBudgetModel.buildJornalesSummary(realCycleData);
+                    const realGastos = PresupuestoBudgetModel.buildGastosSummary(cicloDestino);
+                    const comparison = PresupuestoBudgetModel.getExecutionComparison(cicloDestino, realJornales, realGastos, realCycleData);
+                    if (comparison) {
+                        const ejecContainer = document.getElementById('ppto-ejecucion-container');
+                        if (ejecContainer) {
+                            ejecContainer.innerHTML = renderEjecucionPresupuesto(comparison);
+                            requestAnimationFrame(() => this.renderEjecucionCharts(comparison));
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Error loading execution comparison:', err);
+                }
+            }
         };
 
         // Save
@@ -5523,6 +5562,141 @@ renderFertUnidadesChart() {
             const factor = 1 + (parseFloat(pct) / 100);
             document.querySelectorAll('[data-ppto-producto]').forEach(input => {
                 input.value = (parseFloat(input.value) * factor).toFixed(1);
+                input.dispatchEvent(new Event('input'));
+            });
+        });
+
+        // ── Confirm / Unconfirm Budget ──
+        document.getElementById('btn-ppto-confirm')?.addEventListener('click', () => {
+            const cicloDestino = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
+            if (PresupuestoBudgetModel.isConfirmed(cicloDestino)) {
+                alert('Este presupuesto ya está confirmado.');
+                return;
+            }
+            if (!confirm(`¿Confirmar el presupuesto para ${cicloDestino}?\n\nUna vez confirmado, se tomará como referencia para el seguimiento de ejecución.\nLos valores actuales quedarán congelados.`)) return;
+
+            // Collect current projections from inputs
+            const jornalesSnapshot = {};
+            document.querySelectorAll('[data-ppto-labor]').forEach(input => {
+                jornalesSnapshot[input.getAttribute('data-ppto-labor')] = parseFloat(input.value) || 0;
+            });
+            const gastosSnapshot = {};
+            document.querySelectorAll('[data-ppto-producto]').forEach(input => {
+                gastosSnapshot[input.getAttribute('data-ppto-producto')] = parseFloat(input.value) || 0;
+            });
+
+            PresupuestoBudgetModel.confirm(cicloDestino, {
+                jornales: jornalesSnapshot,
+                gastos: gastosSnapshot
+            });
+
+            this.updatePresupuestoStatus(cicloDestino);
+            alert(`✅ Presupuesto ${cicloDestino} confirmado exitosamente.\n\nAhora puede ver la ejecución en la pestaña "Ejecución vs Plan".`);
+            
+            // Reload to refresh execution tab
+            document.getElementById('btn-ppto-load')?.click();
+        });
+
+        document.getElementById('btn-ppto-unconfirm')?.addEventListener('click', () => {
+            const cicloDestino = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
+            if (!confirm(`¿Desbloquear el presupuesto ${cicloDestino}?\n\nEsto permitirá volver a editar los valores, pero se perderán los datos de ejecución comparativa.`)) return;
+            PresupuestoBudgetModel.unconfirm(cicloDestino);
+            this.updatePresupuestoStatus(cicloDestino);
+            
+            // Clear execution tab
+            const ejecContainer = document.getElementById('ppto-ejecucion-container');
+            if (ejecContainer) {
+                ejecContainer.innerHTML = `<div class="card" style="padding: 3rem; text-align: center; color: var(--text-tertiary); border: 1px dashed var(--color-border);">
+                    <div style="font-size: 3em; margin-bottom: var(--space-4);">📋</div>
+                    <h3 style="margin: 0 0 var(--space-2); color: var(--text-secondary);">Presupuesto No Confirmado</h3>
+                    <p style="margin: 0;">Para ver la ejecución real vs planificada, primero confirme el presupuesto.</p>
+                </div>`;
+            }
+        });
+
+        // ── Save Production Estimates ──
+        document.getElementById('btn-ppto-save-produccion')?.addEventListener('click', () => {
+            const cicloDestino = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
+            const estimates = [];
+            document.querySelectorAll('[data-prod-predio]').forEach(input => {
+                const predio = input.getAttribute('data-prod-predio');
+                const group = input.getAttribute('data-prod-group');
+                const ha = parseFloat(input.getAttribute('data-prod-ha')) || 0;
+                const kgUvaHa = parseFloat(input.value) || 0;
+                estimates.push({ predio, group, hectareas: ha, kgUvaHa });
+            });
+            const enriched = PresupuestoBudgetModel.saveProductionEstimates(cicloDestino, estimates);
+            this.renderProductionChart(enriched);
+            alert('💾 Estimaciones de producción guardadas correctamente.');
+        });
+
+        // ── Conteo de Racimos (Toggle, Save, Apply) ──
+        document.getElementById('btn-toggle-racimos')?.addEventListener('click', (e) => {
+            // Don't toggle if clicking on the buttons inside
+            if (e.target.closest('button')) return;
+            const wrapper = document.getElementById('racimos-content-wrapper');
+            const icon = document.getElementById('racimos-toggle-icon');
+            if (wrapper) {
+                const isHidden = wrapper.style.display === 'none';
+                wrapper.style.display = isHidden ? '' : 'none';
+                if (icon) icon.textContent = isHidden ? '▲' : '▼';
+            }
+        });
+
+        document.getElementById('btn-ppto-save-racimos')?.addEventListener('click', () => {
+            const cicloDestino = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
+            const conteos = this._collectRacimosFromUI();
+            const enriched = PresupuestoBudgetModel.saveRacimosCounts(cicloDestino, conteos);
+            this._updateRacimosTotals(enriched);
+            alert('💾 Conteo de racimos guardado correctamente.');
+        });
+
+        document.getElementById('btn-ppto-apply-racimos')?.addEventListener('click', () => {
+            const cicloDestino = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
+            
+            // First save current racimos data
+            const conteos = this._collectRacimosFromUI();
+            const enriched = PresupuestoBudgetModel.saveRacimosCounts(cicloDestino, conteos);
+            
+            // Get racimos estimates aggregated by predio (only applied ones)
+            const applied = enriched.filter(c => c.aplicarEstimacion);
+            if (applied.length === 0) {
+                alert('⚠️ No hay cuarteles marcados para aplicar.\nMarque la casilla "Aplicar" en los cuarteles deseados.');
+                return;
+            }
+
+            // Aggregate by predio
+            const predioAgg = {};
+            applied.forEach(c => {
+                if (!predioAgg[c.predio]) predioAgg[c.predio] = { totalUva: 0, totalHa: 0 };
+                predioAgg[c.predio].totalUva += c.kgUvaCuartel;
+                predioAgg[c.predio].totalHa += c.hectareas;
+            });
+
+            // Update the production estimation inputs to use racimos-derived kg/ha
+            let updated = 0;
+            Object.entries(predioAgg).forEach(([predio, data]) => {
+                const kgHa = data.totalHa > 0 ? Math.round(data.totalUva / data.totalHa) : 0;
+                const input = document.querySelector(`[data-prod-predio="${predio}"]`);
+                if (input) {
+                    input.value = kgHa;
+                    input.dispatchEvent(new Event('input'));
+                    input.style.background = 'rgba(245, 158, 11, 0.15)';
+                    input.title = `Ajustado por conteo de racimos: ${kgHa} kg/ha`;
+                    updated++;
+                }
+            });
+
+            if (updated > 0) {
+                alert(`✅ Se aplicaron ${updated} estimaciones de racimos al presupuesto.\n\nLos valores de Kg Uva/Ha de ${Object.keys(predioAgg).join(', ')} fueron actualizados según el conteo de racimos.`);
+            }
+        });
+
+        // ── Default peso per racimo → update all ──
+        document.getElementById('racimos-peso-default')?.addEventListener('change', () => {
+            const defaultPeso = parseFloat(document.getElementById('racimos-peso-default')?.value) || 0.35;
+            document.querySelectorAll('[data-racimo-peso]').forEach(input => {
+                input.value = defaultPeso;
                 input.dispatchEvent(new Event('input'));
             });
         });
@@ -5584,6 +5758,525 @@ renderFertUnidadesChart() {
             const data = await getMixedData();
             PresupuestoBudgetModel.exportToCSV(data);
         });
+    }
+
+    /**
+     * Updates the status badge and button visibility based on budget confirmation state.
+     */
+    updatePresupuestoStatus(cicloDestino) {
+        const isConfirmed = PresupuestoBudgetModel.isConfirmed(cicloDestino);
+        const budget = PresupuestoBudgetModel.load(cicloDestino);
+        
+        const statusText = document.getElementById('ppto-status-text');
+        const confirmedDate = document.getElementById('ppto-confirmed-date');
+        const btnConfirm = document.getElementById('btn-ppto-confirm');
+        const btnUnconfirm = document.getElementById('btn-ppto-unconfirm');
+        const btnSave = document.getElementById('btn-ppto-save');
+
+        if (statusText) {
+            if (isConfirmed) {
+                statusText.textContent = '✅ Confirmado';
+                statusText.style.background = 'rgba(16, 185, 129, 0.15)';
+                statusText.style.color = '#10b981';
+                statusText.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+            } else {
+                statusText.textContent = '🔧 En Construcción';
+                statusText.style.background = 'rgba(245, 158, 11, 0.15)';
+                statusText.style.color = '#f59e0b';
+                statusText.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+            }
+        }
+        if (confirmedDate) {
+            if (isConfirmed && budget?.confirmedAt) {
+                confirmedDate.textContent = `Confirmado: ${new Date(budget.confirmedAt).toLocaleDateString('es-AR')}`;
+                confirmedDate.style.display = '';
+            } else {
+                confirmedDate.style.display = 'none';
+            }
+        }
+        if (btnConfirm) btnConfirm.style.display = isConfirmed ? 'none' : '';
+        if (btnUnconfirm) btnUnconfirm.style.display = isConfirmed ? '' : 'none';
+        if (btnSave) btnSave.disabled = isConfirmed;
+
+        // Disable/enable projection inputs when confirmed
+        document.querySelectorAll('[data-ppto-labor], [data-ppto-producto]').forEach(input => {
+            input.disabled = isConfirmed;
+            if (isConfirmed) {
+                input.style.opacity = '0.6';
+                input.style.cursor = 'not-allowed';
+            }
+        });
+    }
+
+    /**
+     * Renders the Production Estimation table (Kg Uva/Ha per predio → Kg Pasa ÷4)
+     */
+    renderProductionEstimationTable(cicloDestino, hectareasData) {
+        const tbody = document.getElementById('tbody-ppto-produccion');
+        const tfoot = document.getElementById('tfoot-ppto-produccion');
+        if (!tbody || !hectareasData) return;
+
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+        const fmtDec = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+
+        // Load saved estimates
+        const savedEstimates = PresupuestoBudgetModel.loadProductionEstimates(cicloDestino);
+        const savedMap = {};
+        savedEstimates.forEach(e => { savedMap[e.predio] = e; });
+        const isConfirmed = PresupuestoBudgetModel.isConfirmed(cicloDestino);
+
+        let rows = '';
+        let totalHa = 0, totalKgUva = 0, totalKgPasa = 0;
+        const estimatesForChart = [];
+
+        hectareasData.groups.forEach(group => {
+            group.predios.forEach(predio => {
+                const saved = savedMap[predio.name];
+                const kgUvaHa = saved ? saved.kgUvaHa : 15000; // Default 15,000 kg/ha
+                const kgUvaTotal = predio.hectareas * kgUvaHa;
+                const kgPasa = kgUvaTotal / PresupuestoBudgetModel.FACTOR_UVA_PASA;
+
+                totalHa += predio.hectareas;
+                totalKgUva += kgUvaTotal;
+                totalKgPasa += kgPasa;
+
+                estimatesForChart.push({ predio: predio.name, group: group.name, hectareas: predio.hectareas, kgUvaHa, kgUvaTotal, kgPasaEstimado: kgPasa });
+
+                rows += `<tr>
+                    <td style="color: var(--text-tertiary); font-size: 0.85em;">${group.name}</td>
+                    <td style="font-weight: 600;">${predio.name}</td>
+                    <td style="text-align: right;">${fmtDec(predio.hectareas)}</td>
+                    <td style="text-align: right;">
+                        <input type="number" value="${kgUvaHa}" step="500" min="0" max="50000"
+                            data-prod-predio="${predio.name}" data-prod-group="${group.name}" data-prod-ha="${predio.hectareas}"
+                            ${isConfirmed ? 'disabled style="opacity: 0.6; cursor: not-allowed; width: 110px; text-align: right; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 8px; color: var(--text-primary);"' : 'style="width: 110px; text-align: right; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 8px; color: var(--text-primary);"'}
+                        />
+                    </td>
+                    <td style="text-align: right; font-weight: 500;" id="prod-uva-${predio.name.replace(/\s/g, '-')}">${fmt(kgUvaTotal)}</td>
+                    <td style="text-align: right; font-weight: 600; color: #8b5cf6;" id="prod-pasa-${predio.name.replace(/\s/g, '-')}">${fmt(kgPasa)}</td>
+                </tr>`;
+            });
+        });
+
+        tbody.innerHTML = rows;
+
+        if (tfoot) {
+            tfoot.innerHTML = `<tr style="font-weight: 700; border-top: 2px solid var(--color-border);">
+                <td colspan="2">TOTALES</td>
+                <td style="text-align: right;">${fmtDec(totalHa)}</td>
+                <td style="text-align: right;">—</td>
+                <td style="text-align: right;" id="prod-total-uva">${fmt(totalKgUva)}</td>
+                <td style="text-align: right; color: #8b5cf6;" id="prod-total-pasa">${fmt(totalKgPasa)}</td>
+            </tr>`;
+        }
+
+        // Auto-recalculate on input change
+        tbody.querySelectorAll('input[data-prod-predio]').forEach(input => {
+            input.addEventListener('input', () => {
+                const predio = input.getAttribute('data-prod-predio');
+                const ha = parseFloat(input.getAttribute('data-prod-ha')) || 0;
+                const kgHa = parseFloat(input.value) || 0;
+                const total = ha * kgHa;
+                const pasa = total / PresupuestoBudgetModel.FACTOR_UVA_PASA;
+                const safeId = predio.replace(/\s/g, '-');
+                const uvaEl = document.getElementById(`prod-uva-${safeId}`);
+                const pasaEl = document.getElementById(`prod-pasa-${safeId}`);
+                if (uvaEl) uvaEl.textContent = fmt(total);
+                if (pasaEl) pasaEl.textContent = fmt(pasa);
+
+                // Recalculate totals
+                let tUva = 0, tPasa = 0;
+                tbody.querySelectorAll('input[data-prod-predio]').forEach(inp => {
+                    const h = parseFloat(inp.getAttribute('data-prod-ha')) || 0;
+                    const v = parseFloat(inp.value) || 0;
+                    tUva += h * v;
+                    tPasa += (h * v) / PresupuestoBudgetModel.FACTOR_UVA_PASA;
+                });
+                const tUvaEl = document.getElementById('prod-total-uva');
+                const tPasaEl = document.getElementById('prod-total-pasa');
+                if (tUvaEl) tUvaEl.textContent = fmt(tUva);
+                if (tPasaEl) tPasaEl.textContent = fmt(tPasa);
+            });
+        });
+
+        // Render chart
+        this.renderProductionChart(estimatesForChart);
+
+        // Also render racimos table
+        this.renderRacimosTable(cicloDestino, hectareasData);
+    }
+
+    /**
+     * Renders the grape cluster counting table (Conteo de Racimos post-floración)
+     * One row per cuartel with editable racimos/planta and peso/racimo fields.
+     */
+    renderRacimosTable(cicloDestino, hectareasData) {
+        const tbody = document.getElementById('tbody-ppto-racimos');
+        const tfoot = document.getElementById('tfoot-ppto-racimos');
+        if (!tbody || !hectareasData) return;
+
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+        const fmtDec = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+
+        // Load saved racimos data
+        const savedRacimos = PresupuestoBudgetModel.loadRacimosCounts(cicloDestino);
+        const savedMap = {};
+        savedRacimos.forEach(c => { savedMap[`${c.predio}|${c.cuartel}`] = c; });
+        const isConfirmed = PresupuestoBudgetModel.isConfirmed(cicloDestino);
+        const defaultPeso = PresupuestoBudgetModel.DEFAULT_PESO_RACIMO_KG;
+
+        let rows = '';
+        let totalCuartelesCount = 0;
+
+        hectareasData.groups.forEach(group => {
+            group.predios.forEach(predio => {
+                if (!predio.cuartelesList || predio.cuartelesList.length === 0) return;
+
+                predio.cuartelesList.forEach(cuartel => {
+                    const key = `${predio.name}|${cuartel.numero}`;
+                    const saved = savedMap[key];
+                    const racimosPlanta = saved ? saved.racimosPlanta : 0;
+                    const pesoRacimo = saved ? saved.pesoRacimoKg : defaultPeso;
+                    const plantas = cuartel.pl || 0;
+                    const ha = cuartel.ha || 0;
+                    const kgUva = racimosPlanta * pesoRacimo * plantas;
+                    const kgHa = ha > 0 ? kgUva / ha : 0;
+                    const kgPasa = kgUva / PresupuestoBudgetModel.FACTOR_UVA_PASA;
+                    const aplicar = saved ? saved.aplicarEstimacion : false;
+                    const notas = saved ? saved.notasIngeniero : '';
+
+                    if (racimosPlanta > 0) totalCuartelesCount++;
+
+                    const rowId = `racimo-${predio.name.replace(/\s/g, '-')}-${cuartel.numero.replace(/\s/g, '-')}`;
+
+                    rows += `<tr data-racimo-row="${key}">
+                        <td style="color: var(--text-tertiary); font-size: 0.85em;">${group.name}</td>
+                        <td style="font-weight: 500;">${predio.name}</td>
+                        <td style="font-size: 0.85em;">${cuartel.numero}${cuartel.variedad ? ` <span style="color: var(--text-tertiary);">(${cuartel.variedad})</span>` : ''}</td>
+                        <td style="text-align: right; color: var(--text-tertiary);">${fmt(plantas)}</td>
+                        <td style="text-align: right; color: var(--text-tertiary);">${fmtDec(ha)}</td>
+                        <td style="text-align: right;">
+                            <input type="number" value="${racimosPlanta}" step="1" min="0" max="100"
+                                data-racimo-predio="${predio.name}" data-racimo-cuartel="${cuartel.numero}"
+                                data-racimo-group="${group.name}" data-racimo-plantas="${plantas}" data-racimo-ha="${ha}"
+                                ${isConfirmed ? 'disabled style="opacity: 0.6; cursor: not-allowed; width: 80px; text-align: right; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 6px; color: var(--text-primary);"' : 'style="width: 80px; text-align: right; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 6px; color: var(--text-primary);"'}
+                            />
+                        </td>
+                        <td style="text-align: right;">
+                            <input type="number" value="${pesoRacimo}" step="0.05" min="0.05" max="2"
+                                data-racimo-peso="${key}"
+                                ${isConfirmed ? 'disabled style="opacity: 0.6; cursor: not-allowed; width: 70px; text-align: right; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 6px; color: var(--text-primary);"' : 'style="width: 70px; text-align: right; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 6px; color: var(--text-primary);"'}
+                            />
+                        </td>
+                        <td style="text-align: right; font-weight: 500;" id="${rowId}-uva">${fmt(kgUva)}</td>
+                        <td style="text-align: right; color: var(--text-tertiary);" id="${rowId}-kgha">${fmt(kgHa)}</td>
+                        <td style="text-align: right; font-weight: 600; color: #8b5cf6;" id="${rowId}-pasa">${fmt(kgPasa)}</td>
+                        <td style="text-align: center;">
+                            <input type="checkbox" data-racimo-apply="${key}" ${aplicar ? 'checked' : ''} ${isConfirmed ? 'disabled' : ''}
+                                style="width: 18px; height: 18px; accent-color: #10b981; cursor: ${isConfirmed ? 'not-allowed' : 'pointer'};"
+                            />
+                        </td>
+                        <td>
+                            <input type="text" value="${notas}" placeholder="Notas..."
+                                data-racimo-notas="${key}"
+                                ${isConfirmed ? 'disabled style="opacity: 0.6; cursor: not-allowed; width: 100%; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 6px; color: var(--text-primary); font-size: 0.85em;"' : 'style="width: 100%; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 6px; color: var(--text-primary); font-size: 0.85em;"'}
+                            />
+                        </td>
+                    </tr>`;
+                });
+            });
+        });
+
+        tbody.innerHTML = rows;
+
+        // Live recalculation for racimos inputs
+        tbody.querySelectorAll('input[data-racimo-predio]').forEach(input => {
+            input.addEventListener('input', () => {
+                const row = input.closest('tr');
+                const predio = input.getAttribute('data-racimo-predio');
+                const cuartel = input.getAttribute('data-racimo-cuartel');
+                const plantas = parseFloat(input.getAttribute('data-racimo-plantas')) || 0;
+                const ha = parseFloat(input.getAttribute('data-racimo-ha')) || 0;
+                const racimos = parseFloat(input.value) || 0;
+                const pesoInput = row.querySelector('[data-racimo-peso]');
+                const peso = parseFloat(pesoInput?.value) || PresupuestoBudgetModel.DEFAULT_PESO_RACIMO_KG;
+
+                const kgUva = racimos * peso * plantas;
+                const kgHa = ha > 0 ? kgUva / ha : 0;
+                const kgPasa = kgUva / PresupuestoBudgetModel.FACTOR_UVA_PASA;
+                const rowId = `racimo-${predio.replace(/\s/g, '-')}-${cuartel.replace(/\s/g, '-')}`;
+
+                const uvaEl = document.getElementById(`${rowId}-uva`);
+                const kgHaEl = document.getElementById(`${rowId}-kgha`);
+                const pasaEl = document.getElementById(`${rowId}-pasa`);
+                if (uvaEl) uvaEl.textContent = fmt(kgUva);
+                if (kgHaEl) kgHaEl.textContent = fmt(kgHa);
+                if (pasaEl) pasaEl.textContent = fmt(kgPasa);
+
+                // Update totals
+                this._updateRacimosTotalsFromDOM();
+            });
+        });
+
+        // Also bind peso changes
+        tbody.querySelectorAll('input[data-racimo-peso]').forEach(input => {
+            input.addEventListener('input', () => {
+                const row = input.closest('tr');
+                const racInput = row.querySelector('[data-racimo-predio]');
+                if (racInput) racInput.dispatchEvent(new Event('input'));
+            });
+        });
+
+        // Set initial totals
+        this._updateRacimosTotalsFromDOM();
+
+        // Update peso default in the header
+        const pesoDefaultInput = document.getElementById('racimos-peso-default');
+        if (pesoDefaultInput && savedRacimos.length > 0) {
+            pesoDefaultInput.value = savedRacimos[0].pesoRacimoKg || defaultPeso;
+        }
+    }
+
+    /**
+     * Collect racimos data from all UI inputs
+     */
+    _collectRacimosFromUI() {
+        const conteos = [];
+        document.querySelectorAll('input[data-racimo-predio]').forEach(input => {
+            const predio = input.getAttribute('data-racimo-predio');
+            const cuartel = input.getAttribute('data-racimo-cuartel');
+            const group = input.getAttribute('data-racimo-group');
+            const plantas = parseFloat(input.getAttribute('data-racimo-plantas')) || 0;
+            const ha = parseFloat(input.getAttribute('data-racimo-ha')) || 0;
+            const racimosPlanta = parseFloat(input.value) || 0;
+
+            const key = `${predio}|${cuartel}`;
+            const pesoInput = document.querySelector(`[data-racimo-peso="${key}"]`);
+            const pesoRacimoKg = parseFloat(pesoInput?.value) || PresupuestoBudgetModel.DEFAULT_PESO_RACIMO_KG;
+            const applyInput = document.querySelector(`[data-racimo-apply="${key}"]`);
+            const aplicar = applyInput?.checked || false;
+            const notasInput = document.querySelector(`[data-racimo-notas="${key}"]`);
+            const notas = notasInput?.value || '';
+
+            conteos.push({ predio, group, cuartel, racimosPlanta, pesoRacimoKg, plantas, hectareas: ha, aplicarEstimacion: aplicar, notasIngeniero: notas });
+        });
+        return conteos;
+    }
+
+    /**
+     * Update racimos summary totals from enriched data
+     */
+    _updateRacimosTotals(enrichedConteos) {
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+        const withData = enrichedConteos.filter(c => c.racimosPlanta > 0);
+        const totalUva = withData.reduce((s, c) => s + c.kgUvaCuartel, 0);
+        const totalPasa = withData.reduce((s, c) => s + c.kgPasaCuartel, 0);
+
+        const countEl = document.getElementById('racimos-cuarteles-count');
+        const uvaEl = document.getElementById('racimos-total-uva');
+        const pasaEl = document.getElementById('racimos-total-pasa');
+        if (countEl) countEl.textContent = withData.length;
+        if (uvaEl) uvaEl.textContent = `${fmt(totalUva)} kg`;
+        if (pasaEl) pasaEl.textContent = `${fmt(totalPasa)} kg`;
+    }
+
+    /**
+     * Update racimos totals from current DOM state
+     */
+    _updateRacimosTotalsFromDOM() {
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+        let totalUva = 0, totalPasa = 0, count = 0;
+        document.querySelectorAll('input[data-racimo-predio]').forEach(input => {
+            const racimos = parseFloat(input.value) || 0;
+            if (racimos <= 0) return;
+            const plantas = parseFloat(input.getAttribute('data-racimo-plantas')) || 0;
+            const key = `${input.getAttribute('data-racimo-predio')}|${input.getAttribute('data-racimo-cuartel')}`;
+            const pesoInput = document.querySelector(`[data-racimo-peso="${key}"]`);
+            const peso = parseFloat(pesoInput?.value) || PresupuestoBudgetModel.DEFAULT_PESO_RACIMO_KG;
+            const kgUva = racimos * peso * plantas;
+            totalUva += kgUva;
+            totalPasa += kgUva / PresupuestoBudgetModel.FACTOR_UVA_PASA;
+            count++;
+        });
+        const countEl = document.getElementById('racimos-cuarteles-count');
+        const uvaEl = document.getElementById('racimos-total-uva');
+        const pasaEl = document.getElementById('racimos-total-pasa');
+        if (countEl) countEl.textContent = count;
+        if (uvaEl) uvaEl.textContent = `${fmt(totalUva)} kg`;
+        if (pasaEl) pasaEl.textContent = `${fmt(totalPasa)} kg`;
+    }
+
+    /**
+     * Renders production estimation chart (Uva vs Pasa by Predio)
+     */
+    renderProductionChart(estimates) {
+        const canvas = document.getElementById('chart-ppto-produccion');
+        if (!canvas || !estimates || estimates.length === 0) return;
+
+        if (this._chartProdEstimation) this._chartProdEstimation.destroy();
+
+        const labels = estimates.map(e => e.predio);
+        const uvaData = estimates.map(e => Math.round(e.kgUvaTotal || (e.hectareas * e.kgUvaHa)));
+        const pasaData = estimates.map(e => Math.round(e.kgPasaEstimado || ((e.hectareas * e.kgUvaHa) / PresupuestoBudgetModel.FACTOR_UVA_PASA)));
+
+        this._chartProdEstimation = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Kg Uva Estimado',
+                        data: uvaData,
+                        backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Kg Pasa Estimado (÷4)',
+                        data: pasaData,
+                        backgroundColor: 'rgba(139, 92, 246, 0.6)',
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { color: '#94a3b8' } },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-AR')} kg`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#94a3b8', callback: v => (v / 1000).toFixed(0) + 'k' }
+                    },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                }
+            }
+        });
+    }
+
+    /**
+     * Renders execution comparison charts for the Ejecución tab
+     */
+    renderEjecucionCharts(comparison) {
+        if (!comparison) return;
+
+        // 1. Jornales chart
+        const canvasJ = document.getElementById('chart-ejecucion-jornales');
+        if (canvasJ && comparison.jornales.length > 0) {
+            if (this._chartEjecJornales) this._chartEjecJornales.destroy();
+            const top10 = comparison.jornales.slice(0, 10);
+            this._chartEjecJornales = new Chart(canvasJ, {
+                type: 'bar',
+                data: {
+                    labels: top10.map(j => j.labor),
+                    datasets: [
+                        {
+                            label: 'Planificado',
+                            data: top10.map(j => j.planificado),
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Consumido',
+                            data: top10.map(j => j.consumido),
+                            backgroundColor: 'rgba(245, 158, 11, 0.5)',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: { legend: { position: 'top', labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+        // 2. Production chart
+        const canvasP = document.getElementById('chart-ejecucion-produccion');
+        if (canvasP && comparison.produccion.length > 0) {
+            if (this._chartEjecProduccion) this._chartEjecProduccion.destroy();
+            this._chartEjecProduccion = new Chart(canvasP, {
+                type: 'bar',
+                data: {
+                    labels: comparison.produccion.map(p => p.predio),
+                    datasets: [
+                        {
+                            label: 'Uva Planificada',
+                            data: comparison.produccion.map(p => Math.round(p.planificadoUva)),
+                            backgroundColor: 'rgba(34, 197, 94, 0.4)',
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Uva Real',
+                            data: comparison.produccion.map(p => Math.round(p.realUva)),
+                            backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Pasa Planificada',
+                            data: comparison.produccion.map(p => Math.round(p.planificadoPasa)),
+                            backgroundColor: 'rgba(139, 92, 246, 0.4)',
+                            borderColor: 'rgba(139, 92, 246, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Pasa Real',
+                            data: comparison.produccion.map(p => Math.round(p.realPasa)),
+                            backgroundColor: 'rgba(139, 92, 246, 0.8)',
+                            borderColor: 'rgba(139, 92, 246, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: '#94a3b8', font: { size: 10 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-AR')} kg`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8', callback: v => (v / 1000).toFixed(0) + 'k' }
+                        },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
     }
 
     renderPresupuestoJornalesTable(summary, saved, cicloBase) {

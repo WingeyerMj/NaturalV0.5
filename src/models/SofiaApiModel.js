@@ -536,7 +536,6 @@ export class SofiaApiModel {
                 cuartel: r.cuartel || r.Cuartel || info.code,
                 variedad: r.variedad || r.variedades || r.Variedad || r.Variedades || info.variedad,
                 isCosecha,
-                isPasaHumeda: hasExclusion || !!r.isPasaHumeda,
                 labor_normalized: (r.finca === 'El Espejo' && (r.labor === 'Poda' || r.labor === 'Poda dov')) ? 'Poda' : r.labor,
                 fecha: (() => {
                     let d = r.fecha || r.Fecha || r.date || r.Date;
@@ -849,7 +848,7 @@ export class SofiaApiModel {
 
         data.forEach(r => {
             const clasif = (r.clasifica || '').toUpperCase();
-            const isPasaHumeda = r.isPasaHumeda;
+            const isPasaHumeda = r.isPasaHumeda || clasif.includes('PASA H') || clasif.includes('HUMEDA');
             if (isPasaHumeda) return; // Skip "pasa humeda" for dashboard totals
 
             const kilos = r.rendimiento_val || 0;
@@ -906,10 +905,11 @@ export class SofiaApiModel {
         const cuartelesPropios = new Set();
 
         data.forEach(r => {
-            if (r.isPasaHumeda) return; // Skip "pasa humeda" here too
-            
             const kilos = r.rendimiento_val || 0;
             const clasif = (r.clasifica || '').toUpperCase();
+
+            const isPasaHumeda = r.isPasaHumeda || clasif.includes('PASA H') || clasif.includes('HUMEDA');
+            if (isPasaHumeda) return;
 
             const isPropia = PROPIA_KEYWORDS.some(k => clasif.includes(k));
             const isEspecial = ESPECIALES.some(k => clasif.includes(k));

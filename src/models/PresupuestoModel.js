@@ -2,15 +2,23 @@
  * PresupuestoModel.js
  * Manages budget projections based on real cycle data.
  * Two axes: Jornales (labor days) and Gastos/Consumos (expenses/inputs).
+ * Supports confirmation workflow: once confirmed, budget is frozen as reference.
+ * Includes production estimation: kg uva/ha → kg pasa (÷4).
  */
 
 import { SofiaImportModel } from './SofiaModel.js';
 import * as XLSX from 'xlsx';
 
 const STORAGE_KEY = 'nf_presupuesto';
+const PRODUCTION_KEY = 'nf_produccion_estimada';
+const RACIMOS_KEY = 'nf_conteo_racimos';
 
 export class PresupuestoModel {
     static _data = null;
+    static _prodData = null;
+    static _racimosData = null;
+    static FACTOR_UVA_PASA = 4; // kg of grapes / 4 = kg of raisins
+    static DEFAULT_PESO_RACIMO_KG = 0.35; // Default estimated weight per cluster (kg)
 
     /**
      * Categorizes a labor string into a broader group.
@@ -155,7 +163,9 @@ export class PresupuestoModel {
      */
     static save(targetCiclo, data) {
         const all = this.loadAll();
+        const existing = all[targetCiclo] || {};
         all[targetCiclo] = {
+            ...existing,
             ...data,
             updatedAt: new Date().toISOString()
         };
@@ -183,6 +193,319 @@ export class PresupuestoModel {
     static load(targetCiclo) {
         const all = this.loadAll();
         return all[targetCiclo] || null;
+    }
+
+    /**
+     * Check if a budget cycle is confirmed (frozen).
+     */
+    static isConfirmed(targetCiclo) {
+        const budget = this.load(targetCiclo);
+        return budget?.confirmed === true;
+    }
+
+    /**
+     * Confirm (freeze) a budget. Once confirmed, it becomes the reference.
+     * All charts and reports will compare against this frozen snapshot.
+     * @param {string} targetCiclo
+     * @param {Object} snapshot - Complete snapshot of { jornales, gastos, produccion, totals }
+     */
+    static confirm(targetCiclo, snapshot) {
+        const all = this.loadAll();
+        all[targetCiclo] = {
+            ...all[targetCiclo],
+            ...snapshot,
+            confirmed: true,
+            confirmedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+        this._data = all;
+    }
+
+    /**
+     * Unconfirm a budget, returning it to editable state.
+     */
+    static unconfirm(targetCiclo) {
+        const all = this.loadAll();
+        if (all[targetCiclo]) {
+            all[targetCiclo].confirmed = false;
+            all[targetCiclo].confirmedAt = null;
+            all[targetCiclo].updatedAt = new Date().toISOString();
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+        this._data = all;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PRODUCTION ESTIMATION (UVA → PASA)
+    // ═══════════════════════════════════════════════════════
+
+    /**
+     * Save production estimates per predio.
+     * @param {string} ciclo
+     * @param {Array} estimates - [{ predio, group, hectareas, kgUvaHa }]
+     */
+    static saveProductionEstimates(ciclo, estimates) {
+        const all = this._loadProductionAll();
+        const enriched = estimates.map(e => ({
+            predio: e.predio,
+            group: e.group,
+            hectareas: e.hectareas || 0,
+            kgUvaHa: e.kgUvaHa || 0,
+            kgUvaTotal: (e.hectareas || 0) * (e.kgUvaHa || 0),
+            kgPasaEstimado: ((e.hectareas || 0) * (e.kgUvaHa || 0)) / this.FACTOR_UVA_PASA
+        }));
+        all[ciclo] = {
+            estimates: enriched,
+            updatedAt: new Date().toISOString()
+        };
+        localStorage.setItem(PRODUCTION_KEY, JSON.stringify(all));
+        this._prodData = all;
+        return enriched;
+    }
+
+    /**
+     * Load production estimates for a cycle.
+     */
+    static loadProductionEstimates(ciclo) {
+        const all = this._loadProductionAll();
+        return all[ciclo]?.estimates || [];
+    }
+
+    static _loadProductionAll() {
+        if (this._prodData) return this._prodData;
+        try {
+            const stored = localStorage.getItem(PRODUCTION_KEY);
+            this._prodData = stored ? JSON.parse(stored) : {};
+        } catch (e) {
+            this._prodData = {};
+        }
+        return this._prodData;
+    }
+
+    /**
+     * Build default production estimates from hectareas data.
+     * @param {Object} hectareasData - Output of SofiaApiModel.getHectareasPorPredio()
+     * @param {number} defaultKgHa - Default kg uva/ha to use if no saved estimate exists
+     */
+    static buildDefaultProductionEstimates(hectareasData, defaultKgHa = 15000) {
+        const estimates = [];
+        if (hectareasData?.groups) {
+            hectareasData.groups.forEach(g => {
+                g.predios.forEach(p => {
+                    estimates.push({
+                        predio: p.name,
+                        group: g.name,
+                        hectareas: p.hectareas,
+                        kgUvaHa: defaultKgHa
+                    });
+                });
+            });
+        }
+        return estimates;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // CONTEO DE RACIMOS (Post-Floración)
+    // ═══════════════════════════════════════════════════════
+
+    /**
+     * Save grape cluster counts per cuartel.
+     * @param {string} ciclo
+     * @param {Array} conteos - [{ predio, cuartel, racimosPlanta, pesoRacimoKg, plantas, hectareas, aplicarEstimacion, notasIngeniero }]
+     * @returns {Array} enriched conteos with calculated yields
+     */
+    static saveRacimosCounts(ciclo, conteos) {
+        const all = this._loadRacimosAll();
+        const enriched = conteos.map(c => {
+            const racimosPlanta = c.racimosPlanta || 0;
+            const pesoRacimoKg = c.pesoRacimoKg || this.DEFAULT_PESO_RACIMO_KG;
+            const plantas = c.plantas || 0;
+            const hectareas = c.hectareas || 0;
+            const kgUvaCuartel = racimosPlanta * pesoRacimoKg * plantas;
+            const kgUvaHaEstimado = hectareas > 0 ? kgUvaCuartel / hectareas : 0;
+            const kgPasaCuartel = kgUvaCuartel / this.FACTOR_UVA_PASA;
+            return {
+                predio: c.predio,
+                group: c.group || '',
+                cuartel: c.cuartel,
+                racimosPlanta,
+                pesoRacimoKg,
+                plantas,
+                hectareas,
+                kgUvaCuartel: Math.round(kgUvaCuartel),
+                kgUvaHaEstimado: Math.round(kgUvaHaEstimado),
+                kgPasaCuartel: Math.round(kgPasaCuartel),
+                aplicarEstimacion: c.aplicarEstimacion || false,
+                notasIngeniero: c.notasIngeniero || ''
+            };
+        });
+        all[ciclo] = {
+            conteos: enriched,
+            updatedAt: new Date().toISOString(),
+            updatedBy: 'ingeniero'
+        };
+        localStorage.setItem(RACIMOS_KEY, JSON.stringify(all));
+        this._racimosData = all;
+        return enriched;
+    }
+
+    /**
+     * Load grape cluster counts for a cycle.
+     */
+    static loadRacimosCounts(ciclo) {
+        const all = this._loadRacimosAll();
+        return all[ciclo]?.conteos || [];
+    }
+
+    /**
+     * Get the racimos-based kg/ha for a specific predio.
+     * Aggregates all cuarteles for that predio where aplicarEstimacion is true.
+     * Returns null if no conteo available or none applied.
+     */
+    static getRacimosEstimateForPredio(ciclo, predioName) {
+        const conteos = this.loadRacimosCounts(ciclo);
+        const predioConteos = conteos.filter(c => c.predio === predioName && c.aplicarEstimacion);
+        if (predioConteos.length === 0) return null;
+
+        const totalKgUva = predioConteos.reduce((s, c) => s + c.kgUvaCuartel, 0);
+        const totalHa = predioConteos.reduce((s, c) => s + c.hectareas, 0);
+        const totalPlantas = predioConteos.reduce((s, c) => s + c.plantas, 0);
+        return {
+            kgUvaTotal: totalKgUva,
+            kgUvaHa: totalHa > 0 ? Math.round(totalKgUva / totalHa) : 0,
+            kgPasaTotal: Math.round(totalKgUva / this.FACTOR_UVA_PASA),
+            totalHa,
+            totalPlantas,
+            cuartelesCount: predioConteos.length
+        };
+    }
+
+    static _loadRacimosAll() {
+        if (this._racimosData) return this._racimosData;
+        try {
+            const stored = localStorage.getItem(RACIMOS_KEY);
+            this._racimosData = stored ? JSON.parse(stored) : {};
+        } catch (e) {
+            this._racimosData = {};
+        }
+        return this._racimosData;
+    }
+
+    /**
+     * Get execution comparison for a confirmed budget.
+     * Compares the confirmed (frozen) values against real data.
+     * @param {string} ciclo - The cycle to compare
+     * @param {Object} realJornalesSummary - { byLabor, byPredio, totals }
+     * @param {Object} realGastosSummary - { byCategoria, byProducto, totals }
+     * @param {Array} realCosechaData - Array of cosecha records
+     * @returns {Object} comparison data for charts
+     */
+    static getExecutionComparison(ciclo, realJornalesSummary, realGastosSummary, realCosechaData) {
+        const budget = this.load(ciclo);
+        if (!budget || !budget.confirmed) return null;
+
+        const savedJornales = budget.jornales || {};
+        const savedGastos = budget.gastos || {};
+        const savedProduccion = this.loadProductionEstimates(ciclo);
+
+        // Jornales comparison
+        const jornalesComparison = [];
+        Object.entries(savedJornales).forEach(([labor, planificado]) => {
+            const real = realJornalesSummary?.byLabor?.find(r => r.labor === labor);
+            const consumido = real ? real.jornales : 0;
+            const pct = planificado > 0 ? (consumido / planificado * 100) : 0;
+            jornalesComparison.push({
+                labor,
+                planificado,
+                consumido,
+                diferencia: consumido - planificado,
+                porcentaje: pct,
+                estado: pct > 100 ? 'excedido' : pct >= 80 ? 'alerta' : 'ok'
+            });
+        });
+
+        // Gastos comparison  
+        const gastosComparison = [];
+        Object.entries(savedGastos).forEach(([producto, planificado]) => {
+            const real = realGastosSummary?.byProducto?.find(r => r.producto === producto);
+            const consumido = real ? real.cantidad : 0;
+            const pct = planificado > 0 ? (consumido / planificado * 100) : 0;
+            gastosComparison.push({
+                producto,
+                planificado,
+                consumido,
+                diferencia: consumido - planificado,
+                porcentaje: pct,
+                estado: pct > 100 ? 'excedido' : pct >= 80 ? 'alerta' : 'ok'
+            });
+        });
+
+        // Production comparison
+        const produccionComparison = savedProduccion.map(est => {
+            // Find real cosecha data for this predio
+            const realKg = this._getRealCosechaForPredio(est.predio, realCosechaData);
+            const pctUva = est.kgUvaTotal > 0 ? (realKg / est.kgUvaTotal * 100) : 0;
+            const realPasa = realKg / this.FACTOR_UVA_PASA;
+            const pctPasa = est.kgPasaEstimado > 0 ? (realPasa / est.kgPasaEstimado * 100) : 0;
+            return {
+                predio: est.predio,
+                group: est.group,
+                hectareas: est.hectareas,
+                kgUvaHa: est.kgUvaHa,
+                planificadoUva: est.kgUvaTotal,
+                planificadoPasa: est.kgPasaEstimado,
+                realUva: realKg,
+                realPasa,
+                pctUva,
+                pctPasa,
+                estado: pctUva > 100 ? 'superado' : pctUva >= 70 ? 'bueno' : 'bajo'
+            };
+        });
+
+        return {
+            confirmed: true,
+            confirmedAt: budget.confirmedAt,
+            jornales: jornalesComparison,
+            gastos: gastosComparison,
+            produccion: produccionComparison,
+            totals: {
+                jornalesPlan: jornalesComparison.reduce((s, j) => s + j.planificado, 0),
+                jornalesReal: jornalesComparison.reduce((s, j) => s + j.consumido, 0),
+                gastosPlan: gastosComparison.reduce((s, g) => s + g.planificado, 0),
+                gastosReal: gastosComparison.reduce((s, g) => s + g.consumido, 0),
+                uvaPlan: produccionComparison.reduce((s, p) => s + p.planificadoUva, 0),
+                uvaReal: produccionComparison.reduce((s, p) => s + p.realUva, 0),
+                pasaPlan: produccionComparison.reduce((s, p) => s + p.planificadoPasa, 0),
+                pasaReal: produccionComparison.reduce((s, p) => s + p.realPasa, 0)
+            }
+        };
+    }
+
+    /**
+     * Helper: Get real cosecha kg for a specific predio from cosecha data array.
+     */
+    static _getRealCosechaForPredio(predioName, cosechaData) {
+        if (!cosechaData || !Array.isArray(cosechaData)) return 0;
+        const PREDIO_KEYWORDS = {
+            'Camino Truncado': ['CAMINO TRUNCADO', 'TRUNCADO'],
+            'La Chimbera': ['CHIMBERA'],
+            'Puente Alto': ['PUENTE ALTO', 'P. ALTO', 'P.ALTO'],
+            'El Espejo 3': ['EEIII'],
+            'El Espejo 2': ['EEII'],
+            'El Espejo 1': ['EEI']
+        };
+        const keywords = PREDIO_KEYWORDS[predioName] || [];
+        let total = 0;
+        cosechaData.forEach(r => {
+            if (!r.isCosecha) return;
+            const clasif = (r.clasifica || '').toUpperCase();
+            if (clasif.includes('PASA H') || clasif.includes('HUMEDA')) return;
+            if (keywords.some(k => clasif.includes(k))) {
+                total += r.rendimiento_val || 0;
+            }
+        });
+        return total;
     }
 
     /**
