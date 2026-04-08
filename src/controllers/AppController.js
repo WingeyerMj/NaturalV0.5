@@ -37,7 +37,7 @@ import {
     renderCosechaLevantadoTable, renderLevantadoPorPlaya, renderAdminCrudView, renderWorkLogView,
     renderGastosView, renderSecaderosView, renderGastosHistoricosView,
     renderControlCargaView, renderPresupuestoProyeccionView, renderExcelBudgetSummary,
-    renderEjecucionPresupuesto
+    renderEjecucionPresupuesto, renderInformePlanificacion
 } from '../views/Views.js';
 
 import { SecaderosController } from './SecaderosController.js';
@@ -64,6 +64,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
+                { id: 'informe-planificacion', label: 'Planificación Ppto', icon: '📅' },
             ]
         },
         {
@@ -115,6 +116,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
+                { id: 'informe-planificacion', label: 'Planificación Ppto', icon: '📅' },
             ]
         },
     ],
@@ -137,6 +139,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
+                { id: 'informe-planificacion', label: 'Planificación Ppto', icon: '📅' },
             ]
         },
     ],
@@ -454,6 +457,10 @@ export class AppController {
                 title.textContent = 'Presupuesto — Proyección de Ciclo';
                 content.innerHTML = renderPresupuestoProyeccionView();
                 this.initPresupuestoSection();
+                break;
+            case 'informe-planificacion':
+                title.textContent = 'Planificación Presupuestaria — Resumen Proyectado';
+                await this.renderInformePlanificacionSection(content);
                 break;
             case 'usuarios':
                 title.textContent = 'Gestión de Usuarios';
@@ -852,6 +859,136 @@ export class AppController {
         });
     }
 
+    /**
+     * ── Sección: Planificación Presupuestaria ──
+     * Resumen en tablas y gráficos del presupuesto proyectado.
+     */
+    async renderInformePlanificacionSection(container) {
+        container.innerHTML = `
+            <div style="padding: var(--space-20); text-align: center; color: var(--text-tertiary);">
+                <div class="spinner" style="margin: 0 auto var(--space-4);"></div>
+                <p>Consolidando reporte de planificación...</p>
+            </div>
+        `;
+
+        try {
+            const ciclo = '2026-2027'; 
+            const budget = PresupuestoBudgetModel.load(ciclo);
+            const prodEstimates = PresupuestoBudgetModel.loadProductionEstimates(ciclo);
+            
+            // Ciclo base para obtener las faenas/labores de referencia
+            const mixed = await PresupuestoBudgetModel.buildMixedBudget('2025-2026');
+
+            // Si hay borrador/snapshot guardado, usamos esos valores
+            const projectedJornales = budget?.jornales || {};
+
+            // Consolidamos datos para la vista
+            const planData = {
+                ciclo: ciclo,
+                totals: {
+                    jornales: Object.values(projectedJornales).reduce((s, v) => s + v, 0) || mixed.totals.jornales,
+                    costoMo: (Object.values(projectedJornales).reduce((s, v) => s + v, 0) || mixed.totals.jornales) * 15000,
+                    usdGral: mixed.totals.usdGral,
+                    pasaPlan: prodEstimates.reduce((s, p) => s + (p.kgPasaEstimado || 0), 0)
+                },
+                jornales: mixed.jornales.map(l => ({
+                    labor: l.labor,
+                    jornales: projectedJornales[l.labor] || l.jornales,
+                    costoArs: (projectedJornales[l.labor] || l.jornales) * 15000
+                })),
+                gastosGral: mixed.gastosGral
+            };
+
+            container.innerHTML = renderInformePlanificacion(planData);
+            this.initPlanificacionCharts(planData);
+
+        } catch (error) {
+            console.error('Error rendering planificacion report:', error);
+            container.innerHTML = `
+                <div class="alert alert-error" style="margin: var(--space-10); text-align: center;">
+                    <h4>⚠️ Error al cargar el reporte</h4>
+                    <p>${error.message}</p>
+                    <button class="btn btn-primary btn-sm" onclick="location.reload()" style="margin-top: var(--space-4);">Reintentar</button>
+                </div>`;
+        }
+    }
+
+    initPlanificacionCharts(data) {
+        // Gráfico 1: Jornales por Labor (Agrupado por Top 6)
+        const ctxLabor = document.getElementById('chart-plan-jornales-labor');
+        if (ctxLabor) {
+            const sortedJornales = [...data.jornales].sort((a,b) => b.jornales - a.jornales).slice(0, 8);
+            new Chart(ctxLabor, {
+                type: 'bar',
+                data: {
+                    labels: sortedJornales.map(j => j.labor),
+                    datasets: [{
+                        label: 'Jornales Proyectados',
+                        data: sortedJornales.map(j => j.jornales),
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)' }
+                    },
+                    scales: { 
+                        x: { display: false, grid: { display: false } },
+                        y: { 
+                            ticks: { color: '#f1f5f9', font: { size: 11 } },
+                            grid: { display: false }
+                        } 
+                    }
+                }
+            });
+        }
+
+        // Gráfico 2: Gastos por Finca (Doughnut)
+        const ctxFinca = document.getElementById('chart-plan-gastos-finca');
+        if (ctxFinca) {
+            const byFinca = {};
+            data.gastosGral.forEach(g => { byFinca[g.finca] = (byFinca[g.finca] || 0) + g.usd; });
+            const sortedFincas = Object.entries(byFinca).sort((a,b) => b[1] - a[1]);
+            
+            new Chart(ctxFinca, {
+                type: 'doughnut',
+                data: {
+                    labels: sortedFincas.map(f => f[0]),
+                    datasets: [{
+                        data: sortedFincas.map(f => f[1]),
+                        backgroundColor: ['#10b981', '#3b82f6', '#a855f7', '#f59e0b', '#ef4444', '#6366f1'],
+                        borderWidth: 2,
+                        borderColor: 'rgba(15, 23, 42, 0.5)',
+                        hoverOffset: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { 
+                                color: '#cbd5e1', 
+                                usePointStyle: true,
+                                padding: 20,
+                                font: { size: 11 }
+                            } 
+                        } 
+                    }
+                }
+            });
+        }
+    }
+
     // ── Sección 2: COSECHA ──
     // ── Sección 2: COSECHA ──
     async renderCosechaSection(container) {
@@ -875,19 +1012,35 @@ export class AppController {
             const currentVal = clFiltersState[key];
 
             let subData = allData;
+            
+            // Normalize helper for consistency
+            const normalizePredio = (v) => {
+                if (!v) return 'Otros';
+                const s = String(v).toUpperCase();
+                if (s.includes('CAMINO TRUNCADO') || s.includes('TRUNCADO')) return 'Camino Truncado';
+                if (s.includes('CHIMBERA')) return 'La Chimbera';
+                if (s.includes('PUENTE ALTO') || s.includes('P. ALTO') || s.includes('P.ALTO')) return 'Puente Alto';
+                if (s.includes('EEIII') || s.includes('ESPEJO 3')) return 'EEIII';
+                if (s.includes('EEII') || s.includes('ESPEJO 2')) return 'EEII';
+                if (s.includes('EEI') || s.includes('ESPEJO 1')) return 'EEI';
+                return v;
+            };
+
             // Apply partial filters for the dropdown context
-            if (clFiltersState.finca) subData = subData.filter(r => r.finca === clFiltersState.finca);
-            if (key === 'cuartel' && clFiltersState.predio) {
-                subData = subData.filter(r => (r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica) === clFiltersState.predio);
+            if (clFiltersState.finca) {
+                subData = subData.filter(r => r.finca === clFiltersState.finca);
             }
 
-            const uniqueVals = [...new Set(subData.map(r => {
-                if (key === 'predio') return r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica;
+            if (key === 'cuartel' && clFiltersState.predio) {
+                subData = subData.filter(r => normalizePredio(r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica) === clFiltersState.predio);
+            }
+
+            let uniqueVals = [...new Set(subData.map(r => {
+                if (key === 'predio') return normalizePredio(r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica);
                 if (key === 'variedad') return r.variedad || r.variedades || r.Variedad || r.Variedades;
-                if (key === 'cuartel') return r.cuartel || r.Cuartel; // Already normalized in model usually
+                if (key === 'cuartel') return r.cuartel || r.Cuartel; 
                 return r[key] || r[key.charAt(0).toUpperCase() + key.slice(1)];
             }))].filter(v => v !== null && v !== undefined && v !== '').sort((a,b) => {
-                // Numeric sort for cuarteles if possible
                 if (key === 'cuartel') {
                     const na = parseInt(a);
                     const nb = parseInt(b);
@@ -895,6 +1048,17 @@ export class AppController {
                 }
                 return String(a).localeCompare(String(b));
             });
+
+            // Specific user request: restrict predios if a finca is selected
+            if (key === 'predio' && clFiltersState.finca) {
+                if (clFiltersState.finca === 'Fincas Viejas') {
+                    const whitelist = ['Camino Truncado', 'Puente Alto', 'La Chimbera'];
+                    uniqueVals = uniqueVals.filter(v => whitelist.includes(v));
+                } else if (clFiltersState.finca === 'El Espejo') {
+                    const whitelist = ['EEI', 'EEII', 'EEIII'];
+                    uniqueVals = uniqueVals.filter(v => whitelist.includes(v));
+                }
+            }
 
             sel.innerHTML = `<option value="">${['predio', 'variedad', 'cuartel'].includes(key) ? 'Todos' : 'Todas'}</option>` +
                 uniqueVals.map(v => `<option value="${v}" ${v === currentVal ? 'selected' : ''}>${v}</option>`).join('');
@@ -906,6 +1070,7 @@ export class AppController {
 
             const fullCycleData = await SofiaApiModel.fetchCycleData(clFiltersState.ciclo || '2025-2026');
             const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, clFiltersState);
+            fullFiltered.fincaFilter = clFiltersState.finca; // Feed the filter for secondary charts
             const clStats = SofiaApiModel.getCosechaLevantadoStats(fullFiltered);
             const pasaEvolStats = SofiaApiModel.getCosechaComparativaPorPredio(fullFiltered);
             const playaStats = SofiaApiModel.getLevantadoPorPlayaStats(fullFiltered);
@@ -980,18 +1145,11 @@ export class AppController {
             const filtered = SofiaApiModel.applyFilters(data, clFiltersState);
             const stats = SofiaApiModel.getCosechaDashboardStats(filtered);
 
-            const clWrapper = document.getElementById('cosecha-levantado-wrapper');
-            if (!clWrapper) {
-                dashboard.innerHTML = renderCosechaDashboard(stats, this.currentUser?.role) + '<div id="cosecha-levantado-wrapper"></div>';
-                updateCosechaLevantadoWidget();
-            } else {
-                const tmp = document.createElement('div');
-                tmp.innerHTML = renderCosechaDashboard(stats, this.currentUser?.role);
-                Array.from(dashboard.childNodes).forEach(node => {
-                    if (node.id !== 'cosecha-levantado-wrapper') node.remove();
-                });
-                while (tmp.firstChild) dashboard.insertBefore(tmp.firstChild, clWrapper);
-            }
+            dashboard.innerHTML = renderCosechaDashboard(stats, this.currentUser?.role) + '<div id="cosecha-levantado-wrapper"></div>';
+            updateCosechaLevantadoWidget();
+
+            // All global charts re-render is now handled inside or after updateCosechaLevantadoWidget as well
+            // but we ensure metrics are current here.
 
             // Rebind historical chart origin filter
             const originFilter = document.getElementById('filter-cosecha-historico-origen');
@@ -5374,6 +5532,12 @@ renderFertUnidadesChart() {
         const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
         const fmtCurrency = (n) => '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
 
+        // Load most recent draft from server
+        const cicloDestinoInit = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
+        PresupuestoBudgetModel.loadFromServer(cicloDestinoInit).then(() => {
+            console.log('Presupuesto sincronizado con servidor.');
+        });
+
         // Tab switching
         const tabJornalesCant = document.getElementById('ppto-tab-jornales-cant');
         const tabJornalesCosto = document.getElementById('ppto-tab-jornales-costo');
@@ -5526,8 +5690,10 @@ renderFertUnidadesChart() {
                 gastosProj[input.dataset.pptoProducto] = parseFloat(input.value) || 0;
             });
 
-            PresupuestoBudgetModel.save(cicloDestino, { jornales: jornalesProj, gastos: gastosProj });
-            this.showAlert('✅ Presupuesto guardado correctamente', 'success');
+            PresupuestoBudgetModel.saveToServer(cicloDestino, { jornales: jornalesProj, gastos: gastosProj }).then(success => {
+                const msg = success ? '✅ Presupuesto guardado en servidor' : '⚠️ Guardado solo localmente (Error de servidor)';
+                this.showAlert(msg, success ? 'success' : 'warning');
+            });
         });
 
         // Export

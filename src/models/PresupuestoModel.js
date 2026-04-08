@@ -236,9 +236,51 @@ export class PresupuestoModel {
         this._data = all;
     }
 
+    /**
+     * Save budget to server as JSON file for persistent cross-device storage.
+     */
+    static async saveToServer(targetCiclo, data) {
+        // First save to local storage as fallback
+        this.save(targetCiclo, data);
+
+        try {
+            const filename = `budget_draft_${targetCiclo}.json`;
+            const response = await fetch('/api/save-budget-json', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename, data })
+            });
+            const result = await response.json();
+            return result.success;
+        } catch (error) {
+            console.error('[PresupuestoModel] Error saving to server:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Load budget from server JSON file.
+     */
+    static async loadFromServer(targetCiclo) {
+        try {
+            const filename = `/Fuentes/Presupuestos/budget_draft_${targetCiclo}.json`;
+            const response = await fetch(filename);
+            if (!response.ok) return null;
+            
+            const data = await response.json();
+            // Also update local storage cache
+            this.save(targetCiclo, data);
+            return data;
+        } catch (error) {
+            // Probably doesn't exist yet
+            return null;
+        }
+    }
+
     // ═══════════════════════════════════════════════════════
     // PRODUCTION ESTIMATION (UVA → PASA)
     // ═══════════════════════════════════════════════════════
+
 
     /**
      * Save production estimates per predio.

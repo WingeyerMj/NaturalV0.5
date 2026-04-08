@@ -268,6 +268,29 @@ app.post('/api/save-jornales-budget', async (req, res) => {
     }
 });
 
+// Save Budget JSON to Fuentes/Presupuestos
+app.post('/api/save-budget-json', async (req, res) => {
+    const { filename, data } = req.body;
+    if (!filename || !data) {
+        return res.status(400).json({ success: false, message: 'Faltan datos (filename o data)' });
+    }
+
+    try {
+        const dirPath = path.join(__dirname, '../public/Fuentes/Presupuestos');
+        if (!fs.existsSync(dirPath)) {
+            fs.mkdirSync(dirPath, { recursive: true });
+        }
+        
+        const filePath = path.join(dirPath, filename);
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+        console.log(`Borrador JSON guardado en: ${filePath}`);
+        res.json({ success: true, message: 'Borrador guardado en servidor exitosamente' });
+    } catch (error) {
+        console.error('Save JSON budget error:', error);
+        res.status(500).json({ success: false, message: 'Error al guardar el JSON en el servidor' });
+    }
+});
+
 // ═══════════════════════════════════════════════════════════
 // MIGRACIÓN: Agregar columna 'cultivo' a admin_cuarteles
 // ═══════════════════════════════════════════════════════════

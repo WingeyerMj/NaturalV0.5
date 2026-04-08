@@ -4186,3 +4186,135 @@ export function renderExcelBudgetSummary(data) {
         </div>
     `;
 }
+
+/**
+ * Renders the Strategic Budget Planning Report
+ */
+export function renderInformePlanificacion(data) {
+    if (!data) return '<div class="alert alert-info" style="padding: 2rem; border-radius: 12px; background: rgba(59, 130, 246, 0.05); color: var(--text-secondary); text-align: center;">No hay datos de planificación disponibles. Use la sección de <strong>Panel de Control > Presupuesto</strong> para generar una proyección.</div>';
+
+    const fmt = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
+    const fmtDec = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(v);
+    const fmtMoney = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
+    const fmtUsd = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'USD' }).format(v);
+
+    return `
+    <div class="animate-fade-in" style="padding-bottom: var(--space-8);">
+        <div style="background: linear-gradient(90deg, rgba(16, 185, 129, 0.05), transparent); border-left: 4px solid var(--color-primary-500); padding: var(--space-4); border-radius: 0 8px 8px 0; margin-bottom: var(--space-6);">
+            <h3 style="margin: 0; color: var(--text-primary); font-family: 'Outfit';">Presupuesto Referencia — Ciclo ${data.ciclo}</h3>
+            <p style="margin: 4px 0 0; color: var(--text-tertiary); font-size: 0.9em;">Basado en ejecución histórica vs proyección estratégica.</p>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="metric-card" style="border-bottom: 3px solid var(--color-primary-500);">
+                <div class="metric-label" style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px;">Jornales Proyectados</div>
+                <div class="metric-value" style="font-size: 2em; margin: 5px 0;">${fmt(data.totals.jornales)}</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">Capacidad operativa necesaria</div>
+            </div>
+            <div class="metric-card" style="border-bottom: 3px solid #10b981;">
+                <div class="metric-label" style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px;">Mano de Obra (Est.)</div>
+                <div class="metric-value" style="font-size: 1.5em; margin: 5px 0; color: #10b981;">${fmtMoney(data.totals.costoMo)}</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">Valorizado en pesos corrientes</div>
+            </div>
+            <div class="metric-card" style="border-bottom: 3px solid var(--color-accent-500);">
+                <div class="metric-label" style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px;">Inversión Gral. (USD)</div>
+                <div class="metric-value" style="font-size: 1.5em; margin: 5px 0; color: var(--color-accent-400);">${fmtUsd(data.totals.usdGral)}</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">Gastos generales operativos</div>
+            </div>
+            <div class="metric-card" style="border-bottom: 3px solid #8b5cf6;">
+                <div class="metric-label" style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px;">Producción Objetivo</div>
+                <div class="metric-value" style="font-size: 2em; margin: 5px 0; color: #8b5cf6;">${fmt(data.totals.pasaPlan || 0)} <small style="font-size: 0.5em; vertical-align: middle;">kg</small></div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">Target de pasas terminadas</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row" style="margin-bottom: var(--space-6); display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-6);">
+            <div class="chart-container" style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-5); border: 1px solid var(--border-subtle);">
+                <div class="chart-header" style="margin-bottom: var(--space-4);">
+                    <span class="chart-title" style="font-family: 'Outfit'; font-weight: 600; color: var(--text-primary);">📊 Planificación de Jornales por Grupo de Labor</span>
+                </div>
+                <div style="height: 320px; position: relative;">
+                    <canvas id="chart-plan-jornales-labor"></canvas>
+                </div>
+            </div>
+            <div class="chart-container" style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-5); border: 1px solid var(--border-subtle);">
+                <div class="chart-header" style="margin-bottom: var(--space-4);">
+                    <span class="chart-title" style="font-family: 'Outfit'; font-weight: 600; color: var(--text-primary);">📈 Proyección de Inversión por Finca</span>
+                </div>
+                <div style="height: 320px; position: relative;">
+                    <canvas id="chart-plan-gastos-finca"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tables Row -->
+        <div class="dashboard-grid" style="grid-template-columns: 1.6fr 1fr; gap: var(--space-6); align-items: start;">
+            <!-- Jornales Table -->
+            <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-secondary); border-radius: 16px;">
+                <div style="padding: var(--space-4) var(--space-5); background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                    <h4 style="margin: 0; color: var(--text-primary); font-family: 'Outfit'; font-size: 1rem;">👷 Labores Estratégicas</h4>
+                    <span style="font-size: 0.75em; color: var(--text-tertiary); background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 12px; font-weight: 600;">Total: ${data.jornales.length} faenas</span>
+                </div>
+                <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+                    <table class="data-table" style="margin: 0;">
+                        <thead>
+                            <tr>
+                                <th style="background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10;">Labor / Faena</th>
+                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10;">Jornales</th>
+                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10;">Costo Est.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.jornales.map(l => `
+                                <tr>
+                                    <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5);">${l.labor}</td>
+                                    <td style="text-align: right; font-weight: 700; color: var(--color-primary-400); padding: var(--space-3) var(--space-5);">${fmtDec(l.jornales)}</td>
+                                    <td style="text-align: right; color: var(--text-tertiary); font-size: 0.85em; padding: var(--space-3) var(--space-5);">${fmtMoney(l.costoArs)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Gastos Table -->
+            <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-secondary); border-radius: 16px;">
+                <div style="padding: var(--space-4) var(--space-5); background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-subtle);">
+                    <h4 style="margin: 0; color: var(--text-primary); font-family: 'Outfit'; font-size: 1rem;">💰 Inversión por Origen</h4>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" style="margin: 0;">
+                        <thead>
+                            <tr>
+                                <th style="padding: var(--space-3) var(--space-5);">Unidad de Negocio</th>
+                                <th style="text-align: right; padding: var(--space-3) var(--space-5);">Presupuesto (USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(() => {
+                                const byFinca = {};
+                                data.gastosGral.forEach(g => {
+                                    byFinca[g.finca] = (byFinca[g.finca] || 0) + g.usd;
+                                });
+                                return Object.entries(byFinca)
+                                    .sort((a,b) => b[1] - a[1])
+                                    .map(([f, usd]) => `
+                                        <tr>
+                                            <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5);">${f}</td>
+                                            <td style="text-align: right; font-weight: 700; color: #10b981; padding: var(--space-3) var(--space-5);">${fmtUsd(usd)}</td>
+                                        </tr>
+                                    `).join('');
+                            })()}
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding: var(--space-4); background: rgba(16, 185, 129, 0.03); color: var(--text-tertiary); font-size: 0.75em; text-align: center; border-top: 1px solid var(--border-subtle);">
+                    Dato consolidado de importación de Excel General.
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}

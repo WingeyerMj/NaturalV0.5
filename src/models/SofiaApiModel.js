@@ -601,8 +601,28 @@ export class SofiaApiModel {
             const rCuartel = r.cuartel || r.Cuartel;
             const rVariedad = r.variedad || r.variedades || r.Variedad || r.Variedades;
 
-            if (filters.finca && rFinca !== filters.finca) return false;
-            if (filters.predio && rPredio !== filters.predio) return false;
+            const normalizePredio = (v) => {
+                if (!v) return 'Otros';
+                const s = String(v).toUpperCase();
+                if (s.includes('CAMINO TRUNCADO') || s.includes('TRUNCADO')) return 'Camino Truncado';
+                if (s.includes('CHIMBERA')) return 'La Chimbera';
+                if (s.includes('PUENTE ALTO') || s.includes('P. ALTO') || s.includes('P.ALTO')) return 'Puente Alto';
+                if (s.includes('EEIII') || s.includes('ESPEJO 3')) return 'EEIII';
+                if (s.includes('EEII') || s.includes('ESPEJO 2')) return 'EEII';
+                if (s.includes('EEI') || s.includes('ESPEJO 1')) return 'EEI';
+                return v;
+            };
+
+            const normalizeFinca = (v) => {
+                if (!v) return '';
+                const s = String(v).toUpperCase();
+                if (s.includes('VIEJA')) return 'Fincas Viejas';
+                if (s.includes('ESPEJO')) return 'El Espejo';
+                return v;
+            };
+
+            if (filters.finca && normalizeFinca(rFinca) !== normalizeFinca(filters.finca)) return false;
+            if (filters.predio && normalizePredio(rPredio) !== filters.predio) return false;
             if (filters.variedad && rVariedad !== filters.variedad) return false;
             if (filters.cuartel && rCuartel !== filters.cuartel) return false;
             
@@ -860,9 +880,9 @@ export class SofiaApiModel {
             if (clasif.includes('CAMINO TRUNCADO') || clasif.includes('TRUNCADO')) predioKey = 'Camino Truncado';
             else if (clasif.includes('CHIMBERA')) predioKey = 'La Chimbera';
             else if (clasif.includes('PUENTE ALTO') || clasif.includes('P. ALTO') || clasif.includes('P.ALTO')) predioKey = 'Puente Alto';
-            else if (clasif.includes('EEIII')) predioKey = 'El Espejo 3';
-            else if (clasif.includes('EEII')) predioKey = 'El Espejo 2';
-            else if (clasif.includes('EEI')) predioKey = 'El Espejo 1';
+            else if (clasif.includes('EEIII') || clasif.includes('ESPEJO 3')) predioKey = 'EEIII';
+            else if (clasif.includes('EEII') || clasif.includes('ESPEJO 2')) predioKey = 'EEII';
+            else if (clasif.includes('EEI') || clasif.includes('ESPEJO 1')) predioKey = 'EEI';
             
             if (!predios[predioKey]) predios[predioKey] = 0;
             predios[predioKey] += kilos;
@@ -874,7 +894,7 @@ export class SofiaApiModel {
             let fincaKey = 'Terceros';
             if (['Camino Truncado', 'La Chimbera', 'Puente Alto'].includes(predioKey)) {
                 fincaKey = 'Fincas Viejas';
-            } else if (['El Espejo 1', 'El Espejo 2', 'El Espejo 3'].includes(predioKey)) {
+            } else if (['EEI', 'EEII', 'EEIII'].includes(predioKey)) {
                 fincaKey = 'El Espejo';
             }
 
@@ -1233,12 +1253,12 @@ export class SofiaApiModel {
      */
     static getCosechaComparativaPorPredio(fullCycleData) {
         const PREDIO_CONFIG = [
-            { keyword: 'Camino Truncado', name: 'Camino Truncado' }, 
-            { keyword: 'La Chimbera', name: 'La Chimbera' }, 
-            { keyword: 'Puente Alto', name: 'Puente Alto' },
-            { keyword: 'EEIII', name: 'El Espejo 3' }, 
-            { keyword: 'EEII', name: 'El Espejo 2' }, 
-            { keyword: 'EEI', name: 'El Espejo 1' }
+            { keyword: 'Camino Truncado', name: 'Camino Truncado', finca: 'Fincas Viejas' }, 
+            { keyword: 'La Chimbera', name: 'La Chimbera', finca: 'Fincas Viejas' }, 
+            { keyword: 'Puente Alto', name: 'Puente Alto', finca: 'Fincas Viejas' },
+            { keyword: 'EEIII', name: 'EEIII', finca: 'El Espejo' }, 
+            { keyword: 'EEII', name: 'EEII', finca: 'El Espejo' }, 
+            { keyword: 'EEI', name: 'EEI', finca: 'El Espejo' }
         ];
 
         const predioData = {};
@@ -1275,9 +1295,19 @@ export class SofiaApiModel {
         });
         
         // Match the predefined order above for logical sorting
-        const sorted = PREDIO_CONFIG.map(p => predioData[p.name] || { label: p.name, fresco: 0, pasa: 0 })
-                                    .reverse(); // Reverse if you want EE1 first, etc. Let's do alphabetical or just reverse index.
-        sorted.sort((a, b) => a.label.localeCompare(b.label)); // Alphabetical sorting guarantees standard order
+        let sorted = PREDIO_CONFIG
+            .filter(p => !fullCycleData.fincaFilter || p.finca === fullCycleData.fincaFilter) // Optional: restrict if we knew the filter
+            .map(p => predioData[p.name] || { label: p.name, fresco: 0, pasa: 0, finca: p.finca });
+
+        // If a finca is selected, only show those predios. If all fincas, show all with data.
+        if (fullCycleData.fincaFilter) {
+            sorted = sorted.filter(s => s.finca === fullCycleData.fincaFilter);
+        } else {
+            // Only show those with at least some data to avoid cluttering with 0s
+            sorted = sorted.filter(s => s.fresco > 0 || s.pasa > 0);
+        }
+        
+        sorted.sort((a, b) => a.label.localeCompare(b.label)); 
 
         return {
             labels: sorted.map(d => d.label),
