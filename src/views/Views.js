@@ -3241,6 +3241,22 @@ export function renderPresupuestoProyeccionView() {
                     <option value="Fincas Viejas">Fincas Viejas</option>
                 </select>
             </div>
+            <div class="filter-group">
+                <label class="form-label">PREDIO (Clasifica)</label>
+                <select class="form-select sofia-filter-select" id="ppto-predio">
+                    <option value="">Todos</option>
+                    <optgroup label="El Espejo">
+                        <option value="El Espejo 1">El Espejo 1 (EEI)</option>
+                        <option value="El Espejo 2">El Espejo 2 (EEII)</option>
+                        <option value="El Espejo 3">El Espejo 3 (EEIII)</option>
+                    </optgroup>
+                    <optgroup label="Fincas Viejas">
+                        <option value="Camino Truncado">Camino Truncado</option>
+                        <option value="La Chimbera">La Chimbera</option>
+                        <option value="Puente Alto">Puente Alto</option>
+                    </optgroup>
+                </select>
+            </div>
             <div class="filter-group" style="display: flex; align-items: flex-end; gap: var(--space-2);">
                 <button class="btn btn-primary" id="btn-ppto-load" style="white-space: nowrap;">
                     📊 Generar Presupuesto
@@ -3249,7 +3265,7 @@ export function renderPresupuestoProyeccionView() {
         </div>
 
         <!-- Summary Cards -->
-        <div id="ppto-summary" class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div id="ppto-summary" class="dashboard-grid" style="grid-template-columns: repeat(5, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
             <div class="metric-card">
                 <div class="metric-card-header"><div class="metric-card-icon green">👷</div></div>
                 <div class="metric-value" id="ppto-total-jornales">—</div>
@@ -3270,12 +3286,24 @@ export function renderPresupuestoProyeccionView() {
                 <div class="metric-value" id="ppto-total-costo-insumos">—</div>
                 <div class="metric-label">COSTO INSUMOS (USD)</div>
             </div>
+            <div class="metric-card" style="border-left: 3px solid #f59e0b;">
+                <div class="metric-card-header"><div class="metric-card-icon amber">🌾</div></div>
+                <div class="metric-value" id="ppto-costo-ha-global">—</div>
+                <div class="metric-label">COSTO/Ha PROMEDIO (ARS)</div>
+            </div>
+        </div>
+
+        <!-- Finca Sub-Summary (hidden until data loads) -->
+        <div id="ppto-finca-summary" style="display: none; margin-bottom: var(--space-6);">
+            <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            </div>
         </div>
 
         <!-- Tabs -->
         <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); flex-wrap: wrap;">
             <button class="btn btn-primary" id="ppto-tab-jornales-cant" style="border-radius: 8px 8px 0 0;">👷 Jornales (Cant.)</button>
             <button class="btn btn-ghost" id="ppto-tab-jornales-costo" style="border-radius: 8px 8px 0 0;">💵 Jornales (Costo)</button>
+            <button class="btn btn-ghost" id="ppto-tab-costo-ha" style="border-radius: 8px 8px 0 0;">🌾 Costo/Ha Manten.</button>
             <button class="btn btn-ghost" id="ppto-tab-gastos" style="border-radius: 8px 8px 0 0;">📦 Gastos y Consumos</button>
             <button class="btn btn-ghost" id="ppto-tab-produccion" style="border-radius: 8px 8px 0 0;">🍇 Producción Estimada</button>
             <button class="btn btn-ghost" id="ppto-tab-excel" style="border-radius: 8px 8px 0 0;">📊 Ppto General (Excel)</button>
@@ -3354,6 +3382,67 @@ export function renderPresupuestoProyeccionView() {
                             </td></tr>
                         </tbody>
                         <tfoot id="tfoot-ppto-jornales-costo"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Costo/Ha Mantenimiento -->
+        <div id="ppto-content-costo-ha" style="display: none;">
+            <div class="charts-row" style="margin-bottom: var(--space-6);">
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">🌾 Costo de Mantenimiento por Hectárea (ARS)</span>
+                    </div>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="chart-ppto-costo-ha"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Jornales por Hectárea por Predio</span>
+                    </div>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="chart-ppto-jornales-ha"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Finca comparison cards -->
+            <div id="ppto-costo-ha-finca-cards" class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+            </div>
+
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <div>
+                        <h3 style="margin: 0; color: #f59e0b; display: flex; align-items: center; gap: 8px;">
+                            🌾 Detalle Costo de Mantenimiento por Hectárea
+                        </h3>
+                        <p style="margin: var(--space-1) 0 0; color: var(--text-tertiary); font-size: 0.85em;">
+                            Costo total de mano de obra dividido por la superficie de cada predio. Permite identificar las zonas con mayor y menor inversión en mantenimiento.
+                        </p>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-costo-ha">
+                        <thead>
+                            <tr style="background: rgba(245, 158, 11, 0.08);">
+                                <th>Finca</th>
+                                <th>Predio (Clasifica)</th>
+                                <th style="text-align: right;">Hectáreas</th>
+                                <th style="text-align: right;">Jornales Tot.</th>
+                                <th style="text-align: right;">Jornales/Ha</th>
+                                <th style="text-align: right;">Costo Total (ARS)</th>
+                                <th style="text-align: right; min-width: 140px;">Costo/Ha (ARS)</th>
+                                <th style="text-align: center;">Nivel</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-costo-ha">
+                            <tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Presione "Generar Presupuesto" para calcular costos por hectárea
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-costo-ha"></tfoot>
                     </table>
                 </div>
             </div>
@@ -4261,17 +4350,17 @@ export function renderInformePlanificacion(data) {
                     <table class="data-table" style="margin: 0;">
                         <thead>
                             <tr>
-                                <th style="background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10;">Labor / Faena</th>
-                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10;">Jornales</th>
-                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10;">Costo Est.</th>
+                                <th style="background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Labor / Faena</th>
+                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Jornales</th>
+                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Costo Est.</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${data.jornales.map(l => `
                                 <tr>
-                                    <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5);">${l.labor}</td>
+                                    <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5); color: white;">${l.labor}</td>
                                     <td style="text-align: right; font-weight: 700; color: var(--color-primary-400); padding: var(--space-3) var(--space-5);">${fmtDec(l.jornales)}</td>
-                                    <td style="text-align: right; color: var(--text-tertiary); font-size: 0.85em; padding: var(--space-3) var(--space-5);">${fmtMoney(l.costoArs)}</td>
+                                    <td style="text-align: right; color: white; opacity: 0.8; font-size: 0.85em; padding: var(--space-3) var(--space-5);">${fmtMoney(l.costoArs)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -4288,8 +4377,8 @@ export function renderInformePlanificacion(data) {
                     <table class="data-table" style="margin: 0;">
                         <thead>
                             <tr>
-                                <th style="padding: var(--space-3) var(--space-5);">Unidad de Negocio</th>
-                                <th style="text-align: right; padding: var(--space-3) var(--space-5);">Presupuesto (USD)</th>
+                                <th style="padding: var(--space-3) var(--space-5); color: white; opacity: 0.9;">Unidad de Negocio</th>
+                                <th style="text-align: right; padding: var(--space-3) var(--space-5); color: white; opacity: 0.9;">Presupuesto (USD)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -4302,7 +4391,7 @@ export function renderInformePlanificacion(data) {
                                     .sort((a,b) => b[1] - a[1])
                                     .map(([f, usd]) => `
                                         <tr>
-                                            <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5);">${f}</td>
+                                            <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5); color: white;">${f}</td>
                                             <td style="text-align: right; font-weight: 700; color: #10b981; padding: var(--space-3) var(--space-5);">${fmtUsd(usd)}</td>
                                         </tr>
                                     `).join('');
@@ -4310,7 +4399,7 @@ export function renderInformePlanificacion(data) {
                         </tbody>
                     </table>
                 </div>
-                <div style="padding: var(--space-4); background: rgba(16, 185, 129, 0.03); color: var(--text-tertiary); font-size: 0.75em; text-align: center; border-top: 1px solid var(--border-subtle);">
+                <div style="padding: var(--space-4); background: rgba(16, 185, 129, 0.03); color: white; opacity: 0.5; font-size: 0.75em; text-align: center; border-top: 1px solid var(--border-subtle);">
                     Dato consolidado de importación de Excel General.
                 </div>
             </div>

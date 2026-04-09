@@ -2785,6 +2785,9 @@ async renderInformeTab(tab) {
         case 'presupuesto':
             content.innerHTML = renderInformePresupuesto(PresupuestoModel.getByCategory());
             requestAnimationFrame(() => this.renderBudgetReportChart());
+
+            // Also load dynamic cost/ha data from Sofia for the informes view
+            this.loadInformeCostoHa(content);
             break;
         case 'labores':
             content.innerHTML = renderInformeLabores(LaborModel.getByType(), LaborModel.getHoursByFinca());
@@ -2846,6 +2849,191 @@ renderBudgetReportChart() {
         },
         options: this.getChartOptions('Monto ($)')
     });
+}
+
+/**
+ * Loads and renders cost/ha section in the informes presupuesto tab.
+ * Appends content dynamically after the static budget report.
+ */
+async loadInformeCostoHa(container) {
+    const ciclo = SofiaApiModel.getCurrentCycle();
+
+    // Append loading indicator
+    const costoSection = document.createElement('div');
+    costoSection.id = 'informe-costo-ha-section';
+    costoSection.innerHTML = `
+        <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+        <div style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+            <div class="spinner" style="margin: 0 auto 1rem;"></div>
+            <p>Cargando análisis de Costo/Ha de Mantenimiento...</p>
+        </div>
+    `;
+    container.appendChild(costoSection);
+
+    try {
+        // Load data
+        const allData = await SofiaApiModel.fetchCycleData(ciclo);
+        const fincaSummary = PresupuestoBudgetModel.buildJornalesSummaryByFinca(allData);
+        const hectareasData = SofiaApiModel.getHectareasPorPredio(allData);
+        const costoHaData = PresupuestoBudgetModel.getCostoMantenimientoHa(fincaSummary, hectareasData);
+
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+        const fmtCur = (n) => '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+        const fincaColors = { 'El Espejo': '#3b82f6', 'Fincas Viejas': '#10b981' };
+
+        // Render finca filter + cost/ha section
+        let html = `
+            <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-3);">
+                <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin: 0;">
+                    🌾 Costo de Mantenimiento por Hectárea — Ciclo ${ciclo}
+                </h3>
+                <div style="display: flex; gap: var(--space-3); align-items: center;">
+                    <label style="font-size: 0.8em; color: var(--text-tertiary);">Filtrar por:</label>
+                    <select id="informe-costoha-finca-filter" class="form-select" style="font-size: 0.8rem; padding: 4px 10px; width: 180px; background: var(--bg-tertiary);">
+                        <option value="">Todas las Fincas</option>
+                        <option value="El Espejo">🏔️ El Espejo</option>
+                        <option value="Fincas Viejas">🌿 Fincas Viejas</option>
+                    </select>
+                    <select id="informe-costoha-predio-filter" class="form-select" style="font-size: 0.8rem; padding: 4px 10px; width: 180px; background: var(--bg-tertiary);">
+                        <option value="">Todos los Predios</option>
+                        <optgroup label="El Espejo">
+                            <option value="El Espejo 1">EEI</option>
+                            <option value="El Espejo 2">EEII</option>
+                            <option value="El Espejo 3">EEIII</option>
+                        </optgroup>
+                        <optgroup label="Fincas Viejas">
+                            <option value="Camino Truncado">Camino Truncado</option>
+                            <option value="La Chimbera">La Chimbera</option>
+                            <option value="Puente Alto">Puente Alto</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+        `;
+
+        // Finca summary cards
+        html += `<div class="dashboard-grid animate-fade-in" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">`;
+        costoHaData.byFinca.forEach(f => {
+            const color = fincaColors[f.finca] || '#818cf8';
+            html += `
+                <div class="card informe-costoha-finca-card" data-finca="${f.finca}" style="padding: var(--space-4); border-top: 3px solid ${color};">
+                    <h4 style="margin: 0 0 var(--space-3); color: ${color};">${f.finca === 'El Espejo' ? '🏔️' : '🌿'} ${f.finca}</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);">
+                        <div>
+                            <div style="font-size: 0.7em; text-transform: uppercase; color: var(--text-tertiary);">Costo/Ha</div>
+                            <div style="font-size: 1.4em; font-weight: 700; color: ${color};">${fmtCur(f.costoHa)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.7em; text-transform: uppercase; color: var(--text-tertiary);">Jornales/Ha</div>
+                            <div style="font-size: 1.4em; font-weight: 700;">${fmt(f.jornalesHa)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.7em; text-transform: uppercase; color: var(--text-tertiary);">Superficie</div>
+                            <div style="font-size: 1.4em; font-weight: 700;">${fmt(f.hectareas)} ha</div>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        html += `</div>`;
+
+        // Detailed table
+        const avgCostoHa = costoHaData.byPredio.length > 0
+            ? costoHaData.byPredio.reduce((s, p) => s + p.costoHa, 0) / costoHaData.byPredio.length : 0;
+
+        html += `
+            <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-6);">
+                <div class="table-header">
+                    <h3>Detalle Costo/Ha por Predio (Clasifica)</h3>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Finca</th>
+                            <th>Predio</th>
+                            <th style="text-align: right;">Has</th>
+                            <th style="text-align: right;">Jornales</th>
+                            <th style="text-align: right;">Jornales/Ha</th>
+                            <th style="text-align: right;">Costo Total</th>
+                            <th style="text-align: right;">Costo/Ha</th>
+                            <th style="text-align: center;">Nivel</th>
+                        </tr>
+                    </thead>
+                    <tbody id="informe-costoha-tbody">`;
+
+        costoHaData.byPredio.forEach(p => {
+            const color = fincaColors[p.finca] || '#818cf8';
+            const ratio = avgCostoHa > 0 ? p.costoHa / avgCostoHa : 1;
+            let levelBadge, levelColor;
+            if (ratio > 1.2) { levelBadge = '🔴 Alto'; levelColor = '#ef4444'; }
+            else if (ratio < 0.8) { levelBadge = '🟢 Bajo'; levelColor = '#10b981'; }
+            else { levelBadge = '🟡 Normal'; levelColor = '#f59e0b'; }
+
+            html += `<tr class="informe-costoha-row" data-finca="${p.finca}" data-predio="${p.predio}">
+                <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px;"></span>${p.finca}</td>
+                <td style="font-weight:600;">${p.predio}</td>
+                <td style="text-align:right;">${fmt(p.hectareas)}</td>
+                <td style="text-align:right;">${fmt(p.jornales)}</td>
+                <td style="text-align:right;">${fmt(p.jornalesHa)}</td>
+                <td style="text-align:right;">${fmtCur(p.costoArs)}</td>
+                <td style="text-align:right;font-weight:700;"><span style="background:${levelColor}15;color:${levelColor};padding:3px 10px;border-radius:6px;">${fmtCur(p.costoHa)}</span></td>
+                <td style="text-align:center;"><span style="font-size:0.85em;color:${levelColor};">${levelBadge}</span></td>
+            </tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+
+        costoSection.innerHTML = html;
+
+        // Wire up filters
+        const fincaFilter = document.getElementById('informe-costoha-finca-filter');
+        const predioFilter = document.getElementById('informe-costoha-predio-filter');
+
+        const applyFilter = () => {
+            const fVal = fincaFilter?.value || '';
+            const pVal = predioFilter?.value || '';
+
+            document.querySelectorAll('.informe-costoha-row').forEach(row => {
+                const rowFinca = row.dataset.finca;
+                const rowPredio = row.dataset.predio;
+                let show = true;
+                if (fVal && rowFinca !== fVal) show = false;
+                if (pVal && rowPredio !== pVal) show = false;
+                row.style.display = show ? '' : 'none';
+            });
+
+            // Show/hide finca cards
+            document.querySelectorAll('.informe-costoha-finca-card').forEach(card => {
+                if (!fVal || card.dataset.finca === fVal) card.style.display = '';
+                else card.style.display = 'none';
+            });
+        };
+
+        fincaFilter?.addEventListener('change', () => {
+            // Sync predio filter optgroups
+            predioFilter?.querySelectorAll('optgroup').forEach(og => {
+                if (!fincaFilter.value || og.label === fincaFilter.value) {
+                    og.style.display = '';
+                    og.querySelectorAll('option').forEach(o => o.style.display = '');
+                } else {
+                    og.style.display = 'none';
+                    og.querySelectorAll('option').forEach(o => o.style.display = 'none');
+                }
+            });
+            if (predioFilter) predioFilter.value = '';
+            applyFilter();
+        });
+        predioFilter?.addEventListener('change', applyFilter);
+
+    } catch (err) {
+        console.warn('Error loading cost/ha for informes:', err);
+        costoSection.innerHTML = `
+            <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+            <div style="padding: 2rem; color: var(--text-tertiary); text-align: center;">
+                ⚠️ No se pudo cargar el análisis de costo/ha. ${err.message || ''}
+            </div>
+        `;
+    }
 }
 
 renderLaboresReportChart() {
@@ -5541,6 +5729,7 @@ renderFertUnidadesChart() {
         // Tab switching
         const tabJornalesCant = document.getElementById('ppto-tab-jornales-cant');
         const tabJornalesCosto = document.getElementById('ppto-tab-jornales-costo');
+        const tabCostoHa = document.getElementById('ppto-tab-costo-ha');
         const tabGastos = document.getElementById('ppto-tab-gastos');
         const tabProduccion = document.getElementById('ppto-tab-produccion');
         const tabExcel = document.getElementById('ppto-tab-excel');
@@ -5548,14 +5737,15 @@ renderFertUnidadesChart() {
         
         const contentJornalesCant = document.getElementById('ppto-content-jornales-cant');
         const contentJornalesCosto = document.getElementById('ppto-content-jornales-costo');
+        const contentCostoHa = document.getElementById('ppto-content-costo-ha');
         const contentGastos = document.getElementById('ppto-content-gastos');
         const contentProduccion = document.getElementById('ppto-content-produccion');
         const contentExcel = document.getElementById('ppto-content-excel');
         const contentEjecucion = document.getElementById('ppto-content-ejecucion');
 
         if (tabJornalesCant && tabJornalesCosto && tabGastos && tabExcel) {
-            const tabs = [tabJornalesCant, tabJornalesCosto, tabGastos, tabProduccion, tabExcel, tabEjecucion].filter(Boolean);
-            const contents = [contentJornalesCant, contentJornalesCosto, contentGastos, contentProduccion, contentExcel, contentEjecucion].filter(Boolean);
+            const tabs = [tabJornalesCant, tabJornalesCosto, tabCostoHa, tabGastos, tabProduccion, tabExcel, tabEjecucion].filter(Boolean);
+            const contents = [contentJornalesCant, contentJornalesCosto, contentCostoHa, contentGastos, contentProduccion, contentExcel, contentEjecucion].filter(Boolean);
 
             const switchTab = (activeTab, activeContent) => {
                 tabs.forEach(t => t.className = 'btn btn-ghost');
@@ -5566,16 +5756,44 @@ renderFertUnidadesChart() {
 
             tabJornalesCant.addEventListener('click', () => switchTab(tabJornalesCant, contentJornalesCant));
             tabJornalesCosto.addEventListener('click', () => switchTab(tabJornalesCosto, contentJornalesCosto));
+            if (tabCostoHa) tabCostoHa.addEventListener('click', () => switchTab(tabCostoHa, contentCostoHa));
             tabGastos.addEventListener('click', () => switchTab(tabGastos, contentGastos));
             if (tabProduccion) tabProduccion.addEventListener('click', () => switchTab(tabProduccion, contentProduccion));
             tabExcel.addEventListener('click', () => switchTab(tabExcel, contentExcel));
             if (tabEjecucion) tabEjecucion.addEventListener('click', () => switchTab(tabEjecucion, contentEjecucion));
         }
 
+        // Finca → Predio filter interplay
+        const fincaSelect = document.getElementById('ppto-finca');
+        const predioSelect = document.getElementById('ppto-predio');
+        if (fincaSelect && predioSelect) {
+            fincaSelect.addEventListener('change', () => {
+                const val = fincaSelect.value;
+                const opts = predioSelect.querySelectorAll('option, optgroup');
+                // Show/hide optgroups based on finca selection
+                predioSelect.querySelectorAll('optgroup').forEach(og => {
+                    if (!val || og.label === val) {
+                        og.style.display = '';
+                        og.querySelectorAll('option').forEach(o => o.style.display = '');
+                    } else {
+                        og.style.display = 'none';
+                        og.querySelectorAll('option').forEach(o => o.style.display = 'none');
+                    }
+                });
+                // Reset predio if it doesn't match the selected finca
+                const selectedOption = predioSelect.querySelector(`option[value="${predioSelect.value}"]`);
+                if (selectedOption && selectedOption.closest('optgroup')?.style.display === 'none') {
+                    predioSelect.value = '';
+                }
+            });
+        }
+
         // State
         let jornalesData = [];
         let gastosData = { byCategoria: [], byProducto: [], totals: {} };
         let jornalesSummary = { byLabor: [], byPredio: [], totals: {} };
+        let fincaSummary = null;
+        let costoHaData = null;
         let excelBudgetData = null;
         let hectareasData = null;
 
@@ -5598,12 +5816,18 @@ renderFertUnidadesChart() {
             const cicloBase = document.getElementById('ppto-ciclo-base')?.value || '2025-2026';
             const cicloDestino = document.getElementById('ppto-ciclo-destino')?.value || '2026-2027';
             const finca = document.getElementById('ppto-finca')?.value || '';
+            const predioFilter = document.getElementById('ppto-predio')?.value || '';
 
             // 1. Load Jornales
             const filters = { ciclo: cicloBase };
             if (finca) filters.finca = finca;
+            if (predioFilter) filters.predio = predioFilter;
             const rawJornales = await SofiaApiModel.fetchJornales(filters);
             jornalesSummary = PresupuestoBudgetModel.buildJornalesSummary(rawJornales);
+
+            // 1b. Build finca-grouped summary (always from unfiltered cycle data for full picture)
+            const allCycleJornales = await SofiaApiModel.fetchJornales({ ciclo: cicloBase });
+            fincaSummary = PresupuestoBudgetModel.buildJornalesSummaryByFinca(allCycleJornales);
 
             // 2. Load Gastos (from CSV aplicaciones — cached after first load)
             if (!this._sofiaDataLoaded) {
@@ -5621,6 +5845,9 @@ renderFertUnidadesChart() {
             if (el('ppto-total-costo-mo')) el('ppto-total-costo-mo').textContent = fmtCurrency(jornalesSummary.totals.totalCostoArs);
             if (el('ppto-total-insumos')) el('ppto-total-insumos').textContent = fmt(gastosData.totals.totalCantidad);
             if (el('ppto-total-costo-insumos')) el('ppto-total-costo-insumos').textContent = fmtCurrency(gastosData.totals.totalCosto);
+
+            // 4b. Render Finca Sub-Summary Cards
+            this.renderFincaSummaryCards(fincaSummary);
 
             // 5. Render Jornales Table
             this.renderPresupuestoJornalesTable(jornalesSummary, saved, cicloBase);
@@ -5650,6 +5877,19 @@ renderFertUnidadesChart() {
                 const allCycleData = await SofiaApiModel.fetchCycleData(cicloBase);
                 hectareasData = SofiaApiModel.getHectareasPorPredio(allCycleData);
                 this.renderProductionEstimationTable(cicloDestino, hectareasData);
+
+                // 9b. Calculate and render Costo/Ha
+                if (fincaSummary && hectareasData) {
+                    costoHaData = PresupuestoBudgetModel.getCostoMantenimientoHa(fincaSummary, hectareasData);
+                    this.renderCostoHaTable(costoHaData);
+                    this.renderCostoHaCharts(costoHaData);
+
+                    // Update global Costo/Ha card
+                    const totalCosto = fincaSummary.totals.totalCostoArs;
+                    const totalHa = hectareasData.grandTotalHa;
+                    const globalCostoHa = totalHa > 0 ? totalCosto / totalHa : 0;
+                    if (el('ppto-costo-ha-global')) el('ppto-costo-ha-global').textContent = fmtCurrency(globalCostoHa);
+                }
             } catch (err) {
                 console.warn('Error loading hectareas data for production', err);
             }
@@ -6441,6 +6681,248 @@ renderFertUnidadesChart() {
                         x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
                     }
                 }
+            });
+        }
+    }
+
+    /**
+     * Renders per-finca summary cards showing jornales, cost, and breakdown.
+     */
+    renderFincaSummaryCards(fincaSummary) {
+        const container = document.getElementById('ppto-finca-summary');
+        if (!container || !fincaSummary) return;
+
+        const fmtCur = (n) => '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+
+        const fincaOrder = ['El Espejo', 'Fincas Viejas'];
+        const fincaColors = { 'El Espejo': '#3b82f6', 'Fincas Viejas': '#10b981' };
+        const fincaIcons = { 'El Espejo': '🏔️', 'Fincas Viejas': '🌿' };
+
+        let cardsHtml = '';
+        fincaOrder.forEach(fincaName => {
+            const data = fincaSummary.byFinca[fincaName];
+            if (!data) return;
+
+            const prediosHtml = Object.values(data.byPredio).map(p =>
+                `<div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <span style="color: var(--text-secondary); font-size: 0.85em;">📍 ${p.predio}</span>
+                    <span style="font-weight: 600; font-size: 0.85em;">${fmt(p.jornales)} jorn.</span>
+                </div>`
+            ).join('');
+
+            const color = fincaColors[fincaName] || '#818cf8';
+            cardsHtml += `
+                <div class="metric-card" style="border-top: 3px solid ${color}; padding: var(--space-4);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+                        <h3 style="margin: 0; color: ${color}; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                            ${fincaIcons[fincaName] || '🏡'} ${fincaName}
+                        </h3>
+                        <span style="font-size: 0.8em; background: ${color}20; color: ${color}; padding: 2px 10px; border-radius: 12px;">
+                            ${Object.keys(data.byPredio).length} predios
+                        </span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-3);">
+                        <div>
+                            <div style="font-size: 0.75em; color: var(--text-tertiary); text-transform: uppercase;">Jornales</div>
+                            <div style="font-size: 1.3em; font-weight: 700; color: var(--text-primary);">${fmt(data.jornales)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75em; color: var(--text-tertiary); text-transform: uppercase;">Costo M.O.</div>
+                            <div style="font-size: 1.3em; font-weight: 700; color: var(--text-primary);">${fmtCur(data.costoArs)}</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.75em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: var(--space-1);">Desglose por predio</div>
+                    ${prediosHtml}
+                </div>
+            `;
+        });
+
+        const grid = container.querySelector('.dashboard-grid');
+        if (grid) grid.innerHTML = cardsHtml;
+        container.style.display = cardsHtml ? '' : 'none';
+    }
+
+    /**
+     * Renders the Costo/Ha maintenance table in the Costo/Ha tab.
+     */
+    renderCostoHaTable(costoHaData) {
+        const tbody = document.getElementById('tbody-ppto-costo-ha');
+        const tfoot = document.getElementById('tfoot-ppto-costo-ha');
+        if (!tbody || !costoHaData) return;
+
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+        const fmtCur = (n) => '$' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+
+        const fincaColors = { 'El Espejo': '#3b82f6', 'Fincas Viejas': '#10b981' };
+
+        // Determine average for color coding
+        const avgCostoHa = costoHaData.byPredio.length > 0
+            ? costoHaData.byPredio.reduce((s, p) => s + p.costoHa, 0) / costoHaData.byPredio.length
+            : 0;
+
+        let rows = '';
+        costoHaData.byPredio.forEach(p => {
+            const color = fincaColors[p.finca] || '#818cf8';
+            const ratio = avgCostoHa > 0 ? p.costoHa / avgCostoHa : 1;
+            let levelBadge, levelColor;
+            if (ratio > 1.2) {
+                levelBadge = '🔴 Alto';
+                levelColor = '#ef4444';
+            } else if (ratio < 0.8) {
+                levelBadge = '🟢 Bajo';
+                levelColor = '#10b981';
+            } else {
+                levelBadge = '🟡 Normal';
+                levelColor = '#f59e0b';
+            }
+
+            rows += `<tr>
+                <td>
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${color}; margin-right: 6px;"></span>
+                    ${p.finca}
+                </td>
+                <td style="font-weight: 600;">${p.predio}</td>
+                <td style="text-align: right;">${fmt(p.hectareas)}</td>
+                <td style="text-align: right;">${fmt(p.jornales)}</td>
+                <td style="text-align: right;">${fmt(p.jornalesHa)}</td>
+                <td style="text-align: right;">${fmtCur(p.costoArs)}</td>
+                <td style="text-align: right; font-weight: 700; font-size: 1.05em;">
+                    <span style="background: ${levelColor}15; color: ${levelColor}; padding: 3px 10px; border-radius: 6px;">
+                        ${fmtCur(p.costoHa)}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <span style="font-size: 0.85em; color: ${levelColor};">${levelBadge}</span>
+                </td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = rows;
+
+        // Finca subtotals
+        let footHtml = '';
+        costoHaData.byFinca.forEach(f => {
+            const color = fincaColors[f.finca] || '#818cf8';
+            footHtml += `<tr style="font-weight: 600; background: ${color}08; border-top: 1px solid var(--color-border);">
+                <td style="color: ${color};">${f.finca}</td>
+                <td>${f.prediosCount} predios</td>
+                <td style="text-align: right;">${fmt(f.hectareas)}</td>
+                <td style="text-align: right;">${fmt(f.jornales)}</td>
+                <td style="text-align: right;">${fmt(f.jornalesHa)}</td>
+                <td style="text-align: right;">${fmtCur(f.costoArs)}</td>
+                <td style="text-align: right; font-weight: 700;">${fmtCur(f.costoHa)}</td>
+                <td></td>
+            </tr>`;
+        });
+
+        // Grand total
+        const grandHa = costoHaData.byFinca.reduce((s, f) => s + f.hectareas, 0);
+        const grandCosto = costoHaData.byFinca.reduce((s, f) => s + f.costoArs, 0);
+        const grandJornales = costoHaData.byFinca.reduce((s, f) => s + f.jornales, 0);
+        footHtml += `<tr style="font-weight: 700; border-top: 2px solid var(--color-border);">
+            <td colspan="2">TOTAL GENERAL</td>
+            <td style="text-align: right;">${fmt(grandHa)}</td>
+            <td style="text-align: right;">${fmt(grandJornales)}</td>
+            <td style="text-align: right;">${grandHa > 0 ? fmt(grandJornales / grandHa) : '—'}</td>
+            <td style="text-align: right;">${fmtCur(grandCosto)}</td>
+            <td style="text-align: right; font-size: 1.1em;">${grandHa > 0 ? fmtCur(grandCosto / grandHa) : '—'}</td>
+            <td></td>
+        </tr>`;
+
+        if (tfoot) tfoot.innerHTML = footHtml;
+
+        // Render finca comparison cards
+        const fincaCards = document.getElementById('ppto-costo-ha-finca-cards');
+        if (fincaCards) {
+            const fincaIcons = { 'El Espejo': '🏔️', 'Fincas Viejas': '🌿' };
+            fincaCards.innerHTML = costoHaData.byFinca.map(f => {
+                const color = fincaColors[f.finca] || '#818cf8';
+                return `
+                    <div class="card" style="padding: var(--space-4); border-top: 3px solid ${color};">
+                        <h4 style="margin: 0 0 var(--space-3); color: ${color}; display: flex; align-items: center; gap: 8px;">
+                            ${fincaIcons[f.finca] || '🏡'} ${f.finca}
+                        </h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-3);">
+                            <div>
+                                <div style="font-size: 0.7em; text-transform: uppercase; color: var(--text-tertiary);">Costo/Ha</div>
+                                <div style="font-size: 1.4em; font-weight: 700; color: ${color};">$${(f.costoHa).toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.7em; text-transform: uppercase; color: var(--text-tertiary);">Jornales/Ha</div>
+                                <div style="font-size: 1.4em; font-weight: 700;">${f.jornalesHa.toFixed(1)}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.7em; text-transform: uppercase; color: var(--text-tertiary);">Superficie</div>
+                                <div style="font-size: 1.4em; font-weight: 700;">${f.hectareas.toFixed(1)} ha</div>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+    }
+
+    /**
+     * Renders charts for Costo/Ha view.
+     */
+    renderCostoHaCharts(costoHaData) {
+        if (!costoHaData) return;
+
+        // Destroy previous charts
+        ['ppto-costo-ha-chart', 'ppto-jornales-ha-chart'].forEach(k => {
+            if (this.charts[k]) { this.charts[k].destroy(); delete this.charts[k]; }
+        });
+
+        // 1. Costo/Ha bar chart
+        const ctx1 = document.getElementById('chart-ppto-costo-ha');
+        if (ctx1) {
+            const fincaColors = { 'El Espejo': 'rgba(59, 130, 246, 0.7)', 'Fincas Viejas': 'rgba(16, 185, 129, 0.7)' };
+            const borderColors = { 'El Espejo': 'rgba(59, 130, 246, 1)', 'Fincas Viejas': 'rgba(16, 185, 129, 1)' };
+
+            this.charts['ppto-costo-ha-chart'] = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: costoHaData.byPredio.map(p => p.predio),
+                    datasets: [{
+                        label: 'Costo/Ha (ARS)',
+                        data: costoHaData.byPredio.map(p => Math.round(p.costoHa)),
+                        backgroundColor: costoHaData.byPredio.map(p => fincaColors[p.finca] || 'rgba(129, 140, 248, 0.7)'),
+                        borderColor: costoHaData.byPredio.map(p => borderColors[p.finca] || 'rgba(129, 140, 248, 1)'),
+                        borderWidth: 1,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    ...this.getChartOptions('Costo/Ha (ARS)'),
+                    plugins: {
+                        ...this.getChartOptions('Costo/Ha (ARS)').plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `$${ctx.raw.toLocaleString('es-AR')} / ha`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Jornales/Ha bar chart
+        const ctx2 = document.getElementById('chart-ppto-jornales-ha');
+        if (ctx2) {
+            this.charts['ppto-jornales-ha-chart'] = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: costoHaData.byPredio.map(p => p.predio),
+                    datasets: [{
+                        label: 'Jornales/Ha',
+                        data: costoHaData.byPredio.map(p => parseFloat(p.jornalesHa.toFixed(1))),
+                        backgroundColor: 'rgba(245, 158, 11, 0.6)',
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1,
+                        borderRadius: 8
+                    }]
+                },
+                options: this.getChartOptions('Jornales/Ha')
             });
         }
     }

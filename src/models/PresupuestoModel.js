@@ -89,6 +89,217 @@ export class PresupuestoModel {
     }
 
     /**
+     * PREDIO_CONFIG shared for normalization.
+     */
+    static PREDIO_CONFIG = [
+        { keyword: 'Camino Truncado', group: 'Fincas Viejas', name: 'Camino Truncado' },
+        { keyword: 'La Chimbera', group: 'Fincas Viejas', name: 'La Chimbera' },
+        { keyword: 'Puente Alto', group: 'Fincas Viejas', name: 'Puente Alto' },
+        { keyword: 'EEIII', group: 'El Espejo', name: 'El Espejo 3' },
+        { keyword: 'EEII', group: 'El Espejo', name: 'El Espejo 2' },
+        { keyword: 'EEI', group: 'El Espejo', name: 'El Espejo 1' }
+    ];
+
+    /**
+     * Normalizes a raw clasifica string to a canonical predio name and finca group.
+     * Returns { predio, finca } or null if not recognized.
+     */
+    static normalizePredio(rawClasifica) {
+        if (!rawClasifica) return null;
+        const upper = rawClasifica.toUpperCase();
+        // Must check EEIII before EEII before EEI (longest match first)
+        const orderedConfig = [
+            { keyword: 'CAMINO TRUNCADO', group: 'Fincas Viejas', name: 'Camino Truncado' },
+            { keyword: 'TRUNCADO', group: 'Fincas Viejas', name: 'Camino Truncado' },
+            { keyword: 'CHIMBERA', group: 'Fincas Viejas', name: 'La Chimbera' },
+            { keyword: 'PUENTE ALTO', group: 'Fincas Viejas', name: 'Puente Alto' },
+            { keyword: 'P. ALTO', group: 'Fincas Viejas', name: 'Puente Alto' },
+            { keyword: 'P.ALTO', group: 'Fincas Viejas', name: 'Puente Alto' },
+            { keyword: 'EEIII', group: 'El Espejo', name: 'El Espejo 3' },
+            { keyword: 'ESPEJO 3', group: 'El Espejo', name: 'El Espejo 3' },
+            { keyword: 'EEII', group: 'El Espejo', name: 'El Espejo 2' },
+            { keyword: 'ESPEJO 2', group: 'El Espejo', name: 'El Espejo 2' },
+            { keyword: 'EEI', group: 'El Espejo', name: 'El Espejo 1' },
+            { keyword: 'ESPEJO 1', group: 'El Espejo', name: 'El Espejo 1' }
+        ];
+        for (const cfg of orderedConfig) {
+            if (upper.includes(cfg.keyword)) {
+                return { predio: cfg.name, finca: cfg.group };
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Build a budget summary grouped BY FINCA → Predio → Labor.
+     * This is the main structure for creating per-finca budgets.
+     * @param {Array} jornalesData - Raw jornales records
+     * @returns {{ byFinca: Object, totals: Object }}
+     * 
+     * byFinca structure:
+     * {
+     *   'El Espejo': {
+     *     finca: 'El Espejo',
+     *     jornales: 0, costoArs: 0,
+     *     byPredio: {
+     *       'El Espejo 1': { predio, jornales, costoArs, byLabor: [...] },
+     *       ...
+     *     },
+     *     byLabor: [{ labor, categoria, jornales, costoArs }]
+     *   },
+     *   'Fincas Viejas': { ... }
+     * }
+     */
+    static buildJornalesSummaryByFinca(jornalesData) {
+        const fincaMap = {};
+        let totalJornales = 0;
+        let totalCostoArs = 0;
+
+        jornalesData.forEach(r => {
+            const rawClasifica = r.clasifica || r.clasificacion || '';
+            const norm = this.normalizePredio(rawClasifica);
+            if (!norm) return; // skip unknown predios
+
+            const fincaName = norm.finca;
+            const predioName = norm.predio;
+            const labor = r.labor_normalized || r.labor || 'Sin Labor';
+            const cat = this.classifyLabor(labor);
+            const jornales = r.totalJornadas || 0;
+            const costo = r.costo_ars || 0;
+
+            totalJornales += jornales;
+            totalCostoArs += costo;
+
+            // Init finca
+            if (!fincaMap[fincaName]) {
+                fincaMap[fincaName] = {
+                    finca: fincaName,
+                    jornales: 0,
+                    costoArs: 0,
+                    byPredio: {},
+                    laborMap: {}
+                };
+            }
+            const finca = fincaMap[fincaName];
+            finca.jornales += jornales;
+            finca.costoArs += costo;
+
+            // Labor acumulada por finca
+            if (!finca.laborMap[labor]) {
+                finca.laborMap[labor] = { labor, categoria: cat, jornales: 0, costoArs: 0, count: 0 };
+            }
+            finca.laborMap[labor].jornales += jornales;
+            finca.laborMap[labor].costoArs += costo;
+            finca.laborMap[labor].count++;
+
+            // Init predio within finca
+            if (!finca.byPredio[predioName]) {
+                finca.byPredio[predioName] = {
+                    predio: predioName,
+                    finca: fincaName,
+                    jornales: 0,
+                    costoArs: 0,
+                    laborMap: {}
+                };
+            }
+            const predio = finca.byPredio[predioName];
+            predio.jornales += jornales;
+            predio.costoArs += costo;
+
+            // Labor by predio
+            if (!predio.laborMap[labor]) {
+                predio.laborMap[labor] = { labor, categoria: cat, jornales: 0, costoArs: 0 };
+            }
+            predio.laborMap[labor].jornales += jornales;
+            predio.laborMap[labor].costoArs += costo;
+        });
+
+        // Convert laborMaps to sorted arrays
+        const sortLabors = (map) => Object.values(map).sort((a, b) => {
+            if (a.categoria !== b.categoria) return a.categoria.localeCompare(b.categoria);
+            return b.jornales - a.jornales;
+        });
+
+        Object.values(fincaMap).forEach(f => {
+            f.byLabor = sortLabors(f.laborMap);
+            delete f.laborMap;
+            Object.values(f.byPredio).forEach(p => {
+                p.byLabor = sortLabors(p.laborMap);
+                delete p.laborMap;
+            });
+        });
+
+        return {
+            byFinca: fincaMap,
+            totals: { totalJornales, totalCostoArs }
+        };
+    }
+
+    /**
+     * Calculates maintenance cost per hectare for each predio and finca.
+     * Combines jornales cost data with hectareas data from SofiaApiModel.getHectareasPorPredio().
+     * @param {Object} fincaSummary - Output of buildJornalesSummaryByFinca()
+     * @param {Object} hectareasData - Output of SofiaApiModel.getHectareasPorPredio()
+     * @returns {{ byPredio: Array, byFinca: Array }}
+     */
+    static getCostoMantenimientoHa(fincaSummary, hectareasData) {
+        if (!fincaSummary || !hectareasData) return { byPredio: [], byFinca: [] };
+
+        // Build hectareas lookup from hectareasData
+        const haMap = {}; // predioName -> hectareas
+        hectareasData.groups.forEach(g => {
+            g.predios.forEach(p => {
+                haMap[p.name] = p.hectareas;
+            });
+        });
+
+        const predioResults = [];
+        const fincaResults = [];
+
+        Object.values(fincaSummary.byFinca).forEach(finca => {
+            let fincaHa = 0;
+            let fincaCosto = 0;
+            let fincaJornales = 0;
+
+            Object.values(finca.byPredio).forEach(predio => {
+                const ha = haMap[predio.predio] || 0;
+                const costoHa = ha > 0 ? predio.costoArs / ha : 0;
+                const jornalesHa = ha > 0 ? predio.jornales / ha : 0;
+
+                predioResults.push({
+                    predio: predio.predio,
+                    finca: finca.finca,
+                    hectareas: ha,
+                    costoArs: predio.costoArs,
+                    costoHa,
+                    jornales: predio.jornales,
+                    jornalesHa,
+                    laboresCount: predio.byLabor.length
+                });
+
+                fincaHa += ha;
+                fincaCosto += predio.costoArs;
+                fincaJornales += predio.jornales;
+            });
+
+            fincaResults.push({
+                finca: finca.finca,
+                hectareas: fincaHa,
+                costoArs: fincaCosto,
+                costoHa: fincaHa > 0 ? fincaCosto / fincaHa : 0,
+                jornales: fincaJornales,
+                jornalesHa: fincaHa > 0 ? fincaJornales / fincaHa : 0,
+                prediosCount: Object.keys(finca.byPredio).length
+            });
+        });
+
+        return {
+            byPredio: predioResults.sort((a, b) => b.costoHa - a.costoHa),
+            byFinca: fincaResults.sort((a, b) => b.costoHa - a.costoHa)
+        };
+    }
+
+    /**
      * Build a gastos/consumos summary from SofiaImportModel (aplicaciones CSV data).
      * Groups by category and product.
      * @param {string} cicloFilter - Optional cycle filter (e.g. '2025-2026')

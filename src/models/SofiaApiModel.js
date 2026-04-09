@@ -607,9 +607,9 @@ export class SofiaApiModel {
                 if (s.includes('CAMINO TRUNCADO') || s.includes('TRUNCADO')) return 'Camino Truncado';
                 if (s.includes('CHIMBERA')) return 'La Chimbera';
                 if (s.includes('PUENTE ALTO') || s.includes('P. ALTO') || s.includes('P.ALTO')) return 'Puente Alto';
-                if (s.includes('EEIII') || s.includes('ESPEJO 3')) return 'EEIII';
-                if (s.includes('EEII') || s.includes('ESPEJO 2')) return 'EEII';
-                if (s.includes('EEI') || s.includes('ESPEJO 1')) return 'EEI';
+                if (s.includes('EEIII') || s.includes('ESPEJO 3') || s === 'EL ESPEJO 3') return 'El Espejo 3';
+                if (s.includes('EEII') || s.includes('ESPEJO 2') || s === 'EL ESPEJO 2') return 'El Espejo 2';
+                if (s.includes('EEI') || s.includes('ESPEJO 1') || s === 'EL ESPEJO 1') return 'El Espejo 1';
                 return v;
             };
 
@@ -622,7 +622,7 @@ export class SofiaApiModel {
             };
 
             if (filters.finca && normalizeFinca(rFinca) !== normalizeFinca(filters.finca)) return false;
-            if (filters.predio && normalizePredio(rPredio) !== filters.predio) return false;
+            if (filters.predio && normalizePredio(rPredio) !== normalizePredio(filters.predio)) return false;
             if (filters.variedad && rVariedad !== filters.variedad) return false;
             if (filters.cuartel && rCuartel !== filters.cuartel) return false;
             
