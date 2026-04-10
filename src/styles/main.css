@@ -1810,7 +1810,7 @@ img {
   font-weight: 700;
 }
 
-/* â”€â”€ Mobile menu toggle â”€â”€ */
+/* ── Mobile menu toggle ── */
 .mobile-menu-toggle {
   display: none;
   width: 40px;
@@ -2788,7 +2788,57 @@ img {
     margin-top: 1rem;
     animation: nf-pulse 1.5s ease-in-out infinite;
 }
-@keyframes nf-pulse {
-    0%, 100% { opacity: 0.6; transform: scale(0.98); }
-    50% { opacity: 1; transform: scale(1.02); }
+
+/* ═══════════════════════════════════════════════════════════
+   POM AVANZADO - Custom Styles
+   ═══════════════════════════════════════════════════════════ */
+
+.pom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.pom-editable-input {
+    transition: all var(--transition-fast);
+    outline: none;
+}
+
+.pom-editable-input:hover {
+    background: rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+.pom-editable-input:focus {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: var(--color-primary-500) !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    transform: scale(1.05);
+}
+
+@keyframes pomPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); }
+}
+
+.pom-value-changed {
+    animation: pomPulse 0.5s ease-out;
+}
+
+#pom-content-calendario table {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+#pom-content-calendario th {
+    border-bottom: 2px solid var(--border-default);
+}
+
+#pom-content-calendario td {
+    min-height: 120px;
+    transition: background var(--transition-fast);
+}
+
+#pom-content-calendario td:hover {
+    background: rgba(255, 255, 255, 0.03) !important;
 }

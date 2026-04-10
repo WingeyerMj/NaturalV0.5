@@ -37,12 +37,16 @@ import {
     renderCosechaLevantadoTable, renderLevantadoPorPlaya, renderAdminCrudView, renderWorkLogView,
     renderGastosView, renderSecaderosView, renderGastosHistoricosView,
     renderControlCargaView, renderPresupuestoProyeccionView, renderExcelBudgetSummary,
-    renderEjecucionPresupuesto, renderInformePlanificacion
+    renderEjecucionPresupuesto, renderInformePlanificacion,
+    renderProyeccionJornalView, renderPomDetalleTable, renderPomResumenFinca, renderPomCalendario,
+    renderCargaDocumentacionView, renderDocumentacionRows
 } from '../views/Views.js';
 
 import { SecaderosController } from './SecaderosController.js';
 import { JornalesBudgetModel } from '../models/JornalesBudgetModel.js';
 import { PresupuestoModel as PresupuestoBudgetModel } from '../models/PresupuestoModel.js';
+import { ProyeccionJornalModel } from '../models/ProyeccionJornalModel.js';
+import { DocumentacionModel } from '../models/DocumentacionModel.js';
 
 // ── Constants ──
 const VITE_API_URL = '/api';
@@ -64,7 +68,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
-                { id: 'informe-planificacion', label: 'Planificación Ppto', icon: '📅' },
+                { id: 'informe-planificacion', label: 'Resumen Ppto Aprobado', icon: '📊' },
             ]
         },
         {
@@ -84,6 +88,7 @@ const ROLE_MENUS = {
                 { id: 'admin-institucional', label: 'Institucional', icon: '🏛️' },
                 { id: 'presupuesto', label: 'Presupuesto', icon: '📊' },
                 { id: 'admin-planificacion', label: 'Planificación', icon: '📅' },
+                { id: 'pom-avanzado', label: 'POM Avanzado', icon: '📈' },
             ]
         },
         {
@@ -96,6 +101,11 @@ const ROLE_MENUS = {
             id: 'riego', label: 'Riego', icon: '💧', section: 'Sistema', submenu: [
                 { id: 'admin-zonas-riego', label: 'Zonas de Riego', icon: '🗺️' },
                 { id: 'admin-sistema-riego', label: 'Sistema de Riego', icon: '🚿' },
+            ]
+        },
+        {
+            id: 'documentacion', label: 'Documentación', icon: '📂', section: 'Sistema', submenu: [
+                { id: 'carga-documentacion', label: 'Carga de Docs', icon: '📝' },
             ]
         },
     ],
@@ -116,7 +126,17 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
-                { id: 'informe-planificacion', label: 'Planificación Ppto', icon: '📅' },
+                { id: 'informe-planificacion', label: 'Resumen Ppto Aprobado', icon: '📊' },
+            ]
+        },
+        {
+            id: 'sistemas-pom', label: 'Sistemas', icon: '⚙️', section: 'Sistema', submenu: [
+                { id: 'pom-avanzado', label: 'POM Avanzado', icon: '📈' }
+            ]
+        },
+        {
+            id: 'documentacion', label: 'Documentación', icon: '📂', section: 'Sistema', submenu: [
+                { id: 'carga-documentacion', label: 'Carga de Docs', icon: '📝' },
             ]
         },
     ],
@@ -139,7 +159,7 @@ const ROLE_MENUS = {
                 { id: 'informe-gastos-historicos', label: 'Gastos Históricos', icon: '📜' },
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
-                { id: 'informe-planificacion', label: 'Planificación Ppto', icon: '📅' },
+                { id: 'informe-planificacion', label: 'Ppto Aprobado', icon: '📅' },
             ]
         },
     ],
@@ -459,8 +479,18 @@ export class AppController {
                 this.initPresupuestoSection();
                 break;
             case 'informe-planificacion':
-                title.textContent = 'Planificación Presupuestaria — Resumen Proyectado';
+                title.textContent = 'Presupuesto Aprobado — Resumen Ejecutivo';
                 await this.renderInformePlanificacionSection(content);
+                break;
+            case 'carga-documentacion':
+                title.textContent = 'Carga de Documentación Administrativa';
+                content.innerHTML = renderCargaDocumentacionView();
+                this.initCargaDocumentacionSection();
+                break;
+            case 'pom-avanzado':
+                title.textContent = 'POM Avanzado — Proyección de Jornal Específico';
+                content.innerHTML = renderProyeccionJornalView();
+                this.initPomAvanzadoSection();
                 break;
             case 'usuarios':
                 title.textContent = 'Gestión de Usuarios';
@@ -911,6 +941,239 @@ export class AppController {
                     <button class="btn btn-primary btn-sm" onclick="location.reload()" style="margin-top: var(--space-4);">Reintentar</button>
                 </div>`;
         }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // POM AVANZADO — Proyección de Jornal Específico
+    // ═══════════════════════════════════════════════════════
+    initPomAvanzadoSection() {
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+
+        // State
+        let currentMatrix = [];
+        let currentCiclo = '2025-2026';
+
+        // Populate labor filter
+        const laborFilter = document.getElementById('pom-labor-filter');
+        if (laborFilter) {
+            ProyeccionJornalModel.LABOR_CATALOG.forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.id;
+                opt.textContent = l.nombre;
+                laborFilter.appendChild(opt);
+            });
+        }
+
+        // Tab switching
+        const tabs = ['detalle', 'resumen', 'calendario'];
+        const tabBtns = tabs.map(t => document.getElementById(`pom-tab-${t}`));
+        const tabContents = tabs.map(t => document.getElementById(`pom-content-${t}`));
+
+        tabBtns.forEach((btn, i) => {
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => { if (b) b.className = 'btn btn-ghost'; });
+                tabContents.forEach(c => { if (c) c.style.display = 'none'; });
+                btn.className = 'btn btn-primary';
+                if (tabContents[i]) tabContents[i].style.display = '';
+
+                // Render on-demand for resumen and calendario
+                if (tabs[i] === 'resumen' && currentMatrix.length > 0) {
+                    const resumen = ProyeccionJornalModel.getResumenPorFinca(currentMatrix);
+                    tabContents[i].innerHTML = renderPomResumenFinca(resumen);
+                }
+                if (tabs[i] === 'calendario' && currentMatrix.length > 0) {
+                    const calendario = ProyeccionJornalModel.getCalendarioLabores(currentMatrix);
+                    tabContents[i].innerHTML = renderPomCalendario(calendario);
+                }
+            });
+        });
+
+        // Load projection
+        const btnLoad = document.getElementById('btn-pom-load');
+        if (btnLoad) {
+            btnLoad.addEventListener('click', async () => {
+                btnLoad.disabled = true;
+                btnLoad.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;margin-right:6px;"></span> Generando...';
+
+                try {
+                    currentCiclo = document.getElementById('pom-ciclo')?.value || '2025-2026';
+                    const fincaFilter = document.getElementById('pom-finca-filter')?.value || '';
+                    const laborFilterVal = document.getElementById('pom-labor-filter')?.value || '';
+
+                    // 1. Build base from Excel "Tabla general" (requested by user)
+                    let cuartelBase = await ProyeccionJornalModel.loadBaseFromExcel();
+
+                    // Apply finca filter
+                    if (fincaFilter) {
+                        cuartelBase = cuartelBase.filter(c => c.finca === fincaFilter);
+                    }
+
+                    // 2. Load saved overrides
+                    let overrides = ProyeccionJornalModel.loadOverrides(currentCiclo);
+                    // Try server too
+                    const serverOverrides = await ProyeccionJornalModel.loadFromServer(currentCiclo);
+                    if (serverOverrides) {
+                        overrides = { ...overrides, ...serverOverrides };
+                    }
+
+                    // 3. Build projection matrix
+                    let laborsToUse = null;
+                    if (laborFilterVal) {
+                        laborsToUse = ProyeccionJornalModel.LABOR_CATALOG.filter(l => l.id === laborFilterVal);
+                    }
+
+                    currentMatrix = ProyeccionJornalModel.buildProjectionMatrix(cuartelBase, laborsToUse, overrides);
+
+                    // 4. Cross with real Sofia data
+                    currentMatrix = await ProyeccionJornalModel.crossWithRealData(currentMatrix, currentCiclo);
+
+                    // 5. Render detail table
+                    const detalleContainer = document.getElementById('pom-content-detalle');
+                    if (detalleContainer) {
+                        detalleContainer.innerHTML = renderPomDetalleTable(currentMatrix);
+                        this.bindPomEditableInputs(currentCiclo, currentMatrix);
+                    }
+
+                    // 6. Update summary cards
+                    this.updatePomSummaryCards(currentMatrix);
+
+                    // 7. If other tabs are active, also render them
+                    const activeResumen = document.getElementById('pom-content-resumen');
+                    if (activeResumen && activeResumen.style.display !== 'none') {
+                        const resumen = ProyeccionJornalModel.getResumenPorFinca(currentMatrix);
+                        activeResumen.innerHTML = renderPomResumenFinca(resumen);
+                    }
+
+                    this.showToast('Proyección generada correctamente', 'success');
+
+                } catch (error) {
+                    console.error('[POM] Error generating projection:', error);
+                    this.showToast('Error al generar la proyección: ' + error.message, 'error');
+                } finally {
+                    btnLoad.disabled = false;
+                    btnLoad.innerHTML = '<span>🚀</span> Generar Proyección';
+                }
+            });
+        }
+
+        // Export CSV
+        document.getElementById('btn-pom-export')?.addEventListener('click', () => {
+            if (currentMatrix.length === 0) {
+                this.showToast('Genere una proyección primero', 'warning');
+                return;
+            }
+            ProyeccionJornalModel.exportToCSV(currentMatrix, currentCiclo);
+            this.showToast('CSV exportado correctamente', 'success');
+        });
+
+        // Save to server
+        document.getElementById('btn-pom-save')?.addEventListener('click', async () => {
+            if (currentMatrix.length === 0) {
+                this.showToast('Genere una proyección primero', 'warning');
+                return;
+            }
+            const overrides = ProyeccionJornalModel.loadOverrides(currentCiclo);
+            const saved = await ProyeccionJornalModel.saveToServer(currentCiclo, overrides);
+            this.showToast(saved ? 'Proyección guardada en el servidor' : 'Guardado local (sin servidor)', saved ? 'success' : 'warning');
+        });
+    }
+
+    bindPomEditableInputs(ciclo, matrix) {
+        const inputs = document.querySelectorAll('.pom-editable-input');
+        inputs.forEach(input => {
+            input.addEventListener('change', (e) => {
+                const key = e.target.dataset.key;
+                const field = e.target.dataset.field;
+                const value = parseFloat(e.target.value) || 0;
+
+                // Save override
+                ProyeccionJornalModel.applyOverride(ciclo, key, field, value);
+
+                // Update the record in current matrix
+                const record = matrix.find(p => p.key === key);
+                if (record) {
+                    record.fuente = 'manual';
+                    record.editado = true;
+
+                    if (field === 'rendimiento') {
+                        record.rendimientoProyectado = value;
+                        // Recalculate jornales
+                        const base = record.unidadBase === 'plantas' ? record.plantas : record.hectareas;
+                        const newJornales = value > 0 ? Math.ceil(base / value) : 0;
+                        record.jornalesProyectados = newJornales;
+                        // Update UI
+                        const jornalesInput = document.querySelector(`.pom-editable-input[data-key="${key}"][data-field="jornales"]`);
+                        if (jornalesInput) jornalesInput.value = newJornales;
+                        ProyeccionJornalModel.applyOverride(ciclo, key, 'jornales', newJornales);
+                    } else if (field === 'jornales') {
+                        record.jornalesProyectados = value;
+                        // Recalculate rendimiento
+                        const base = record.unidadBase === 'plantas' ? record.plantas : record.hectareas;
+                        const newRend = value > 0 ? Math.round((base / value) * 10) / 10 : 0;
+                        record.rendimientoProyectado = newRend;
+                        // Update UI
+                        const rendInput = document.querySelector(`.pom-editable-input[data-key="${key}"][data-field="rendimiento"]`);
+                        if (rendInput) rendInput.value = newRend;
+                        ProyeccionJornalModel.applyOverride(ciclo, key, 'rendimiento', newRend);
+                    }
+
+                    // Recalculate desvios
+                    if (record.jornalesReales != null && record.jornalesProyectados > 0) {
+                        record.desvioJornales = ((record.jornalesReales - record.jornalesProyectados) / record.jornalesProyectados * 100);
+                        // Update UI cell (9th column: Desvío)
+                        const desvioCell = e.target.closest('tr').querySelector('td:nth-child(9)');
+                        if (desvioCell) {
+                            const dValue = record.desvioJornales;
+                            desvioCell.textContent = (dValue > 0 ? '+' : '') + dValue.toFixed(1) + '%';
+                            desvioCell.style.color = dValue > 10 ? '#ef4444' : dValue < -10 ? '#10b981' : 'var(--text-secondary)';
+                        }
+                    }
+
+                    // Update summary cards
+                    this.updatePomSummaryCards(matrix);
+                }
+
+                // Visual feedback
+                e.target.style.borderColor = '#a855f7';
+                e.target.style.background = 'rgba(168,85,247,0.1)';
+                setTimeout(() => {
+                    e.target.style.borderColor = 'rgba(16,185,129,0.2)';
+                    e.target.style.background = 'rgba(16,185,129,0.06)';
+                }, 800);
+            });
+
+            // Highlight on focus
+            input.addEventListener('focus', (e) => {
+                e.target.style.outline = '2px solid rgba(16,185,129,0.4)';
+                e.target.style.outlineOffset = '1px';
+            });
+            input.addEventListener('blur', (e) => {
+                e.target.style.outline = '';
+                e.target.style.outlineOffset = '';
+            });
+        });
+    }
+
+    updatePomSummaryCards(matrix) {
+        const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+        const totalProy = matrix.reduce((s, p) => s + (p.jornalesProyectados || 0), 0);
+        const totalReal = matrix.reduce((s, p) => s + (p.jornalesReales || 0), 0);
+        const totalSug = matrix.reduce((s, p) => s + (p.jornalesSugeridos || p.jornalesProyectados || 0), 0);
+        const desvio = totalProy > 0 && totalReal > 0 ? ((totalReal - totalProy) / totalProy * 100) : null;
+
+        const el = (id) => document.getElementById(id);
+        if (el('pom-total-proy')) el('pom-total-proy').textContent = fmt(totalProy);
+        if (el('pom-total-real')) el('pom-total-real').textContent = totalReal > 0 ? fmt(totalReal) : '—';
+        if (el('pom-desvio')) {
+            if (desvio != null) {
+                el('pom-desvio').textContent = (desvio > 0 ? '+' : '') + desvio.toFixed(1) + '%';
+                el('pom-desvio').style.color = desvio > 10 ? '#ef4444' : desvio < -10 ? '#10b981' : '#f59e0b';
+            } else {
+                el('pom-desvio').textContent = '—';
+            }
+        }
+        if (el('pom-total-sug')) el('pom-total-sug').textContent = totalSug > 0 ? fmt(totalSug) : '—';
     }
 
     initPlanificacionCharts(data) {
@@ -7205,5 +7468,266 @@ renderFertUnidadesChart() {
                 options: chartOpts(true)
             });
         }
+    }
+
+    /** ── DOCUMENTACION SECTION LOGIC ── **/
+    initCargaDocumentacionSection() {
+        this.renderInvoicesTable();
+        this.renderTransfersTable();
+        this.bindDocumentacionEvents();
+    }
+
+    renderInvoicesTable() {
+        const invoices = DocumentacionModel.getInvoices();
+        const tbody = document.getElementById('tbody-documentacion');
+        if (!tbody) return;
+
+        tbody.innerHTML = renderDocumentacionRows(invoices);
+
+        // Update Stats (Invoices)
+        const total = invoices.length;
+        const pending = invoices.filter(v => v.status === 'Pendiente de Entrega').length;
+        
+        document.getElementById('doc-stat-total').textContent = total;
+        document.getElementById('doc-stat-pending').textContent = pending;
+    }
+
+    renderTransfersTable() {
+        const transfers = DocumentacionModel.getTransfers();
+        const tbody = document.getElementById('tbody-transferencias');
+        if (!tbody) return;
+        tbody.innerHTML = renderTransferRows(transfers);
+    }
+
+    bindDocumentacionEvents() {
+        // --- TAB SWITCHING ---
+        const tabFacturas = document.getElementById('doc-tab-facturas');
+        const tabTransf = document.getElementById('doc-tab-transferencias');
+        const viewFacturas = document.getElementById('view-facturas');
+        const viewTransf = document.getElementById('view-transferencias');
+
+        if (tabFacturas && tabTransf) {
+            tabFacturas.onclick = () => {
+                tabFacturas.classList.replace('btn-ghost', 'btn-primary');
+                tabTransf.classList.replace('btn-primary', 'btn-ghost');
+                viewFacturas.style.display = 'block';
+                viewTransf.style.display = 'none';
+            };
+            tabTransf.onclick = () => {
+                tabTransf.classList.replace('btn-ghost', 'btn-primary');
+                tabFacturas.classList.replace('btn-primary', 'btn-ghost');
+                viewTransf.style.display = 'block';
+                viewFacturas.style.display = 'none';
+            };
+        }
+
+        // --- INVOICE EVENTS ---
+        const btnNueva = document.getElementById('btn-nueva-factura');
+        if (btnNueva) {
+            btnNueva.onclick = () => {
+                document.getElementById('form-factura').reset();
+                new bootstrap.Modal(document.getElementById('modalFactura')).show();
+            };
+        }
+
+        const btnSave = document.getElementById('btn-save-factura');
+        if (btnSave) {
+            btnSave.onclick = () => {
+                const form = document.getElementById('form-factura');
+                const formData = new FormData(form);
+                const data = {
+                    proveedor: formData.get('proveedor'),
+                    nroFactura: formData.get('nroFactura'),
+                    fecha: formData.get('fecha'),
+                    monto: parseFloat(formData.get('monto')),
+                    entregaEnFactura: formData.get('logistica') === 'con_factura'
+                };
+
+                if (!data.proveedor || !data.nroFactura || !data.fecha || isNaN(data.monto)) {
+                    this.showToast('Por favor complete todos los campos.', 'error');
+                    return;
+                }
+
+                DocumentacionModel.saveInvoice(data);
+                this.showToast('Documentación guardada.', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('modalFactura')).hide();
+                this.renderInvoicesTable();
+            };
+        }
+
+        // --- TRANSFER EVENTS (Internal) ---
+        const btnNuevaTransf = document.getElementById('btn-nueva-transferencia');
+        if (btnNuevaTransf) {
+            btnNuevaTransf.onclick = async () => {
+                const bodegas = await ADMIN_MODELS['admin-bodegas'].getAll();
+                const productos = await ADMIN_MODELS['admin-productos'].getAll();
+
+                document.querySelectorAll('.doc-select-bodega').forEach(sel => {
+                    sel.innerHTML = '<option value="">Seleccionar Bodega...</option>' +
+                        bodegas.map(b => `<option value="${b.id}">${b.nombre}</option>`).join('');
+                });
+
+                document.querySelectorAll('.doc-select-producto').forEach(sel => {
+                    sel.innerHTML = '<option value="">Seleccionar Insumo...</option>' +
+                        productos.map(p => `<option value="${p.id}">${p.nombre} (Stock: ${p.stock || 0})</option>`).join('');
+                });
+
+                document.getElementById('form-transferencia').reset();
+                new bootstrap.Modal(document.getElementById('modalTransferencia')).show();
+            };
+        }
+
+        const btnSaveTransf = document.getElementById('btn-save-transferencia');
+        if (btnSaveTransf) {
+            btnSaveTransf.onclick = async () => {
+                const form = document.getElementById('form-transferencia');
+                const formData = new FormData(form);
+                
+                const bodegaOrigenId = formData.get('bodegaOrigen');
+                const bodegaDestinoId = formData.get('bodegaDestino');
+                const productoId = formData.get('productoId');
+                const cantidad = parseFloat(formData.get('cantidad'));
+
+                if (!bodegaOrigenId || !bodegaDestinoId || !productoId || isNaN(cantidad)) {
+                    this.showToast('Complete todos los campos de transferencia.', 'error');
+                    return;
+                }
+
+                if (bodegaOrigenId === bodegaDestinoId) {
+                    this.showToast('La bodega de origen y destino no pueden ser iguales.', 'error');
+                    return;
+                }
+
+                // Get Names for storage
+                const bodegas = await ADMIN_MODELS['admin-bodegas'].getAll();
+                const productos = await ADMIN_MODELS['admin-productos'].getAll();
+                const bOrg = bodegas.find(b => b.id == bodegaOrigenId);
+                const bDst = bodegas.find(b => b.id == bodegaDestinoId);
+                const prod = productos.find(p => p.id == productoId);
+
+                const data = {
+                    bodegaOrigenId,
+                    bodegaOrigenNombre: bOrg?.nombre || 'Origen',
+                    bodegaDestinoId,
+                    bodegaDestinoNombre: bDst?.nombre || 'Destino',
+                    productoId,
+                    productoNombre: prod?.nombre || 'Producto',
+                    cantidad,
+                    notas: formData.get('notas'),
+                    nroRemito: 'REMI-' + Math.floor(1000 + Math.random() * 9000),
+                    fecha: new Date().toISOString()
+                };
+
+                DocumentacionModel.saveTransfer(data);
+                this.showToast('Remito Interno emitido exitosamente.', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('modalTransferencia')).hide();
+                this.renderTransfersTable();
+            };
+        }
+
+        // --- DELEGATED BUTTONS ---
+        const tbodyDoc = document.getElementById('tbody-documentacion');
+        if (tbodyDoc) {
+            tbodyDoc.onclick = (e) => {
+                const btnRecibir = e.target.closest('.btn-add-remito');
+                if (btnRecibir) {
+                    const id = btnRecibir.dataset.id;
+                    // Logic for Receiving mercadería from Invoice (already implemented in many systems)
+                    this.showToast('Funcionalidad de recepción de factura en desarrollo.', 'info');
+                }
+            };
+        }
+
+        const tbodyTransf = document.getElementById('tbody-transferencias');
+        if (tbodyTransf) {
+            tbodyTransf.onclick = (e) => {
+                const btnConfirm = e.target.closest('.btn-confirm-transfer');
+                if (btnConfirm) {
+                    const id = btnConfirm.dataset.id;
+                    this.openConfirmTransferModal(id);
+                }
+            };
+        }
+
+        const btnDoConfirmTransf = document.getElementById('btn-do-confirm-transfer');
+        if (btnDoConfirmTransf) {
+            btnDoConfirmTransf.onclick = async () => {
+                const form = document.getElementById('form-confirm-transfer');
+                const transferId = document.getElementById('transfer-info-confirm').dataset.id;
+                const formData = new FormData(form);
+                
+                const data = {
+                    receptor: formData.get('receptor'),
+                    notas: formData.get('notas')
+                };
+
+                if (!data.receptor) {
+                    this.showToast('Debe ingresar el nombre de quién recibe.', 'error');
+                    return;
+                }
+
+                // ── Inventory Sync Logic ──
+                const transfers = DocumentacionModel.getTransfers();
+                const t = transfers.find(x => x.id === transferId);
+                if (t && t.status === 'En Tránsito') {
+                    try {
+                        // 1. Deduct from Source
+                        const prodSource = await ADMIN_MODELS['admin-productos'].getById(t.productoId);
+                        if (prodSource) {
+                            const newStockSource = (parseFloat(prodSource.stock) || 0) - parseFloat(t.cantidad);
+                            await ADMIN_MODELS['admin-productos'].update(t.productoId, { ...prodSource, stock: newStockSource });
+                        }
+
+                        // 2. Add to Destination (Search by name in that bodega)
+                        const allProds = await ADMIN_MODELS['admin-productos'].getAll();
+                        let prodDest = allProds.find(p => p.nombre === t.productoNombre && p.bodega_id == t.bodegaDestinoId);
+                        
+                        if (prodDest) {
+                            const newStockDest = (parseFloat(prodDest.stock) || 0) + parseFloat(t.cantidad);
+                            await ADMIN_MODELS['admin-productos'].update(prodDest.id, { ...prodDest, stock: newStockDest });
+                        } else {
+                            // Create new record in destination bodega if it doesn't exist
+                            await ADMIN_MODELS['admin-productos'].create({
+                                nombre: t.productoNombre,
+                                categoria: prodSource?.categoria || 'Insumo',
+                                bodega_id: t.bodegaDestinoId,
+                                unidad: prodSource?.unidad || 'un',
+                                stock: t.cantidad,
+                                notas: `Ingresado por remito interno ${t.nroRemito}`
+                            });
+                        }
+                        
+                        // 3. Update Transfer Status
+                        DocumentacionModel.confirmTransfer(transferId, data);
+                        this.showToast('Transferencia completada y stock sincronizado.', 'success');
+                    } catch (err) {
+                        console.error('Stock sync error:', err);
+                        this.showToast('Error al sincronizar stock, pero se registró la recepción.', 'warning');
+                        DocumentacionModel.confirmTransfer(transferId, data);
+                    }
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById('modalConfirmarTransferencia')).hide();
+                this.renderTransfersTable();
+            };
+        }
+    }
+
+    openConfirmTransferModal(transferId) {
+        const transfers = DocumentacionModel.getTransfers();
+        const t = transfers.find(x => x.id === transferId);
+        if (!t) return;
+
+        const infoDiv = document.getElementById('transfer-info-confirm');
+        infoDiv.dataset.id = transferId;
+        infoDiv.innerHTML = `
+            <div style="font-size: 0.9em;">
+                <div style="margin-bottom: 8px;">Recibiendo: <strong style="color: var(--color-primary-400);">${t.cantidad} unidades</strong> de <strong>${t.productoNombre}</strong></div>
+                <div style="font-size: 0.85em; color: var(--text-tertiary);">Desde: ${t.bodegaOrigenNombre} ➡️ A: ${t.bodegaDestinoNombre}</div>
+                <div style="font-size: 0.85em; color: var(--text-tertiary); margin-top: 4px;">Remito: ${t.nroRemito}</div>
+            </div>
+        `;
+
+        new bootstrap.Modal(document.getElementById('modalConfirmarTransferencia')).show();
     }
 }

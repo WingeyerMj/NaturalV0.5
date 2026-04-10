@@ -4407,3 +4407,629 @@ export function renderInformePlanificacion(data) {
     </div>
     `;
 }
+
+// ═══════════════════════════════════════════════════════
+// POM AVANZADO — Proyección de Jornal Específico
+// ═══════════════════════════════════════════════════════
+
+export function renderProyeccionJornalView() {
+    return `
+    <div class="animate-fade-in" style="padding: var(--space-2) 0;">
+        <!-- Header & Filters -->
+        <div style="display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-end; margin-bottom: var(--space-6); padding: var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(59,130,246,0.04)); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle);">
+            <div style="flex: 1; min-width: 200px;">
+                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin: 0 0 var(--space-1) 0; display: flex; align-items: center; gap: var(--space-2);">
+                    <span style="font-size: 1.6rem;">📊</span> POM Avanzado — Proyección de Jornal
+                </h2>
+                <p style="color: var(--text-tertiary); font-size: 0.85em; margin: 0;">Proyección editable del jornal específico por cuartel y faena. Cruce con datos reales de Sofía.</p>
+            </div>
+            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: flex-end;">
+                <div class="filter-group" style="min-width: 130px;">
+                    <label class="form-label" style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);">Ciclo Base</label>
+                    <select class="form-select sofia-filter-select" id="pom-ciclo" style="font-size: 0.9em; padding: var(--space-2) var(--space-3);">
+                        <option value="2025-2026" selected>2025-2026</option>
+                        <option value="2024-2025">2024-2025</option>
+                        <option value="2023-2024">2023-2024</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="min-width: 140px;">
+                    <label class="form-label" style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);">Finca</label>
+                    <select class="form-select sofia-filter-select" id="pom-finca-filter" style="font-size: 0.9em; padding: var(--space-2) var(--space-3);">
+                        <option value="">Todas</option>
+                        <option value="El Espejo">El Espejo</option>
+                        <option value="Fincas Viejas">Fincas Viejas</option>
+                        <option value="Puente Alto">Puente Alto</option>
+                        <option value="La Chimbera">La Chimbera</option>
+                        <option value="Camino Truncado">Camino Truncado</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="min-width: 140px;">
+                    <label class="form-label" style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);">Labor</label>
+                    <select class="form-select sofia-filter-select" id="pom-labor-filter" style="font-size: 0.9em; padding: var(--space-2) var(--space-3);">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="btn-pom-load" style="padding: var(--space-2) var(--space-5); font-weight: 700; font-size: 0.9em; border-radius: var(--radius-lg); display: flex; align-items: center; gap: var(--space-2);">
+                    <span>🚀</span> Generar Proyección
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div id="pom-summary-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02)); border: 1px solid rgba(16,185,129,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
+                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(16,185,129,0.8); font-weight: 700; margin-bottom: var(--space-2);">Jornales Proyectados</div>
+                <div id="pom-total-proy" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #10b981;">—</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02)); border: 1px solid rgba(59,130,246,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
+                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(59,130,246,0.8); font-weight: 700; margin-bottom: var(--space-2);">Jornales Reales</div>
+                <div id="pom-total-real" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #3b82f6;">—</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02)); border: 1px solid rgba(245,158,11,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
+                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(245,158,11,0.8); font-weight: 700; margin-bottom: var(--space-2);">Desvío Total</div>
+                <div id="pom-desvio" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #f59e0b;">—</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(168,85,247,0.02)); border: 1px solid rgba(168,85,247,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
+                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(168,85,247,0.8); font-weight: 700; margin-bottom: var(--space-2);">Sugeridos Antigravity</div>
+                <div id="pom-total-sug" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #a855f7;">—</div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); flex-wrap: wrap;">
+            <button class="btn btn-primary" id="pom-tab-detalle" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">📋 Detalle por Cuartel</button>
+            <button class="btn btn-ghost" id="pom-tab-resumen" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">🏡 Resumen por Finca</button>
+            <button class="btn btn-ghost" id="pom-tab-calendario" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">📅 Calendario</button>
+            <div style="flex: 1;"></div>
+            <button class="btn btn-ghost" id="btn-pom-export" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4); color: var(--color-primary-400);">📥 Exportar CSV</button>
+            <button class="btn btn-ghost" id="btn-pom-save" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4); color: var(--color-success);">💾 Guardar</button>
+        </div>
+
+        <!-- Content Areas -->
+        <div id="pom-content-detalle">
+            <div style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); font-size: 1.1em;">
+                <div style="font-size: 3rem; margin-bottom: var(--space-4); opacity: 0.3;">📊</div>
+                <p>Presione <strong>"Generar Proyección"</strong> para construir la proyección de jornales a partir de los datos de Sofía.</p>
+                <p style="font-size: 0.85em; opacity: 0.6; margin-top: var(--space-2);">Se cruzará automáticamente con los datos reales del ciclo seleccionado.</p>
+            </div>
+        </div>
+        <div id="pom-content-resumen" style="display: none;"></div>
+        <div id="pom-content-calendario" style="display: none;"></div>
+    </div>
+    `;
+}
+
+export function renderPomDetalleTable(matrix) {
+    if (!matrix || matrix.length === 0) {
+        return '<div style="padding: var(--space-8); text-align: center; color: var(--text-tertiary);">No hay datos para mostrar.</div>';
+    }
+
+    // Group by finca → predio
+    const grouped = {};
+    matrix.forEach(p => {
+        const fKey = p.finca;
+        if (!grouped[fKey]) grouped[fKey] = {};
+        const pKey = p.predio;
+        if (!grouped[fKey][pKey]) grouped[fKey][pKey] = [];
+        grouped[fKey][pKey].push(p);
+    });
+
+    let html = '';
+    Object.entries(grouped).forEach(([finca, predios]) => {
+        html += `
+        <div style="margin-bottom: var(--space-6);">
+            <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); padding: var(--space-3) var(--space-4); background: linear-gradient(90deg, rgba(16,185,129,0.12), transparent); border-radius: var(--radius-lg); border-left: 4px solid #10b981;">
+                <span style="font-size: 1.3em;">🏡</span>
+                <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${finca}</h3>
+            </div>
+        `;
+
+        Object.entries(predios).forEach(([predio, records]) => {
+            html += `
+            <div style="margin-bottom: var(--space-4); margin-left: var(--space-4);">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); padding: var(--space-2) var(--space-3); background: rgba(59,130,246,0.05); border-radius: var(--radius-md); border-left: 3px solid rgba(59,130,246,0.4);">
+                    <span style="font-size: 1em;">📍</span>
+                    <strong style="color: var(--text-primary); font-size: 0.95em;">${predio}</strong>
+                </div>
+                <div style="overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
+                    <table class="data-table pom-table" style="width: 100%; font-size: 0.82em; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.03);">
+                                <th style="padding: var(--space-2) var(--space-3); text-align: left; color: var(--text-secondary); font-weight: 700; font-size: 0.85em; white-space: nowrap;">Cuartel</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary); font-weight: 700; font-size: 0.85em;">Ha</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary); font-weight: 700; font-size: 0.85em;">Plantas</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: left; color: var(--text-secondary); font-weight: 700; font-size: 0.85em;">Labor</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #10b981; font-weight: 700; font-size: 0.85em;" title="Rendimiento proyectado (unidades/jornal)">Rend.Proy.</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #10b981; font-weight: 700; font-size: 0.85em;" title="Jornales proyectados">Jorn.Proy.</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 700; font-size: 0.85em;" title="Rendimiento real observado">Rend.Real</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 700; font-size: 0.85em;" title="Jornales reales ejecutados">Jorn.Real</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #f59e0b; font-weight: 700; font-size: 0.85em;" title="Desvío porcentual">Desvío</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 700; font-size: 0.85em;" title="Rendimiento sugerido por Antigravity">Sug.Rend.</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 700; font-size: 0.85em;" title="Jornales sugeridos por Antigravity">Sug.Jorn.</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: var(--text-tertiary); font-weight: 700; font-size: 0.85em;">Fuente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            records.forEach(p => {
+                const desvioClass = p.desvioJornales != null
+                    ? (p.desvioJornales > 10 ? 'color: #ef4444;' : p.desvioJornales < -10 ? 'color: #10b981;' : 'color: var(--text-secondary);')
+                    : 'color: var(--text-tertiary);';
+
+                const fuenteIcon = p.fuente === 'manual' ? '✏️' : (p.rendimientoSugerido ? '🤖' : '📄');
+                const fuenteLabel = p.fuente === 'manual' ? 'Manual' : 'Original';
+
+                html += `
+                    <tr style="border-top: 1px solid rgba(255,255,255,0.03); transition: background 0.15s;" onmouseenter="this.style.background='rgba(16,185,129,0.04)'" onmouseleave="this.style.background=''">
+                        <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary); font-weight: 600; white-space: nowrap;">${p.cuartel}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary);">${p.hectareas.toFixed(1)}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary);">${p.plantas.toLocaleString('es-AR')}</td>
+                        <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary);">
+                            <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.88em; font-weight: 600; background: rgba(16,185,129,0.08); color: #10b981; white-space: nowrap;">${p.laborNombre}</span>
+                        </td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center;">
+                            <input type="number" class="pom-editable-input" data-key="${p.key}" data-field="rendimiento" value="${p.rendimientoProyectado}" min="1"
+                                style="width: 70px; text-align: center; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; color: #10b981; font-weight: 700; padding: 3px 6px; font-size: 0.95em;" />
+                        </td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center;">
+                            <input type="number" class="pom-editable-input" data-key="${p.key}" data-field="jornales" value="${p.jornalesProyectados}" min="0"
+                                style="width: 65px; text-align: center; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; color: #10b981; font-weight: 700; padding: 3px 6px; font-size: 0.95em;" />
+                        </td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 600;">${p.rendimientoReal ?? '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 600;">${p.jornalesReales != null ? p.jornalesReales.toFixed(1) : '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; font-weight: 700; ${desvioClass}">${p.desvioJornales != null ? (p.desvioJornales > 0 ? '+' : '') + p.desvioJornales.toFixed(1) + '%' : '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 600;">${p.rendimientoSugerido ?? '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 600;">${p.jornalesSugeridos ?? '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; font-size: 0.85em;" title="${fuenteLabel}">${fuenteIcon}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            `;
+        });
+
+        html += '</div>';
+    });
+
+    return html;
+}
+
+export function renderPomResumenFinca(resumen) {
+    if (!resumen || resumen.length === 0) {
+        return '<div style="padding: var(--space-8); text-align: center; color: var(--text-tertiary);">Sin datos de resumen.</div>';
+    }
+
+    let html = '<div style="display: grid; gap: var(--space-5);">';
+
+    resumen.forEach(f => {
+        const desvioColor = f.desvioTotal != null
+            ? (f.desvioTotal > 10 ? '#ef4444' : f.desvioTotal < -10 ? '#10b981' : '#f59e0b')
+            : 'var(--text-tertiary)';
+
+        html += `
+        <div style="background: var(--bg-secondary); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+            <!-- Finca Header -->
+            <div style="padding: var(--space-4) var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.04)); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+                <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.15em; display: flex; align-items: center; gap: var(--space-2);">
+                    <span style="font-size: 1.3em;">🏡</span> ${f.finca}
+                </h3>
+                <div style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin-left: auto;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Predios</div>
+                        <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.prediosCount}</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Cuarteles</div>
+                        <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.cuartelesCount}</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Hectáreas</div>
+                        <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.hectareas.toFixed(1)}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Totals Row -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle);">
+                <div style="text-align: center; padding: var(--space-3); background: rgba(16,185,129,0.05); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(16,185,129,0.7); font-weight: 700;">J. Proyectados</div>
+                    <div style="font-size: 1.4em; font-weight: 900; color: #10b981; font-family: var(--font-display);">${f.jornalesProyectados.toLocaleString('es-AR')}</div>
+                </div>
+                <div style="text-align: center; padding: var(--space-3); background: rgba(59,130,246,0.05); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(59,130,246,0.7); font-weight: 700;">J. Reales</div>
+                    <div style="font-size: 1.4em; font-weight: 900; color: #3b82f6; font-family: var(--font-display);">${f.jornalesReales > 0 ? f.jornalesReales.toLocaleString('es-AR') : '—'}</div>
+                </div>
+                <div style="text-align: center; padding: var(--space-3); background: rgba(245,158,11,0.05); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(245,158,11,0.7); font-weight: 700;">Desvío</div>
+                    <div style="font-size: 1.4em; font-weight: 900; color: ${desvioColor}; font-family: var(--font-display);">${f.desvioTotal != null ? (f.desvioTotal > 0 ? '+' : '') + f.desvioTotal.toFixed(1) + '%' : '—'}</div>
+                </div>
+                <div style="text-align: center; padding: var(--space-3); background: rgba(168,85,247,0.05); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(168,85,247,0.7); font-weight: 700;">J. Sugeridos</div>
+                    <div style="font-size: 1.4em; font-weight: 900; color: #a855f7; font-family: var(--font-display);">${f.jornalesSugeridos > 0 ? f.jornalesSugeridos.toLocaleString('es-AR') : '—'}</div>
+                </div>
+            </div>
+
+            <!-- Labor Breakdown Table -->
+            <div style="padding: var(--space-4) var(--space-5);">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-subtle);">
+                            <th style="text-align: left; padding: var(--space-2) var(--space-3); color: var(--text-tertiary); font-weight: 600; font-size: 0.88em;">Labor / Faena</th>
+                            <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #10b981; font-weight: 600; font-size: 0.88em;">Proyectados</th>
+                            <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #3b82f6; font-weight: 600; font-size: 0.88em;">Reales</th>
+                            <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #a855f7; font-weight: 600; font-size: 0.88em;">Sugeridos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${f.labores.map(l => `
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary); font-weight: 500;">${l.nombre}</td>
+                                <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #10b981; font-weight: 700;">${l.jornalesP.toFixed(1)}</td>
+                                <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #3b82f6; font-weight: 700;">${l.jornalesR > 0 ? l.jornalesR.toFixed(1) : '—'}</td>
+                                <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #a855f7; font-weight: 700;">${l.jornalesS > 0 ? l.jornalesS.toFixed(1) : '—'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        `;
+    });
+
+    html += '</div>';
+    return html;
+}
+
+export function renderPomCalendario(months) {
+    if (!months || months.length === 0) {
+        return '<div style="padding: var(--space-8); text-align: center; color: var(--text-tertiary);">Sin datos de calendario.</div>';
+    }
+
+    const LABOR_COLORS = {
+        'Poda': '#10b981',
+        'Atada': '#3b82f6',
+        'Desbrote': '#f59e0b',
+        'Cosecha': '#ef4444',
+        'Riego': '#06b6d4',
+        'Curación': '#8b5cf6',
+        'Fertilización': '#ec4899',
+        'Desmalezado': '#84cc16',
+        'Levantado': '#f97316',
+        'Guiado': '#14b8a6',
+    };
+
+    let html = `
+    <div style="overflow-x: auto; border-radius: var(--radius-xl); border: 1px solid var(--border-subtle);">
+        <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
+            <thead>
+                <tr style="background: rgba(255,255,255,0.03);">
+                    ${months.map(m => `
+                        <th style="padding: var(--space-3) var(--space-2); text-align: center; color: var(--text-secondary); font-weight: 700; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; border-right: 1px solid var(--border-subtle); min-width: 75px;">${m.label}</th>
+                    `).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    ${months.map(m => {
+                        // Aggregate labores by type for this month
+                        const laborAgg = {};
+                        m.labores.forEach(l => {
+                            if (!laborAgg[l.labor]) laborAgg[l.labor] = { count: 0, jornales: 0, fincas: new Set() };
+                            laborAgg[l.labor].count++;
+                            laborAgg[l.labor].jornales += l.jornales;
+                            laborAgg[l.labor].fincas.add(l.finca);
+                        });
+                        const entries = Object.entries(laborAgg).sort((a, b) => b[1].jornales - a[1].jornales);
+
+                        return `
+                        <td style="padding: var(--space-2); border-right: 1px solid var(--border-subtle); vertical-align: top;">
+                            <div style="font-weight: 800; color: var(--text-primary); margin-bottom: var(--space-2); text-align: center; font-size: 0.9em; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05);">${m.totalJornales.toFixed(0)}</div>
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                ${entries.map(([labor, data]) => {
+                                    const percentage = (data.jornales / m.totalJornales) * 100;
+                                    const color = LABOR_COLORS[labor] || '#818cf8';
+                                    return `
+                                    <div style="font-size: 0.68em; background: ${color}15; color: ${color}; padding: 3px 6px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border: 1px solid ${color}30;" title="${labor} - ${data.jornales.toFixed(1)} j.">
+                                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 50px;">${labor}</span>
+                                        <span style="font-weight: 800;">${percentage.toFixed(0)}%</span>
+                                    </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </td>
+                        `;
+                    }).join('')}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    `;
+    return html;
+}
+
+export function renderCargaDocumentacionView() {
+    return `
+        <div class="container-fluid animate-fade-in" style="padding: var(--space-4);">
+            <!-- Tab Navigation -->
+            <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5);">
+                <button class="btn btn-primary" id="doc-tab-facturas" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">📄 Facturas de Proveedores</button>
+                <button class="btn btn-ghost" id="doc-tab-transferencias" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">🚛 Remitos Internos (Inter-Bodega)</button>
+            </div>
+
+            <!-- VIEW: FACTURAS -->
+            <div id="view-facturas">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+                                <div>
+                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">📂 Carga de <span style="color: var(--color-primary-400);">Documentación</span></h2>
+                                    <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Gestión administrativa de facturas y enlace logístico con operativa.</p>
+                                </div>
+                                <div style="display: flex; gap: var(--space-3); align-items: center;">
+                                    <!-- Stats Mini -->
+                                    <div style="display: flex; gap: var(--space-4); margin-right: var(--space-4);">
+                                        <div style="text-align: right;"><span id="doc-stat-total" style="font-weight: 800; color: var(--text-primary); display: block;">0</span><small style="font-size: 0.7em; color: var(--text-tertiary);">Total</small></div>
+                                        <div style="text-align: right;"><span id="doc-stat-pending" style="font-weight: 800; color: #f59e0b; display: block;">0</span><small style="font-size: 0.7em; color: var(--text-tertiary);">Pendientes</small></div>
+                                    </div>
+                                    <button class="btn btn-primary" id="btn-nueva-factura" style="border-radius: var(--radius-lg); font-weight: 700; display: flex; align-items: center; gap: var(--space-2);">
+                                        <span>➕</span> Nueva Factura
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255,255,255,0.01); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88em;">
+                                        <thead>
+                                            <tr style="text-align: left; border-bottom: 1px solid var(--border-subtle);">
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Fecha</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Proveedor</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">N° Documento</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: right;">Monto</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Estado</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-documentacion"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: TRANSFERENCIAS -->
+            <div id="view-transferencias" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+                                <div>
+                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">🚚 Remitos <span style="color: var(--color-primary-400);">Internos</span></h2>
+                                    <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Movimiento de stock inter-bodega y control de recepciones.</p>
+                                </div>
+                                <div style="display: flex; gap: var(--space-3);">
+                                    <button class="btn btn-primary" id="btn-nueva-transferencia" style="border-radius: var(--radius-lg); font-weight: 700; display: flex; align-items: center; gap: var(--space-2);">
+                                        <span>🚛</span> Generar Movimiento
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255,255,255,0.01); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88em;">
+                                        <thead>
+                                            <tr style="text-align: left; border-bottom: 1px solid var(--border-subtle);">
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Fecha</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Remito</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Origen</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">➡️</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Destino</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Producto</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Cant.</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Estado</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-transferencias"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div class="modal fade" id="modalFactura" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header">
+                        <h5 class="modal-title font-display">Subir Nueva Documentación</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-factura">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">Proveedor</label>
+                                    <input type="text" name="proveedor" required class="form-control">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">N° Documento</label>
+                                    <input type="text" name="nroFactura" required class="form-control">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">Fecha</label>
+                                    <input type="date" name="fecha" required class="form-control">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">Monto Total</label>
+                                    <input type="number" name="monto" required class="form-control">
+                                </div>
+                                <div style="grid-column: span 2;">
+                                    <label class="small text-tertiary">Logística</label>
+                                    <select name="logistica" class="form-select">
+                                        <option value="con_factura">Llegó con Factura (Cerrado)</option>
+                                        <option value="separados">Entrega Diferida (Remitos)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btn-save-factura">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalTransferencia" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle);">
+                        <h5 class="modal-title font-display" style="font-weight: 800;">Generar Remito Interno</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="padding: var(--space-6);">
+                        <form id="form-transferencia">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Bodega Origen</label>
+                                    <select name="bodegaOrigen" class="form-select doc-select-bodega" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Bodega Destino</label>
+                                    <select name="bodegaDestino" class="form-select doc-select-bodega" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Producto / Insumo</label>
+                                    <select name="productoId" class="form-select doc-select-producto" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Cantidad a Mover</label>
+                                    <input type="number" name="cantidad" step="0.01" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 2;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Notas de Transporte</label>
+                                    <textarea name="notas" rows="2" class="form-control" placeholder="Ej: Chofer Juan Perez, Camion patente ABC-123" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btn-save-transferencia">Emitir Remito Interno</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalConfirmarTransferencia" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header">
+                        <h5 class="modal-title font-display">Confirmar Recepción Interna</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="transfer-info-confirm" class="mb-4 p-3 rounded bg-glass border-subtle"></div>
+                        <form id="form-confirm-transfer">
+                            <div>
+                                <label class="form-label small text-tertiary">Recibido por (Nombre):</label>
+                                <input type="text" name="receptor" required class="form-control mb-3">
+                                <label class="form-label small text-tertiary">Observaciones de Recepción:</label>
+                                <textarea name="notas" rows="2" class="form-control"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary w-100" id="btn-do-confirm-transfer">Confirmar Ingreso a Bodega</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+export function renderTransferRows(transfers) {
+    if (!transfers || transfers.length === 0) {
+        return `<tr><td colspan="9" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay remitos internos registrados.</td></tr>`;
+    }
+
+    return transfers.map(t => {
+        const statusColor = t.status === 'En Tránsito' ? '#f59e0b' : '#10b981';
+        return `
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap;">${new Date(t.fecha).toLocaleDateString()}</td>
+                <td style="padding: var(--space-4); font-family: monospace; color: var(--color-primary-400);">${t.nroRemito}</td>
+                <td style="padding: var(--space-4); font-weight: 600;">${t.bodegaOrigenNombre}</td>
+                <td style="padding: var(--space-4); text-align: center; color: var(--text-tertiary);">➡️</td>
+                <td style="padding: var(--space-4); font-weight: 600;">${t.bodegaDestinoNombre}</td>
+                <td style="padding: var(--space-4);">${t.productoNombre}</td>
+                <td style="padding: var(--space-4); text-align: center; font-weight: 800;">${t.cantidad}</td>
+                <td style="padding: var(--space-4); text-align: center;">
+                    <span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: ${statusColor}15; color: ${statusColor}; font-size: 0.8em; font-weight: 700;">
+                        ${t.status}
+                    </span>
+                </td>
+                <td style="padding: var(--space-4); text-align: center;">
+                    ${t.status === 'En Tránsito' ? `
+                        <button class="btn btn-primary btn-sm btn-confirm-transfer" data-id="${t.id}" style="padding: 4px 12px; font-size: 0.75em;">
+                            Confirmar
+                        </button>
+                    ` : `<span style="color: var(--color-success); font-size: 1.1em;">✔️</span>`}
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+export function renderDocumentacionRows(invoices) {
+    if (!invoices || invoices.length === 0) {
+        return `<tr><td colspan="6" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No se encontró documentación cargada.</td></tr>`;
+    }
+
+    return invoices.map(v => {
+        let statusBadge = '';
+        if (v.status === 'Pendiente de Entrega') {
+            statusBadge = `<span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(245,158,11,0.1); color: #f59e0b; font-size: 0.8em; font-weight: 700;">⏳ Pendiente</span>`;
+        } else if (v.status === 'Entrega Parcial') {
+            statusBadge = `<span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(59,130,246,0.1); color: #3b82f6; font-size: 0.8em; font-weight: 700;">📦 Parcial (${v.remitos_asociados.length})</span>`;
+        } else {
+            statusBadge = `<span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(16,185,129,0.1); color: #10b981; font-size: 0.8em; font-weight: 700;">✅ Completado</span>`;
+        }
+
+        return `
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.01)'" onmouseleave="this.style.background=''">
+                <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap; text-align: center;">${new Date(v.fecha).toLocaleDateString()}</td>
+                <td style="padding: var(--space-4); text-align: center;">
+                    <div style="font-weight: 700; color: var(--text-primary);">${v.proveedor}</div>
+                </td>
+                <td style="padding: var(--space-4); font-family: monospace; color: var(--color-primary-400); text-align: center;">${v.nroFactura}</td>
+                <td style="padding: var(--space-4); text-align: right; font-weight: 800; color: var(--text-primary);">$ ${parseFloat(v.monto).toLocaleString('es-AR')}</td>
+                <td style="padding: var(--space-4); text-align: center;">${statusBadge}</td>
+                <td style="padding: var(--space-4); text-align: center;">
+                    <div style="display: flex; gap: var(--space-2); justify-content: center;">
+                        ${v.status !== 'Completado' ? `
+                            <button class="btn btn-primary btn-sm btn-add-remito" data-id="${v.id}" title="Registrar Remito" style="padding: var(--space-2) var(--space-3); font-size: 0.75em; font-weight: 700; border-radius: var(--radius-md);">
+                                🚛 Recibir
+                            </button>
+                        ` : `
+                            <button class="btn btn-ghost btn-sm" disabled style="opacity: 0.3;">✔️</button>
+                        `}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
