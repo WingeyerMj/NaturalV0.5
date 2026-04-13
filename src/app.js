@@ -258,13 +258,22 @@ app.post('/api/save-jornales-budget', async (req, res) => {
     }
 
     try {
-        const filePath = path.join(__dirname, '../public/Fuentes', filename);
+        // Use root Fuentes directory instead of public/Fuentes
+        const dirPath = path.join(__dirname, '../Fuentes');
+        if (!fs.existsSync(dirPath)) {
+            fs.mkdirSync(dirPath, { recursive: true });
+        }
+
+        // Sanitize filename
+        const safeFilename = path.basename(filename);
+        const filePath = path.join(dirPath, safeFilename);
+        
         fs.writeFileSync(filePath, content, 'utf8');
         console.log(`Presupuesto guardado en: ${filePath}`);
         res.json({ success: true, message: 'Archivo guardado en Fuentes exitosamente' });
     } catch (error) {
         console.error('Save budget error:', error);
-        res.status(500).json({ success: false, message: 'Error al guardar el archivo en el servidor' });
+        res.status(500).json({ success: false, message: 'Error al guardar el archivo: ' + error.message });
     }
 });
 
@@ -276,18 +285,22 @@ app.post('/api/save-budget-json', async (req, res) => {
     }
 
     try {
-        const dirPath = path.join(__dirname, '../public/Fuentes/Presupuestos');
+        // Use root Fuentes directory instead of public/Fuentes
+        const dirPath = path.join(__dirname, '../Fuentes/Presupuestos');
         if (!fs.existsSync(dirPath)) {
             fs.mkdirSync(dirPath, { recursive: true });
         }
         
-        const filePath = path.join(dirPath, filename);
+        // Sanitize filename
+        const safeFilename = path.basename(filename);
+        const filePath = path.join(dirPath, safeFilename);
+        
         fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
         console.log(`Borrador JSON guardado en: ${filePath}`);
         res.json({ success: true, message: 'Borrador guardado en servidor exitosamente' });
     } catch (error) {
         console.error('Save JSON budget error:', error);
-        res.status(500).json({ success: false, message: 'Error al guardar el JSON en el servidor' });
+        res.status(500).json({ success: false, message: 'Error al guardar el JSON: ' + error.message });
     }
 });
 
