@@ -280,7 +280,6 @@ export function renderLoginPage() {
                     <input type="password" id="register-password" class="form-input" placeholder="Mínimo 6 caracteres" required minlength="6" />
                     <span class="form-input-icon">🔒</span>
                   </div>
-                </div>
                 <div class="form-group" style="margin-bottom: var(--space-6);">
                   <label class="form-label" for="register-password-confirm">Confirmar Contraseña</label>
                   <div class="form-input-wrapper">
@@ -307,6 +306,7 @@ export function renderLoginPage() {
 
 // ── Dashboard Layout ──
 export function renderDashboardLayout(user, menuItems, activeSection) {
+  const isCarga = user.role === 'Carga' || user.rol === 'Carga';
   return `
     <div id="loading-overlay" class="loading-overlay hidden" style="position: fixed; inset: 0; background: var(--bg-primary); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
         <!-- Top Left Logo during loading -->
@@ -331,6 +331,7 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
         </div>
     </div>
     <div class="dashboard-layout">
+      ${!isCarga ? `
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
           <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" class="nf-logo">
@@ -360,8 +361,10 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
           </button>
         </div>
       </aside>
+      ` : ''}
 
-      <main class="main-content">
+      <main class="main-content" style="${isCarga ? 'margin-left: 0; width: 100%; height: 100vh; overflow-y: auto;' : ''}">
+        ${!isCarga ? `
         <header class="main-header">
           <div class="main-header-left">
             <button class="mobile-menu-toggle" id="btn-mobile-menu">☰</button>
@@ -374,8 +377,17 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
             </button>
           </div>
         </header>
+        ` : `
+        <header style="background: var(--bg-primary); padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="Logo" style="width:32px;">
+                <span style="font-weight:600; color:white;">Operador ${user.name}</span>
+            </div>
+            <button id="btn-mobile-logout" onclick="localStorage.removeItem('nf_user'); window.location.reload();" style="background:transparent; border:none; color:var(--color-error); font-weight:bold;">Salir</button>
+        </header>
+        `}
 
-        <div class="page-content" id="page-content">
+        <div class="page-content" id="page-content" style="${isCarga ? 'padding: 0; min-height: calc(100vh - 65px); display: flex; flex-direction: column; justify-content: flex-start;' : ''}">
           <!-- Dynamic content loads here -->
         </div>
       </main>
@@ -4552,22 +4564,34 @@ export function renderPomDetalleTable(matrix) {
                         <tbody>
             `;
 
+            const recordsByCuartel = {};
             records.forEach(p => {
-                const desvioClass = p.desvioJornales != null
-                    ? (p.desvioJornales > 10 ? 'color: #ef4444;' : p.desvioJornales < -10 ? 'color: #10b981;' : 'color: var(--text-secondary);')
-                    : 'color: var(--text-tertiary);';
+                if(!recordsByCuartel[p.cuartel]) recordsByCuartel[p.cuartel] = [];
+                recordsByCuartel[p.cuartel].push(p);
+            });
 
-                const fuenteIcon = p.fuente === 'manual' ? '✏️' : (p.rendimientoSugerido ? '🤖' : '📄');
-                const fuenteLabel = p.fuente === 'manual' ? 'Manual' : 'Original';
+            Object.entries(recordsByCuartel).forEach(([cuartelKey, laboresArr]) => {
+                laboresArr.forEach((p, idx) => {
+                    const desvioClass = p.desvioJornales != null
+                        ? (p.desvioJornales > 10 ? 'color: #ef4444;' : p.desvioJornales < -10 ? 'color: #10b981;' : 'color: var(--text-secondary);')
+                        : 'color: var(--text-tertiary);';
 
-                html += `
-                    <tr style="border-top: 1px solid rgba(255,255,255,0.03); transition: background 0.15s;" onmouseenter="this.style.background='rgba(16,185,129,0.04)'" onmouseleave="this.style.background=''">
-                        <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary); font-weight: 600; white-space: nowrap;">${p.cuartel}</td>
-                        <td style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary);">${p.hectareas.toFixed(1)}</td>
-                        <td style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary);">${p.plantas.toLocaleString('es-AR')}</td>
-                        <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary);">
-                            <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.88em; font-weight: 600; background: rgba(16,185,129,0.08); color: #10b981; white-space: nowrap;">${p.laborNombre}</span>
-                        </td>
+                    const fuenteIcon = p.fuente === 'manual' ? '✏️' : (p.rendimientoSugerido ? '🤖' : '📄');
+                    const fuenteLabel = p.fuente === 'manual' ? 'Manual' : 'Original';
+
+                    const rowspanAttr = laboresArr.length > 1 && idx === 0 ? ` rowspan="${laboresArr.length}"` : '';
+                    const sharedCols = idx === 0 ? `
+                        <td${rowspanAttr} style="padding: var(--space-2) var(--space-3); color: var(--text-primary); font-weight: 600; white-space: nowrap; vertical-align: middle; border-right: 1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.1); border-bottom: 1px solid rgba(255,255,255,0.03);">${p.cuartel}</td>
+                        <td${rowspanAttr} style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary); vertical-align: middle; border-right: 1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.1); border-bottom: 1px solid rgba(255,255,255,0.03);">${p.hectareas.toFixed(1)}</td>
+                        <td${rowspanAttr} style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary); vertical-align: middle; border-right: 1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.05); border-bottom: 1px solid rgba(255,255,255,0.03);">${p.plantas.toLocaleString('es-AR')}</td>
+                    ` : '';
+
+                    html += `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s;" onmouseenter="this.style.background='rgba(16,185,129,0.04)'" onmouseleave="this.style.background=''">
+                            ${sharedCols}
+                            <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary);">
+                                <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.88em; font-weight: 600; background: rgba(16,185,129,0.08); color: #10b981; white-space: nowrap;">${p.laborNombre}</span>
+                            </td>
                         <td style="padding: var(--space-2) var(--space-3); text-align: center;">
                             <input type="number" class="pom-editable-input" data-key="${p.key}" data-field="rendimiento" value="${p.rendimientoProyectado}" min="1"
                                 style="width: 70px; text-align: center; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; color: #10b981; font-weight: 700; padding: 3px 6px; font-size: 0.95em;" />
@@ -4584,6 +4608,7 @@ export function renderPomDetalleTable(matrix) {
                         <td style="padding: var(--space-2) var(--space-3); text-align: center; font-size: 0.85em;" title="${fuenteLabel}">${fuenteIcon}</td>
                     </tr>
                 `;
+                });
             });
 
             html += `

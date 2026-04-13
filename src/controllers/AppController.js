@@ -39,8 +39,9 @@ import {
     renderControlCargaView, renderPresupuestoProyeccionView, renderExcelBudgetSummary,
     renderEjecucionPresupuesto, renderInformePlanificacion,
     renderProyeccionJornalView, renderPomDetalleTable, renderPomResumenFinca, renderPomCalendario,
-    renderCargaDocumentacionView, renderDocumentacionRows
+    renderCargaDocumentacionView, renderDocumentacionRows, renderTransferRows
 } from '../views/Views.js';
+import { renderInversionesKanbanView } from '../views/InversionesView.js';
 
 import { SecaderosController } from './SecaderosController.js';
 import { JornalesBudgetModel } from '../models/JornalesBudgetModel.js';
@@ -88,6 +89,7 @@ const ROLE_MENUS = {
                 { id: 'admin-institucional', label: 'Institucional', icon: '🏛️' },
                 { id: 'presupuesto', label: 'Presupuesto', icon: '📊' },
                 { id: 'admin-planificacion', label: 'Planificación', icon: '📅' },
+                { id: 'inversiones-propuestas', label: 'Inversiones', icon: '💡' },
                 { id: 'pom-avanzado', label: 'POM Avanzado', icon: '📈' },
             ]
         },
@@ -143,8 +145,7 @@ const ROLE_MENUS = {
     'Carga': [
         {
             id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
-                { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
-                { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' },
+                { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' }
             ]
         },
     ],
@@ -308,8 +309,10 @@ export class AppController {
         // They will be loaded when the aplicaciones section is actually opened
         this._sofiaDataLoaded = false;
 
-        // Default section is 'home'
-        if (!section) section = 'home';
+        // Default section
+        if (!section) {
+            section = (user.role === 'Carga' || user.rol === 'Carga') ? 'admin-carga-trabajo' : 'home';
+        }
         this.currentSection = section;
 
         // Render layout first so overlay exists
@@ -1982,7 +1985,34 @@ export class AppController {
             }))
         ]);
 
-        container.innerHTML = renderAdminCrudView(config, data, catalogs, sectionId);
+        if (sectionId === 'inversiones-propuestas') {
+            container.innerHTML = renderInversionesKanbanView(config, data);
+            
+            // Re-bind click event for 'New' button to use generic CRUD modal but visually integrated
+            setTimeout(() => {
+                const btnNew = document.getElementById('btn-inversiones-new');
+                if (btnNew) {
+                    btnNew.addEventListener('click', () => {
+                        // Using the built-in generic modal, but we must make sure events are bound
+                        const tableBody = container.querySelector('tbody');
+                        // Simulation of add generic row
+                        this.openAdminCrudModal(config, null, catalogs);
+                    });
+                }
+                
+                // Bind cards click to edit
+                const cards = container.querySelectorAll('.inversion-card');
+                cards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        const id = card.getAttribute('data-id');
+                        const itemData = data.find(item => item.id == id);
+                        if (itemData) this.openAdminCrudModal(config, itemData, catalogs);
+                    });
+                });
+            }, 50);
+        } else {
+            container.innerHTML = renderAdminCrudView(config, data, catalogs, sectionId);
+        }
 
         // ── Event bindings ──
         const refreshTable = async () => {
@@ -1993,7 +2023,22 @@ export class AppController {
                     if (ADMIN_MODELS[mId]) catalogs[mId] = await ADMIN_MODELS[mId].getAll(true);
                 }))
             ]);
-            container.innerHTML = renderAdminCrudView(config, freshData, catalogs, sectionId);
+            if (sectionId === 'inversiones-propuestas') {
+                container.innerHTML = renderInversionesKanbanView(config, freshData);
+                // Re-bind internal kanban events
+                setTimeout(() => {
+                    const btnNew = container.querySelector('#btn-inversiones-new');
+                    if (btnNew) btnNew.addEventListener('click', () => this.openAdminCrudModal(config, null, catalogs));
+                    container.querySelectorAll('.inversion-card').forEach(card => {
+                        card.addEventListener('click', () => {
+                            const itemData = freshData.find(item => item.id == card.getAttribute('data-id'));
+                            if (itemData) this.openAdminCrudModal(config, itemData, catalogs);
+                        });
+                    });
+                }, 50);
+            } else {
+                container.innerHTML = renderAdminCrudView(config, freshData, catalogs, sectionId);
+            }
             this.bindAdminCrudEvents(container, config, model, refreshTable, sectionId);
         };
 
@@ -2004,34 +2049,95 @@ export class AppController {
         container.innerHTML = `<div style="padding: 2rem; text-align: center;">⌛ Cargando sistema de operativa...</div>`;
 
         try {
-            // Fetch everything needed with individual error catching for debug
+            // Import and configure offline model first
+            const { OfflineSyncModel } = await import('../models/OfflineSyncModel.js');
+            const { renderMobileWorkLogView } = await import('../views/MobileWorkLogView.js');
+
             const [logs, fincas, predios, cuarteles, faenas, labores, personal, productos] = await Promise.all([
-                fetch(`${VITE_API_URL}/trabajo-campo-completo`).then(r => r.json()).catch(e => { console.error('Error logs:', e); throw e; }),
-                ADMIN_MODELS['admin-fincas'].getAll().catch(e => { console.error('Error fincas:', e); throw e; }),
-                ADMIN_MODELS['admin-predios'].getAll().catch(e => { console.error('Error predios:', e); throw e; }),
-                ADMIN_MODELS['admin-cuarteles'].getAll().catch(e => { console.error('Error cuarteles:', e); throw e; }),
-                ADMIN_MODELS['admin-faenas'].getAll().catch(e => { console.error('Error faenas:', e); throw e; }),
-                ADMIN_MODELS['admin-labor'].getAll().catch(e => { console.error('Error labor:', e); throw e; }),
-                ADMIN_MODELS['admin-personal'].getAll().catch(e => { console.error('Error personal:', e); throw e; }), // Personal/Empleados
-                ADMIN_MODELS['admin-productos'].getAll().catch(e => { console.error('Error productos:', e); throw e; })
+                fetch(`${VITE_API_URL}/trabajo-campo-completo`).then(r => r.json()).catch(e => { console.warn('Offline?', e); return []; }),
+                ADMIN_MODELS['admin-fincas'].getAll().catch(e => []),
+                ADMIN_MODELS['admin-predios'].getAll().catch(e => []),
+                ADMIN_MODELS['admin-cuarteles'].getAll().catch(e => []),
+                ADMIN_MODELS['admin-faenas'].getAll().catch(e => []),
+                ADMIN_MODELS['admin-labor'].getAll().catch(e => []),
+                ADMIN_MODELS['admin-personal'].getAll().catch(e => []), 
+                ADMIN_MODELS['admin-productos'].getAll().catch(e => [])
             ]);
 
             const catalogs = { fincas, predios, cuarteles, faenas, labores, empleados: personal, productos };
             
-            // Safety check: ensure logs is an array
-            const logsArray = Array.isArray(logs) ? logs : [];
-            if (!Array.isArray(logs)) {
-                console.error('Expected array for work-logs, got:', logs);
+            // Si estamos online y descargamos los catalogos, los guardamos
+            if (fincas.length > 0) {
+                OfflineSyncModel.saveCatalogsLocally(catalogs);
             }
-            
+
+            // Detección de celular (Ancho de pantalla)
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                container.innerHTML = renderMobileWorkLogView(catalogs);
+                // Bind Mobile Events
+                setTimeout(() => {
+                    const form = document.getElementById('mobile-worklog-form');
+                    const btnSync = document.getElementById('btn-mobile-sync');
+                    
+                    if (form) form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const logData = {
+                            fecha: new Date().toISOString().split('T')[0],
+                            hora_inicio: '08:00', hora_fin: '17:00', // Hardcodeds temporales para campo
+                            finca_id: document.getElementById('m-finca').value,
+                            cuartel_id: document.getElementById('m-cuartel').value || null,
+                            empleado_id: document.getElementById('m-empleado').value,
+                            labor_id: document.getElementById('m-labor').value,
+                            cantidad: parseFloat(document.getElementById('m-cantidad').value),
+                            unidad: document.getElementById('m-unidad').value,
+                            total_jornadas: document.getElementById('m-unidad').value === 'Jornadas' ? parseFloat(document.getElementById('m-cantidad').value) : 0,
+                            usuario_cargo_id: UserModel.getCurrentUser().id
+                        };
+                        OfflineSyncModel.enqueueWorkLog(logData);
+                        document.getElementById('m-save-msg').textContent = '✅ Guardado. Queda en cola.';
+                        document.getElementById('m-cantidad').value = '';
+                        setTimeout(() => document.getElementById('m-save-msg').textContent='', 2000);
+                        
+                        // Actualizar UI
+                        const queueBadge = document.getElementById('mobile-queue-count');
+                        if (queueBadge) queueBadge.textContent = OfflineSyncModel.getSyncQueue().length + ' pendientes';
+                    });
+
+                    if (btnSync) btnSync.addEventListener('click', async () => {
+                        btnSync.textContent = 'Subiendo...';
+                        const queue = OfflineSyncModel.getSyncQueue();
+                        let successCount = 0;
+                        for (const item of queue) {
+                            try {
+                                const response = await fetch(`${VITE_API_URL}/trabajo-campo`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ log: item, insumos: [], herramientas: [] })
+                                });
+                                if (response.ok) {
+                                    OfflineSyncModel.dequeueWorkLog(item._offlineId);
+                                    successCount++;
+                                }
+                            } catch (e) {
+                                console.error('Error subiendo', item, e);
+                            }
+                        }
+                        alert(`Sincronización finalizada. Éxito: ${successCount}`);
+                        this.renderCargaTrabajoSection(container);
+                    });
+
+                }, 100);
+                return; // FIN MOBILE
+            }
+
+            // Desktop View Normal
+            const logsArray = Array.isArray(logs) ? logs : [];
             container.innerHTML = renderWorkLogView(logsArray, catalogs);
             this.bindWorkLogEvents(container, logsArray, catalogs);
         } catch (e) {
             console.error('Work section load error:', e);
-            container.innerHTML = `<div style="padding: 2rem; color: var(--color-error);">
-                Error al cargar catálogos operativos. Verifique la base de datos.<br>
-                <code style="color: black; background: #fee; padding: 1rem; display: block; margin-top: 1rem; text-align: left;">${e.stack || e.message || String(e)}</code>
-            </div>`;
         }
     }
 

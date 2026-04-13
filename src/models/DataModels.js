@@ -586,6 +586,7 @@ export const AdminZonasRiegoModel = new AdminCrudModel('admin_zonas_riego', 'Zon
 export const AdminSistemaRiegoModel = new AdminCrudModel('admin_sistema_riego', 'Sistema de Riego');
 export const AdminPlanificacionModel = new AdminCrudModel('admin_planificacion', 'Planificación');
 export const AdminContratosModel = new AdminCrudModel('admin_contratos', 'Contratos');
+export const AdminInversionesModel = new AdminCrudModel('inversiones_propuestas', 'Inversiones');
 
 // Mapa para acceso rápido por ID de sección
 export const ADMIN_MODELS = {
@@ -603,6 +604,7 @@ export const ADMIN_MODELS = {
   'admin-planificacion': AdminPlanificacionModel,
   'admin-contratos': AdminContratosModel,
   'admin-carga-trabajo': new AdminCrudModel('trabajo_campo_logs', 'Carga Trabajo'),
+  'inversiones-propuestas': AdminInversionesModel,
 };
 
 // Configuración de columnas para cada tabla (para renderizar tablas/formularios genéricos)
@@ -797,6 +799,22 @@ export const ADMIN_TABLE_CONFIG = {
       { key: 'cantidad', label: 'Cantidad', type: 'number', required: true },
       { key: 'unidad', label: 'Unidad (horas/surcos/etc)', type: 'text' },
       { key: 'notas', label: 'Observaciones', type: 'textarea' },
+    ]
+  },
+  'inversiones-propuestas': {
+    title: 'Gestión y Justificación de Inversiones',
+    icon: '💡',
+    columns: [
+      { key: 'nombre', label: 'Nombre de Inversión', type: 'text', required: true },
+      { key: 'area_estrategica', label: 'Área Estratégica', type: 'select', options: ['Maquinaria', 'Riego', 'Fertilización', 'Fitosanitarios', 'Infraestructura', 'Energía', 'Nuevas Plantaciones', 'Automatización', 'Eficiencia Operativa', 'Administración'] },
+      { key: 'tipo_inversion', label: 'Tipo', type: 'select', options: ['CAPEX', 'Mejora Operativa', 'Reemplazo', 'Innovación'] },
+      { key: 'ciclo_agricola', label: 'Ciclo', type: 'text', required: true },
+      { key: 'estado', label: 'Estado', type: 'select', options: ['Idea', 'En Evaluación', 'Aprobada', 'En Ejecución', 'Ejecutada', 'Descartada'] },
+      { key: 'prioridad', label: 'Prioridad', type: 'select', options: ['Alta', 'Media', 'Baja'] },
+      { key: 'costo_estimado', label: 'Costo Estimado (USD)', type: 'number' },
+      { key: 'costo_real', label: 'Costo Real Ejecutado (USD)', type: 'number' },
+      { key: 'fecha_inicio_estimada', label: 'Fecha de Ejecución', type: 'date' },
+      { key: 'descripcion', label: 'Obj. y Justificación', type: 'textarea' }
     ]
   }
 };

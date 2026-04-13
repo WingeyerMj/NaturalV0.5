@@ -350,7 +350,8 @@ const ADMIN_TABLES = [
     'admin_sistema_riego',
     'admin_planificacion',
     'admin_contratos',
-    'trabajo_campo_logs'
+    'trabajo_campo_logs',
+    'inversiones_propuestas'
 ];
 
 // ═══════════════════════════════════════════════════════════
