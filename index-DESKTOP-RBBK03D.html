@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="NATURALFOOD - Plataforma de Gestión Agrícola para la producción integral de uva para pasa. Sistema de informes, gestión de predios y control operativo." />
+  <meta name="keywords" content="gestión agrícola, uva, pasa, NATURALFOOD, producción, informes, campo" />
+  <title>NATURALFOOD | Plataforma de Gestión Agrícola</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://app.powerbi.com">
+  <!-- Non-blocking Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" media="print" onload="this.media='all'">
+  <!-- Non-blocking Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+  <!-- Defer Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  
+  <link rel="icon" type="image/png"
+    href="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" />
+  <link rel="stylesheet" href="/src/styles/main.css" fetchpriority="high" />
+  <link rel="stylesheet" href="/src/styles/device-orientation.css" />
+  <!-- Manifest for PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#1E293B" />
+</head>
+
+<body>
+  <div id="rotate-device-suggestion" class="rotate-device-suggestion">
+    <div class="rotate-device-content">
+      <svg class="rotate-device-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        <path d="M16 10a4 4 0 0 1-8 0"></path>
+      </svg>
+      <p class="rotate-device-text">
+        Para una mejor visualización de los gráficos, gira tu teléfono de forma horizontal.
+      </p>
+      <button class="rotate-device-close" onclick="document.getElementById('rotate-device-suggestion').style.display='none'" aria-label="Cerrar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Global Loading Overlay (NaturalFood Wave-Fill Logo) -->
+  <div id="global-loader" class="global-loader-overlay">
+    <div class="loader-container">
+      <img src="/logo.svg" alt="Logo BG" class="loader-nf-logo-bg">
+      <div class="loader-nf-logo-fill-wrapper">
+        <div class="loader-nf-wave-fill"></div>
+      </div>
+    </div>
+    <div class="loader-nf-text">Cargando...</div>
+  </div>
+
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+  
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('ServiceWorker PWA registrado con exito:', registration.scope);
+        }).catch(err => {
+          console.log('Fallo en el registro del ServiceWorker:', err);
+        });
+      });
+    }
+  </script>
+</body>
+
+</html>

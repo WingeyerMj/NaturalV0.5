@@ -1,0 +1,5060 @@
+/**
+ * ═══════════════════════════════════════════════════════════
+ * NATURALFOOD - Views Layer
+ * Renders all HTML templates for the application
+ * ═══════════════════════════════════════════════════════════
+ */
+
+// ── Landing Page View ──
+export function renderLandingPage() {
+  return `
+    <div class="new-landing-wrapper">
+        <header id="mainHeader">
+            <a href="https://www.naturalfoodargentina.com">
+                <figure>
+                    <img src="https://www.naturalfoodargentina.com/wp-content/uploads/2018/02/logo-natural-food-argentina.png"
+                        alt="Logo Natural Food Argentina">
+                </figure>
+            </a>
+            <span id="btnMenu">≡</span>
+            <nav class="menu-menu-principal-container">
+                <ul id="menu-menu-principal" class="menu">
+                    <li class="menu-item"><a href="https://www.naturalfoodargentina.com/about-us/">NOSOTROS</a></li>
+                    <li class="menu-item"><a href="https://www.naturalfoodargentina.com/our-process/">NUESTRO
+                            PROCESO</a></li>
+                    <li class="menu-item"><a href="https://www.naturalfoodargentina.com/our-farms/">NUESTRAS
+                            FINCAS</a></li>
+                    <li class="menu-item"><a href="#">PRODUCTOS</a></li>
+                    <li class="menu-item"><a href="https://www.naturalfoodargentina.com/quality/">CALIDAD</a></li>
+                    <li class="menu-item"><a href="https://www.naturalfoodargentina.com/contact/">CONTACTO</a></li>
+                    <li><button id="btn-login-nav" class="btn-login-custom">INGRESAR</button></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <section id="sliderPrincipal">
+                <div>
+                    <video preload autoplay loop muted>
+                        <source
+                            src="https://www.naturalfoodargentina.com/wp-content/uploads/2017/12/Natural-Food-Argentina-Our-Farms.mp4"
+                            type="video/mp4">
+                        Tu navegador no soporta HTML5 Video
+                    </video>
+                </div>
+                <span class="triangulo"></span>
+            </section>
+            <section id="traz-producto">
+                <h2>Integración vertical en pasas de uva</h2>
+                <figure class="img-vertically-integrated">
+                    <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/vertically-integrated/1-campo-natural-food-argentina.png"
+                        alt="">
+                </figure>
+                <p class="text-vertically-integrated p-left">Nuestra ventaja competitiva comienza desde el origen,
+                </p>
+                <p class="text-vertically-integrated p-right">donde seleccionamos las pasas directamente de nuestra
+                    red de fincas propias.</p>
+                <figure class="img-vertically-integrated">
+                    <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/vertically-integrated/2-cosecha-natural-food-argentina.png"
+                        alt="">
+                </figure>
+                <p class="text-vertically-integrated p-center">
+                    Esta red abarca 300 kilómetros a lo largo de las provincias de San Juan y La Rioja<br>y nos
+                    permite rastrear nuestra fruta desde la finca hasta el cliente,
+                </p>
+                <figure class="img-vertically-integrated img-doble">
+                    <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/vertically-integrated/4-recoleccion-natural-food-argentina.png"
+                        alt="">
+                </figure>
+                <figure class="img-vertically-integrated">
+                    <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/vertically-integrated/5-planta-natural-food-argentina.png"
+                        alt="">
+                </figure>
+                <p class="text-vertically-integrated p-center">asegurando la entrega de un producto de la más alta
+                    calidad con una eficiencia inigualable.</p>
+            </section>
+            <section id="machines-modernas">
+                <h2>Instalación tecnológicamente avanzada</h2>
+                <div class="section-container">
+                    <video preload controls>
+                        <source
+                            src="https://www.naturalfoodargentina.com/wp-content/uploads/2017/11/Natural-Food-Argentina-Our-Process.mp4"
+                            type="video/mp4">
+                        Tu navegador no soporta HTML5 Video
+                    </video>
+                </div>
+            </section>
+            <section id="quality-certif">
+                <div class="section-container">
+                    <span class="logo-certificado"></span>
+                    <span class="logo-certificado"></span>
+                    <span class="logo-certificado"></span>
+                    <span class="logo-certificado"></span>
+                    <span class="logo-certificado"></span>
+                    <span class="logo-certificado"></span>
+                    <span class="logo-certificado"></span>
+                </div>
+            </section>
+            <footer>
+                <div>
+                    <h3>ENLACES RÁPIDOS</h3>
+                    <nav class="menu-menu-footer-container">
+                        <ul id="menu-menu-footer" class="menu">
+                            <li class="menu-item"><a
+                                    href="https://www.naturalfoodargentina.com/about-us/">NOSOTROS</a></li>
+                            <li class="menu-item"><a
+                                    href="https://www.naturalfoodargentina.com/our-process/">NUESTRO PROCESO</a>
+                            </li>
+                            <li class="menu-item"><a href="https://www.naturalfoodargentina.com/our-farms/">NUESTRAS
+                                    FINCAS</a></li>
+                            <li class="menu-item"><a
+                                    href="https://www.naturalfoodargentina.com/raisins/">PRODUCTOS</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <address>
+                    <h3>CORPORATIVO</h3>
+                    <ul>
+                        <li>NATURAL FOOD ARGENTINA</li>
+                        <br>
+                        <li>BUENOS AIRES. Av. Callao 1234 - Of. 503 Edificio Concord Callao</li>
+                        <li>+5493416912585</li>
+                        <br>
+                        <li>ROSARIO, España 889 - Oficinas: 1 - 4 - 9</li>
+                        <li>+5493415302083</li>
+                        <br>
+                        <li>SAN JUAN , Lavalle S/N La Puntilla Caucete</li>
+                        <li>+5493415921275</li>
+                        <br>
+                        <li>info@naturalfoodargentina.com</li>
+                    </ul>
+                </address>
+                <span>
+                    <a href="https://www.instagram.com/naturalfoodargentina/" target="_blank"><img
+                            src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/icon-igram.png"
+                            alt="Instagram"></a>
+                    <a href="https://www.youtube.com/channel/UCanLYzfQvY9ZiWSVlUe6lkA" target="_blank"><img
+                            src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/icon-youtube.png"
+                            alt="YouTube"></a>
+                    <a href="https://www.twitter.com/naturalfoodarg" target="_blank"><img
+                            src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/icon-tw.png"
+                            alt="Twitter"></a>
+                </span>
+            </footer>
+        </main>
+    </div>
+  `;
+}
+
+// ── Login Page View ──
+export function renderLoginPage() {
+  return `
+    <div class="login-page">
+      <div class="login-card">
+        <div class="login-header">
+          <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" class="nf-logo nf-logo--lg">
+          <h2>Bienvenido</h2>
+          <p>Ingresa tus credenciales para acceder al sistema</p>
+        </div>
+
+        <div class="form-error" id="login-error">
+          ⚠️ <span>Credenciales incorrectas. Intente nuevamente.</span>
+        </div>
+
+        <div class="form-success" id="login-success" style="display:none; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; padding: var(--space-4); margin-bottom: var(--space-4); color: #22c55e; font-size: 0.9em; text-align: center;">
+          ✅ <span id="login-success-msg">Registro exitoso</span>
+        </div>
+
+        <div class="form-error" id="login-pending-error" style="display:none; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: var(--space-4); margin-bottom: var(--space-4); color: #f59e0b; font-size: 0.9em; text-align: center;">
+          ⏳ <span>Tu cuenta está pendiente de aprobación por el administrador.</span>
+        </div>
+
+        <form id="login-form" autocomplete="off">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Correo electrónico</label>
+            <div class="form-input-wrapper">
+              <input 
+                type="email" 
+                id="login-email" 
+                class="form-input" 
+                placeholder="usuario@naturalfood.com"
+                required
+                autocomplete="email"
+              />
+              <span class="form-input-icon">📧</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Contraseña</label>
+            <div class="form-input-wrapper">
+              <input 
+                type="password" 
+                id="login-password" 
+                class="form-input" 
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+              />
+              <span class="form-input-icon">🔒</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary login-btn" id="btn-login-submit">
+            Iniciar Sesión
+          </button>
+        </form>
+
+        <div style="margin-top: var(--space-4); text-align: center;">
+          <p style="font-size: var(--text-sm); color: var(--text-tertiary); margin-bottom: var(--space-3);">¿No tenés cuenta?</p>
+          <button class="btn btn-ghost" id="btn-show-register" style="color: var(--color-primary-400); font-weight: 600; border: 1px solid var(--color-primary-400); width: 100%; padding: var(--space-3); border-radius: var(--radius-lg); transition: all 0.2s ease;">
+            📝 Registrarse
+          </button>
+        </div>
+
+        <div class="login-footer">
+          <a href="#" id="btn-back-landing">← Volver al inicio</a>
+        </div>
+      </div>
+
+      <!-- Registration Modal (Bootstrap 5) -->
+      <div class="modal fade" id="register-modal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content" style="background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-subtle); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            <div class="modal-header border-0 pb-0">
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 pt-0">
+              <div style="text-align: center; margin-bottom: var(--space-6);">
+                <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 60px; height: 60px; margin-bottom: var(--space-3);">
+                <h3 id="registerModalLabel" style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-1);">Crear Cuenta</h3>
+                <p style="font-size: var(--text-sm); color: var(--text-tertiary);">Completá tus datos para solicitar acceso</p>
+              </div>
+
+              <div class="form-error" id="register-error" style="display:none; margin-bottom: var(--space-4);">
+                ⚠️ <span id="register-error-msg"></span>
+              </div>
+
+              <form id="form-register" autocomplete="off">
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="register-name">Nombre Completo</label>
+                  <div class="form-input-wrapper">
+                    <input type="text" id="register-name" class="form-input" placeholder="Ej: Juan Pérez" required />
+                    <span class="form-input-icon">👤</span>
+                  </div>
+                </div>
+                  <div class="form-group" style="margin-bottom: var(--space-4);">
+                    <label class="form-label">Elegir Avatar</label>
+                    
+                    <!-- Avatar Selection Grid (Shown first) -->
+                    <div id="register-avatar-selector" class="avatar-selector-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border-subtle); max-height: 180px; overflow-y: auto; margin-bottom: var(--space-3);">
+                      ${['admin.png', 'admin1.png', 'gerencia.png', 'gerencia2.png', 'gerenciaf.png', 'gerenciafe.png', 'ingeniero.png', 'ingeniero1.png', 'ingeniero2.png', 'rrhh.png', 'rrhh1.png', 'soporteit.png', 'soporteit1.png', 'soporteit2.png', 'soporteit3.png', 'soporteit4.png'].map(img => `
+                        <div class="avatar-option" data-img="${img}" style="cursor: pointer; transition: all 0.2s ease; border-radius: 50%; overflow: hidden; border: 2px solid transparent; width: 44px; height: 44px; margin: 0 auto;">
+                          <img src="/img/usuarios/${img}" alt="${img}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                      `).join('')}
+                    </div>
+
+                    <!-- Avatar Preview (Visible after selection) -->
+                    <div id="register-avatar-preview-container" style="display: none; align-items: center; gap: var(--space-4); padding: 10px; background: rgba(16, 185, 129, 0.05); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                      <div id="register-avatar-preview" style="width: 54px; height: 54px; border-radius: 50%; border: 2px solid var(--color-success); overflow: hidden; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        <img src="/img/usuarios/ingeniero.png" style="width: 100%; height: 100%; object-fit: cover;">
+                      </div>
+                      <div style="flex: 1;">
+                        <div style="font-size: 0.85em; font-weight: 700; color: var(--color-success); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">✓ Avatar Seleccionado</div>
+                        <button type="button" id="btn-change-avatar" style="background: none; border: none; color: var(--text-tertiary); font-size: 0.75em; padding: 0; cursor: pointer; text-decoration: underline;">Elegir otro diferente</button>
+                      </div>
+                    </div>
+
+                    <input type="hidden" id="register-avatar" value="">
+                  </div>
+                  <div class="form-group" style="margin-bottom: var(--space-4);">
+                    <label class="form-label" for="register-email">Correo Electrónico</label>
+                    <div class="form-input-wrapper">
+                      <input type="email" id="register-email" class="form-input" placeholder="tucorreo@ejemplo.com" required />
+                      <span class="form-input-icon">📧</span>
+                    </div>
+                  </div>
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="register-password">Contraseña</label>
+                  <div class="form-input-wrapper">
+                    <input type="password" id="register-password" class="form-input" placeholder="Mínimo 6 caracteres" required minlength="6" />
+                    <span class="form-input-icon">🔒</span>
+                  </div>
+                <div class="form-group" style="margin-bottom: var(--space-6);">
+                  <label class="form-label" for="register-password-confirm">Confirmar Contraseña</label>
+                  <div class="form-input-wrapper">
+                    <input type="password" id="register-password-confirm" class="form-input" placeholder="Repetí tu contraseña" required minlength="6" />
+                    <span class="form-input-icon">🔒</span>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" style="padding: var(--space-3); border-radius: var(--radius-lg); font-weight: 600;">
+                  🚀 Solicitar Acceso
+                </button>
+              </form>
+
+              <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-4); text-align: center; line-height: 1.5;">
+                Tu solicitud será revisada por un administrador.<br>Recibirás un correo cuando tu cuenta sea activada.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── Dashboard Layout ──
+export function renderDashboardLayout(user, menuItems, activeSection) {
+  const isCarga = user.role === 'Carga' || user.rol === 'Carga';
+  return `
+    <div id="loading-overlay" class="loading-overlay hidden" style="position: fixed; inset: 0; background: var(--bg-primary); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <!-- Top Left Logo during loading -->
+        <div style="position: absolute; top: var(--space-6); left: var(--space-6); display: flex; align-items: center; gap: var(--space-4);">
+            <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 48px; height: 48px; animation: coinFlip 4s ease-in-out infinite;">
+            <span style="font-family: var(--font-display); font-weight: 700; color: var(--text-primary); letter-spacing: 1px;">NATURALFOOD</span>
+        </div>
+
+        <div class="loading-content" style="background: transparent; border: none; box-shadow: none; text-align: center; max-width: 500px; width: 90%;">
+            <div style="margin-bottom: 40px;">
+                <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 120px; height: 120px; animation: coinFlip 4s ease-in-out infinite; filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.2));">
+            </div>
+            <h3 style="margin-bottom: 15px; font-family: 'Outfit'; color: var(--text-primary); font-size: 1.8rem;">Conectando con Sofía...</h3>
+            <p id="loading-message" style="color: var(--text-secondary); margin-bottom: 30px; font-size: 1.1rem; opacity: 0.8;">Iniciando descarga de datos históricos</p>
+            
+            <div style="max-width: 300px; margin: 0 auto;">
+                <div class="progress-bar-container" style="width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; margin-bottom: 12px;">
+                    <div class="progress-bar" id="loading-progress" style="width: 0%; height: 100%; background: var(--color-primary-500); box-shadow: 0 0 15px var(--color-primary-500); transition: width 0.3s ease;"></div>
+                </div>
+                <div id="loading-details" style="font-size: 0.9rem; font-weight: 600; color: var(--color-primary-400); font-family: 'Outfit';">0%</div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-layout">
+      ${!isCarga ? `
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" class="nf-logo">
+          <span class="sidebar-title">NATURALFOOD</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+          ${renderSidebarMenu(menuItems, activeSection)}
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-user" id="sidebar-user-menu">
+            <div class="sidebar-avatar">
+              <img src="/img/usuarios/${user.avatar || 'ingeniero.png'}" 
+                   alt="Avatar" 
+                   onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random'"
+                   style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            </div>
+            <div class="sidebar-user-info">
+              <div class="sidebar-user-name">${user.name}</div>
+              <div class="sidebar-user-role">${user.role}</div>
+            </div>
+          </div>
+          <button class="sidebar-item" id="btn-logout" style="margin-top: var(--space-2); color: var(--color-error);">
+            <span class="sidebar-item-icon">🚪</span>
+            Cerrar Sesión
+          </button>
+        </div>
+      </aside>
+      ` : ''}
+
+      <main class="main-content" style="${isCarga ? 'margin-left: 0; width: 100%; height: 100vh; overflow-y: auto;' : ''}">
+        ${!isCarga ? `
+        <header class="main-header">
+          <div class="main-header-left">
+            <button class="mobile-menu-toggle" id="btn-mobile-menu">☰</button>
+            <h1 class="page-title" id="page-title">Dashboard</h1>
+          </div>
+          <div class="main-header-right">
+            <button class="notification-bell" title="Notificaciones">
+              🔔
+              <span class="notification-count">3</span>
+            </button>
+          </div>
+        </header>
+        ` : `
+        <header style="background: var(--bg-primary); padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="Logo" style="width:32px;">
+                <span style="font-weight:600; color:white;">Operador ${user.name}</span>
+            </div>
+            <button id="btn-mobile-logout" onclick="localStorage.removeItem('nf_user'); window.location.reload();" style="background:transparent; border:none; color:var(--color-error); font-weight:bold;">Salir</button>
+        </header>
+        `}
+
+        <div class="page-content" id="page-content" style="${isCarga ? 'padding: 0; min-height: calc(100vh - 65px); display: flex; flex-direction: column; justify-content: flex-start;' : ''}">
+          <!-- Dynamic content loads here -->
+        </div>
+      </main>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Modal Container -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal" id="modal">
+        <div class="modal-header">
+          <h3 id="modal-title">Modal</h3>
+          <button class="modal-close" id="modal-close">✕</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 Confirmation Modal -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); background: var(--bg-secondary); color: var(--text-primary);">
+          <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.5rem;">
+            <h5 class="modal-title" id="confirmDeleteModalLabel" style="font-weight: 700; font-family: 'Outfit';">
+              ⚠️ Confirmar Eliminación
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" style="padding: 2rem; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🗑️</div>
+            <p id="confirmDeleteModalMessage" style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.5;">
+              ¿Estás seguro que deseas eliminar este registro? <br>
+              <strong style="color: var(--color-error);">Esta acción no se puede deshacer.</strong>
+            </p>
+          </div>
+          <div class="modal-footer" style="border-top: 1px solid var(--border-subtle); padding: 1rem 1.5rem; display: flex; gap: 1rem; justify-content: center;">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600;">Cancelar</button>
+            <button type="button" class="btn btn-danger" id="btn-confirm-delete-action" style="padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; background: var(--color-error); border: none;">Eliminar Registro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 Generic Alert Modal -->
+    <div class="modal fade" id="genericAlertModal" tabindex="-1" aria-labelledby="genericAlertModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); background: var(--bg-secondary); color: var(--text-primary);">
+          <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle); padding: 1.5rem;">
+            <h5 class="modal-title" id="genericAlertModalLabel" style="font-weight: 700; font-family: 'Outfit';">
+              Mensaje del Sistema
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="genericAlertModalMessage" style="padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 1.1rem; line-height: 1.5;">
+            Mensaje aquí...
+          </div>
+          <div class="modal-footer" style="border-top: 1px solid var(--border-subtle); padding: 1rem 1.5rem; display: flex; justify-content: center;">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="padding: 0.6rem 2rem; border-radius: 8px; font-weight: 600;">Entendido</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 10000;">
+      <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body" id="liveToastMessage">
+            Mensaje aquí...
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSidebarMenu(menuItems, activeSection) {
+  let html = '';
+  let currentSection = '';
+
+  menuItems.forEach(item => {
+    if (item.section !== currentSection) {
+      if (currentSection) html += '</div>';
+      currentSection = item.section;
+      html += `<div class="sidebar-section">
+        <div class="sidebar-section-title">${item.section}</div>`;
+    }
+
+    if (item.submenu) {
+      // Use activeSection comparison but DON'T expand by default if we want them contracted
+      // UNLESS the user explicitly requested a section within that submenu during navigation.
+      // But for initial load (where activeSection is default), we keep them closed.
+      const isExpanded = false; // Forced false to keep menus closed on load
+      html += `
+        <button class="sidebar-item sidebar-dropdown-toggle ${isExpanded ? 'expanded' : ''}" data-toggle="${item.id}">
+          <span class="sidebar-item-icon">${item.icon}</span>
+          ${item.label}
+          <span class="sidebar-chevron">${isExpanded ? '▾' : '▸'}</span>
+        </button>
+        <div class="sidebar-submenu ${isExpanded ? 'open' : ''}" id="submenu-${item.id}">
+          ${item.submenu.map(sub => `
+            <button class="sidebar-item sidebar-subitem ${sub.id === activeSection ? 'active' : ''}" data-section="${sub.id}">
+              <span class="sidebar-item-icon">${sub.icon}</span>
+              ${sub.label}
+            </button>
+          `).join('')}
+        </div>
+      `;
+    } else {
+      const isActive = item.id === activeSection ? 'active' : '';
+      html += `
+        <button class="sidebar-item ${isActive}" data-section="${item.id}">
+          <span class="sidebar-item-icon">${item.icon}</span>
+          ${item.label}
+        </button>
+      `;
+    }
+  });
+
+  if (currentSection) html += '</div>';
+  return html;
+}
+
+// ── Dashboard Home Content ──
+export function renderDashboardHome() {
+  return `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center; color: var(--text-secondary);">
+      <div style="margin-bottom: var(--space-8);">
+          <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 150px; height: 150px; animation: coinFlip 6s ease-in-out infinite; filter: drop-shadow(0 0 40px rgba(16, 185, 129, 0.15));">
+      </div>
+      <h2 style="font-family: 'Outfit'; color: var(--text-primary); font-size: 2.5rem; margin-bottom: var(--space-4);">¡Bienvenido a NaturalFood!</h2>
+      <p style="font-size: 1.1rem; max-width: 500px; margin: 0 auto; opacity: 0.7; line-height: 1.6;">
+        Selecciona una sección en el menú lateral para <br> comenzar a gestionar tu producción.
+      </p>
+    </div>
+  `;
+}
+
+// ── Fincas View ──
+export function renderFincasView(fincas) {
+  return `
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>Gestión de Fincas</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar finca..." id="search-fincas" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-finca">+ Nueva Finca</button>
+        </div>
+      </div>
+      <table class="data-table" id="table-fincas">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Ubicación</th>
+            <th>Hectáreas</th>
+            <th>Predios</th>
+            <th>Encargado</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${fincas.map(f => `
+            <tr>
+              <td><strong>${f.name}</strong></td>
+              <td>${f.location}</td>
+              <td>${f.hectares} ha</td>
+              <td>${f.predios}</td>
+              <td>${f.manager}</td>
+              <td>
+                <span class="status-badge ${f.status === 'active' ? 'active' : 'inactive'}">
+                  <span class="status-dot"></span>
+                  ${f.status === 'active' ? 'Activa' : 'Inactiva'}
+                </span>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── Predios View ──
+export function renderPrediosView(predios) {
+  return `
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>Gestión de Predios</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar predio..." id="search-predios" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-predio">+ Nuevo Predio</button>
+        </div>
+      </div>
+      <table class="data-table" id="table-predios">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Hectáreas</th>
+            <th>Variedad</th>
+            <th>Riego</th>
+            <th>Tipo de Suelo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${predios.map(p => `
+            <tr>
+              <td><strong>${p.name}</strong></td>
+              <td>${p.hectares} ha</td>
+              <td>${p.variety}</td>
+              <td>${p.irrigationType}</td>
+              <td>${p.soilType}</td>
+              <td>
+                <span class="status-badge ${p.status === 'active' ? 'active' : 'pending'}">
+                  <span class="status-dot"></span>
+                  ${p.status === 'active' ? 'Activo' : 'Pendiente'}
+                </span>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── Variedades View ──
+export function renderVariedadesView(variedades) {
+  return `
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>Variedades de Uva</h3>
+        <div class="table-actions">
+          <button class="btn btn-primary btn-sm" id="btn-add-variedad">+ Nueva Variedad</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Variedad</th>
+            <th>Tipo</th>
+            <th>Días a Cosecha</th>
+            <th>Contenido de Azúcar</th>
+            <th>Uso</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${variedades.map(v => `
+            <tr>
+              <td><strong>${v.name}</strong></td>
+              <td>${v.type}</td>
+              <td>${v.daysToHarvest} días</td>
+              <td>${v.sugarContent}</td>
+              <td>${v.usage}</td>
+              <td>
+                <span class="status-badge ${v.status === 'active' ? 'active' : 'inactive'}">
+                  <span class="status-dot"></span>
+                  ${v.status === 'active' ? 'Activa' : 'Inactiva'}
+                </span>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── Empleados View ──
+export function renderEmpleadosView(empleados) {
+  return `
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>Gestión de Personal</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar empleado..." id="search-empleados" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-empleado">+ Nuevo Empleado</button>
+        </div>
+      </div>
+      <table class="data-table" id="table-empleados">
+        <thead>
+          <tr>
+            <th>Legajo</th>
+            <th>Nombre</th>
+            <th>DNI</th>
+            <th>Cargo</th>
+            <th>Finca</th>
+            <th>Ingreso</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${empleados.map(e => `
+            <tr>
+              <td><code style="color: var(--color-primary-400)">${e.legajo}</code></td>
+              <td><strong>${e.name}</strong></td>
+              <td>${e.dni}</td>
+              <td>${e.position}</td>
+              <td>${e.finca}</td>
+              <td>${formatDate(e.startDate)}</td>
+              <td>
+                <span class="status-badge ${e.status === 'active' ? 'active' : 'inactive'}">
+                  <span class="status-dot"></span>
+                  ${e.status === 'active' ? 'Activo' : 'Baja'}
+                </span>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── Labores (Field Work) View ──
+export function renderLaboresView(labores) {
+  return `
+    <div class="tabs" id="labores-tabs">
+      <button class="tab-btn active" data-tab="all">Todas</button>
+      <button class="tab-btn" data-tab="completed">Completadas</button>
+      <button class="tab-btn" data-tab="pending">Pendientes</button>
+    </div>
+
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>Registro de Labores de Campo</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar labor..." id="search-labores" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-labor">+ Registrar Labor</button>
+        </div>
+      </div>
+      <table class="data-table" id="table-labores">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Predio</th>
+            <th>Finca</th>
+            <th>Empleado</th>
+            <th>Horas</th>
+            <th>Notas</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${labores.map(l => `
+            <tr data-status="${l.status}">
+              <td>${formatDate(l.date)}</td>
+              <td>${l.type}</td>
+              <td>${l.predio}</td>
+              <td>${l.finca}</td>
+              <td>${l.employee}</td>
+              <td>${l.hours}h</td>
+              <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes}">${l.notes}</td>
+              <td>
+                <span class="status-badge ${l.status === 'completed' ? 'active' : 'pending'}">
+                  <span class="status-dot"></span>
+                  ${l.status === 'completed' ? 'Completado' : 'Pendiente'}
+                </span>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── Carga (Field Operator) Simplified View ──
+export function renderCargaView(labores, fincas, predios, empleados) {
+  return `
+    <div class="charts-row" style="grid-template-columns: 1fr 1.2fr;">
+      <div class="chart-container animate-fade-in">
+        <div class="chart-header">
+          <span class="chart-title">📝 Registrar Nueva Labor</span>
+        </div>
+        <form id="form-nueva-labor">
+          <div class="form-group">
+            <label class="form-label" for="labor-date">Fecha</label>
+            <div class="form-input-wrapper">
+              <input type="date" id="labor-date" class="form-input" style="padding-left: var(--space-4);" value="${new Date().toISOString().split('T')[0]}" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="labor-type">Tipo de Labor</label>
+            <div class="form-input-wrapper">
+              <select id="labor-type" class="form-select" style="padding-left: var(--space-4);" required>
+                <option value="">Seleccionar...</option>
+                <option value="Poda">Poda</option>
+                <option value="Riego">Riego</option>
+                <option value="Fumigación">Fumigación</option>
+                <option value="Cosecha">Cosecha</option>
+                <option value="Desmalezado">Desmalezado</option>
+                <option value="Fertilización">Fertilización</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="labor-finca">Finca</label>
+            <div class="form-input-wrapper">
+              <select id="labor-finca" class="form-select" style="padding-left: var(--space-4);" required>
+                <option value="">Seleccionar...</option>
+                ${fincas.map(f => `<option value="${f.name}">${f.name}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="labor-predio">Predio</label>
+            <div class="form-input-wrapper">
+              <select id="labor-predio" class="form-select" style="padding-left: var(--space-4);" required>
+                <option value="">Seleccionar finca primero...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="labor-hours">Horas Trabajadas</label>
+            <div class="form-input-wrapper">
+              <input type="number" id="labor-hours" class="form-input" style="padding-left: var(--space-4);" min="1" max="24" placeholder="8" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="labor-notes">Observaciones</label>
+            <div class="form-input-wrapper">
+              <textarea id="labor-notes" class="form-input" style="padding-left: var(--space-4); min-height: 80px; resize: vertical;" placeholder="Descripción de la labor realizada..."></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">✅ Registrar Labor</button>
+        </form>
+      </div>
+
+      <div>
+        <div class="data-table-container animate-fade-in animate-delay-1">
+          <div class="table-header">
+            <h3>Mis Últimas Labores</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Predio</th>
+                <th>Horas</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${labores.slice(0, 6).map(l => `
+                <tr>
+                  <td>${formatDate(l.date)}</td>
+                  <td>${l.type}</td>
+                  <td>${l.predio}</td>
+                  <td>${l.hours}h</td>
+                  <td>
+                    <span class="status-badge ${l.status === 'completed' ? 'active' : 'pending'}">
+                      <span class="status-dot"></span>
+                      ${l.status === 'completed' ? 'OK' : 'Pendiente'}
+                    </span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── Informes (Reports) View ──
+export function renderInformesView() {
+  return `
+    <div class="informes-container">
+      <aside class="informes-nav" id="informes-tabs">
+        <div class="informes-nav-header">REPORTES</div>
+        <button class="tab-btn active" data-tab="presupuesto">📊 Ejecución</button>
+        <button class="tab-btn" data-tab="labores">🚜 Labores</button>
+        <button class="tab-btn" data-tab="parametros">⚙️ Parámetros</button>
+        <button class="tab-btn" data-tab="aplicaciones">📋 Aplicaciones</button>
+        <button class="tab-btn" data-tab="gastos">💰 Gastos</button>
+        <button class="tab-btn" data-tab="secaderos">☀️ Secaderos</button>
+      </aside>
+  
+      <div id="informe-content" class="informes-content">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  `;
+}
+
+export function renderInformePresupuesto(budgetData) {
+  const categories = Object.keys(budgetData);
+  const overBudget = categories.filter(c => budgetData[c].executed > budgetData[c].planned);
+  const underBudget = categories.filter(c => budgetData[c].executed <= budgetData[c].planned);
+
+  return `
+    <div class="dashboard-grid animate-fade-in">
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon green">💰</div>
+        </div>
+        <div class="metric-value">$${formatCurrency(Object.values(budgetData).reduce((s, c) => s + c.planned, 0))}</div>
+        <div class="metric-label">Total Presupuestado</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon blue">📊</div>
+        </div>
+        <div class="metric-value">$${formatCurrency(Object.values(budgetData).reduce((s, c) => s + c.executed, 0))}</div>
+        <div class="metric-label">Total Ejecutado</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon amber">✅</div>
+        </div>
+        <div class="metric-value">${underBudget.length}</div>
+        <div class="metric-label">Categorías en Presupuesto</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon purple">⚠️</div>
+        </div>
+        <div class="metric-value">${overBudget.length}</div>
+        <div class="metric-label">Categorías Excedidas</div>
+      </div>
+    </div>
+
+    <div class="chart-container animate-fade-in animate-delay-1">
+      <div class="chart-header">
+        <span class="chart-title">Comparativa Presupuesto vs Ejecución</span>
+      </div>
+      <div class="chart-canvas-wrapper" style="height: 350px;">
+        <canvas id="chart-budget-report"></canvas>
+      </div>
+    </div>
+
+    <div class="data-table-container animate-fade-in animate-delay-2">
+      <div class="table-header">
+        <h3>Detalle por Categoría</h3>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th>Presupuestado</th>
+            <th>Ejecutado</th>
+            <th>Diferencia</th>
+            <th>% Ejecución</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${categories.map(cat => {
+    const diff = budgetData[cat].executed - budgetData[cat].planned;
+    const pct = Math.round((budgetData[cat].executed / budgetData[cat].planned) * 100);
+    const over = diff > 0;
+    return `
+              <tr>
+                <td><strong>${cat}</strong></td>
+                <td>$${formatCurrency(budgetData[cat].planned)}</td>
+                <td>$${formatCurrency(budgetData[cat].executed)}</td>
+                <td style="color: ${over ? 'var(--color-error)' : 'var(--color-success)'}">
+                  ${over ? '+' : ''}$${formatCurrency(diff)}
+                </td>
+                <td>${pct}%</td>
+                <td>
+                  <span class="status-badge ${over ? 'inactive' : 'active'}">
+                    <span class="status-dot"></span>
+                    ${over ? 'Excedido' : 'En presupuesto'}
+                  </span>
+                </td>
+              </tr>
+            `;
+  }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCycle = '2025-2026', userRole = 'Administrador') {
+  const fmt = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
+  const fmtDec = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(v);
+  const fmtMoney = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(v);
+
+  const totalJornadas = laborStats.reduce((acc, s) => acc + s.totalJornadas, 0);
+  const isAdmin = userRole === 'Administrador';
+
+  const cycles = ['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022'];
+
+  return `
+    ${isAdmin ? `<!-- Budget Upload Zone -->
+    <div class="data-table-container animate-fade-in" id="jornales-budget-upload" style="margin-bottom: var(--space-6); padding: var(--space-4); background: var(--bg-glass); display: flex; align-items: center; gap: var(--space-4);">
+      <div style="font-size: 1.5rem;">📄</div>
+      <div style="flex: 1;">
+        <h4 style="font-family: 'Outfit'; margin: 0;">Presupuesto de Jornales</h4>
+        <p style="font-size: var(--text-xs); margin: 0; color: var(--text-tertiary);">Carga el CSV de proyección para comparar consumos reales vs proyectados.</p>
+      </div>
+      <input type="file" id="input-budget-csv" accept=".csv" hidden />
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('input-budget-csv').click()">
+        Seleccionar CSV
+      </button>
+    </div>` : ''}
+
+    <!-- Chart Container (Full Width) -->
+    <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-6); padding: var(--space-6);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+        <h4 style="font-family: 'Outfit'; margin: 0; display: flex; align-items: center; gap: var(--space-2);">
+          📊 Distribución de Jornadas
+        </h4>
+        <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+          <!-- Predios Propios Filter -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <select id="chart-filter-predio" class="form-select" style="font-size: 0.75rem; padding: 4px 8px; width: 180px; background: var(--bg-tertiary);">
+              <option value="">🏠 Todos los Predios</option>
+              <optgroup label="El Espejo">
+                <option value="FINCA:El Espejo">✨ Todo El Espejo</option>
+                <option value="EEI">El Espejo I</option>
+                <option value="EEII">El Espejo II</option>
+                <option value="EEIII">El Espejo III</option>
+              </optgroup>
+              <optgroup label="Fincas Viejas">
+                <option value="FINCA:Fincas Viejas">✨ Toda Fincas Viejas</option>
+                <option value="Camino Truncado">Camino Truncado</option>
+                <option value="Puente Alto">Puente Alto</option>
+                <option value="La Chimbera">La Chimbera</option>
+              </optgroup>
+            </select>
+          </div>
+          <!-- Faena Filter -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <select id="chart-filter-faena" class="form-select" style="font-size: 0.75rem; padding: 4px 8px; width: 150px; background: var(--bg-tertiary);">
+              <option value="">🚜 Todas las Faenas</option>
+            </select>
+          </div>
+          <!-- Labor Filter -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <select id="chart-filter-labor" class="form-select" style="font-size: 0.75rem; padding: 4px 8px; width: 150px; background: var(--bg-tertiary);">
+              <option value="">📝 Todas las Labores</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style="height: 350px; position: relative;">
+        <canvas id="chart-jornadas-consumidas"></canvas>
+      </div>
+    </div>
+
+    <!-- Eficiencia por Finca Section -->
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-6);">🚜 Eficiencia Laboral por Finca</h3>
+
+    <div class="dashboard-grid animate-fade-in animate-delay-1" style="margin-bottom: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+        ${efficiencyStats.groups.map(g => `
+            <div class="metric-card" style="border-left: 4px solid ${g.name === 'Fincas Viejas' ? 'var(--color-primary-500)' : 'var(--color-accent-500)'}; padding: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <div class="metric-label" style="font-size: 1.1em; color: var(--text-primary);">${g.name}</div>
+                    <div style="font-size: 0.8em; color: var(--text-tertiary);">${fmtDec(g.area)} Ha</div>
+                </div>
+                <div class="metric-value" style="font-size: 2.5em; color: ${g.name === 'Fincas Viejas' ? 'var(--color-primary-600)' : 'var(--color-accent-600)'};">
+                    ${fmtDec(g.efficiency)} <small style="font-size: 0.4em; color: var(--text-tertiary);">Jor/Ha</small>
+                </div>
+                <div style="display: flex; gap: var(--space-4); margin-top: var(--space-4);">
+                    <div>
+                        <div style="font-size: 0.8em; color: var(--text-tertiary);">Costo Promedio (ARS)</div>
+                        <div style="font-size: 1.2em; font-weight: 600; color: var(--text-primary);">${fmtMoney(g.avgCostArs)}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8em; color: var(--text-tertiary);">Costo Promedio (USD)</div>
+                        <div style="font-size: 1.2em; font-weight: 600; color: var(--color-success);">$${fmtDec(g.avgCostUsd)}</div>
+                    </div>
+                </div>
+                <p style="color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4); padding-top: var(--space-2); border-top: 1px solid var(--border-subtle);">Total Jornadas: ${fmt(g.jornales)}</p>
+                <div style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
+                    ${efficiencyStats.predios.filter(p => p.group === g.name).map(p => `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2); font-size: 0.9em;">
+                            <span>${p.name}</span>
+                            <span style="font-weight: 600;">${fmtDec(p.efficiency)} <span style="font-size: 0.8em; opacity: 0.7;">J/Ha</span></span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('')}
+    </div>
+
+    <!-- Historical Evolution Chart -->
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-6);">📅 Evolución Comparativa de Ciclos</h3>
+    <div class="data-table-container animate-fade-in animate-delay-2" style="padding: var(--space-6);">
+        <div style="height: 300px; position: relative;">
+            <canvas id="chart-jornales-historico"></canvas>
+        </div>
+        <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
+            Comparación de consumo de Jornales mes a mes (May-Abr) entre ciclos productivos desde 2021.
+        </p>
+    </div>
+
+
+
+    <div class="data-table-container animate-fade-in animate-delay-3">
+      <div class="table-header" style="justify-content: space-between;">
+        <h3 style="display: flex; align-items: center; gap: var(--space-3);">
+          💲 Costo Total por Predio
+          <select id="table-jornales-cycle" class="form-select" style="font-size: 0.8em; padding: 4px 8px; width: auto; background: var(--bg-secondary);">
+            ${cycles.map(c => `<option value="${c}" ${c === currentCycle ? 'selected' : ''}>${c}</option>`).join('')}
+          </select>
+        </h3>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Finca</th>
+            <th>Predio</th>
+            <th style="text-align: right;">Costo Total (ARS)</th>
+            <th style="text-align: right;">Costo Total (USD)</th>
+            <th style="text-align: right;">Jornadas</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${efficiencyStats.predios.slice().sort((a, b) => b.costoArs - a.costoArs).map(p => `
+              <tr>
+                <td><span style="font-size: 0.9em; color: var(--text-tertiary);">${p.group}</span></td>
+                <td><strong>${p.name}</strong></td>
+                <td style="text-align: right; color: var(--color-primary-500); font-weight: 600;">${fmtMoney(p.costoArs)}</td>
+                <td style="text-align: right; color: #22c55e; font-weight: 600;">US${fmtMoney(p.costoUsd || 0)}</td>
+                <td style="text-align: right;">${fmt(p.jornales)}</td>
+              </tr>
+            `).join('')}
+        </tbody>
+        <tfoot style="background: var(--bg-glass); font-weight: 700;">
+          <tr>
+            <td colspan="2">TOTAL</td>
+            <td style="text-align: right; color: var(--color-primary-600);">${fmtMoney(efficiencyStats.predios.reduce((acc, p) => acc + p.costoArs, 0))}</td>
+            <td style="text-align: right; color: #16a34a;">US${fmtMoney(efficiencyStats.predios.reduce((acc, p) => acc + (p.costoUsd || 0), 0))}</td>
+            <td style="text-align: right;">${fmt(efficiencyStats.predios.reduce((acc, p) => acc + p.jornales, 0))}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  `;
+}
+
+export function renderHectareasPorPredio(hectareasData) {
+  const fmtDec = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(v);
+  const fmtNum = (v) => new Intl.NumberFormat('es-AR').format(v);
+
+  const groupColors = {
+    'El Espejo': { accent: 'var(--color-accent-500)', bg: 'rgba(168, 85, 247, 0.1)', gradient: 'linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(168, 85, 247, 0.05))' },
+    'Fincas Viejas': { accent: 'var(--color-primary-500)', bg: 'rgba(59, 130, 246, 0.1)', gradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05))' }
+  };
+
+  return `
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-6); display: flex; align-items: center; gap: var(--space-3);">
+      📊 Superficie por Predio (Clasificación)
+    </h3>
+
+    <!-- Summary Cards -->
+    <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+      <div class="metric-card" style="padding: var(--space-5);">
+        <div class="metric-card-header"><div class="metric-card-icon green">🌿</div></div>
+        <div class="metric-value" style="font-size: 2em;">${fmtDec(hectareasData.grandTotalHa)} <small style="font-size: 0.4em; color: var(--text-tertiary);">Ha</small></div>
+        <div class="metric-label">Superficie Total</div>
+      </div>
+      <div class="metric-card" style="padding: var(--space-5);">
+        <div class="metric-card-header"><div class="metric-card-icon blue">📍</div></div>
+        <div class="metric-value" style="font-size: 2em;">${fmtNum(hectareasData.grandTotalCuarteles)}</div>
+        <div class="metric-label">Cuarteles</div>
+      </div>
+      <div class="metric-card" style="padding: var(--space-5);">
+        <div class="metric-card-header"><div class="metric-card-icon purple">🌱</div></div>
+        <div class="metric-value" style="font-size: 2em;">${fmtNum(hectareasData.grandTotalPlantas)}</div>
+        <div class="metric-label">Plantas Totales</div>
+      </div>
+    </div>
+
+    <!-- Detail Table per Finca Group -->
+    <div class="dashboard-grid animate-fade-in animate-delay-1" style="grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-8);">
+      ${hectareasData.groups.map(g => {
+    const colors = groupColors[g.name] || groupColors['El Espejo'];
+    return `
+        <div class="data-table-container" style="padding: var(--space-6); border-left: 4px solid ${colors.accent};">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5);">
+            <h4 style="font-family: 'Outfit'; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-2);">
+              ${g.name === 'El Espejo' ? '🏔️' : '🏡'} ${g.name}
+            </h4>
+            <div style="background: ${colors.bg}; color: ${colors.accent}; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
+              ${fmtDec(g.totalHa)} Ha
+            </div>
+          </div>
+          <table class="data-table" style="margin: 0;">
+            <thead>
+              <tr>
+                <th>Predio</th>
+                <th style="text-align: center;">Cuarteles</th>
+                <th style="text-align: right;">Hectáreas</th>
+                <th style="text-align: right;">Plantas</th>
+                <th style="text-align: center; min-width: 100px;">% Superficie</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${g.predios.map(p => {
+                const pct = g.totalHa > 0 ? (p.hectareas / g.totalHa * 100) : 0;
+                return `
+                <tr>
+                  <td><strong>${p.name}</strong></td>
+                  <td style="text-align: center;">${fmtNum(p.cuarteles)}</td>
+                  <td style="text-align: right; color: ${colors.accent}; font-weight: 600;">${fmtDec(p.hectareas)}</td>
+                  <td style="text-align: right;">${fmtNum(p.plantas)}</td>
+                  <td style="text-align: center;">
+                    <div style="display: flex; align-items: center; gap: var(--space-2); justify-content: center;">
+                      <div style="flex: 1; height: 6px; background: var(--bg-glass); border-radius: var(--radius-full); overflow: hidden; max-width: 80px;">
+                        <div style="height: 100%; width: ${pct}%; background: ${colors.accent}; border-radius: var(--radius-full); transition: width 0.6s ease;"></div>
+                      </div>
+                      <span style="font-size: 0.8em; color: var(--text-tertiary); min-width: 36px;">${fmtDec(pct)}%</span>
+                    </div>
+                  </td>
+                </tr>
+                `;
+              }).join('')}
+            </tbody>
+            <tfoot style="background: ${colors.bg}; font-weight: 700;">
+              <tr>
+                <td>Subtotal</td>
+                <td style="text-align: center;">${fmtNum(g.totalCuarteles)}</td>
+                <td style="text-align: right; color: ${colors.accent};">${fmtDec(g.totalHa)}</td>
+                <td style="text-align: right;">${fmtNum(g.totalPlantas)}</td>
+                <td style="text-align: center; font-size: 0.85em;">100%</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        `;
+  }).join('')}
+    </div>
+
+    <!-- Detalle por Cuartel -->
+    <div class="data-table-container animate-fade-in animate-delay-2" style="margin-top: var(--space-8);">
+      <div class="table-header">
+        <h3>📓 Detalle de Plantación por Cuartel</h3>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="data-table" id="table-plantacion-detalle">
+          <thead>
+            <tr>
+              <th>Finca</th>
+              <th>Predio</th>
+              <th>Cuartel</th>
+              <th style="text-align: right;">Ha</th>
+              <th style="text-align: right;">Plantas</th>
+              <th style="text-align: right;">Pl/Ha</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${hectareasData.groups.flatMap(g => 
+              g.predios.flatMap(p => 
+                (p.cuartelesList || []).map(c => `
+                  <tr>
+                    <td><span style="font-size: 0.85em; color: var(--text-tertiary);">${g.name}</span></td>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${c.numero}</td>
+                    <td style="text-align: right;">${fmtDec(c.ha)}</td>
+                    <td style="text-align: right;">${fmtNum(c.pl)}</td>
+                    <td style="text-align: right; color: var(--color-primary-400); font-weight: 600;">
+                      ${c.ha > 0 ? fmtNum(Math.round(c.pl / c.ha)) : '0'}
+                    </td>
+                  </tr>
+                `)
+              )
+            ).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+export function renderEficienciaChartSection(hectareasData) {
+  // Build list of all predios for the filter
+  const allPredios = hectareasData.groups.flatMap(g => g.predios.map(p => p.name));
+
+  return `
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+      <h3 style="font-family: 'Outfit'; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-3); margin: 0;">
+        📊 Eficiencia de Jornales por Hectárea
+      </h3>
+      <div style="display: flex; align-items: center; gap: var(--space-3);">
+        <label class="form-label" style="margin: 0; white-space: nowrap; font-size: 0.85em;">Clasificación:</label>
+        <select class="form-select sofia-filter-select" id="filter-eficiencia-clasificacion" style="min-width: 180px; padding: 6px 12px; font-size: 0.85em;">
+          <option value="">Todas</option>
+          ${allPredios.map(p => `<option value="${p}">${p}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="data-table-container animate-fade-in" style="padding: var(--space-6);">
+        <div style="height: 320px; position: relative;">
+            <canvas id="chart-jornales-eficiencia-historico"></canvas>
+        </div>
+        <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
+            Evolución de Intensidad Laboral (Jornales/Ha) por mes entre ciclos productivos.
+            <span id="eficiencia-filter-label" style="font-weight: 600; color: var(--color-accent-400);"></span>
+        </p>
+    </div>
+  `;
+}
+
+export function renderInformeParametros(fincas, variedades, aplicaciones) {
+  return `
+    <div class="dashboard-grid animate-fade-in" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon green">🏘️</div>
+        </div>
+        <div class="metric-value">${fincas.length}</div>
+        <div class="metric-label">Fincas Registradas</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon purple">🍇</div>
+        </div>
+        <div class="metric-value">${variedades.length}</div>
+        <div class="metric-label">Variedades de Uva</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon amber">🧪</div>
+        </div>
+        <div class="metric-value">${aplicaciones.length}</div>
+        <div class="metric-label">Aplicaciones Registradas</div>
+      </div>
+    </div>
+
+    <div class="charts-row animate-fade-in animate-delay-1">
+      <div class="data-table-container">
+        <div class="table-header">
+          <h3>Fincas y Superficie</h3>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Finca</th>
+              <th>Hectáreas</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${fincas.map(f => `
+              <tr>
+                <td><strong>${f.name}</strong></td>
+                <td>${f.hectares} ha</td>
+                <td>
+                  <span class="status-badge ${f.status === 'active' ? 'active' : 'inactive'}">
+                    <span class="status-dot"></span>
+                    ${f.status === 'active' ? 'Activa' : 'Inactiva'}
+                  </span>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="data-table-container">
+        <div class="table-header">
+          <h3>Últimas Aplicaciones</h3>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Dosis</th>
+              <th>Predio</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${aplicaciones.map(a => `
+              <tr>
+                <td><strong>${a.product}</strong></td>
+                <td>${a.dose}</td>
+                <td>${a.predio}</td>
+                <td>
+                  <span class="status-badge ${a.status === 'applied' ? 'active' : a.status === 'pending' ? 'pending' : 'inactive'}">
+                    <span class="status-dot"></span>
+                    ${a.status === 'applied' ? 'Aplicado' : a.status === 'pending' ? 'Pendiente' : 'Programado'}
+                  </span>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ── Aplicaciones View ──
+export function renderAplicacionesView(aplicaciones) {
+  return `
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>Aplicaciones Fitosanitarias</h3>
+        <div class="table-actions">
+          <button class="btn btn-primary btn-sm" id="btn-add-aplicacion">+ Nueva Aplicación</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Dosis</th>
+            <th>Predio</th>
+            <th>Fecha</th>
+            <th>Ingeniero</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${aplicaciones.map(a => `
+            <tr>
+              <td><strong>${a.product}</strong></td>
+              <td>${a.dose}</td>
+              <td>${a.predio}</td>
+              <td>${formatDate(a.date)}</td>
+              <td>${a.engineer}</td>
+              <td>
+                <span class="status-badge ${a.status === 'applied' ? 'active' : a.status === 'pending' ? 'pending' : 'inactive'}">
+                  <span class="status-dot"></span>
+                  ${a.status === 'applied' ? 'Aplicado' : a.status === 'pending' ? 'Pendiente' : 'Programado'}
+                </span>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── Presupuesto Management View ──
+export function renderPresupuestoView(presupuestos) {
+  return `
+    <div class="chart-container animate-fade-in">
+      <div class="chart-header">
+        <span class="chart-title">Ejecución Presupuestaria</span>
+      </div>
+      <div class="chart-canvas-wrapper" style="height: 350px;">
+        <canvas id="chart-presupuesto-mgmt"></canvas>
+      </div>
+    </div>
+
+    <div class="data-table-container animate-fade-in animate-delay-1">
+      <div class="table-header">
+        <h3>Detalle de Presupuestos</h3>
+        <div class="table-actions">
+          <button class="btn btn-primary btn-sm" id="btn-add-presupuesto">+ Nuevo Presupuesto</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Mes</th>
+            <th>Categoría</th>
+            <th>Presupuestado</th>
+            <th>Ejecutado</th>
+            <th>% Ejecución</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${presupuestos.map(p => {
+    const pct = Math.round((p.executed / p.planned) * 100);
+    return `
+              <tr>
+                <td>${p.month}</td>
+                <td><strong>${p.category}</strong></td>
+                <td>$${formatCurrency(p.planned)}</td>
+                <td>$${formatCurrency(p.executed)}</td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: var(--space-3);">
+                    <div style="flex: 1; height: 6px; background: var(--bg-glass); border-radius: var(--radius-full); overflow: hidden; max-width: 100px;">
+                      <div style="height: 100%; width: ${Math.min(pct, 100)}%; background: ${pct > 100 ? 'var(--color-error)' : 'var(--color-primary-500)'}; border-radius: var(--radius-full);"></div>
+                    </div>
+                    <span style="font-size: var(--text-xs); color: ${pct > 100 ? 'var(--color-error)' : 'var(--text-secondary)'};">${pct}%</span>
+                  </div>
+                </td>
+              </tr>
+            `;
+  }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// renderUsuariosView movida al final del archivo
+
+export function renderCosechaDashboard(stats, userRole = 'Administrador') {
+  const formatKg = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
+  const isAdmin = userRole === 'Administrador';
+
+  return `
+    <!-- Power BI Embed -->
+    <div style="width: 100%; height: 800px; margin-bottom: var(--space-8); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+        <iframe title="Cosecha 2026" width="100%" height="100%" src="https://app.powerbi.com/view?r=eyJrIjoiNTRjODBhMzktYTQzOC00MDQzLTgxYzktODM4ZmFmZWNjYWI3IiwidCI6ImNmMDc4MjNiLTc3NjAtNGYwZS05OTA0LWZjYmZhOTViZGE4NSJ9" frameborder="0" allowFullScreen="true" loading="lazy"></iframe>
+    </div>
+
+    <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6);">
+      <!-- Metric Cards -->
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon purple">🍇</div>
+        </div>
+        <div class="metric-value">${formatKg(stats.totalKilos)} <small style="font-size: 0.5em; color: var(--text-tertiary);">kg</small></div>
+        <div class="metric-label">TOTAL COSECHADO</div>
+        <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Todas las fincas</p>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon green">🗺️</div>
+        </div>
+        <div class="metric-value">${stats.cuartelesCosechados}</div>
+        <div class="metric-label">CUARTELES COSECHADOS</div>
+        <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Con actividad de cosecha</p>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon amber">🌿</div>
+        </div>
+        <div class="metric-value">${stats.totalVariedades}</div>
+        <div class="metric-label">VARIEDADES</div>
+        <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Tipos de uva cosechados</p>
+      </div>
+
+
+    </div>
+
+    <!-- Lists Row -->
+    <div class="dashboard-grid animate-fade-in animate-delay-1" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-6);">
+      
+      <!-- Rendimiento por Finca -->
+      <div class="data-table-container" style="padding: var(--space-6);">
+        <h4 style="margin-bottom: var(--space-6); font-family: 'Outfit'; display: flex; align-items: center; gap: var(--space-2);">
+          🚜 Rendimiento por Finca
+        </h4>
+        <div class="list-container">
+          ${stats.fincas.map(f => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="font-weight: 500;">${f.name}</span>
+              <span style="color: var(--color-primary-400); font-weight: 700;">${formatKg(f.kg)} <small style="font-weight: 400; opacity: 0.7;">kg</small></span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Rendimiento por Predio -->
+      <div class="data-table-container" style="padding: var(--space-6);">
+        <h4 style="margin-bottom: var(--space-6); font-family: 'Outfit'; display: flex; align-items: center; gap: var(--space-2);">
+          📍 Rendimiento por Predio
+        </h4>
+        <div class="list-container">
+          ${stats.predios.map(p => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="font-weight: 500;">${p.name}</span>
+              <span style="color: var(--color-secondary-400); font-weight: 700;">${formatKg(p.kg)} <small style="font-weight: 400; opacity: 0.7;">kg</small></span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Rendimiento por Cuartel -->
+      <div class="data-table-container" style="padding: var(--space-6);">
+        <h4 style="margin-bottom: var(--space-6); font-family: 'Outfit'; display: flex; align-items: center; gap: var(--space-2);">
+          📖 Rendimiento por Cuartel
+        </h4>
+        <div class="list-container">
+          ${stats.cuarteles.map(c => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="font-weight: 500; font-size: var(--text-sm);">${c.name}</span>
+              <span style="color: var(--color-accent-400); font-weight: 700;">${formatKg(c.kg)} <small style="font-weight: 400; opacity: 0.7;">kg</small></span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Rendimiento por Variedad -->
+      <div class="data-table-container" style="padding: var(--space-6);">
+        <h4 style="margin-bottom: var(--space-6); font-family: 'Outfit'; display: flex; align-items: center; gap: var(--space-2);">
+          🍇 Rendimiento por Variedad
+        </h4>
+        <div class="list-container">
+          ${stats.variedades.map(v => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="font-weight: 500;">${v.name}</span>
+              <span style="color: var(--color-amber-400); font-weight: 700;">${formatKg(v.kg)} <small style="font-weight: 400; opacity: 0.7;">kg</small></span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Origen Analysis -->
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    
+    <h4 style="margin-bottom: var(--space-4); font-family: 'Outfit'; color: var(--text-secondary);">📦 Origen de Uva</h4>
+    
+    <div class="dashboard-grid animate-fade-in animate-delay-2" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6);">
+        <div class="metric-card" style="border-left: 4px solid var(--color-primary-500); padding: var(--space-6);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+                <div class="metric-label" style="font-size: 1.1em; color: var(--text-primary);">🏠 Uva Propia</div>
+                <div style="background: var(--color-primary-500); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75em; font-weight: 600;">INTERNO</div>
+            </div>
+            <div class="metric-value" style="color: var(--color-primary-600); font-size: 2.5em;">${formatKg(stats.origen.propia)} <small style="font-size: 0.4em; color: var(--text-tertiary);">kg</small></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid rgba(0,0,0,0.05);">
+                <span style="font-size: 0.85em; color: var(--text-secondary);">Rendimiento Propio:</span>
+                <span style="font-weight: 700; color: var(--color-primary-500);">${formatKg(stats.origen.promedioPropia)} <small style="font-weight: 400; font-size: 0.8em;">kg/ha</small></span>
+            </div>
+            <p style="color: var(--text-tertiary); font-size: 0.85em; margin-top: var(--space-2);">Camino Truncado, EEI-III, La Chimbera, Puente Alto</p>
+        </div>
+        <div class="metric-card" style="border-left: 4px solid var(--color-accent-500); padding: var(--space-6);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+                <div class="metric-label" style="font-size: 1.1em; color: var(--text-primary);">🤝 Uva Terceros</div>
+                <div style="background: var(--color-accent-500); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75em; font-weight: 600;">EXTERNO</div>
+            </div>
+            <div class="metric-value" style="color: var(--color-accent-600); font-size: 2.5em;">${formatKg(stats.origen.terceros)} <small style="font-size: 0.4em; color: var(--text-tertiary);">kg</small></div>
+            <p style="color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-2);">Compra de uva a terceros</p>
+        </div>
+    </div>
+    
+    <!-- Rendimiento por Predio Chart -->
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+        <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📊 Rendimiento Promedio por Predio (Kg/Ha) <span id="label-rendimiento-ciclo" style="opacity: 0.7; font-size: 0.85em;"></span></h4>
+        <div class="filter-group" style="margin: 0;">
+            <select class="form-select sofia-filter-select" id="filter-cosecha-rendimiento-ciclo" style="padding: 4px 12px; font-size: 0.9em; min-width: 150px;">
+                <option value="2025-2026">2025-2026</option>
+                <option value="2024-2025">2024-2025</option>
+                <option value="2023-2024">2023-2024</option>
+                <option value="2022-2023">2022-2023</option>
+                <option value="2021-2022">2021-2022</option>
+                <option value="2020-2021">2020-2021</option>
+                <option value="2019-2020">2019-2020</option>
+                <option value="2018-2019">2018-2019</option>
+                <option value="2017-2018">2017-2018</option>
+                <option value="2016-2017">2016-2017</option>
+                <option value="2015-2016">2015-2016</option>
+                <option value="2014-2015">2014-2015</option>
+                <option value="2013-2014">2013-2014</option>
+                <option value="2012-2013">2012-2013</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="data-table-container animate-fade-in animate-delay-2" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+        <div style="height: 350px; position: relative;">
+            <canvas id="chart-cosecha-rendimiento-predio"></canvas>
+        </div>
+        <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
+            Promedio de kilogramos cosechados en fresco por hectárea según clasificación.
+        </p>
+    </div>
+
+    <!-- Evolución de Rendimiento Chart -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); margin-top: var(--space-8);">
+        <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📈 Evolución de Producción por Ciclo (Kg Totales)</h4>
+    </div>
+    <div class="data-table-container animate-fade-in animate-delay-3" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+        <div style="height: 350px; position: relative;">
+            <canvas id="chart-cosecha-evolucion-rendimiento"></canvas>
+        </div>
+        <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
+            Comparativa histórica del total cosechado (Kg fresco) por ciclo productivo para cada predio.
+        </p>
+    </div>
+
+    
+    <!-- Historical Harvest Chart -->
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+        <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📅 Evolución Histórica de Cosecha</h4>
+        <div class="filter-group" style="margin: 0;">
+            <select class="form-select sofia-filter-select" id="filter-cosecha-historico-origen" style="padding: 4px 12px; font-size: 0.9em; min-width: 150px;">
+                <option value="">Todo Origen</option>
+                <option value="propia">🍇 Propia</option>
+                <option value="terceros">🤝 Terceros</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="data-table-container animate-fade-in animate-delay-3" style="padding: var(--space-6);">
+        <div style="height: 300px; position: relative;">
+            <canvas id="chart-cosecha-historico"></canvas>
+        </div>
+        <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
+            Total de Kg Cosechados por Ciclo Productivo.
+        </p>
+    </div>
+    `;
+}
+
+export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentCiclo = '2025-2026') {
+  const fmt = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
+  const passes = [1, 2, 3, 4, 5];
+  const groupColors = {
+    'El Espejo': { accent: 'var(--color-accent-500)', bg: 'rgba(168, 85, 247, 0.08)' },
+    'Fincas Viejas': { accent: 'var(--color-primary-500)', bg: 'rgba(59, 130, 246, 0.08)' }
+  };
+  const globalFactor = clStats.grandTotalLevantado > 0 ? (clStats.grandTotalCosecha / clStats.grandTotalLevantado) : 0;
+
+  const getFColor = (f) => f > 0 ? (f <= 4.4 ? '#10b981' : '#ef4444') : '#f59e0b';
+  const getFBg = (f) => f > 0 ? (f <= 4.4 ? 'rgba(16, 185, 129, 0.06)' : 'rgba(239, 68, 68, 0.06)') : 'rgba(245, 158, 11, 0.06)';
+  const getFBadge = (f) => f > 0 ? (f <= 4.4 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)') : 'rgba(245, 158, 11, 0.1)';
+
+  return `
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    </div>
+
+
+
+    <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+      <div class="metric-card" style="padding: var(--space-5); border-left: 4px solid var(--color-primary-500);">
+        <div class="metric-card-header"><div class="metric-card-icon green">🍇</div></div>
+        <div class="metric-value" style="font-size: 1.8em;">${fmt(clStats.grandTotalCosecha)} <small style="font-size: 0.35em; color: var(--text-tertiary);">kg</small></div>
+        <div class="metric-label">Total Cosecha en Fresco</div>
+      </div>
+      <div class="metric-card" style="padding: var(--space-5); border-left: 4px solid var(--color-accent-500);">
+        <div class="metric-card-header"><div class="metric-card-icon purple">🫘</div></div>
+        <div class="metric-value" style="font-size: 1.8em;">${fmt(clStats.grandTotalLevantado)} <small style="font-size: 0.35em; color: var(--text-tertiary);">kg</small></div>
+        <div class="metric-label">Total Levantado (Pasa)</div>
+      </div>
+      <div class="metric-card" style="padding: var(--space-5); border-left: 4px solid ${getFColor(globalFactor)};">
+        <div class="metric-card-header"><div class="metric-card-icon amber" style="background:${getFBadge(globalFactor)}; color:${getFColor(globalFactor)};">⚖️</div></div>
+        <div class="metric-value" style="font-size: 1.8em; color: ${getFColor(globalFactor)};">${globalFactor.toFixed(2)}</div>
+        <div class="metric-label">Factor de Reducción Global</div>
+      </div>
+    </div>
+
+    <!-- EVOLUCIÓN PASA CHART -->
+    <div class="data-table-container animate-fade-in animate-delay-1" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+            <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📈 Cosecha Fresco vs Levantado Pasa (Por Predio - Sólo Producción Propia)</h4>
+        </div>
+        <div style="height: 350px; position: relative;">
+            <canvas id="chart-cosecha-pasa-evolucion"></canvas>
+        </div>
+        <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
+            Comparativa agregada por predio de cosecha en fresco y pasa. Incluye exclusivamente kilos de los 6 predios principales.
+        </p>
+    </div>
+
+    ${clStats.groups.map(g => {
+    const colors = groupColors[g.name] || groupColors['El Espejo'];
+    if (g.predios.length === 0) return '';
+    const gFactor = g.totalLevantado > 0 ? (g.totalCosecha / g.totalLevantado) : 0;
+    return `
+      <div class="data-table-container animate-fade-in animate-delay-1" style="padding: var(--space-6); border-left: 4px solid ${colors.accent}; margin-bottom: var(--space-6);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3);">
+          <h4 style="font-family: 'Outfit'; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-2); margin: 0;">
+            ${g.name === 'El Espejo' ? '🏔️' : '🏡'} ${g.name}
+          </h4>
+          <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+            <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">🍇 ${fmt(g.totalCosecha)} kg</div>
+            <div style="background: rgba(168, 85, 247, 0.1); color: var(--color-accent-400); padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">🫘 ${fmt(g.totalLevantado)} kg</div>
+            <div style="background: ${getFBadge(gFactor)}; color: ${getFColor(gFactor)}; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">⚖️ Factor: ${gFactor.toFixed(2)}</div>
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="data-table" style="margin: 0; min-width: 850px;">
+            <thead>
+              <tr>
+                <th style="vertical-align: middle; min-width: 120px;">Predio</th>
+                <th style="vertical-align: middle; min-width: 70px;">Tipo</th>
+                ${passes.map(n => '<th style="text-align: right; font-size: 0.85em;">' + n + '° Pasada</th>').join('')}
+                <th style="text-align: right;">Total</th>
+                <th style="text-align: center; min-width: 80px; background: rgba(245, 158, 11, 0.06);">Factor</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${g.predios.map(p => {
+      const pFactor = p.totalLevantado > 0 ? (p.totalCosecha / p.totalLevantado) : 0;
+      return '<tr style="border-bottom: none;">' +
+        '<td rowspan="3" style="vertical-align: middle; border-bottom: 2px solid var(--border-subtle);"><strong>' + p.name + '</strong></td>' +
+        '<td style="font-size: 0.8em; color: #10b981; font-weight: 600;">🍇 Fresco</td>' +
+        p.cosecha.map(v => '<td style="text-align: right; ' + (v > 0 ? 'color: #10b981; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;') + '">' + (v > 0 ? fmt(v) : '—') + '</td>').join('') +
+        '<td style="text-align: right; font-weight: 700; color: #059669;">' + fmt(p.totalCosecha) + '</td>' +
+        '<td rowspan="3" style="text-align: center; vertical-align: middle; font-size: 1.3em; font-weight: 800; color: ' + getFColor(pFactor) + '; background: ' + getFBg(pFactor) + '; border-bottom: 2px solid var(--border-subtle);">' + pFactor.toFixed(2) + '</td>' +
+        '</tr>' +
+        '<tr style="border-bottom: none;">' +
+        '<td style="font-size: 0.8em; color: var(--color-accent-400); font-weight: 600;">🫘 Pasa</td>' +
+        p.levantado.map(v => '<td style="text-align: right; ' + (v > 0 ? 'color: var(--color-accent-400); font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;') + '">' + (v > 0 ? fmt(v) : '—') + '</td>').join('') +
+        '<td style="text-align: right; font-weight: 700; color: var(--color-accent-500);">' + fmt(p.totalLevantado) + '</td>' +
+        '</tr>' +
+        '<tr style="border-bottom: 2px solid var(--border-subtle);">' +
+        '<td style="font-size: 0.8em; color: #f59e0b; font-weight: 600;">⚖️ Factor</td>' +
+        p.cosecha.map((c, i) => {
+          const l = p.levantado[i];
+          const f = l > 0 ? (c / l) : 0;
+          const hasData = c > 0 && l > 0;
+          return '<td style="text-align: right; ' + (hasData ? 'color: ' + getFColor(f) + '; font-weight: 700;' : 'color: var(--text-tertiary); opacity: 0.5;') + '">' + (hasData ? f.toFixed(2) : '—') + '</td>';
+        }).join('') +
+        '<td style="text-align: right; font-weight: 700; color: ' + getFColor(pFactor) + ';">' + (pFactor > 0 ? pFactor.toFixed(2) : '—') + '</td>' +
+        '</tr>';
+    }).join('')}
+            </tbody>
+            <tfoot style="background: ${colors.bg}; font-weight: 700;">
+              <tr style="border-bottom: none;">
+                <td rowspan="3" style="vertical-align: middle;">Subtotal</td>
+                <td style="font-size: 0.8em;">🍇</td>
+                ${g.cosechaPasses.map(v => '<td style="text-align: right; color: #10b981;">' + (v > 0 ? fmt(v) : '—') + '</td>').join('')}
+                <td style="text-align: right; color: #059669;">${fmt(g.totalCosecha)}</td>
+                <td rowspan="3" style="text-align: center; vertical-align: middle; font-size: 1.3em; font-weight: 800; color: ${getFColor(gFactor)};">${gFactor.toFixed(2)}</td>
+              </tr>
+              <tr style="border-bottom: none;">
+                <td style="font-size: 0.8em;">🫘</td>
+                ${g.levantadoPasses.map(v => '<td style="text-align: right; color: var(--color-accent-500);">' + (v > 0 ? fmt(v) : '—') + '</td>').join('')}
+                <td style="text-align: right; color: var(--color-accent-600);">${fmt(g.totalLevantado)}</td>
+              </tr>
+              <tr>
+                <td style="font-size: 0.8em;">⚖️</td>
+                ${g.cosechaPasses.map((c, i) => {
+      const l = g.levantadoPasses[i];
+      const f = l > 0 ? (c / l) : 0;
+      return '<td style="text-align: right; color: ' + (c > 0 && l > 0 ? getFColor(f) : '#f59e0b') + ';">' + (c > 0 && l > 0 ? f.toFixed(2) : '—') + '</td>';
+    }).join('')}
+                <td style="text-align: right; color: ${getFColor(gFactor)};">${gFactor > 0 ? gFactor.toFixed(2) : '—'}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>`;
+  }).join('')}
+  `;
+}
+
+export function renderLevantadoPorPlaya(playaStats) {
+  const fmt = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
+  const fmtDec = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(v);
+
+  if (!playaStats || playaStats.playas.length === 0) {
+    return `
+      <div class="data-table-container animate-fade-in" style="padding: var(--space-6); margin-top: var(--space-6); border-left: 4px solid #f97316;">
+        <h4 style="font-family: 'Outfit'; color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-2);">
+          🏖️ Levantado por Playa de Secadero
+        </h4>
+        <p style="color: var(--text-tertiary); font-size: 0.9em;">No se encontraron registros de levantado con playa de secadero asignada para este ciclo.</p>
+      </div>`;
+  }
+
+  const fincaNames = Object.keys(playaStats.byFinca).sort();
+  
+  // Find all unique pass numbers across all playas (both levantado and cosecha)
+  const allPasses = new Set();
+  playaStats.playas.forEach(p => {
+    Object.keys(p.pasadas).forEach(k => allPasses.add(parseInt(k)));
+    Object.keys(p.cosechaPasadas || {}).forEach(k => allPasses.add(parseInt(k)));
+  });
+  const passes = Array.from(allPasses).sort((a, b) => a - b);
+
+  const fincaColors = {
+    'Fincas Viejas': { accent: 'var(--color-primary-500)', bg: 'rgba(59, 130, 246, 0.08)', icon: '🏡' },
+    'El Espejo': { accent: 'var(--color-accent-500)', bg: 'rgba(168, 85, 247, 0.08)', icon: '🏔️' }
+  };
+
+  const predioColors = [
+    'rgba(16, 185, 129, 0.1)',   // green
+    'rgba(59, 130, 246, 0.1)',   // blue
+    'rgba(168, 85, 247, 0.1)',   // purple
+    'rgba(245, 158, 11, 0.1)',   // amber
+    'rgba(236, 72, 153, 0.1)',   // pink
+    'rgba(6, 182, 212, 0.1)'    // cyan
+  ];
+  const predioTextColors = [
+    '#10b981', '#3b82f6', '#a855f7', '#f59e0b', '#ec4899', '#06b6d4'
+  ];
+
+  // Compute global factor 
+  const globalFactor = playaStats.grandTotalKg > 0 && playaStats.grandTotalKgFresco > 0 
+    ? (playaStats.grandTotalKgFresco / playaStats.grandTotalKg) : 0;
+
+  const getFColor = (f) => f > 0 ? (f <= 4.4 ? '#10b981' : '#ef4444') : '#f59e0b';
+  const getFBg = (f) => f > 0 ? (f <= 4.4 ? 'rgba(16, 185, 129, 0.06)' : 'rgba(239, 68, 68, 0.06)') : 'rgba(245, 158, 11, 0.06)';
+  const getFBadge = (f) => f > 0 ? (f <= 4.4 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)') : 'rgba(245, 158, 11, 0.1)';
+
+  return `
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    <div style="margin-bottom: var(--space-4);">
+      <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-3);">
+        🏖️ Levantado por Playa de Secadero
+      </h3>
+      <p style="color: var(--text-tertiary); font-size: 0.85em; margin: 0;">
+        Detalle de las playas (secaderos) donde se tiende la pasa, agrupado por finca y predio. Total general: <strong style="color: var(--color-accent-400);">${fmt(playaStats.grandTotalKg)} kg</strong>
+        ${playaStats.grandTotalKgFresco > 0 ? ` · Cosecha Fresco: <strong style="color: #10b981;">${fmt(playaStats.grandTotalKgFresco)} kg</strong>` : ''}
+        ${globalFactor > 0 ? ` · Factor Global: <strong style="color: ${getFColor(globalFactor)};">${globalFactor.toFixed(2)}</strong>` : ''}
+      </p>
+    </div>
+
+    ${fincaNames.map(fincaName => {
+      const fData = playaStats.byFinca[fincaName];
+      const colors = fincaColors[fincaName] || fincaColors['Fincas Viejas'];
+      const fincaFactor = fData.totalKg > 0 && fData.totalKgFresco > 0 
+        ? (fData.totalKgFresco / fData.totalKg) : 0;
+      
+      // Group playas by predio within this finca
+      const byPredio = {};
+      fData.playas.forEach(p => {
+        const pName = p.predio || 'Sin Predio';
+        if (!byPredio[pName]) byPredio[pName] = { playas: [], totalKg: 0, totalKgFresco: 0 };
+        byPredio[pName].playas.push(p);
+        byPredio[pName].totalKg += p.kg;
+        byPredio[pName].totalKgFresco += (p.kgFresco || 0);
+      });
+      // Sort predios by name
+      const predioNames = Object.keys(byPredio).sort();
+
+      // Check if there's any cosecha data in this finca
+      const hasCosechaData = fData.totalKgFresco > 0;
+
+      return `
+      <div class="data-table-container animate-fade-in animate-delay-1" style="padding: var(--space-6); border-left: 4px solid ${colors.accent}; margin-bottom: var(--space-6);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3);">
+          <h4 style="font-family: 'Outfit'; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-2); margin: 0;">
+            ${colors.icon} ${fincaName}
+          </h4>
+          <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+            <div style="background: rgba(168, 85, 247, 0.1); color: var(--color-accent-400); padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
+              🫘 ${fmt(fData.totalKg)} kg total
+            </div>
+            ${hasCosechaData ? `
+            <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
+              🍇 ${fmt(fData.totalKgFresco)} kg fresco
+            </div>
+            <div style="background: ${getFBadge(fincaFactor)}; color: ${getFColor(fincaFactor)}; padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
+              ⚖️ Factor: ${fincaFactor.toFixed(2)}
+            </div>` : ''}
+            <div style="background: rgba(59, 130, 246, 0.1); color: var(--color-primary-400); padding: 4px 12px; border-radius: 12px; font-size: 0.8em; font-weight: 600;">
+              📍 ${fData.playas.length} playas · ${predioNames.length} predios
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="data-table" style="margin: 0; min-width: 750px;">
+            <thead>
+              <tr>
+                <th style="min-width: 180px;">Playa de Secadero</th>
+                <th style="min-width: 60px; font-size: 0.8em;">Tipo</th>
+                ${passes.map(n => `<th style="text-align: right; font-size: 0.8em; text-transform: uppercase; white-space: nowrap;">Pasada ${n}</th>`).join('')}
+                <th style="text-align: right;">Total Kg</th>
+                <th style="text-align: center; min-width: 70px; background: rgba(245, 158, 11, 0.06);">Factor</th>
+                <th style="text-align: right;">% del Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${predioNames.map((predioName, pi) => {
+                const pData = byPredio[predioName];
+                const pColor = predioTextColors[pi % predioTextColors.length];
+                const pBg = predioColors[pi % predioColors.length];
+                const predioPlayas = pData.playas.sort((a, b) => {
+                  if (fincaName === 'El Espejo' || fincaName === 'Fincas Viejas') {
+                    return a.nombre.localeCompare(b.nombre, undefined, { numeric: true });
+                  }
+                  return b.kg - a.kg;
+                });
+                const predioFactor = pData.totalKg > 0 && pData.totalKgFresco > 0 
+                  ? (pData.totalKgFresco / pData.totalKg) : 0;
+                
+                // Skip predio header/footer if it's El Espejo or a single predio matching finca name
+                const isSingleGroup = fincaName === 'El Espejo' || (predioNames.length === 1 && predioName === fincaName);
+
+                // Predio sub-header row
+                const predioHeader = isSingleGroup ? '' : `
+                <tr>
+                  <td colspan="${2 + passes.length + 3}" style="background: ${pBg}; padding: 8px 16px; border-bottom: 2px solid ${pColor}30;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                      <strong style="color: ${pColor}; font-size: 0.95em;">📋 ${predioName}</strong>
+                      <span style="color: ${pColor}; font-size: 0.8em; font-weight: 600;">${fmt(pData.totalKg)} kg · ${predioPlayas.length} playas</span>
+                    </div>
+                  </td>
+                </tr>`;
+                
+                // Playa rows for this predio - now with 2 rows per playa (Pasa + Fresco)
+                const playaRows = predioPlayas.map(playa => {
+                  const hasPlayaCosecha = (playa.kgFresco || 0) > 0;
+                  const hasPlayaPasaHumeda = (playa.kgPasaHumeda || 0) > 0;
+                  const totalPlayaKg = (playa.kg || 0);
+                  const playaRowsCount = 1 + (hasPlayaCosecha ? 1 : 0) + (hasPlayaPasaHumeda ? 1 : 0);
+
+                  const pct = playaStats.grandTotalKg > 0 ? (totalPlayaKg / playaStats.grandTotalKg * 100) : 0;
+                  const playaFactor = totalPlayaKg > 0 && playa.kgFresco > 0 
+                    ? (playa.kgFresco / totalPlayaKg) : 0;
+
+                  const borderStyle = (isLast) => isLast ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: none;';
+
+                  // Row 1: Levantado (Pasa)
+                  const isPasaLast = !hasPlayaCosecha && !hasPlayaPasaHumeda;
+                  let rows = `
+                  <tr style="${borderStyle(isPasaLast)}">
+                    <td rowspan="${playaRowsCount}" style="padding-left: 28px; vertical-align: middle; border-bottom: 2px solid var(--border-subtle);">
+                      <div style="display: flex; align-items: center; gap: var(--space-2);">
+                        <span style="color: #f97316; font-size: 1.1em;">🏖️</span>
+                        <strong>${playa.nombre}</strong>
+                      </div>
+                    </td>
+                    <td style="font-size: 0.8em; color: var(--color-accent-400); font-weight: 600;">🫘 Pasa</td>
+                    ${passes.map(n => {
+                      const val = playa.pasadas[n] || 0;
+                      return `<td style="text-align: right; ${val > 0 ? 'color: var(--color-accent-400); font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
+                    }).join('')}
+                    <td style="text-align: right; font-weight: 700; color: var(--color-accent-500);">${fmt(playa.kg)}</td>
+                    <td rowspan="${playaRowsCount}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: ${getFColor(playaFactor)}; background: ${getFBg(playaFactor)}; border-bottom: 2px solid var(--border-subtle);">${playaFactor > 0 ? playaFactor.toFixed(2) : '—'}</td>
+                    <td rowspan="${playaRowsCount}" style="text-align: right; vertical-align: middle; border-bottom: 2px solid var(--border-subtle);">
+                      <div style="display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2);">
+                        <div style="width: 60px; height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden;">
+                          <div style="width: ${Math.min(pct, 100)}%; height: 100%; background: var(--color-accent-500); border-radius: 3px;"></div>
+                        </div>
+                        <span style="font-size: 0.85em; color: var(--text-secondary); min-width: 40px;">${fmtDec(pct)}%</span>
+                      </div>
+                    </td>
+                  </tr>`;
+
+                  // Row 2: Cosecha (Fresco)
+                  if (hasPlayaCosecha) {
+                    const isFrescoLast = !hasPlayaPasaHumeda;
+                    rows += `
+                    <tr style="${borderStyle(isFrescoLast)}">
+                      <td style="font-size: 0.8em; color: #10b981; font-weight: 600;">🍇 Fresco</td>
+                      ${passes.map(n => {
+                        const val = (playa.cosechaPasadas || {})[n] || 0;
+                        return `<td style="text-align: right; ${val > 0 ? 'color: #10b981; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
+                      }).join('')}
+                      <td style="text-align: right; font-weight: 700; color: #059669;">${fmt(playa.kgFresco)}</td>
+                    </tr>`;
+                  }
+
+                  // Row 3: Pasa Húmeda
+                  if (hasPlayaPasaHumeda) {
+                    rows += `
+                    <tr style="border-bottom: 2px solid var(--border-subtle);">
+                      <td style="font-size: 0.8em; color: #3b82f6; font-weight: 600;">💧 Pasa Húm.</td>
+                      ${passes.map(n => {
+                        const val = (playa.pasaHumedaPasadas || {})[n] || 0;
+                        return `<td style="text-align: right; ${val > 0 ? 'color: #3b82f6; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
+                      }).join('')}
+                      <td style="text-align: right; font-weight: 700; color: #2563eb;">${fmt(playa.kgPasaHumeda)}</td>
+                    </tr>`;
+                  }
+
+                  return rows;
+                }).join('');
+
+                // Predio subtotal row  
+                const predioSubFresco = predioPlayas.reduce((s, p) => s + (p.kgFresco || 0), 0);
+                const predioSubtotal = isSingleGroup ? '' : `
+                <tr style="background: ${pBg}; font-weight: 600; border-bottom: none;">
+                  <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="padding-left: 28px; color: ${pColor}; font-size: 0.85em; vertical-align: middle; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">Subtotal ${predioName}</td>
+                  <td style="font-size: 0.75em;">🫘</td>
+                  ${passes.map(n => {
+                    const sub = predioPlayas.reduce((s, p) => s + (p.pasadas[n] || 0), 0);
+                    return `<td style="text-align: right; color: ${pColor}; font-size: 0.9em;">${sub > 0 ? fmt(sub) : '—'}</td>`;
+                  }).join('')}
+                  <td style="text-align: right; color: ${pColor};">${fmt(pData.totalKg)}</td>
+                  <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-weight: 800; color: ${getFColor(predioFactor)}; background: ${getFBg(predioFactor)}; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">${predioFactor > 0 ? predioFactor.toFixed(2) : '—'}</td>
+                  <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="text-align: right; color: var(--text-secondary); font-size: 0.85em; vertical-align: middle; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">
+                    ${fmtDec(playaStats.grandTotalKg > 0 ? (pData.totalKg / playaStats.grandTotalKg * 100) : 0)}%
+                  </td>
+                </tr>
+                ${predioSubFresco > 0 ? `
+                <tr style="background: ${pBg}; font-weight: 600; border-bottom: 2px solid var(--border-subtle);">
+                  <td style="font-size: 0.75em;">🍇</td>
+                  ${passes.map(n => {
+                    const sub = predioPlayas.reduce((s, p) => s + ((p.cosechaPasadas || {})[n] || 0), 0);
+                    return `<td style="text-align: right; color: #10b981; font-size: 0.9em;">${sub > 0 ? fmt(sub) : '—'}</td>`;
+                  }).join('')}
+                  <td style="text-align: right; color: #059669;">${fmt(predioSubFresco)}</td>
+                </tr>` : ''}`;
+                
+                return predioHeader + playaRows + predioSubtotal;
+              }).join('')}
+            </tbody>
+            <tfoot style="background: ${colors.bg}; font-weight: 700;">
+              <tr style="border-bottom: none;">
+                <td rowspan="${hasCosechaData ? '2' : '1'}" style="vertical-align: middle;">Total ${fincaName}</td>
+                <td style="font-size: 0.75em;">🫘</td>
+                ${passes.map(n => {
+                  const subtotal = fData.playas.reduce((s, p) => s + (p.pasadas[n] || 0), 0);
+                  return `<td style="text-align: right; color: var(--color-accent-500);">${subtotal > 0 ? fmt(subtotal) : '—'}</td>`;
+                }).join('')}
+                <td style="text-align: right; color: var(--color-accent-600);">${fmt(fData.totalKg)}</td>
+                <td rowspan="${hasCosechaData ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: ${getFColor(fincaFactor)};">${fincaFactor > 0 ? fincaFactor.toFixed(2) : '—'}</td>
+                <td rowspan="${hasCosechaData ? '2' : '1'}" style="text-align: right; color: var(--text-secondary); vertical-align: middle;">
+                  ${fmtDec(playaStats.grandTotalKg > 0 ? (fData.totalKg / playaStats.grandTotalKg * 100) : 0)}%
+                </td>
+              </tr>
+              ${hasCosechaData ? `
+              <tr>
+                <td style="font-size: 0.75em;">🍇</td>
+                ${passes.map(n => {
+                  const subtotal = fData.playas.reduce((s, p) => s + ((p.cosechaPasadas || {})[n] || 0), 0);
+                  return `<td style="text-align: right; color: #10b981;">${subtotal > 0 ? fmt(subtotal) : '—'}</td>`;
+                }).join('')}
+                <td style="text-align: right; color: #059669;">${fmt(fData.totalKgFresco)}</td>
+              </tr>` : ''}
+            </tfoot>
+          </table>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+
+export function renderWorkLogView(data, catalogs) {
+  const { fincas, predios, cuarteles, faenas, empleados, productos } = catalogs;
+
+  // Catalog subsets
+  const insumosFull = productos.filter(p => p.categoria === 'Insumo' && p.status === 'active');
+  const herramientasFull = productos.filter(p => p.categoria === 'Herramienta' && p.status === 'active');
+
+  // Helper formatting names
+  const getFincaName = (id) => fincas.find(f => f.id == id)?.nombre || id;
+  const getPredioName = (id) => predios.find(p => p.id == id)?.nombre || id;
+  const getCuartelName = (id) => cuarteles.find(c => c.id == id)?.numero || id;
+  const getFaenaName = (id) => faenas.find(f => f.id == id)?.nombre || id;
+  const getEmpleadoName = (id) => empleados.find(e => e.id == id)?.name || id;
+
+  const tableData = data.filter(d => d.status === 'active');
+
+  return `
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3 style="display: flex; align-items: center; gap: var(--space-2);">🚜 Carga de Trabajo de Campo</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper" style="width: 280px;">
+             <span class="search-icon">🔍</span>
+             <input type="text" class="search-input" id="search-work-logs" placeholder="Filtrar por empleado..." />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-work-log" style="display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4);">
+            <span style="font-size: 1.2em;">+</span> Cargar Jornal
+          </button>
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="data-table" id="table-work-logs">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Empleado</th>
+              <th>Lugar / Ubicación</th>
+              <th>Tarea / Labor</th>
+              <th style="text-align: right;">Cant.</th>
+               <th style="text-align: right;">Jornales</th>
+               <th style="text-align: left;">Audit/Carga</th>
+               <th style="text-align: center;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableData.length === 0 ? `
+              <tr>
+                <td colspan="7" style="text-align: center; padding: var(--space-10); color: var(--text-tertiary);">
+                  No se han registrado trabajos.
+                </td>
+              </tr>
+            ` : tableData.map(row => `
+              <tr data-id="${row.id}">
+                <td>${new Date(row.fecha).toLocaleDateString('es-AR')}</td>
+                <td style="font-weight: 600; color: var(--color-primary-400);">${row.empleado_nombre || getEmpleadoName(row.empleado_id)}</td>
+                <td><small style="opacity: 0.8;">${row.finca_nombre || getFincaName(row.finca_id)} > ${row.predio_nombre || getPredioName(row.predio_id)} > C${row.cuartel_numero || getCuartelName(row.cuartel_id)}</small></td>
+                <td><span style="padding: 4px 8px; background: rgba(139, 92, 246, 0.1); color: var(--color-primary-300); border-radius: 4px; font-size: 0.9em;">
+                   ${row.faena_nombre || getFaenaName(row.faena_id)}
+                   ${row.labor_nombre ? ` > <span style="opacity:0.8; font-size:0.9em;">${row.labor_nombre}</span>` : ''}
+                </span></td>
+                <td style="text-align: right; font-weight: 700;">${row.cantidad} <small style="color: var(--text-tertiary); font-weight: 400;">${row.unidad}</small></td>
+                <td style="text-align: right; font-weight: 700; color: var(--color-accent);">${parseFloat(row.total_jornadas || 0).toFixed(2)}</td>
+                <td style="font-size: 0.8em; line-height: 1.2;">
+                   <div style="color: var(--text-secondary);">${row.usuario_nombre || 'S/U'}</div>
+                   <div style="color: var(--text-tertiary); opacity: 0.7;">${row.created_at ? new Date(row.created_at).toLocaleString('es-AR') : '-'}</div>
+                </td>
+                <td style="text-align: center; white-space: nowrap;">
+                  <button class="btn btn-sm btn-ghost btn-edit-work-log" data-id="${row.id}" style="color: var(--color-primary-400); margin-right: 8px;">✏️</button>
+                  <button class="btn btn-sm btn-ghost btn-delete-work-log" data-id="${row.id}" style="color: var(--color-error); opacity: 0.7;">🗑️</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Formulario Carga de Trabajo -->
+    <div id="work-log-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 20px; padding: var(--space-8); max-width: 800px; width: 94%; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8); border: 1px solid var(--border-subtle); max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-6);">
+          <h3 id="work-modal-title">🚜 Registro de Jornal / Trabajo Diario</h3>
+          <button type="button" class="btn btn-ghost" id="btn-close-work-modal" style="font-size: 1.5em; padding: 0;">×</button>
+        </div>
+
+        <form id="form-work-log" autocomplete="off">
+          <input type="hidden" id="work-log-id" value="" />
+          <!-- Datos Generales -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="form-group">
+              <label class="form-label">Fecha de Inicio</label>
+              <input type="date" id="work-fecha-inicio" class="form-input" required value="${new Date().toISOString().split('T')[0]}" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha de Fin</label>
+              <input type="date" id="work-fecha-fin" class="form-input" required value="${new Date().toISOString().split('T')[0]}" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora de Inicio</label>
+              <input type="time" id="work-hora-inicio" class="form-input" value="08:00" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora de Fin</label>
+              <input type="time" id="work-hora-fin" class="form-input" value="17:00" />
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label class="form-label">Personal Responsable</label>
+              <select id="work-empleado" class="form-select" required>
+                <option value="">Seleccionar empleado...</option>
+                ${empleados.map(e => `<option value="${e.id}">${e.name} (${e.legajo})</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); padding: var(--space-5); border-radius: 12px; margin-bottom: var(--space-6);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4);">
+              <div class="form-group">
+                <label class="form-label">Finca</label>
+                <select id="work-finca" class="form-select" required>
+                  <option value="">Seleccionar...</option>
+                  ${fincas.map(f => `<option value="${f.id}">${f.nombre}</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Predio / Lote</label>
+                <select id="work-predio" class="form-select" disabled required><option value="">Puntualizando...</option></select>
+              </div>
+            <div class="form-group" style="height: auto;">
+                <label class="form-label">Cuartel / Cuadro</label>
+                <select id="work-cuartel" class="form-select" disabled required multiple size="3" style="height: auto;"><option value="">Ubicando...</option></select>
+            </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-6); padding: var(--space-5); background: rgba(139, 92, 246, 0.05); border-radius: 12px; border: 1px solid var(--border-subtle);">
+            <div class="form-group">
+              <label class="form-label">Labor o Tarea Realizada</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);">
+                  <select id="work-faena" class="form-select" required>
+                    <option value="">Faena General...</option>
+                    ${faenas.map(f => `<option value="${f.id}">${f.nombre}</option>`).join('')}
+                  </select>
+                  <select id="work-labor" class="form-select" disabled>
+                    <option value="">Labor Específica...</option>
+                  </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cantidad</label>
+              <input type="number" step="any" id="work-cantidad" class="form-input" required placeholder="0.00" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unidad</label>
+              <select id="work-unidad" class="form-select">
+                <option value="horas">Horas</option>
+                <option value="jornal">Jornal</option>
+                <option value="surcos">Surcos</option>
+                <option value="plantas">Plantas</option>
+                <option value="kg">Kg</option>
+              </select>
+            </div>
+          </div>
+          <div id="work-jornal-preview" style="margin-top: -15px; margin-bottom: 15px; font-size: 0.9em; color: var(--color-accent); font-weight: 600; text-align: right; display: none;">
+            Equivale a: <span>0.00</span> Jornales
+          </div>
+
+          <!-- Insumos (Salida de Bodega) -->
+          <div style="margin-bottom: var(--space-6); border-top: 1px solid var(--border-subtle); padding-top: var(--space-4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+              <h4 style="font-size: 0.85em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.1em;">📦 Insumos / Suministros (Deducción Stock)</h4>
+              <button type="button" class="btn btn-sm btn-ghost" id="btn-add-insumo-row" style="color: var(--color-primary-400); font-weight: 600;">+ Agregar Fila</button>
+            </div>
+            <div id="insumos-list-container" style="display: grid; grid-template-columns: 1fr; gap: var(--space-2);">
+              <!-- Filas de insumos dinámicas -->
+            </div>
+          </div>
+
+          <!-- Herramientas -->
+          <div style="margin-bottom: var(--space-6); border-top: 1px solid var(--border-subtle); padding-top: var(--space-4);">
+             <h4 style="font-size: 0.85em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.1em; margin-bottom: var(--space-3);">🔧 Herramientas Utilizadas</h4>
+             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); max-height: 150px; overflow-y: auto; padding: var(--space-4); background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 8px;">
+               ${herramientasFull.map(h => `
+                 <label style="display: flex; align-items: center; gap: var(--space-3); cursor: pointer; font-size: 0.9em; padding: var(--space-1); transition: color 0.2s ease;" onmouseover="this.style.color='var(--color-primary-400)'" onmouseout="this.style.color='inherit'">
+                   <input type="checkbox" name="work-tools" value="${h.id}" style="accent-color: var(--color-primary-400);" />
+                   ${h.nombre}
+                 </label>
+               `).join('')}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notas Adicionales</label>
+            <textarea id="work-notas" class="form-input" style="min-height: 80px; padding: var(--space-3);" placeholder="Describa cualquier observación o incidencia..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: var(--space-4); justify-content: flex-end; margin-top: var(--space-8);">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-work-log" style="padding: var(--space-2) var(--space-8);">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="work-btn-submit" style="padding: var(--space-2) var(--space-12); font-weight: 600;">💾 Registrar Trabajo</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Template Insumo -->
+    <template id="template-insumo-item">
+      <div class="insumo-row animate-slide-up" style="display: grid; grid-template-columns: 3fr 1fr 40px; gap: var(--space-3); align-items: flex-end; padding: var(--space-3); background: rgba(255,255,255,0.01); border: 1px dashed var(--border-subtle); border-radius: 10px;">
+        <div class="form-group">
+          <label style="font-size: 0.7em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 2px;">Producto</label>
+          <select class="form-select select-insumo-id" required style="border-style: none none solid none; border-radius: 0;">
+            <option value="">Seleccionar insumo...</option>
+            ${insumosFull.map(i => `<option value="${i.id}">${i.nombre} (Dispo: ${i.stock})</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="font-size: 0.7em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 2px;">Cant.</label>
+          <input type="number" step="any" class="form-input input-insumo-qty" required placeholder="0.0" style="border-style: none none solid none; border-radius: 0; padding-left: 0;" />
+        </div>
+        <button type="button" class="btn btn-sm btn-ghost btn-remove-insumo" style="color: var(--color-error); margin-bottom: 5px; font-size: 1.2em;">×</button>
+      </div>
+    </template>
+  `;
+}
+// ── Utility Functions ──
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const s = dateStr.toString().trim();
+  let date;
+
+  if (s.includes('/')) {
+    const [d, m, y] = s.split('/');
+    const year = y.length === 2 ? '20' + y : y;
+    date = new Date(`${year}-${m.padStart(2, '0')}-${d.padStart(2, '0')}T00:00:00`);
+  } else if (s.includes('-')) {
+    // Assume YYYY-MM-DD
+    date = new Date(s + 'T00:00:00');
+  } else {
+    date = new Date(s);
+  }
+
+  if (isNaN(date.getTime())) return s; // Fallback to raw string if invalid
+  return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+export function formatCurrency(amount) {
+  if (amount === undefined || amount === null || isNaN(amount)) return '0';
+  return Math.abs(amount).toLocaleString('es-AR');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MÓDULO INFORMES DE APLICACIONES (SOFÍA)
+// ═══════════════════════════════════════════════════════════
+
+export function renderInformeAplicaciones(cycles, fincas, predios, cuarteles, userRole, filters) {
+  const canUpload = userRole === 'Administrador' || userRole === 'Ingeniero';
+  return `
+  <div id="sofia-module-container">
+    <div class="section-header animate-fade-in" style="margin-bottom: var(--space-4);">
+        <h2 style="font-family: 'Outfit'; color: var(--text-primary);">🧪 Informe de Aplicaciones</h2>
+    </div>
+
+    <div class="sofia-filters animate-fade-in animate-delay-1" id="sofia-filters">
+      <div class="filter-group">
+        <label class="form-label">Ciclo Producción</label>
+        <select class="form-select sofia-filter-select" id="filter-ciclo" style="padding-left:var(--space-4);">
+          ${cycles.map(c => `<option value="${c}" ${c === filters.ciclo ? 'selected' : ''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="form-label">Finca</label>
+        <select class="form-select sofia-filter-select" id="filter-finca" style="padding-left:var(--space-4);">
+          <option value="">Todas</option>
+          ${fincas.map(f => `<option value="${f}" ${f === filters.finca ? 'selected' : ''}>${f}</option>`).join('')}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="form-label">Clasificación</label>
+        <select class="form-select sofia-filter-select" id="filter-predio" style="padding-left:var(--space-4);">
+          <option value="">Todos</option>
+          ${predios.map(p => `<option value="${p}" ${p === filters.predio ? 'selected' : ''}>${p}</option>`).join('')}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="form-label">Variedad</label>
+        <select class="form-select sofia-filter-select" id="filter-variedad" style="padding-left:var(--space-4);">
+          <option value="">Todas</option>
+          ${(filters.variedades || []).map(v => `<option value="${v}" ${v === filters.variedad ? 'selected' : ''}>${v}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div class="tabs animate-fade-in animate-delay-2" id="sofia-subtabs">
+      <button class="tab-btn active" data-subtab="resumen">Resumen</button>
+      <button class="tab-btn" data-subtab="foliares">Foliares</button>
+      <button class="tab-btn" data-subtab="herbicidas">Herbicidas</button>
+      <button class="tab-btn" data-subtab="fertilizacion">Fertilización Comparativa</button>
+    </div>
+
+    <div id="sofia-subtab-content" class="animate-fade-in animate-delay-3"></div>
+    </div >
+  `;
+}
+
+export function renderSofiaResumen(resumen) {
+  const fmtCost = (v) => '$' + formatCurrency(v);
+  const fincas = Object.entries(resumen.fincaBreakdown || {});
+
+  return `
+  <!--Global Totals Section-->
+
+    <div class="section-divider"> Consolidado Global </div>
+    <div class="dashboard-grid" style="margin-bottom: var(--space-8);">
+      <div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon green">📊</div>
+          <span class="metric-badge up">Total</span>
+        </div>
+        <div class="metric-value">${resumen.totalApplications}</div>
+        <div class="metric-label">Aplicaciones Totales</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header"><div class="metric-card-icon blue">🧴</div></div>
+        <div class="metric-value">${resumen.foliares.count}</div>
+        <div class="metric-label">Foliares · ${fmtCost(resumen.foliares.costo)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header"><div class="metric-card-icon amber">🌿</div></div>
+        <div class="metric-value">${resumen.herbicidas.count}</div>
+        <div class="metric-label">Herbicidas · ${fmtCost(resumen.herbicidas.costo)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header"><div class="metric-card-icon purple">🧪</div></div>
+        <div class="metric-value">${resumen.fertilizacion.count}</div>
+        <div class="metric-label">Fertilización · ${fmtCost(resumen.fertilizacion.costo)}</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-container">
+        <div class="chart-header"><span class="chart-title">Distribución por Categoría</span></div>
+        <div class="chart-canvas-wrapper"><canvas id="chart-sofia-dist"></canvas></div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-header"><span class="chart-title">Costo por Producto (Top 8)</span></div>
+        <div class="chart-canvas-wrapper"><canvas id="chart-sofia-cost"></canvas></div>
+      </div>
+    </div>
+
+    <div class="data-table-container animate-fade-in animate-delay-2" style="margin-top: var(--space-8);">
+        <div class="table-header">
+            <h3>🧴 Consolidado de Insumos / Productos Aplicados</h3>
+            <span style="font-size: var(--text-sm); color: var(--text-tertiary);">Top 10 por Volumen (L/Kg)</span>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Insumo / Producto</th>
+                    <th>Labor</th>
+                    <th style="text-align: right;">Cant. Aplicaciones</th>
+                    <th style="text-align: right;">Total Litros / Kg</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${resumen.topProducts.map(p => `
+                    <tr>
+                        <td style="font-weight: 600;">${p.producto}</td>
+                        <td><span class="status-badge" style="background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-light); font-size: 0.85em;">${p.labor}</span></td>
+                        <td style="text-align: right; color: var(--text-tertiary);">${p.count}</td>
+                        <td style="text-align: right;">
+                            <span class="status-badge active" style="background: var(--bg-tertiary); color: var(--color-blue-400); min-width: 80px; justify-content: flex-end;">
+                                ${p.totalCantidad.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} L
+                            </span>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    </div>
+`;
+}
+
+export function renderSofiaFoliares(data) {
+  return `
+  <div class="data-table-container">
+      <div class="table-header">
+        <h3>🧴 Aplicaciones Foliares (AF) — <span style="color:var(--text-tertiary)">Gasto Operativo Curativo</span></h3>
+        <div class="table-actions">
+          <span class="status-badge active"><span class="status-dot"></span> ${data.length} registros</span>
+        </div>
+      </div>
+      
+      <!-- FOLIAR CHARTS CONTAINER -->
+      <div style="padding: var(--space-6); border-bottom: 1px solid var(--border-subtle); margin-bottom: var(--space-4);">
+          <div style="display: flex; flex-direction: column; gap: var(--space-8);">
+              <div>
+                  <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin-bottom: var(--space-4); font-size: 0.9em;">📊 Costo Operativo por Predio</h4>
+                  <div style="height: 350px; position: relative; width: 100%;">
+                      <canvas id="chart-sofia-foliares"></canvas>
+                  </div>
+              </div>
+              <div>
+                  <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin-bottom: var(--space-4); font-size: 0.9em;">🧪 Productos Aplicados (Cantidades Totales)</h4>
+                  <div style="height: 350px; position: relative; width: 100%;">
+                      <canvas id="chart-sofia-foliares-productos"></canvas>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <table class="data-table">
+        <thead><tr>
+          <th>Predio / Cuartel</th><th>Fecha</th><th>Labor</th><th>Producto</th>
+          <th>Cant. (L)</th><th>Dosis</th><th>Costo Unit.</th><th>Costo Total</th>
+        </tr></thead>
+        <tbody>
+          ${data.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text-tertiary);padding:var(--space-8);">Sin registros</td></tr>' :
+      (() => {
+        const grouped = data.reduce((acc, r) => {
+          const key = r.finca_original || r.finca || 'Otros';
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(r);
+          return acc;
+        }, {});
+
+        return Object.entries(grouped).map(([finca, rows]) => `
+          <tr class="table-group-header" style="background: rgba(59, 130, 246, 0.05);">
+            <td colspan="8" style="font-weight: 700; color: var(--color-blue-400); padding: var(--space-3) var(--space-4);">
+              🏡 ${finca}
+            </td>
+          </tr>
+          ${rows.map(r => `
+          <tr>
+            <td style="padding-left: var(--space-8);">
+              <span style="color: var(--text-tertiary); font-size: 0.85em;">${r.clasifica || ''}</span><br/>
+              <strong>${r.cuartel}</strong>
+            </td>
+            <td>${formatDate(r.fecha_aplicacion)}</td>
+            <td><span class="status-badge" style="background: var(--bg-secondary); font-size: 0.85em;">${r.labor_codigo}</span></td>
+            <td><strong>${r.producto}</strong></td>
+            <td>${formatCurrency(r.cantidad)}</td>
+            <td>${r.dosis}</td>
+            <td>$${formatCurrency(r.costo_unitario)}</td>
+            <td style="color:var(--color-primary-400)">$${formatCurrency(r.cantidad * r.costo_unitario)}</td>
+          </tr>
+          `).join('')}
+        `).join('');
+      })()}
+        </tbody>
+      </table>
+    </div > `;
+}
+
+export function renderSofiaHerbicidas(data) {
+  return `
+  <div class="data-table-container">
+      <div class="table-header">
+        <h3>🌿 Herbicidas — <span style="color:var(--text-tertiary)">Gasto Operativo Mantenimiento</span></h3>
+        <div class="table-actions">
+          <span class="status-badge pending"><span class="status-dot"></span> ${data.length} registros</span>
+        </div>
+      </div>
+      
+      <!-- HERBICIDAS CHARTS CONTAINER -->
+      <div style="padding: var(--space-6); border-bottom: 1px solid var(--border-subtle); margin-bottom: var(--space-4);">
+          <div style="display: flex; flex-direction: column; gap: var(--space-8);">
+              <div>
+                  <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin-bottom: var(--space-4); font-size: 0.9em;">📊 Costo Operativo por Predio</h4>
+                  <div style="height: 350px; position: relative; width: 100%;">
+                      <canvas id="chart-sofia-herbicidas"></canvas>
+                  </div>
+              </div>
+              <div>
+                  <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin-bottom: var(--space-4); font-size: 0.9em;">🧪 Productos Aplicados (Cantidades Totales)</h4>
+                  <div style="height: 350px; position: relative; width: 100%;">
+                      <canvas id="chart-sofia-herbicidas-productos"></canvas>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <table class="data-table">
+        <thead><tr>
+          <th>Predio / Cuartel</th><th>Fecha</th><th>Labor</th><th>Producto</th>
+          <th>Cant. (L)</th><th>Dosis</th><th>Costo Unit.</th><th>Costo Total</th>
+        </tr></thead>
+        <tbody>
+          ${data.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text-tertiary);padding:var(--space-8);">Sin registros</td></tr>' :
+      (() => {
+        const grouped = data.reduce((acc, r) => {
+          const key = r.finca_original || r.finca || 'Otros';
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(r);
+          return acc;
+        }, {});
+
+        return Object.entries(grouped).map(([finca, rows]) => `
+          <tr class="table-group-header" style="background: rgba(245, 158, 11, 0.05);">
+            <td colspan="8" style="font-weight: 700; color: var(--color-amber-400); padding: var(--space-3) var(--space-4);">
+              🏡 ${finca}
+            </td>
+          </tr>
+          ${rows.map(r => `
+          <tr>
+            <td style="padding-left: var(--space-8);">
+              <span style="color: var(--text-tertiary); font-size: 0.85em;">${r.clasifica || ''}</span><br/>
+              <strong>${r.cuartel}</strong>
+            </td>
+            <td>${formatDate(r.fecha_aplicacion)}</td>
+            <td><span class="status-badge" style="background: var(--bg-secondary); font-size: 0.85em;">${r.labor_codigo}</span></td>
+            <td><strong>${r.producto}</strong></td>
+            <td>${formatCurrency(r.cantidad)}</td>
+            <td>${r.dosis}</td>
+            <td>$${formatCurrency(r.costo_unitario)}</td>
+            <td style="color:var(--color-secondary-400)">$${formatCurrency(r.cantidad * r.costo_unitario)}</td>
+          </tr>
+          `).join('')}
+        `).join('');
+      })()}
+        </tbody>
+      </table>
+    </div > `;
+}
+
+export function renderFertilizacionComparativa(data) {
+  const totalMeta = data.reduce((s, r) => s + r.metaAnual, 0);
+  const totalReal = data.reduce((s, r) => s + r.real, 0);
+  const totalDesvio = totalReal - totalMeta;
+  const totalPct = totalMeta > 0 ? Math.round((totalDesvio / totalMeta) * 100) : 0;
+
+  return `
+  <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+      <div class="metric-card">
+        <div class="metric-card-header"><div class="metric-card-icon green">🎯</div></div>
+        <div class="metric-value">${formatCurrency(totalMeta)} L</div>
+        <div class="metric-label">Total Comprado (Presupuestado)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header"><div class="metric-card-icon purple">📦</div></div>
+        <div class="metric-value">${formatCurrency(totalReal)} L</div>
+        <div class="metric-label">Total Real Aplicado</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header"><div class="metric-card-icon ${totalDesvio > 0 ? 'amber' : 'green'}">📐</div></div>
+        <div class="metric-value desvio-value ${totalDesvio > 0 ? 'over' : totalDesvio < 0 ? 'under' : ''}">${totalDesvio > 0 ? '+' : ''}${formatCurrency(totalDesvio)} L</div>
+        <div class="metric-label">Desvío Total (${totalPct > 0 ? '+' : ''}${totalPct}%)</div>
+      </div>
+    </div>
+
+    <!--Charts -->
+    <div style="display: flex; flex-direction: column; gap: var(--space-6); margin-bottom: var(--space-8);">
+      <div class="chart-container" style="min-height: 500px; padding: var(--space-6);">
+          <div class="chart-header" style="color:var(--color-primary-400)"><span class="chart-title">🍇 El Espejo: Comprado vs Real por Producto</span></div>
+          <div class="chart-canvas-wrapper" style="height:450px;"><canvas id="chart-fert-prod-espejo"></canvas></div>
+      </div>
+      <div class="chart-container" style="min-height: 500px; padding: var(--space-6);">
+          <div class="chart-header" style="color:var(--color-amber-400)"><span class="chart-title">🌾 Fincas Viejas: Comprado vs Real por Producto</span></div>
+          <div class="chart-canvas-wrapper" style="height:450px;"><canvas id="chart-fert-prod-fincasviejas"></canvas></div>
+      </div>
+      <!-- ═══ EL ESPEJO: Nutrientes por Cod Cuartel ═══ -->
+      <div class="section-divider" style="margin: var(--space-6) 0; height: 2px; background: linear-gradient(90deg, transparent, var(--color-primary-500), transparent);"></div>
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4);">
+        <h3 style="font-family: 'Outfit'; color: var(--color-primary-400); margin: 0;">
+          🍇 El Espejo (PRE-COSECHA) — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Cod Cuartel</span>
+        </h3>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <label for="filter-producto-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
+          <select id="filter-producto-ee" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none; transition: border-color 0.2s;">
+            <option value="" style="color:#000;">Todos los productos</option>
+          </select>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6);">
+        <div class="chart-container" style="min-height: 380px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #34d399;">
+              <span class="chart-title">🧪 Nitrógeno (N)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Unidades</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-n-ee"></canvas></div>
+        </div>
+        <div class="chart-container" style="min-height: 380px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #eab308;">
+              <span class="chart-title">🔬 Fósforo (P)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Unidades</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-p-ee"></canvas></div>
+        </div>
+        <div class="chart-container" style="min-height: 380px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #a78bfa;">
+              <span class="chart-title">⚗️ Calcio (Ca)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Unidades</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-ca-ee"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ═══ EL ESPEJO: Nutrientes POS COSECHA ═══ -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); margin-bottom: var(--space-4);">
+        <h3 style="font-family: 'Outfit'; color: var(--color-primary-400); margin: 0;">
+          🍇 El Espejo (POS-COSECHA) — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Cod Cuartel</span>
+        </h3>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-6);">
+        <div class="chart-container" style="min-height: 420px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #34d399;">
+              <span class="chart-title">🧪 Nitrógeno (N)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Bio-Crecimiento</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-unidades-n-ee-pos"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ═══ FINCAS VIEJAS: Nutrientes por Clasifica ═══ -->
+      <div class="section-divider" style="margin: var(--space-6) 0; height: 2px; background: linear-gradient(90deg, transparent, var(--color-amber-500), transparent);"></div>
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4);">
+        <h3 style="font-family: 'Outfit'; color: var(--color-amber-400); margin: 0;">
+          🌾 Fincas Viejas (PRE-COSECHA) — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Clasifica</span>
+        </h3>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <label for="filter-producto-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
+          <select id="filter-producto-fv" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none; transition: border-color 0.2s;">
+            <option value="" style="color:#000;">Todos los productos</option>
+          </select>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6);">
+        <div class="chart-container" style="min-height: 380px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #34d399;">
+              <span class="chart-title">🧪 Nitrógeno (N)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Unidades</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-n-fv"></canvas></div>
+        </div>
+        <div class="chart-container" style="min-height: 380px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #eab308;">
+              <span class="chart-title">🔬 Fósforo (P)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Unidades</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-p-fv"></canvas></div>
+        </div>
+        <div class="chart-container" style="min-height: 380px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #a78bfa;">
+              <span class="chart-title">⚗️ Calcio (Ca)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Unidades</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:320px;"><canvas id="chart-fert-unidades-ca-fv"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ═══ FINCAS VIEJAS: Nutrientes POS COSECHA ═══ -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); margin-bottom: var(--space-4);">
+        <h3 style="font-family: 'Outfit'; color: var(--color-amber-400); margin: 0;">
+          🌾 Fincas Viejas (POS-COSECHA) — <span style="font-size: 0.85em; color: var(--text-tertiary);">Unidades por Clasifica</span>
+        </h3>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-6);">
+        <div class="chart-container" style="min-height: 420px; padding: var(--space-6);">
+            <div class="chart-header" style="color: #34d399;">
+              <span class="chart-title">🧪 Nitrógeno (N)</span>
+              <span style="font-size: 0.75em; color: var(--text-tertiary); margin-left: var(--space-2);">Bio-Crecimiento</span>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-unidades-n-fv-pos"></canvas></div>
+        </div>
+      </div>
+
+      <div class="chart-container" style="min-height: 400px; padding: var(--space-6); grid-column: 1 / -1;">
+          <div class="chart-header" style="color: var(--color-primary-400); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3);">
+            <span class="chart-title">📈 🍇 El Espejo — Aplicación Semanal (L)</span>
+            <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-predio-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Predio:</label>
+                <select id="filter-weekly-predio-ee" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none; transition: border-color 0.2s;">
+                  <option value="" style="color:#000;">Todos los predios</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-producto-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
+                <select id="filter-weekly-producto-ee" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
+                  <option value="" style="color:#000;">Todos los productos</option>
+                  <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
+                  <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
+                  <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div id="weekly-summary-ee" style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin: var(--space-4) 0;"></div>
+          <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-weekly-ee"></canvas></div>
+      </div>
+      <div class="chart-container" style="min-height: 400px; padding: var(--space-6); grid-column: 1 / -1;">
+          <div class="chart-header" style="color: var(--color-amber-400); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3);">
+            <span class="chart-title">📈 🌾 Fincas Viejas — Aplicación Semanal (L)</span>
+            <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-predio-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Predio:</label>
+                <select id="filter-weekly-predio-fv" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none; transition: border-color 0.2s;">
+                  <option value="" style="color:#000;">Todos los predios</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-producto-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
+                <select id="filter-weekly-producto-fv" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
+                  <option value="" style="color:#000;">Todos los productos</option>
+                  <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
+                  <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
+                  <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div id="weekly-summary-fv" style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin: var(--space-4) 0;"></div>
+          <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-weekly-fv"></canvas></div>
+      </div>
+    </div>
+
+    <!--Detail Table grouped by Finca-->
+  <div class="data-table-container">
+    <div class="table-header">
+      <h3>🧪 Detalle por Finca y Cuartel</h3>
+    </div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Predio / Cuartel</th><th>Producto</th><th>Pre-Cos. (L)</th><th>Pos-Cos. (L)</th>
+        <th>Comprado (L)</th><th>Real (L)</th><th>Estado</th><th>%</th>
+      </tr></thead>
+      <tbody>
+        ${data.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text-tertiary);padding:var(--space-8);">Sin registros</td></tr>' :
+      (() => {
+        const grouped = data.reduce((acc, r) => {
+          const key = r.finca_original || r.finca || 'Otros';
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(r);
+          return acc;
+        }, {});
+
+        return Object.entries(grouped).map(([finca, rows]) => `
+          <tr class="table-group-header" style="background: rgba(16, 185, 129, 0.05);">
+            <td colspan="8" style="font-weight: 700; color: var(--color-primary-400); padding: var(--space-3) var(--space-4);">
+              🏡 ${finca}
+            </td>
+          </tr>
+          ${rows.map(r => `
+          <tr>
+            <td style="padding-left: var(--space-8);">
+              <span style="color: var(--text-tertiary); font-size: 0.85em;">${r.clasifica || ''}</span><br/>
+              <strong>${r.cuartel}</strong>
+            </td>
+            <td><strong>${r.producto}</strong></td>
+            <td>${formatCurrency(r.pre)}</td>
+            <td>${formatCurrency(r.pos)}</td>
+            <td style="font-weight:600;">${formatCurrency(r.metaAnual)}</td>
+            <td style="font-weight:600; color:var(--color-accent-400)">${formatCurrency(r.real)}</td>
+            <td><span class="desvio-badge ${r.desvio > 0 ? 'over' : r.desvio < 0 ? 'under' : 'on-target'}">${r.desvio > 0 ? '⛔ +' : r.desvio < 0 ? '⚠️ ' : '✅ '}${formatCurrency(r.desvio)}</span></td>
+            <td><span class="desvio-badge ${r.desvioPct > 0 ? 'over' : r.desvioPct < 0 ? 'under' : 'on-target'}">${r.desvioPct > 0 ? '⛔ +' : r.desvioPct < 0 ? '⚠️ ' : '✅ '}${r.desvioPct}%</span></td>
+          </tr>
+          `).join('')}
+        `).join('');
+      })()}
+      </tbody>
+    </table>
+  </div>
+`;
+}
+
+// ── Gestión de Usuarios View ──
+export function renderUsuariosView(users, roles) {
+  const pendingUsers = users.filter(u => u.pending && !u.active);
+  const regularUsers = users.filter(u => !u.pending || u.active);
+
+  return `
+    ${pendingUsers.length > 0 ? `
+    <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-6); border: 1px solid rgba(245,158,11,0.3);">
+      <div class="table-header" style="background: rgba(245,158,11,0.08);">
+        <h3 style="display: flex; align-items: center; gap: var(--space-3);">
+          ⏳ Solicitudes Pendientes
+          <span style="background: #f59e0b; color: #000; font-size: 0.7em; padding: 2px 8px; border-radius: 12px; font-weight: 700;">${pendingUsers.length}</span>
+        </h3>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha Solicitud</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingUsers.map(u => `
+            <tr data-id="${u.id}">
+              <td>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8em; color: white;">
+                  ${u.avatar}
+                </div>
+              </td>
+              <td><strong>${u.name}</strong></td>
+              <td><code style="color: var(--color-primary-400); font-size: 0.9em;">${u.email}</code></td>
+              <td style="font-size: 0.85em; color: var(--text-tertiary);">${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString('es-AR') : '—'}</td>
+              <td>
+                <div style="display: flex; gap: var(--space-2);">
+                  <button class="btn btn-sm btn-approve-usuario" data-id="${u.id}" style="background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); padding: 4px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    ✅ Aprobar
+                  </button>
+                  <button class="btn btn-sm btn-reject-usuario" data-id="${u.id}" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 4px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    ❌ Rechazar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    ` : ''}
+
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>👥 Gestión de Usuarios</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar usuario..." id="search-usuarios" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-usuario">+ Nuevo Usuario</button>
+        </div>
+      </div>
+      <table class="data-table" id="table-usuarios">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${regularUsers.map(u => `
+            <tr data-id="${u.id}">
+              <td>
+                <div style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border-subtle); overflow: hidden; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center;">
+                  ${u.avatar && u.avatar.includes('.') ? `<img src="/img/usuarios/${u.avatar}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="font-weight: 700;">${u.avatar || u.name.charAt(0)}</span>`}
+                </div>
+              </td>
+              <td><strong>${u.name}</strong></td>
+              <td><code style="color: var(--color-primary-400); font-size: 0.9em;">${u.email}</code></td>
+              <td>
+                <span style="padding: 4px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 600;
+                  background: ${u.role === 'Administrador' ? 'rgba(239, 68, 68, 0.15); color: #ef4444' :
+      u.role === 'Ingeniero' ? 'rgba(59, 130, 246, 0.15); color: #3b82f6' :
+        u.role === 'Sub-Admin' ? 'rgba(168, 85, 247, 0.15); color: #a855f7' :
+          'rgba(74, 222, 128, 0.15); color: #4ade80'};">
+                  ${u.role}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge ${u.active ? 'active' : 'inactive'}">
+                  <span class="status-dot"></span>
+                  ${u.active ? 'Activo' : 'Inactivo'}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: var(--space-2);">
+                  <button class="btn btn-sm btn-ghost btn-edit-usuario" data-id="${u.id}" title="Editar">✏️</button>
+                  <button class="btn btn-sm btn-ghost btn-delete-usuario" data-id="${u.id}" title="${u.active ? 'Desactivar' : 'Activar'}" style="color: ${u.active ? 'var(--color-error)' : 'var(--color-success)'};">
+                    ${u.active ? '🗑️' : '✅'}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Formulario Usuario -->
+    <div id="user-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-8); max-width: 480px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle);">
+        <h3 id="user-modal-title" style="font-family: 'Outfit'; margin-bottom: var(--space-6); color: var(--text-primary);">Nuevo Usuario</h3>
+        <form id="form-usuario" autocomplete="off">
+          <input type="hidden" id="user-edit-id" value="">
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-name">Nombre Completo</label>
+            <input type="text" id="user-name" class="form-input" style="padding-left: var(--space-4);" placeholder="Ej: Juan Pérez" required />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-email">Email</label>
+            <input type="email" id="user-email" class="form-input" style="padding-left: var(--space-4);" placeholder="usuario@naturalfood.com" required />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-password">Contraseña</label>
+            <input type="text" id="user-password" class="form-input" style="padding-left: var(--space-4);" placeholder="••••••••" />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label">Elegir Avatar</label>
+            <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-3);">
+              <div id="user-avatar-preview" style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--color-primary-500); overflow: hidden; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                <img src="/img/usuarios/ingeniero.png" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div style="flex: 1; font-size: 0.85em; color: var(--text-tertiary);">
+                Seleccione una imagen para el perfil del usuario.
+              </div>
+            </div>
+            <div class="avatar-selector-grid-admin" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; padding: 12px; background: rgba(0,0,0,0.15); border-radius: 12px; border: 1px solid var(--border-subtle); max-height: 150px; overflow-y: auto;">
+              ${['admin.png', 'admin1.png', 'gerencia.png', 'gerencia2.png', 'gerenciaf.png', 'gerenciafe.png', 'ingeniero.png', 'ingeniero1.png', 'ingeniero2.png', 'rrhh.png', 'rrhh1.png', 'soporteit.png', 'soporteit1.png', 'soporteit2.png', 'soporteit3.png', 'soporteit4.png'].map(img => `
+                <div class="avatar-option-admin" data-img="${img}" style="cursor: pointer; transition: all 0.2s ease; border-radius: 50%; overflow: hidden; border: 2px solid transparent; width: 40px; height: 40px; margin: 0 auto;">
+                  <img src="/img/usuarios/${img}" alt="${img}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+              `).join('')}
+            </div>
+            <input type="hidden" id="user-avatar" value="ingeniero.png">
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-6);">
+            <label class="form-label" for="user-role">Rol</label>
+            <select id="user-role" class="form-select" style="padding-left: var(--space-4);" required>
+              ${roles.map(r => `<option value="${r}">${r}</option>`).join('')}
+            </select>
+          </div>
+          <div style="display: flex; gap: var(--space-3); justify-content: flex-end;">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-usuario">Cancelar</button>
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+// ── Vista CRUD Genérica para Administración ──
+// ── Vista CRUD Genérica para Administración ──
+export function renderAdminCrudView(config, data, catalogs = {}, sectionId = '') {
+  const { title, icon, columns } = config;
+  const tableColumns = columns.filter(c => c.type !== 'textarea');
+
+  return `
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>${icon} ${title}</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar..." id="search-admin-crud" />
+          </div>
+          <button class="btn btn-sm" id="btn-delete-selected-admin-crud" style="display:none; background: var(--color-error); border-color: var(--color-error); color: white; gap: var(--space-1);">🗑️ Eliminar Seleccionados (<span id="count-selected-admin-crud">0</span>)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-import-admin-crud" style="background: var(--color-emerald-600); border-color: var(--color-emerald-600); color: white;">📥 Carga Masiva</button>
+          <button class="btn btn-primary btn-sm" id="btn-add-admin-crud">+ Nuevo Registro</button>
+          <input type="file" id="input-import-admin-crud" style="display:none;" accept=".xlsx, .xls, .csv" />
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="data-table" id="table-admin-crud">
+          <thead>
+            <tr>
+              <th style="width: 40px; text-align: center;"><input type="checkbox" id="chk-select-all-admin-crud" title="Seleccionar todos" style="cursor: pointer; width: 16px; height: 16px;" /></th>
+              <th style="width: 50px;">#</th>
+              ${tableColumns.map(col => `<th>${col.label}</th>`).join('')}
+              <th>Estado</th>
+              <th style="width: 100px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.length === 0 ? `
+              <tr>
+                <td colspan="${tableColumns.length + 4}" style="text-align: center; padding: var(--space-8); color: var(--text-tertiary);">
+                  <div style="font-size: 2em; margin-bottom: var(--space-2);">📭</div>
+                  No hay registros. Haz clic en "+ Nuevo Registro" para agregar uno.
+                </td>
+              </tr>
+            ` : data.map((row, idx) => `
+              <tr data-id="${row.id}" class="${row.status === 'inactive' ? 'row-inactive' : ''}">
+                <td style="text-align: center;"><input type="checkbox" class="chk-row-admin-crud" data-id="${row.id}" style="cursor: pointer; width: 16px; height: 16px;" /></td>
+                <td style="color: var(--text-tertiary); font-size: 0.85em;">${idx + 1}</td>
+                ${tableColumns.map(col => {
+    let val = row[col.key] ?? '';
+    let displayVal = val;
+
+    // Relation Lookup
+    if (col.type === 'select-model' && catalogs[col.model]) {
+      const parent = catalogs[col.model].find(i => i.id == val);
+      if (parent) {
+        displayVal = parent.nombre || parent.name || parent.numero || val;
+        // Special case for Quarteles: Show Finca name
+        if (sectionId === 'admin-cuarteles' && col.key === 'predio_id') {
+          const finca = catalogs['admin-fincas']?.find(f => f.id == parent.finca_id);
+          if (finca) displayVal = `${displayVal} <span style="font-size: 0.8em; color: var(--text-tertiary); font-weight: 400;">(${finca.nombre})</span>`;
+        }
+      }
+    } else if (col.type === 'number' && val !== '') {
+      displayVal = new Intl.NumberFormat('es-AR').format(Number(val));
+    } else if (col.type === 'date' && val) {
+      try { displayVal = new Date(val).toLocaleDateString('es-AR'); } catch (e) { displayVal = val; }
+    }
+
+    const isFirst = col === tableColumns[0];
+    return `<td${isFirst ? ' style="font-weight: 600;"' : ''}>${displayVal}</td>`;
+  }).join('')}
+                <td>
+                  <select class="status-select-admin-crud" data-id="${row.id}" style="
+                    background: ${row.status === 'active' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+                    color: ${row.status === 'active' ? '#10b981' : '#ef4444'};
+                    border: 1px solid ${row.status === 'active' ? '#10b98133' : '#ef444433'};
+                    border-radius: 20px; font-size: 0.75em; padding: 4px 12px; cursor: pointer;
+                    font-weight: 600; outline: none; transition: all 0.2s;
+                  ">
+                    <option value="active" ${row.status === 'active' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">● Activo</option>
+                    <option value="inactive" ${row.status === 'inactive' ? 'selected' : ''} style="background: var(--bg-secondary); color: var(--text-primary);">● Inactivo</option>
+                  </select>
+                </td>
+                <td>
+                  <div style="display: flex; gap: var(--space-2);">
+                    <button class="btn btn-sm btn-ghost btn-edit-admin-crud" data-id="${row.id}" title="Editar">✏️</button>
+                    <button class="btn btn-sm btn-ghost btn-delete-admin-crud" data-id="${row.id}" title="Eliminar" style="color: var(--color-error);">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ${data.length > 0 ? `
+        <div style="padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border-subtle); color: var(--text-tertiary); font-size: 0.85em; display: flex; justify-content: space-between;">
+          <span>Total: ${data.length} registros</span>
+          <span>${icon} ${title}</span>
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- Modal Formulario Admin CRUD -->
+    <div id="admin-crud-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-8); max-width: 560px; width: 92%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle); max-height: 85vh; overflow-y: auto;">
+        <h3 id="admin-crud-modal-title" style="font-family: 'Outfit'; margin-bottom: var(--space-6); color: var(--text-primary); display: flex; align-items: center; gap: var(--space-2);">
+          ${icon} Nuevo Registro
+        </h3>
+        <form id="form-admin-crud" autocomplete="off">
+          <input type="hidden" id="admin-crud-edit-id" value="">
+          ${columns.map(col => {
+    if (col.type === 'textarea') {
+      return `
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                  <textarea id="admin-crud-${col.key}" class="form-input" style="padding-left: var(--space-4); min-height: 80px; resize: vertical;" placeholder="${col.label}"${col.required ? ' required' : ''}></textarea>
+                </div>
+              `;
+    }
+    if (col.type === 'select') {
+      return `
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                  <select id="admin-crud-${col.key}" class="form-select" style="padding-left: var(--space-4);"${col.required ? ' required' : ''}>
+                    ${(col.options || []).map(opt => `<option value="${opt}">${opt.charAt(0).toUpperCase() + opt.slice(1).replace(/_/g, ' ')}</option>`).join('')}
+                  </select>
+                </div>
+              `;
+    }
+    if (col.type === 'select-model') {
+       const opts = catalogs[col.model] || [];
+       return `
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                  <select id="admin-crud-${col.key}" class="form-select" style="padding-left: var(--space-4);"${col.required ? ' required' : ''}>
+                    <option value="">Seleccionar ${col.label}...</option>
+                    ${opts.map(opt => {
+                        const name = opt.nombre || opt.name || opt.numero || '';
+                        let extra = '';
+                        // Special for Quartel form: Show Finca next to Predio
+                        if (sectionId === 'admin-cuarteles' && col.key === 'predio_id') {
+                            const finca = catalogs['admin-fincas']?.find(f => f.id == opt.finca_id);
+                            if (finca) extra = ` (${finca.nombre})`;
+                        }
+                        return `<option value="${opt.id}">${name}${extra}</option>`;
+                    }).join('')}
+                  </select>
+                </div>
+              `;
+    }
+    if (col.type === 'text-multi') {
+      return `
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                  <input type="text" id="admin-crud-${col.key}" class="form-input" style="padding-left: var(--space-4);" placeholder="Ej: Variedad A, Variedad B"${col.required ? ' required' : ''} />
+                  <small style="color: var(--text-tertiary); font-size: 0.75em; display: block; margin-top: 4px;">Puede ingresar múltiples valores separados por comas.</small>
+                </div>
+              `;
+    }
+    return `
+              <div class="form-group" style="margin-bottom: var(--space-4);">
+                <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                <input type="${col.type === 'number' ? 'number' : col.type === 'date' ? 'date' : col.type === 'email' ? 'email' : 'text'}" 
+                  id="admin-crud-${col.key}" 
+                  class="form-input" 
+                  style="padding-left: var(--space-4);" 
+                  placeholder="${col.label}"
+                  ${col.type === 'number' ? 'step="any"' : ''}
+                  ${col.required ? 'required' : ''} />
+              </div>
+            `;
+  }).join('')}
+          <div style="display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-6);">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-admin-crud">Cancelar</button>
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+// ── Presupuesto (Budget) View ──
+export function renderPresupuestoProyeccionView() {
+  return `
+    <div class="animate-fade-in">
+        <!-- Filters -->
+        <div class="sofia-filters" style="margin-bottom: var(--space-6);">
+            <div class="filter-group">
+                <label class="form-label">CICLO BASE (Real)</label>
+                <select class="form-select sofia-filter-select" id="ppto-ciclo-base">
+                    <option value="2025-2026" selected>2025-2026</option>
+                    <option value="2024-2025">2024-2025</option>
+                    <option value="2023-2024">2023-2024</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">CICLO DESTINO</label>
+                <select class="form-select sofia-filter-select" id="ppto-ciclo-destino">
+                    <option value="2026-2027" selected>2026-2027</option>
+                    <option value="2027-2028">2027-2028</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">FINCA</label>
+                <select class="form-select sofia-filter-select" id="ppto-finca">
+                    <option value="">Todas</option>
+                    <option value="El Espejo">El Espejo</option>
+                    <option value="Fincas Viejas">Fincas Viejas</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">PREDIO (Clasifica)</label>
+                <select class="form-select sofia-filter-select" id="ppto-predio">
+                    <option value="">Todos</option>
+                    <optgroup label="El Espejo">
+                        <option value="El Espejo 1">El Espejo 1 (EEI)</option>
+                        <option value="El Espejo 2">El Espejo 2 (EEII)</option>
+                        <option value="El Espejo 3">El Espejo 3 (EEIII)</option>
+                    </optgroup>
+                    <optgroup label="Fincas Viejas">
+                        <option value="Camino Truncado">Camino Truncado</option>
+                        <option value="La Chimbera">La Chimbera</option>
+                        <option value="Puente Alto">Puente Alto</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="filter-group" style="display: flex; align-items: flex-end; gap: var(--space-2);">
+                <button class="btn btn-primary" id="btn-ppto-load" style="white-space: nowrap;">
+                    📊 Generar Presupuesto
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div id="ppto-summary" class="dashboard-grid" style="grid-template-columns: repeat(5, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="metric-card">
+                <div class="metric-card-header"><div class="metric-card-icon green">👷</div></div>
+                <div class="metric-value" id="ppto-total-jornales">—</div>
+                <div class="metric-label">TOTAL JORNALES (Real)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header"><div class="metric-card-icon amber">💵</div></div>
+                <div class="metric-value" id="ppto-total-costo-mo">—</div>
+                <div class="metric-label">COSTO MANO DE OBRA (ARS)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header"><div class="metric-card-icon purple">📦</div></div>
+                <div class="metric-value" id="ppto-total-insumos">—</div>
+                <div class="metric-label">REGISTROS INSUMOS</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header"><div class="metric-card-icon blue">💰</div></div>
+                <div class="metric-value" id="ppto-total-costo-insumos">—</div>
+                <div class="metric-label">COSTO INSUMOS (USD)</div>
+            </div>
+            <div class="metric-card" style="border-left: 3px solid #f59e0b;">
+                <div class="metric-card-header"><div class="metric-card-icon amber">🌾</div></div>
+                <div class="metric-value" id="ppto-costo-ha-global">—</div>
+                <div class="metric-label">COSTO/Ha PROMEDIO (ARS)</div>
+            </div>
+        </div>
+
+        <!-- Finca Sub-Summary (hidden until data loads) -->
+        <div id="ppto-finca-summary" style="display: none; margin-bottom: var(--space-6);">
+            <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); flex-wrap: wrap;">
+            <button class="btn btn-primary" id="ppto-tab-jornales-cant" style="border-radius: 8px 8px 0 0;">👷 Jornales (Cant.)</button>
+            <button class="btn btn-ghost" id="ppto-tab-jornales-costo" style="border-radius: 8px 8px 0 0;">💵 Jornales (Costo)</button>
+            <button class="btn btn-ghost" id="ppto-tab-costo-ha" style="border-radius: 8px 8px 0 0;">🌾 Costo/Ha Manten.</button>
+            <button class="btn btn-ghost" id="ppto-tab-gastos" style="border-radius: 8px 8px 0 0;">📦 Gastos y Consumos</button>
+            <button class="btn btn-ghost" id="ppto-tab-produccion" style="border-radius: 8px 8px 0 0;">🍇 Producción Estimada</button>
+            <button class="btn btn-ghost" id="ppto-tab-excel" style="border-radius: 8px 8px 0 0;">📊 Ppto General (Excel)</button>
+            <button class="btn btn-ghost" id="ppto-tab-ejecucion" style="border-radius: 8px 8px 0 0;">📈 Ejecución vs Plan</button>
+        </div>
+
+        <!-- Tab Content: Jornales Cantidad -->
+        <div id="ppto-content-jornales-cant">
+            <div class="charts-row" style="margin-bottom: var(--space-6);">
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Comparativa Jornales por Labor</span>
+                    </div>
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="chart-ppto-jornales-labor"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Comparativa Jornales por Predio</span>
+                    </div>
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="chart-ppto-jornales-predio"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <h3 style="margin: 0; color: var(--text-primary);">👷 Detalle Cuantitativo de Jornadas</h3>
+                    <div style="display: flex; gap: var(--space-2);">
+                        <button class="btn btn-ghost btn-sm" id="btn-ppto-adjust-jornales-cant">⚙️ Ajuste Global %</button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-jornales-qty">
+                        <thead>
+                            <tr>
+                                <th>Categoría</th>
+                                <th style="min-width: 140px;">Labor</th>
+                                <th style="text-align: right;">Real (Base)</th>
+                                <th style="text-align: right; min-width: 100px;">Proyectado</th>
+                                <th style="text-align: right;">Δ %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-jornales-qty">
+                            <tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Presione "Generar Presupuesto" para cargar datos
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-jornales-qty"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Jornales Costo -->
+        <div id="ppto-content-jornales-costo" style="display: none;">
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <h3 style="margin: 0; color: #10b981;">💵 Valorización Monetaria de M.O.</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-jornales-costo">
+                        <thead>
+                            <tr>
+                                <th>Categoría</th>
+                                <th style="min-width: 140px;">Labor</th>
+                                <th style="text-align: right;">Costo Real (ARS)</th>
+                                <th style="text-align: right;">Costo Proy. (ARS)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-jornales-costo">
+                            <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Esperando cálculo...
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-jornales-costo"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Costo/Ha Mantenimiento -->
+        <div id="ppto-content-costo-ha" style="display: none;">
+            <div class="charts-row" style="margin-bottom: var(--space-6);">
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">🌾 Costo de Mantenimiento por Hectárea (ARS)</span>
+                    </div>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="chart-ppto-costo-ha"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Jornales por Hectárea por Predio</span>
+                    </div>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="chart-ppto-jornales-ha"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Finca comparison cards -->
+            <div id="ppto-costo-ha-finca-cards" class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+            </div>
+
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <div>
+                        <h3 style="margin: 0; color: #f59e0b; display: flex; align-items: center; gap: 8px;">
+                            🌾 Detalle Costo de Mantenimiento por Hectárea
+                        </h3>
+                        <p style="margin: var(--space-1) 0 0; color: var(--text-tertiary); font-size: 0.85em;">
+                            Costo total de mano de obra dividido por la superficie de cada predio. Permite identificar las zonas con mayor y menor inversión en mantenimiento.
+                        </p>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-costo-ha">
+                        <thead>
+                            <tr style="background: rgba(245, 158, 11, 0.08);">
+                                <th>Finca</th>
+                                <th>Predio (Clasifica)</th>
+                                <th style="text-align: right;">Hectáreas</th>
+                                <th style="text-align: right;">Jornales Tot.</th>
+                                <th style="text-align: right;">Jornales/Ha</th>
+                                <th style="text-align: right;">Costo Total (ARS)</th>
+                                <th style="text-align: right; min-width: 140px;">Costo/Ha (ARS)</th>
+                                <th style="text-align: center;">Nivel</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-costo-ha">
+                            <tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Presione "Generar Presupuesto" para calcular costos por hectárea
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-costo-ha"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Gastos -->
+        <div id="ppto-content-gastos" style="display: none;">
+            <div class="charts-row" style="margin-bottom: var(--space-6);">
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Comparativa por Categoría</span>
+                    </div>
+                    <div style="height: 350px; position: relative;">
+                        <canvas id="chart-ppto-gastos-cat"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container" style="flex: 1;">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Top Productos por Cantidad</span>
+                    </div>
+                    <div style="height: 350px; position: relative;">
+                        <canvas id="chart-ppto-gastos-prod"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <h3 style="margin: 0; color: var(--text-primary);">📋 Detalle por Producto</h3>
+                    <div style="display: flex; gap: var(--space-2);">
+                        <button class="btn btn-ghost btn-sm" id="btn-ppto-adjust-gastos" title="Aplicar ajuste % a toda la proyección">
+                            ⚙️ Ajuste Global %
+                        </button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-gastos">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 140px;">Categoría</th>
+                                <th style="min-width: 180px;">Producto</th>
+                                <th style="text-align: right;">Cant. Real</th>
+                                <th style="text-align: right; min-width: 120px;">Cant. Proy.</th>
+                                <th style="text-align: right;">Δ %</th>
+                                <th style="text-align: right;">Costo Real (USD)</th>
+                                <th style="text-align: right;">Costo Proy. (USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-gastos">
+                            <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Presione "Generar Presupuesto" para cargar datos
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-gastos"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Producción Estimada (UVA → PASA) -->
+        <div id="ppto-content-produccion" style="display: none;">
+            <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6); border: 1px solid rgba(139, 92, 246, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <div>
+                        <h3 style="margin: 0; color: #8b5cf6; display: flex; align-items: center; gap: 8px;">
+                            🍇 Estimación de Producción por Predio
+                        </h3>
+                        <p style="margin: var(--space-1) 0 0; color: var(--text-tertiary); font-size: 0.85em;">
+                            Defina los Kg de uva estimados por hectárea para cada predio. La producción de pasas se calcula dividiendo por 4.
+                        </p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" id="btn-ppto-save-produccion" style="border: 1px solid #8b5cf6; color: #8b5cf6;">
+                        💾 Guardar Estimaciones
+                    </button>
+                </div>
+
+                <div class="charts-row" style="margin-bottom: var(--space-6);">
+                    <div class="chart-container" style="flex: 1;">
+                        <div class="chart-header">
+                            <span class="chart-title">📊 Producción Estimada: Uva vs Pasa por Predio</span>
+                        </div>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="chart-ppto-produccion"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="tbl-ppto-produccion">
+                        <thead>
+                            <tr style="background: rgba(139, 92, 246, 0.1);">
+                                <th>Finca</th>
+                                <th>Predio</th>
+                                <th style="text-align: right;">Hectáreas</th>
+                                <th style="text-align: right; min-width: 150px;">Kg Uva/Ha (estimado)</th>
+                                <th style="text-align: right;">Total Kg Uva</th>
+                                <th style="text-align: right;">Kg Pasa Estimado (÷4)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-ppto-produccion">
+                            <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                Presione "Generar Presupuesto" para cargar datos de predios
+                            </td></tr>
+                        </tbody>
+                        <tfoot id="tfoot-ppto-produccion"></tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Conteo de Racimos Post-Floración -->
+            <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6); border: 1px solid rgba(245, 158, 11, 0.3); background: linear-gradient(135deg, rgba(245, 158, 11, 0.03), transparent);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); cursor: pointer;" id="btn-toggle-racimos">
+                    <div>
+                        <h3 style="margin: 0; color: #f59e0b; display: flex; align-items: center; gap: 8px;">
+                            🌸 Conteo de Racimos Post-Floración
+                            <span style="font-size: 0.65em; padding: 3px 10px; border-radius: 12px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; font-weight: 500;">Análisis del Ingeniero</span>
+                        </h3>
+                        <p style="margin: var(--space-1) 0 0; color: var(--text-tertiary); font-size: 0.85em;">
+                            Después de la floración, se cuentan los racimos por planta para estimar rendimiento por cuartel.
+                            El ingeniero decide si aplicar esta estimación al presupuesto.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: var(--space-2); align-items: center;">
+                        <button class="btn btn-ghost btn-sm" id="btn-ppto-save-racimos" style="border: 1px solid #f59e0b; color: #f59e0b;">
+                            💾 Guardar Conteo
+                        </button>
+                        <button class="btn btn-ghost btn-sm" id="btn-ppto-apply-racimos" style="border: 1px solid #10b981; color: #10b981;" title="Aplica las estimaciones marcadas a la tabla de Kg Uva/Ha">
+                            ✅ Aplicar al Presupuesto
+                        </button>
+                        <span id="racimos-toggle-icon" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>
+                    </div>
+                </div>
+
+                <div id="racimos-content-wrapper" style="display: none;">
+                    <div style="display: flex; gap: var(--space-4); margin-bottom: var(--space-4); flex-wrap: wrap;">
+                        <div class="metric-card" style="flex: 1; min-width: 180px; border-left: 3px solid #f59e0b;">
+                            <div class="metric-label">PESO PROMEDIO POR RACIMO</div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="number" id="racimos-peso-default" value="0.35" step="0.05" min="0.1" max="2"
+                                    style="width: 80px; text-align: right; background: var(--bg-tertiary); border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 8px; color: var(--text-primary); font-size: 1.1em; font-weight: 600;"
+                                />
+                                <span style="color: var(--text-tertiary); font-size: 0.85em;">kg/racimo</span>
+                            </div>
+                            <div style="font-size: 0.75em; color: var(--text-tertiary); margin-top: 4px;">Valor base para todos los cuarteles</div>
+                        </div>
+                        <div class="metric-card" style="flex: 1; min-width: 180px; border-left: 3px solid #8b5cf6;">
+                            <div class="metric-label">CUARTELES CON CONTEO</div>
+                            <div class="metric-value" id="racimos-cuarteles-count" style="font-size: 1.4em;">0</div>
+                        </div>
+                        <div class="metric-card" style="flex: 1; min-width: 180px; border-left: 3px solid #10b981;">
+                            <div class="metric-label">ESTIMACIÓN TOTAL UVA</div>
+                            <div class="metric-value" id="racimos-total-uva" style="font-size: 1.4em;">0 kg</div>
+                        </div>
+                        <div class="metric-card" style="flex: 1; min-width: 180px; border-left: 3px solid #6366f1;">
+                            <div class="metric-label">ESTIMACIÓN TOTAL PASA</div>
+                            <div class="metric-value" id="racimos-total-pasa" style="font-size: 1.4em;">0 kg</div>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="tbl-ppto-racimos">
+                            <thead>
+                                <tr style="background: rgba(245, 158, 11, 0.1);">
+                                    <th>Finca</th>
+                                    <th>Predio</th>
+                                    <th>Cuartel</th>
+                                    <th style="text-align: right;">Plantas</th>
+                                    <th style="text-align: right;">Ha</th>
+                                    <th style="text-align: right; min-width: 120px;">Racimos/Planta</th>
+                                    <th style="text-align: right; min-width: 100px;">Peso/Racimo (kg)</th>
+                                    <th style="text-align: right;">Kg Uva Est.</th>
+                                    <th style="text-align: right;">Kg/Ha Est.</th>
+                                    <th style="text-align: right;">Kg Pasa Est.</th>
+                                    <th style="text-align: center; min-width: 70px;" title="Marque para aplicar esta estimación al presupuesto">Aplicar</th>
+                                    <th style="min-width: 150px;">Notas Ingeniero</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-ppto-racimos">
+                                <tr><td colspan="12" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                    Presione "Generar Presupuesto" para cargar datos de cuarteles
+                                </td></tr>
+                            </tbody>
+                            <tfoot id="tfoot-ppto-racimos"></tfoot>
+                        </table>
+                    </div>
+
+                    <div style="margin-top: var(--space-4); padding: var(--space-3); background: rgba(245, 158, 11, 0.05); border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.15);">
+                        <p style="margin: 0; font-size: 0.8em; color: var(--text-tertiary); line-height: 1.6;">
+                            <strong style="color: #f59e0b;">ℹ️ Metodología:</strong> Racimos/Planta × Peso/Racimo × Plantas = Kg Uva Cuartel.
+                            Al marcar "Aplicar", la estimación por conteo de racimos reemplaza el valor manual de Kg/Ha en la tabla de producción del predio correspondiente.
+                            El ingeniero puede ajustar el peso por racimo y las notas según su análisis de campo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Presupuesto General (Excel) -->
+        <div id="ppto-content-excel" style="display: none;">
+            <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <h3 style="margin: 0; color: var(--text-primary);">📊 Compilado Presupuesto General</h3>
+                </div>
+                <div id="excel-budget-container">
+                    <div style="text-align: center; padding: 3rem; color: var(--text-tertiary);">
+                        <p>Presione "Generar Presupuesto" para cargar el archivo Excel</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Ejecución vs Plan -->
+        <div id="ppto-content-ejecucion" style="display: none;">
+            <div id="ppto-ejecucion-container">
+                <div class="card" style="padding: 3rem; text-align: center; color: var(--text-tertiary); border: 1px dashed var(--color-border);">
+                    <div style="font-size: 3em; margin-bottom: var(--space-4);">📋</div>
+                    <h3 style="margin: 0 0 var(--space-2); color: var(--text-secondary);">Presupuesto No Confirmado</h3>
+                    <p style="margin: 0;">Para ver la ejecución real vs planificada, primero confirme el presupuesto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Badge + Action Buttons -->
+        <div style="display: flex; gap: var(--space-3); justify-content: space-between; align-items: center; margin-top: var(--space-4); padding-bottom: var(--space-4);">
+            <div id="ppto-status-badge" style="display: flex; align-items: center; gap: var(--space-3);">
+                <span id="ppto-status-text" style="padding: 6px 16px; border-radius: 20px; font-size: 0.85em; font-weight: 600; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);">
+                    🔧 En Construcción
+                </span>
+                <span id="ppto-confirmed-date" style="font-size: 0.8em; color: var(--text-tertiary); display: none;"></span>
+            </div>
+            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+                <button class="btn btn-ghost" id="btn-ppto-export">📄 Exportar CSV</button>
+                <button class="btn btn-primary" id="btn-ppto-save">💾 Guardar Borrador</button>
+                <button class="btn" id="btn-ppto-confirm" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; font-weight: 600; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                    ✅ Confirmar Presupuesto
+                </button>
+                <button class="btn btn-ghost" id="btn-ppto-unconfirm" style="display: none; border: 1px solid #ef4444; color: #ef4444;">
+                    🔓 Desbloquear
+                </button>
+            </div>
+        </div>
+
+        <!-- NEW: Mixed Budget Export Section -->
+        <div class="card" style="margin-top: var(--space-8); padding: var(--space-6); background: var(--bg-secondary); border: 1px dashed var(--color-primary);">
+             <div style="display: flex; justify-content: space-between; align-items: center;">
+                 <div>
+                     <h3 style="margin: 0 0 var(--space-1) 0; color: var(--color-primary);">📦 Generar Presupuesto Mixto (Sofia + Excel)</h3>
+                     <p style="margin: 0; color: var(--text-tertiary); font-size: 0.9rem;">
+                         Combina Labores de Sofia con Gastos Generales del Excel actual.
+                     </p>
+                 </div>
+                 <div style="display: flex; gap: var(--space-2);">
+                     <button class="btn btn-sm btn-ghost" id="btn-ppto-mixed-pdf" style="border: 1px solid #ef4444; color: #ef4444;">📕 Descargar PDF</button>
+                     <button class="btn btn-sm btn-ghost" id="btn-ppto-mixed-xlsx" style="border: 1px solid #22c55e; color: #22c55e;">📗 Descargar Excel</button>
+                     <button class="btn btn-sm btn-ghost" id="btn-ppto-mixed-csv" style="border: 1px solid #3b82f6; color: #3b82f6;">📘 Descargar CSV</button>
+                 </div>
+             </div>
+        </div>
+    </div>
+  `;
+}
+
+// ── Render Execution View (Planificado vs Real) ──
+export function renderEjecucionPresupuesto(comparison) {
+    if (!comparison) return '';
+    const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+    const fmtDec = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+    const pctColor = (pct) => pct > 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
+    const estadoIcon = (estado) => estado === 'excedido' || estado === 'superado' ? '🔴' : estado === 'alerta' || estado === 'bueno' ? '🟡' : '🟢';
+
+    const t = comparison.totals;
+    const jPct = t.jornalesPlan > 0 ? (t.jornalesReal / t.jornalesPlan * 100) : 0;
+    const gPct = t.gastosPlan > 0 ? (t.gastosReal / t.gastosPlan * 100) : 0;
+    const uPct = t.uvaPlan > 0 ? (t.uvaReal / t.uvaPlan * 100) : 0;
+    const pPct = t.pasaPlan > 0 ? (t.pasaReal / t.pasaPlan * 100) : 0;
+
+    return `
+    <div class="animate-fade-in">
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="metric-card" style="border-left: 4px solid ${pctColor(jPct)};">
+                <div class="metric-label">JORNALES</div>
+                <div class="metric-value" style="font-size: 1.4em;">${fmtDec(jPct)}%</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">${fmt(t.jornalesReal)} / ${fmt(t.jornalesPlan)} plan</div>
+                <div style="margin-top: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; height: 6px; overflow: hidden;">
+                    <div style="height: 100%; width: ${Math.min(jPct, 100)}%; background: ${pctColor(jPct)}; border-radius: 6px; transition: width 1s ease;"></div>
+                </div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid ${pctColor(gPct)};">
+                <div class="metric-label">CONSUMOS / INSUMOS</div>
+                <div class="metric-value" style="font-size: 1.4em;">${fmtDec(gPct)}%</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">${fmt(t.gastosReal)} / ${fmt(t.gastosPlan)} plan</div>
+                <div style="margin-top: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; height: 6px; overflow: hidden;">
+                    <div style="height: 100%; width: ${Math.min(gPct, 100)}%; background: ${pctColor(gPct)}; border-radius: 6px; transition: width 1s ease;"></div>
+                </div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid ${pctColor(uPct)};">
+                <div class="metric-label">PRODUCCIÓN UVA</div>
+                <div class="metric-value" style="font-size: 1.4em;">${fmtDec(uPct)}%</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">${fmt(t.uvaReal)} / ${fmt(t.uvaPlan)} kg plan</div>
+                <div style="margin-top: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; height: 6px; overflow: hidden;">
+                    <div style="height: 100%; width: ${Math.min(uPct, 100)}%; background: ${pctColor(uPct)}; border-radius: 6px; transition: width 1s ease;"></div>
+                </div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid ${pctColor(pPct)};">
+                <div class="metric-label">PRODUCCIÓN PASA</div>
+                <div class="metric-value" style="font-size: 1.4em;">${fmtDec(pPct)}%</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">${fmt(t.pasaReal)} / ${fmt(t.pasaPlan)} kg plan</div>
+                <div style="margin-top: 8px; background: rgba(255,255,255,0.05); border-radius: 6px; height: 6px; overflow: hidden;">
+                    <div style="height: 100%; width: ${Math.min(pPct, 100)}%; background: ${pctColor(pPct)}; border-radius: 6px; transition: width 1s ease;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-row" style="margin-bottom: var(--space-6);">
+            <div class="chart-container" style="flex: 1;">
+                <div class="chart-header"><span class="chart-title">📊 Jornales: Planificado vs Consumido</span></div>
+                <div style="height: 300px; position: relative;"><canvas id="chart-ejecucion-jornales"></canvas></div>
+            </div>
+            <div class="chart-container" style="flex: 1;">
+                <div class="chart-header"><span class="chart-title">🍇 Producción: Plan vs Real por Predio</span></div>
+                <div style="height: 300px; position: relative;"><canvas id="chart-ejecucion-produccion"></canvas></div>
+            </div>
+        </div>
+
+        ${comparison.jornales.length > 0 ? `
+        <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+            <h3 style="margin: 0 0 var(--space-4); color: var(--text-primary);">👷 Ejecución de Jornales</h3>
+            <div style="overflow-x: auto;"><table class="data-table">
+                <thead><tr>
+                    <th>Labor</th><th style="text-align: right;">Planificado</th><th style="text-align: right;">Consumido</th>
+                    <th style="text-align: right;">Diferencia</th><th style="text-align: center; min-width: 120px;">Avance</th><th style="text-align: center;">Estado</th>
+                </tr></thead>
+                <tbody>
+                    ${comparison.jornales.map(j => `<tr>
+                        <td style="font-weight: 500;">${j.labor}</td>
+                        <td style="text-align: right;">${fmtDec(j.planificado)}</td>
+                        <td style="text-align: right; font-weight: 600;">${fmtDec(j.consumido)}</td>
+                        <td style="text-align: right; color: ${j.diferencia > 0 ? '#ef4444' : '#10b981'};">${j.diferencia > 0 ? '+' : ''}${fmtDec(j.diferencia)}</td>
+                        <td style="text-align: center;"><div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+                            <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 4px; height: 8px; max-width: 80px; overflow: hidden;">
+                                <div style="height: 100%; width: ${Math.min(j.porcentaje, 100)}%; background: ${pctColor(j.porcentaje)}; border-radius: 4px;"></div>
+                            </div>
+                            <span style="font-size: 0.85em; font-weight: 600; color: ${pctColor(j.porcentaje)};">${fmtDec(j.porcentaje)}%</span>
+                        </div></td>
+                        <td style="text-align: center;">${estadoIcon(j.estado)}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table></div>
+        </div>` : ''}
+
+        ${comparison.produccion.length > 0 ? `
+        <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6); border: 1px solid rgba(139, 92, 246, 0.2);">
+            <h3 style="margin: 0 0 var(--space-4); color: #8b5cf6;">🍇 Ejecución de Producción por Predio</h3>
+            <div style="overflow-x: auto;"><table class="data-table">
+                <thead><tr style="background: rgba(139, 92, 246, 0.08);">
+                    <th>Finca</th><th>Predio</th><th style="text-align: right;">Ha</th>
+                    <th style="text-align: right;">Kg Uva Plan</th><th style="text-align: right;">Kg Uva Real</th>
+                    <th style="text-align: right;">Kg Pasa Plan</th><th style="text-align: right;">Kg Pasa Real</th>
+                    <th style="text-align: center; min-width: 120px;">Avance</th>
+                </tr></thead>
+                <tbody>
+                    ${comparison.produccion.map(p => `<tr>
+                        <td style="color: var(--text-tertiary); font-size: 0.85em;">${p.group}</td>
+                        <td style="font-weight: 600;">${p.predio}</td>
+                        <td style="text-align: right;">${fmtDec(p.hectareas)}</td>
+                        <td style="text-align: right;">${fmt(p.planificadoUva)}</td>
+                        <td style="text-align: right; font-weight: 600; color: ${pctColor(p.pctUva)};">${fmt(p.realUva)}</td>
+                        <td style="text-align: right;">${fmt(p.planificadoPasa)}</td>
+                        <td style="text-align: right; font-weight: 600;">${fmt(p.realPasa)}</td>
+                        <td style="text-align: center;"><div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+                            <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 4px; height: 8px; max-width: 80px; overflow: hidden;">
+                                <div style="height: 100%; width: ${Math.min(p.pctUva, 100)}%; background: ${pctColor(p.pctUva)}; border-radius: 4px;"></div>
+                            </div>
+                            <span style="font-size: 0.85em; font-weight: 600; color: ${pctColor(p.pctUva)};">${fmtDec(p.pctUva)}%</span>
+                        </div></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table></div>
+        </div>` : ''}
+
+        <div style="text-align: center; padding: var(--space-3); color: var(--text-tertiary); font-size: 0.8em;">
+            Presupuesto confirmado el ${comparison.confirmedAt ? new Date(comparison.confirmedAt).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' }) : ''}
+        </div>
+    </div>
+    `;
+}
+
+// ── Gastos View ──
+export function renderGastosView() {
+  return `
+    <div class="animate-fade-in">
+        <div class="sofia-filters" style="margin-bottom: var(--space-6);">
+            <div class="filter-group">
+                <label class="form-label">PERIODO</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Ciclo Actual (2025-2026)</option>
+                    <option>2024-2025</option>
+                    <option>2023-2024</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">FINCA</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Todas</option>
+                    <option>El Espejo</option>
+                    <option>Fincas Viejas</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">CATEGORÍA</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Todas</option>
+                    <option>Mano de Obra</option>
+                    <option>Insumos</option>
+                    <option>Energía/Riego</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-6); margin-bottom: var(--space-8);">
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon green">💸</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">TOTAL GASTOS ACUMULADOS</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">+0% vs ciclo anterior</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon amber">👤</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">MANO DE OBRA (DIRECTA)</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Gastos de personal en finca</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon purple">📦</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">INSUMOS Y PRODUCTOS</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Fertilizantes y fitosanitarios</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon blue">⚡</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">OTROS (ENERGÍA/RIEGO)</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Gasoil, Energía y Mantenimiento</p>
+            </div>
+        </div>
+
+        <div class="charts-row" style="margin-bottom: var(--space-8);">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <span class="chart-title">Evolución Mensual de Gastos</span>
+                </div>
+                <div style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-style: italic; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                    [ Gráfico de Gastos Históricos ]
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-header">
+                    <span class="chart-title">Distribución por Finca</span>
+                </div>
+                <div style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-style: italic; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                    [ Distribución de Gastos ]
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+// ── Secaderos View ──
+export function renderSecaderosView() {
+  return `
+    <div id="secaderos-view" class="view animate-fade-in" style="padding: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+          <h2>Disponibilidad de Secaderos</h2>
+          <div class="view-toggle">
+              <button class="toggle-btn active" id="btn-secadero-grid">Vista Cuadrícula</button>
+              <button class="toggle-btn" id="btn-secadero-gantt">Vista Gantt</button>
+          </div>
+      </div>
+
+      <section class="global-summary" id="secadero-stats" style="margin-bottom: 2rem;">
+          <!-- KPIs de secaderos inyectados -->
+      </section>
+
+      <section class="premium-card">
+          <div id="secadero-grid-container">
+              <h2 style="margin-bottom: 1.5rem;">Mapa de Estado: Playas y Sectores</h2>
+              <div id="secadero-grid" class="secadero-grid">
+                  <!-- Grid inyectado -->
+              </div>
+          </div>
+
+          <div id="secadero-gantt-container" style="display: none;">
+              <h2 style="margin-bottom: 1.5rem;">Cronograma de Secado (Gantt)</h2>
+              <div id="secadero-gantt" class="gantt-wrapper">
+                  <!-- Gantt inyectado -->
+              </div>
+          </div>
+      </section>
+    </div>
+  `;
+}
+
+// ── Gastos Históricos View (External Dashboard) ──
+export function renderGastosHistoricosView() {
+  return `
+    <div class="animate-fade-in" style="padding: 0;">
+      <!-- Filters -->
+      <div class="sofia-filters" style="margin-bottom: var(--space-6);">
+        <div class="filter-group">
+          <label class="form-label">Finca</label>
+          <select class="form-select sofia-filter-select" id="gh-filter-finca">
+            <option value="all">Todas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Ítem de Gasto</label>
+          <select class="form-select sofia-filter-select" id="gh-filter-item">
+            <option value="all">Todas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Unificación</label>
+          <select class="form-select sofia-filter-select" id="gh-filter-unif">
+            <option value="all">Todas</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- KPI Summary -->
+      <div class="dashboard-grid" id="gh-kpi-summary" style="margin-bottom: var(--space-6);">
+        <div class="metric-card animate-slide-up">
+          <span class="metric-label">Gasto Acumulado</span>
+          <span class="metric-value" id="gh-kpi-total">$0</span>
+        </div>
+        <div class="metric-card animate-slide-up" style="animation-delay: 0.1s;">
+          <span class="metric-label">Gasto Último Año</span>
+          <span class="metric-value" id="gh-kpi-last">$0</span>
+        </div>
+        <div class="metric-card animate-slide-up" style="animation-delay: 0.2s;">
+          <span class="metric-label">BP Último Año</span>
+          <span class="metric-value" id="gh-kpi-bp" style="color: var(--accent-emerald);">N/A</span>
+        </div>
+        <div class="metric-card animate-slide-up" style="animation-delay: 0.3s;">
+          <span class="metric-label">Variación vs Anterior</span>
+          <span class="metric-value" id="gh-kpi-var">0%</span>
+        </div>
+      </div>
+
+      <!-- Charts Row 1: Evolution + USD/Ha -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); margin-bottom: var(--space-8);">
+        <div class="animate-fade-in" style="padding: var(--space-4) 0;">
+          <h3 style="margin-bottom: var(--space-4); font-weight: 700; color: var(--accent-primary); font-size: 1.05rem; padding-left: 12px; border-left: 3px solid var(--accent-primary);">Evolución Histórica de Gastos (USD)</h3>
+          <div style="height: 380px; position: relative;">
+            <canvas id="gh-chart-evolution"></canvas>
+          </div>
+        </div>
+        <div class="animate-fade-in" style="padding: var(--space-4) 0; animation-delay: 0.1s;">
+          <h3 style="margin-bottom: var(--space-4); font-weight: 700; color: var(--accent-emerald); font-size: 1.05rem; padding-left: 12px; border-left: 3px solid var(--accent-emerald);">Gasto por Hectárea (USD/Ha)</h3>
+          <div style="height: 380px; position: relative;">
+            <canvas id="gh-chart-ha"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2: Costo/Kg Pasa + Distribución -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); margin-bottom: var(--space-6);">
+        <div class="animate-fade-in" style="padding: var(--space-4) 0;">
+          <h3 style="margin-bottom: var(--space-4); font-weight: 700; color: #fbbf24; font-size: 1.05rem; padding-left: 12px; border-left: 3px solid #fbbf24;">Costo por Kg de Pasa (USD/Kg)</h3>
+          <div style="height: 380px; position: relative;">
+            <canvas id="gh-chart-pasa"></canvas>
+          </div>
+        </div>
+        <div class="animate-fade-in" style="padding: var(--space-4) 0; animation-delay: 0.1s;">
+          <h3 style="margin-bottom: var(--space-4); font-weight: 700; color: #f472b6; font-size: 1.05rem; padding-left: 12px; border-left: 3px solid #f472b6;">Distribución de Gastos por Ítem</h3>
+          <div style="height: 380px; position: relative;">
+            <canvas id="gh-chart-pie"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div id="gh-status" style="text-align: center; padding: var(--space-4); color: var(--text-tertiary); font-size: 0.85rem;"></div>
+    </div>
+  `;
+}
+
+// ── Control de Carga View ──
+export function renderControlCargaView() {
+    const today = new Date().toISOString().split('T')[0];
+    return `
+    <div id="control-carga-view" class="view animate-fade-in" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin: 0;">Control de Carga</h1>
+                <p style="color: var(--text-secondary); margin: 5px 0 0 0;">Visualización de labores cargadas por día desde Sofía API</p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="filter-group" style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px;">
+                    <label for="control-carga-date" style="font-size: 0.9rem; color: var(--text-secondary);">Fecha:</label>
+                    <input type="date" id="control-carga-date" value="${today}" style="background: transparent; border: none; color: white; outline: none; cursor: pointer;">
+                </div>
+                <div class="filter-group" style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px;">
+                    <label for="control-carga-cuartel" style="font-size: 0.9rem; color: var(--text-secondary);">Cuartel:</label>
+                    <select id="control-carga-cuartel" style="background: transparent; border: none; color: white; outline: none; cursor: pointer; max-width: 150px;">
+                        <option value="all" style="background: var(--color-bg-sidebar);">Todos</option>
+                    </select>
+                </div>
+                <button id="refresh-control-carga" class="btn-primary" style="padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; gap: 4px;">
+                    <span>🔄</span> Actualizar
+                </button>
+            </div>
+        </div>
+
+        <div id="control-carga-search-last" class="card animate-slide-up" style="margin-bottom: 2rem; padding: 1.5rem; border: 1px solid var(--color-border); background: var(--color-bg-sidebar);">
+            <h4 style="margin-top: 0; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">🔍 Buscar Última Vez de una Labor</h4>
+            <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; display: block;">Labor:</label>
+                    <select id="cc-search-labor" class="form-select" style="min-width: 250px; background: rgba(0,0,0,0.2);">
+                        <option value="">Cargando labores...</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; display: block;">Finca:</label>
+                    <select id="cc-search-finca" class="form-select" style="min-width: 150px; background: rgba(0,0,0,0.2);">
+                        <option value="">Todas las Fincas</option>
+                        <option value="El Espejo">El Espejo</option>
+                        <option value="Fincas Viejas">Fincas Viejas</option>
+                    </select>
+                </div>
+                <button id="btn-search-last-labor" class="btn btn-primary" style="padding: 0.6em 1.2em; height: 38px;">Buscar Última Fecha</button>
+            </div>
+            <div id="cc-search-result" style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--color-primary-500); font-size: 1.1em; color: var(--text-primary); display: none;"></div>
+        </div>
+
+        <div id="control-carga-summary" class="dashboard-grid" style="margin-bottom: 2rem;">
+            <div class="metric-card animate-slide-up">
+                <span class="metric-label">Total Registros</span>
+                <span class="metric-value" id="cc-total-registros">0</span>
+            </div>
+            <div class="metric-card animate-slide-up" style="animation-delay: 0.1s;">
+                <span class="metric-label">Total Jornadas</span>
+                <span class="metric-value" id="cc-total-jornadas">0</span>
+            </div>
+            <div class="metric-card animate-slide-up" style="animation-delay: 0.2s;">
+                <span class="metric-label">Predios con Carga</span>
+                <span class="metric-value" id="cc-total-predios">0</span>
+            </div>
+        </div>
+
+        <div id="control-carga-tables-container">
+            <div class="card" style="padding: 3rem; text-align: center; background: var(--color-bg-sidebar); border: 1px solid var(--color-border);">
+                <div class="loader-container">
+                    <div class="loader"></div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Cargando datos de Sofía...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+export function renderStockMovementView(movements, catalogs, user) {
+    const { productos } = catalogs;
+    const canLoadFactura = user.role === 'Administrador';
+    const canLoadRemito = user.role === 'Administrador' || user.role === 'Carga' || user.role === 'Ingeniero';
+
+    return `
+    <div class="work-log-view animate-fade-in">
+      <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+        <div>
+          <h2 style="font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em;">📦 Movimientos Stock</h2>
+          <p style="color: var(--text-tertiary);">Facturas de Compra (Admin) y Remitos de Entrega (Carga)</p>
+        </div>
+        <button class="btn btn-primary" id="btn-add-stock-move" style="box-shadow: var(--shadow-lg);">
+          <span style="margin-right: 8px;">➕</span> Cargar Movimiento
+        </button>
+      </div>
+
+      <div class="card" style="margin-bottom: var(--space-6);">
+        <div style="padding: var(--space-5); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1.1em; color: var(--text-secondary);">Últimos Movimientos de Entrada/Ajuste</h3>
+            <input type="text" id="search-stock-moves" class="form-input" placeholder="🔍 Buscar por comprobante o producto..." style="max-width: 300px;" />
+        </div>
+        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+            <table class="table" id="table-stock-moves">
+                <thead style="position: sticky; top: 0; background: var(--bg-secondary); z-index: 10;">
+                    <tr>
+                        <th style="padding: var(--space-4);">Fecha</th>
+                        <th>Producto</th>
+                        <th>Tipo</th>
+                        <th>Nº Comprobante</th>
+                        <th>Cantidad</th>
+                        <th>Usuario</th>
+                        <th>Notas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${movements.map(m => `
+                        <tr>
+                            <td style="padding: var(--space-4);">
+                                <div style="font-weight: 600;">${new Date(m.fecha).toLocaleDateString('es-AR')}</div>
+                                <div style="font-size: 0.8em; opacity: 0.6;">${new Date(m.fecha).toLocaleTimeString('es-AR')}</div>
+                            </td>
+                            <td><div style="font-weight: 600;">${m.producto_nombre || 'ID: ' + m.producto_id}</div></td>
+                            <td>
+                                <span class="badge" style="background: ${m.tipo_movimiento === 'factura' ? 'rgba(139, 92, 246, 0.15)' : (m.tipo_movimiento === 'remito' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)')}; color: ${m.tipo_movimiento === 'factura' ? '#a78bfa' : (m.tipo_movimiento === 'remito' ? '#4ade80' : '#f87171')};">
+                                    ${m.tipo_movimiento.toUpperCase()}
+                                </span>
+                            </td>
+                            <td><code>${m.nro_comprobante || '-'}</code></td>
+                            <td style="font-weight: 800; color: ${m.cantidad > 0 ? '#10b981' : '#ef4444'}">
+                                ${m.cantidad > 0 ? '+' : ''}${m.cantidad}
+                            </td>
+                            <td><div style="font-size: 0.9em;">${m.usuario_nombre || 'S/U'}</div></td>
+                            <td style="font-size: 0.85em; opacity: 0.8; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.notas}">${m.notas || '-'}</td>
+                        </tr>
+                    `).join('')}
+                    ${movements.length === 0 ? '<tr><td colspan="7" style="text-align: center; padding: 4rem; color: var(--text-tertiary); font-style: italic;">No hay movimientos registrados recientemente</td></tr>' : ''}
+                </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Movimiento Stock -->
+    <div id="stock-move-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 24px; padding: var(--space-8); max-width: 500px; width: 94%; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8); border: 1px solid var(--border-subtle); overflow: hidden; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-6);">
+          <div>
+            <h3 style="font-size: 1.4em; font-weight: 800;">📦 Registro de Ingreso</h3>
+            <p style="color: var(--text-tertiary); font-size: 0.9em;">Actualización de inventario físico</p>
+          </div>
+          <button type="button" class="btn btn-ghost" id="btn-close-stock-modal" style="font-size: 1.5em; padding: 0;">×</button>
+        </div>
+
+        <form id="form-stock-move" autocomplete="off">
+          <div class="form-group" style="margin-bottom: var(--space-5);">
+            <label class="form-label" style="font-weight: 600;">Tipo de Comprobante</label>
+            <select id="move-tipo" class="form-select" required style="background: rgba(255,255,255,0.03);">
+                ${canLoadFactura ? '<option value="factura">📄 Factura de Compra (Admin)</option>' : ''}
+                ${canLoadRemito ? '<option value="remito">🚚 Remito de Entrega (Recepción)</option>' : ''}
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-5);">
+            <label class="form-label" style="font-weight: 600;">Producto / Insumo</label>
+            <select id="move-producto" class="form-select" required style="background: rgba(255,255,255,0.03);">
+                <option value="">Seleccionar producto...</option>
+                ${productos.map(p => `<option value="${p.id}">${p.nombre} (Stock: ${p.stock} ${p.unidad || ''})</option>`).join('')}
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-5);">
+            <div class="form-group">
+                <label class="form-label" style="font-weight: 600;">Cantidad</label>
+                <input type="number" step="any" id="move-cantidad" class="form-input" required placeholder="0.00" style="background: rgba(255,255,255,0.03);" />
+            </div>
+            <div class="form-group">
+                <label class="form-label" style="font-weight: 600;">Nº Comprobante</label>
+                <input type="text" id="move-comprobante" class="form-input" required placeholder="Ej: 001-4567" style="background: rgba(255,255,255,0.03);" />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-6);">
+            <label class="form-label" style="font-weight: 600;">Notas / Observaciones</label>
+            <textarea id="move-notas" class="form-input" style="min-height: 80px; background: rgba(255,255,255,0.03);" placeholder="Detalles adicionales..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: var(--space-4); justify-content: flex-end;">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-stock-move" style="padding: var(--space-2) var(--space-6);">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-stock-move" style="padding: var(--space-2) var(--space-8); font-weight: 600;">💾 Guardar Ingreso</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    `;
+}
+
+
+/**
+ * Helper to render the Excel budget summary.
+ */
+export function renderExcelBudgetSummary(data) {
+    if (!data || !data.byFinca) return '<div class="alert alert-info">Sin datos para mostrar.</div>';
+
+    return `
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>FINCA</th>
+                        <th style="text-align: right;">Presupuesto USD</th>
+                        <th style="text-align: right;">Presupuesto ARS</th>
+                        <th style="text-align: right;">Items Registrados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.byFinca.map(f => `
+                        <tr>
+                            <td style="font-weight: 600;">${f.finca}</td>
+                            <td style="text-align: right; color: var(--color-success);">${f.usd.toLocaleString('es-AR', { style: 'currency', currency: 'USD' })}</td>
+                            <td style="text-align: right; color: var(--text-tertiary);">${f.ars.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })}</td>
+                            <td style="text-align: right;">${f.items.length}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot style="font-weight: 700; border-top: 2px solid var(--color-border);">
+                    <tr>
+                        <td>TOTAL GENERAL</td>
+                        <td style="text-align: right; color: var(--color-success);">
+                            ${data.byFinca.reduce((s, f) => s + f.usd, 0).toLocaleString('es-AR', { style: 'currency', currency: 'USD' })}
+                        </td>
+                        <td style="text-align: right;">
+                            ${data.byFinca.reduce((s, f) => s + f.ars, 0).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })}
+                        </td>
+                        <td style="text-align: right;">${data.raw.length}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    `;
+}
+
+/**
+ * Renders the Strategic Budget Planning Report
+ */
+export function renderInformePlanificacion(data) {
+    if (!data) return '<div class="alert alert-info" style="padding: 2rem; border-radius: 12px; background: rgba(59, 130, 246, 0.05); color: var(--text-secondary); text-align: center;">No hay datos de planificación disponibles. Use la sección de <strong>Panel de Control > Presupuesto</strong> para generar una proyección.</div>';
+
+    const fmt = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
+    const fmtDec = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(v);
+    const fmtMoney = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);
+    const fmtUsd = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'USD' }).format(v);
+
+    return `
+    <div class="animate-fade-in" style="padding-bottom: var(--space-8);">
+        <div style="background: linear-gradient(90deg, rgba(16, 185, 129, 0.05), transparent); border-left: 4px solid var(--color-primary-500); padding: var(--space-4); border-radius: 0 8px 8px 0; margin-bottom: var(--space-6);">
+            <h3 style="margin: 0; color: var(--text-primary); font-family: 'Outfit';">Presupuesto Referencia — Ciclo ${data.ciclo}</h3>
+            <p style="margin: 4px 0 0; color: var(--text-tertiary); font-size: 0.9em;">Basado en ejecución histórica vs proyección estratégica.</p>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="metric-card" style="border-bottom: 3px solid var(--color-primary-500);">
+                <div class="metric-label" style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px;">Jornales Proyectados</div>
+                <div class="metric-value" style="font-size: 2em; margin: 5px 0;">${fmt(data.totals.jornales)}</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">Capacidad operativa necesaria</div>
+            </div>
+            <div class="metric-card" style="border-bottom: 3px solid #10b981;">
+                <div class="metric-label" style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px;">Mano de Obra (Est.)</div>
+                <div class="metric-value" style="font-size: 1.5em; margin: 5px 0; color: #10b981;">${fmtMoney(data.totals.costoMo)}</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">Valorizado en pesos corrientes</div>
+            </div>
+            <div class="metric-card" style="border-bottom: 3px solid var(--color-accent-500);">
+                <div class="metric-label" style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px;">Inversión Gral. (USD)</div>
+                <div class="metric-value" style="font-size: 1.5em; margin: 5px 0; color: var(--color-accent-400);">${fmtUsd(data.totals.usdGral)}</div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">Gastos generales operativos</div>
+            </div>
+            <div class="metric-card" style="border-bottom: 3px solid #8b5cf6;">
+                <div class="metric-label" style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px;">Producción Objetivo</div>
+                <div class="metric-value" style="font-size: 2em; margin: 5px 0; color: #8b5cf6;">${fmt(data.totals.pasaPlan || 0)} <small style="font-size: 0.5em; vertical-align: middle;">kg</small></div>
+                <div style="font-size: 0.75em; color: var(--text-tertiary);">Target de pasas terminadas</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row" style="margin-bottom: var(--space-6); display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-6);">
+            <div class="chart-container" style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-5); border: 1px solid var(--border-subtle);">
+                <div class="chart-header" style="margin-bottom: var(--space-4);">
+                    <span class="chart-title" style="font-family: 'Outfit'; font-weight: 600; color: var(--text-primary);">📊 Planificación de Jornales por Grupo de Labor</span>
+                </div>
+                <div style="height: 320px; position: relative;">
+                    <canvas id="chart-plan-jornales-labor"></canvas>
+                </div>
+            </div>
+            <div class="chart-container" style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-5); border: 1px solid var(--border-subtle);">
+                <div class="chart-header" style="margin-bottom: var(--space-4);">
+                    <span class="chart-title" style="font-family: 'Outfit'; font-weight: 600; color: var(--text-primary);">📈 Proyección de Inversión por Finca</span>
+                </div>
+                <div style="height: 320px; position: relative;">
+                    <canvas id="chart-plan-gastos-finca"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tables Row -->
+        <div class="dashboard-grid" style="grid-template-columns: 1.6fr 1fr; gap: var(--space-6); align-items: start;">
+            <!-- Jornales Table -->
+            <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-secondary); border-radius: 16px;">
+                <div style="padding: var(--space-4) var(--space-5); background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                    <h4 style="margin: 0; color: var(--text-primary); font-family: 'Outfit'; font-size: 1rem;">👷 Labores Estratégicas</h4>
+                    <span style="font-size: 0.75em; color: var(--text-tertiary); background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 12px; font-weight: 600;">Total: ${data.jornales.length} faenas</span>
+                </div>
+                <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+                    <table class="data-table" style="margin: 0;">
+                        <thead>
+                            <tr>
+                                <th style="background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Labor / Faena</th>
+                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Jornales</th>
+                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Costo Est.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.jornales.map(l => `
+                                <tr>
+                                    <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5); color: white;">${l.labor}</td>
+                                    <td style="text-align: right; font-weight: 700; color: var(--color-primary-400); padding: var(--space-3) var(--space-5);">${fmtDec(l.jornales)}</td>
+                                    <td style="text-align: right; color: white; opacity: 0.8; font-size: 0.85em; padding: var(--space-3) var(--space-5);">${fmtMoney(l.costoArs)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Gastos Table -->
+            <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-secondary); border-radius: 16px;">
+                <div style="padding: var(--space-4) var(--space-5); background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-subtle);">
+                    <h4 style="margin: 0; color: var(--text-primary); font-family: 'Outfit'; font-size: 1rem;">💰 Inversión por Origen</h4>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" style="margin: 0;">
+                        <thead>
+                            <tr>
+                                <th style="padding: var(--space-3) var(--space-5); color: white; opacity: 0.9;">Unidad de Negocio</th>
+                                <th style="text-align: right; padding: var(--space-3) var(--space-5); color: white; opacity: 0.9;">Presupuesto (USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(() => {
+                                const byFinca = {};
+                                data.gastosGral.forEach(g => {
+                                    byFinca[g.finca] = (byFinca[g.finca] || 0) + g.usd;
+                                });
+                                return Object.entries(byFinca)
+                                    .sort((a,b) => b[1] - a[1])
+                                    .map(([f, usd]) => `
+                                        <tr>
+                                            <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5); color: white;">${f}</td>
+                                            <td style="text-align: right; font-weight: 700; color: #10b981; padding: var(--space-3) var(--space-5);">${fmtUsd(usd)}</td>
+                                        </tr>
+                                    `).join('');
+                            })()}
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding: var(--space-4); background: rgba(16, 185, 129, 0.03); color: white; opacity: 0.5; font-size: 0.75em; text-align: center; border-top: 1px solid var(--border-subtle);">
+                    Dato consolidado de importación de Excel General.
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+// ═══════════════════════════════════════════════════════
+// POM AVANZADO — Proyección de Jornal Específico
+// ═══════════════════════════════════════════════════════
+
+export function renderProyeccionJornalView() {
+    return `
+    <div class="animate-fade-in" style="padding: var(--space-2) 0;">
+        <!-- Header & Filters -->
+        <div style="display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-end; margin-bottom: var(--space-6); padding: var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(59,130,246,0.04)); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle);">
+            <div style="flex: 1; min-width: 200px;">
+                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin: 0 0 var(--space-1) 0; display: flex; align-items: center; gap: var(--space-2);">
+                    <span style="font-size: 1.6rem;">📊</span> POM Avanzado — Proyección de Jornal
+                </h2>
+                <p style="color: var(--text-tertiary); font-size: 0.85em; margin: 0;">Proyección editable del jornal específico por cuartel y faena. Cruce con datos reales de Sofía.</p>
+            </div>
+            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: flex-end;">
+                <div class="filter-group" style="min-width: 130px;">
+                    <label class="form-label" style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);">Ciclo Base</label>
+                    <select class="form-select sofia-filter-select" id="pom-ciclo" style="font-size: 0.9em; padding: var(--space-2) var(--space-3);">
+                        <option value="2025-2026" selected>2025-2026</option>
+                        <option value="2024-2025">2024-2025</option>
+                        <option value="2023-2024">2023-2024</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="min-width: 140px;">
+                    <label class="form-label" style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);">Finca</label>
+                    <select class="form-select sofia-filter-select" id="pom-finca-filter" style="font-size: 0.9em; padding: var(--space-2) var(--space-3);">
+                        <option value="">Todas</option>
+                        <option value="El Espejo">El Espejo</option>
+                        <option value="Fincas Viejas">Fincas Viejas</option>
+                        <option value="Puente Alto">Puente Alto</option>
+                        <option value="La Chimbera">La Chimbera</option>
+                        <option value="Camino Truncado">Camino Truncado</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="min-width: 140px;">
+                    <label class="form-label" style="font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);">Labor</label>
+                    <select class="form-select sofia-filter-select" id="pom-labor-filter" style="font-size: 0.9em; padding: var(--space-2) var(--space-3);">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="btn-pom-load" style="padding: var(--space-2) var(--space-5); font-weight: 700; font-size: 0.9em; border-radius: var(--radius-lg); display: flex; align-items: center; gap: var(--space-2);">
+                    <span>🚀</span> Generar Proyección
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div id="pom-summary-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02)); border: 1px solid rgba(16,185,129,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
+                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(16,185,129,0.8); font-weight: 700; margin-bottom: var(--space-2);">Jornales Proyectados</div>
+                <div id="pom-total-proy" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #10b981;">—</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02)); border: 1px solid rgba(59,130,246,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
+                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(59,130,246,0.8); font-weight: 700; margin-bottom: var(--space-2);">Jornales Reales</div>
+                <div id="pom-total-real" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #3b82f6;">—</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02)); border: 1px solid rgba(245,158,11,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
+                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(245,158,11,0.8); font-weight: 700; margin-bottom: var(--space-2);">Desvío Total</div>
+                <div id="pom-desvio" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #f59e0b;">—</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(168,85,247,0.02)); border: 1px solid rgba(168,85,247,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
+                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(168,85,247,0.8); font-weight: 700; margin-bottom: var(--space-2);">Sugeridos Antigravity</div>
+                <div id="pom-total-sug" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #a855f7;">—</div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); flex-wrap: wrap;">
+            <button class="btn btn-primary" id="pom-tab-detalle" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">📋 Detalle por Cuartel</button>
+            <button class="btn btn-ghost" id="pom-tab-resumen" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">🏡 Resumen por Finca</button>
+            <button class="btn btn-ghost" id="pom-tab-calendario" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">📅 Calendario</button>
+            <div style="flex: 1;"></div>
+            <button class="btn btn-ghost" id="btn-pom-export" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4); color: var(--color-primary-400);">📥 Exportar CSV</button>
+            <button class="btn btn-ghost" id="btn-pom-save" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4); color: var(--color-success);">💾 Guardar</button>
+        </div>
+
+        <!-- Content Areas -->
+        <div id="pom-content-detalle">
+            <div style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); font-size: 1.1em;">
+                <div style="font-size: 3rem; margin-bottom: var(--space-4); opacity: 0.3;">📊</div>
+                <p>Presione <strong>"Generar Proyección"</strong> para construir la proyección de jornales a partir de los datos de Sofía.</p>
+                <p style="font-size: 0.85em; opacity: 0.6; margin-top: var(--space-2);">Se cruzará automáticamente con los datos reales del ciclo seleccionado.</p>
+            </div>
+        </div>
+        <div id="pom-content-resumen" style="display: none;"></div>
+        <div id="pom-content-calendario" style="display: none;"></div>
+    </div>
+    `;
+}
+
+export function renderPomDetalleTable(matrix) {
+    if (!matrix || matrix.length === 0) {
+        return '<div style="padding: var(--space-8); text-align: center; color: var(--text-tertiary);">No hay datos para mostrar.</div>';
+    }
+
+    // Group by finca → predio
+    const grouped = {};
+    matrix.forEach(p => {
+        const fKey = p.finca;
+        if (!grouped[fKey]) grouped[fKey] = {};
+        const pKey = p.predio;
+        if (!grouped[fKey][pKey]) grouped[fKey][pKey] = [];
+        grouped[fKey][pKey].push(p);
+    });
+
+    let html = '';
+    Object.entries(grouped).forEach(([finca, predios]) => {
+        html += `
+        <div style="margin-bottom: var(--space-6);">
+            <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); padding: var(--space-3) var(--space-4); background: linear-gradient(90deg, rgba(16,185,129,0.12), transparent); border-radius: var(--radius-lg); border-left: 4px solid #10b981;">
+                <span style="font-size: 1.3em;">🏡</span>
+                <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${finca}</h3>
+            </div>
+        `;
+
+        Object.entries(predios).forEach(([predio, records]) => {
+            html += `
+            <div style="margin-bottom: var(--space-4); margin-left: var(--space-4);">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); padding: var(--space-2) var(--space-3); background: rgba(59,130,246,0.05); border-radius: var(--radius-md); border-left: 3px solid rgba(59,130,246,0.4);">
+                    <span style="font-size: 1em;">📍</span>
+                    <strong style="color: var(--text-primary); font-size: 0.95em;">${predio}</strong>
+                </div>
+                <div style="overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
+                    <table class="data-table pom-table" style="width: 100%; font-size: 0.82em; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.03);">
+                                <th style="padding: var(--space-2) var(--space-3); text-align: left; color: var(--text-secondary); font-weight: 700; font-size: 0.85em; white-space: nowrap;">Cuartel</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary); font-weight: 700; font-size: 0.85em;">Ha</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary); font-weight: 700; font-size: 0.85em;">Plantas</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: left; color: var(--text-secondary); font-weight: 700; font-size: 0.85em;">Labor</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #10b981; font-weight: 700; font-size: 0.85em;" title="Rendimiento proyectado (unidades/jornal)">Rend.Proy.</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #10b981; font-weight: 700; font-size: 0.85em;" title="Jornales proyectados">Jorn.Proy.</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 700; font-size: 0.85em;" title="Rendimiento real observado">Rend.Real</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 700; font-size: 0.85em;" title="Jornales reales ejecutados">Jorn.Real</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #f59e0b; font-weight: 700; font-size: 0.85em;" title="Desvío porcentual">Desvío</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 700; font-size: 0.85em;" title="Rendimiento sugerido por Antigravity">Sug.Rend.</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 700; font-size: 0.85em;" title="Jornales sugeridos por Antigravity">Sug.Jorn.</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: var(--text-tertiary); font-weight: 700; font-size: 0.85em;">Fuente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            const recordsByCuartel = {};
+            records.forEach(p => {
+                if(!recordsByCuartel[p.cuartel]) recordsByCuartel[p.cuartel] = [];
+                recordsByCuartel[p.cuartel].push(p);
+            });
+
+            Object.entries(recordsByCuartel).forEach(([cuartelKey, laboresArr]) => {
+                laboresArr.forEach((p, idx) => {
+                    const desvioClass = p.desvioJornales != null
+                        ? (p.desvioJornales > 10 ? 'color: #ef4444;' : p.desvioJornales < -10 ? 'color: #10b981;' : 'color: var(--text-secondary);')
+                        : 'color: var(--text-tertiary);';
+
+                    const fuenteIcon = p.fuente === 'manual' ? '✏️' : (p.rendimientoSugerido ? '🤖' : '📄');
+                    const fuenteLabel = p.fuente === 'manual' ? 'Manual' : 'Original';
+
+                    const rowspanAttr = laboresArr.length > 1 && idx === 0 ? ` rowspan="${laboresArr.length}"` : '';
+                    const sharedCols = idx === 0 ? `
+                        <td${rowspanAttr} style="padding: var(--space-2) var(--space-3); color: var(--text-primary); font-weight: 600; white-space: nowrap; vertical-align: middle; border-right: 1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.1); border-bottom: 1px solid rgba(255,255,255,0.03);">${p.cuartel}</td>
+                        <td${rowspanAttr} style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary); vertical-align: middle; border-right: 1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.1); border-bottom: 1px solid rgba(255,255,255,0.03);">${p.hectareas.toFixed(1)}</td>
+                        <td${rowspanAttr} style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary); vertical-align: middle; border-right: 1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.05); border-bottom: 1px solid rgba(255,255,255,0.03);">${p.plantas.toLocaleString('es-AR')}</td>
+                    ` : '';
+
+                    html += `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s;" onmouseenter="this.style.background='rgba(16,185,129,0.04)'" onmouseleave="this.style.background=''">
+                            ${sharedCols}
+                            <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary);">
+                                <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.88em; font-weight: 600; background: rgba(16,185,129,0.08); color: #10b981; white-space: nowrap;">${p.laborNombre}</span>
+                            </td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center;">
+                            <input type="number" class="pom-editable-input" data-key="${p.key}" data-field="rendimiento" value="${p.rendimientoProyectado}" min="1"
+                                style="width: 70px; text-align: center; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; color: #10b981; font-weight: 700; padding: 3px 6px; font-size: 0.95em;" />
+                        </td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center;">
+                            <input type="number" class="pom-editable-input" data-key="${p.key}" data-field="jornales" value="${p.jornalesProyectados}" min="0"
+                                style="width: 65px; text-align: center; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; color: #10b981; font-weight: 700; padding: 3px 6px; font-size: 0.95em;" />
+                        </td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 600;">${p.rendimientoReal ?? '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 600;">${p.jornalesReales != null ? p.jornalesReales.toFixed(1) : '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; font-weight: 700; ${desvioClass}">${p.desvioJornales != null ? (p.desvioJornales > 0 ? '+' : '') + p.desvioJornales.toFixed(1) + '%' : '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 600;">${p.rendimientoSugerido ?? '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 600;">${p.jornalesSugeridos ?? '—'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: center; font-size: 0.85em;" title="${fuenteLabel}">${fuenteIcon}</td>
+                    </tr>
+                `;
+                });
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            `;
+        });
+
+        html += '</div>';
+    });
+
+    return html;
+}
+
+export function renderPomResumenFinca(resumen) {
+    if (!resumen || resumen.length === 0) {
+        return '<div style="padding: var(--space-8); text-align: center; color: var(--text-tertiary);">Sin datos de resumen.</div>';
+    }
+
+    let html = '<div style="display: grid; gap: var(--space-5);">';
+
+    resumen.forEach(f => {
+        const desvioColor = f.desvioTotal != null
+            ? (f.desvioTotal > 10 ? '#ef4444' : f.desvioTotal < -10 ? '#10b981' : '#f59e0b')
+            : 'var(--text-tertiary)';
+
+        html += `
+        <div style="background: var(--bg-secondary); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+            <!-- Finca Header -->
+            <div style="padding: var(--space-4) var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.04)); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+                <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.15em; display: flex; align-items: center; gap: var(--space-2);">
+                    <span style="font-size: 1.3em;">🏡</span> ${f.finca}
+                </h3>
+                <div style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin-left: auto;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Predios</div>
+                        <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.prediosCount}</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Cuarteles</div>
+                        <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.cuartelesCount}</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Hectáreas</div>
+                        <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.hectareas.toFixed(1)}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Totals Row -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle);">
+                <div style="text-align: center; padding: var(--space-3); background: rgba(16,185,129,0.05); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(16,185,129,0.7); font-weight: 700;">J. Proyectados</div>
+                    <div style="font-size: 1.4em; font-weight: 900; color: #10b981; font-family: var(--font-display);">${f.jornalesProyectados.toLocaleString('es-AR')}</div>
+                </div>
+                <div style="text-align: center; padding: var(--space-3); background: rgba(59,130,246,0.05); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(59,130,246,0.7); font-weight: 700;">J. Reales</div>
+                    <div style="font-size: 1.4em; font-weight: 900; color: #3b82f6; font-family: var(--font-display);">${f.jornalesReales > 0 ? f.jornalesReales.toLocaleString('es-AR') : '—'}</div>
+                </div>
+                <div style="text-align: center; padding: var(--space-3); background: rgba(245,158,11,0.05); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(245,158,11,0.7); font-weight: 700;">Desvío</div>
+                    <div style="font-size: 1.4em; font-weight: 900; color: ${desvioColor}; font-family: var(--font-display);">${f.desvioTotal != null ? (f.desvioTotal > 0 ? '+' : '') + f.desvioTotal.toFixed(1) + '%' : '—'}</div>
+                </div>
+                <div style="text-align: center; padding: var(--space-3); background: rgba(168,85,247,0.05); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(168,85,247,0.7); font-weight: 700;">J. Sugeridos</div>
+                    <div style="font-size: 1.4em; font-weight: 900; color: #a855f7; font-family: var(--font-display);">${f.jornalesSugeridos > 0 ? f.jornalesSugeridos.toLocaleString('es-AR') : '—'}</div>
+                </div>
+            </div>
+
+            <!-- Labor Breakdown Table -->
+            <div style="padding: var(--space-4) var(--space-5);">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-subtle);">
+                            <th style="text-align: left; padding: var(--space-2) var(--space-3); color: var(--text-tertiary); font-weight: 600; font-size: 0.88em;">Labor / Faena</th>
+                            <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #10b981; font-weight: 600; font-size: 0.88em;">Proyectados</th>
+                            <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #3b82f6; font-weight: 600; font-size: 0.88em;">Reales</th>
+                            <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #a855f7; font-weight: 600; font-size: 0.88em;">Sugeridos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${f.labores.map(l => `
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary); font-weight: 500;">${l.nombre}</td>
+                                <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #10b981; font-weight: 700;">${l.jornalesP.toFixed(1)}</td>
+                                <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #3b82f6; font-weight: 700;">${l.jornalesR > 0 ? l.jornalesR.toFixed(1) : '—'}</td>
+                                <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #a855f7; font-weight: 700;">${l.jornalesS > 0 ? l.jornalesS.toFixed(1) : '—'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        `;
+    });
+
+    html += '</div>';
+    return html;
+}
+
+export function renderPomCalendario(months) {
+    if (!months || months.length === 0) {
+        return '<div style="padding: var(--space-8); text-align: center; color: var(--text-tertiary);">Sin datos de calendario.</div>';
+    }
+
+    const LABOR_COLORS = {
+        'Poda': '#10b981',
+        'Atada': '#3b82f6',
+        'Desbrote': '#f59e0b',
+        'Cosecha': '#ef4444',
+        'Riego': '#06b6d4',
+        'Curación': '#8b5cf6',
+        'Fertilización': '#ec4899',
+        'Desmalezado': '#84cc16',
+        'Levantado': '#f97316',
+        'Guiado': '#14b8a6',
+    };
+
+    let html = `
+    <div style="overflow-x: auto; border-radius: var(--radius-xl); border: 1px solid var(--border-subtle);">
+        <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
+            <thead>
+                <tr style="background: rgba(255,255,255,0.03);">
+                    ${months.map(m => `
+                        <th style="padding: var(--space-3) var(--space-2); text-align: center; color: var(--text-secondary); font-weight: 700; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; border-right: 1px solid var(--border-subtle); min-width: 75px;">${m.label}</th>
+                    `).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    ${months.map(m => {
+                        // Aggregate labores by type for this month
+                        const laborAgg = {};
+                        m.labores.forEach(l => {
+                            if (!laborAgg[l.labor]) laborAgg[l.labor] = { count: 0, jornales: 0, fincas: new Set() };
+                            laborAgg[l.labor].count++;
+                            laborAgg[l.labor].jornales += l.jornales;
+                            laborAgg[l.labor].fincas.add(l.finca);
+                        });
+                        const entries = Object.entries(laborAgg).sort((a, b) => b[1].jornales - a[1].jornales);
+
+                        return `
+                        <td style="padding: var(--space-2); border-right: 1px solid var(--border-subtle); vertical-align: top;">
+                            <div style="font-weight: 800; color: var(--text-primary); margin-bottom: var(--space-2); text-align: center; font-size: 0.9em; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05);">${m.totalJornales.toFixed(0)}</div>
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                ${entries.map(([labor, data]) => {
+                                    const percentage = (data.jornales / m.totalJornales) * 100;
+                                    const color = LABOR_COLORS[labor] || '#818cf8';
+                                    return `
+                                    <div style="font-size: 0.68em; background: ${color}15; color: ${color}; padding: 3px 6px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border: 1px solid ${color}30;" title="${labor} - ${data.jornales.toFixed(1)} j.">
+                                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 50px;">${labor}</span>
+                                        <span style="font-weight: 800;">${percentage.toFixed(0)}%</span>
+                                    </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </td>
+                        `;
+                    }).join('')}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    `;
+    return html;
+}
+
+export function renderCargaDocumentacionView() {
+    return `
+        <div class="container-fluid animate-fade-in" style="padding: var(--space-4);">
+            <!-- Tab Navigation -->
+            <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5);">
+                <button class="btn btn-primary" id="doc-tab-facturas" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">📄 Facturas de Proveedores</button>
+                <button class="btn btn-ghost" id="doc-tab-transferencias" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">🚛 Remitos Internos (Inter-Bodega)</button>
+            </div>
+
+            <!-- VIEW: FACTURAS -->
+            <div id="view-facturas">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+                                <div>
+                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">📂 Carga de <span style="color: var(--color-primary-400);">Documentación</span></h2>
+                                    <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Gestión administrativa de facturas y enlace logístico con operativa.</p>
+                                </div>
+                                <div style="display: flex; gap: var(--space-3); align-items: center;">
+                                    <!-- Stats Mini -->
+                                    <div style="display: flex; gap: var(--space-4); margin-right: var(--space-4);">
+                                        <div style="text-align: right;"><span id="doc-stat-total" style="font-weight: 800; color: var(--text-primary); display: block;">0</span><small style="font-size: 0.7em; color: var(--text-tertiary);">Total</small></div>
+                                        <div style="text-align: right;"><span id="doc-stat-pending" style="font-weight: 800; color: #f59e0b; display: block;">0</span><small style="font-size: 0.7em; color: var(--text-tertiary);">Pendientes</small></div>
+                                    </div>
+                                    <button class="btn btn-primary" id="btn-nueva-factura" style="border-radius: var(--radius-lg); font-weight: 700; display: flex; align-items: center; gap: var(--space-2);">
+                                        <span>➕</span> Nueva Factura
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255,255,255,0.01); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88em;">
+                                        <thead>
+                                            <tr style="text-align: left; border-bottom: 1px solid var(--border-subtle);">
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Fecha</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Proveedor</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">N° Documento</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: right;">Monto</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Estado</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-documentacion"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: TRANSFERENCIAS -->
+            <div id="view-transferencias" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+                                <div>
+                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">🚚 Remitos <span style="color: var(--color-primary-400);">Internos</span></h2>
+                                    <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Movimiento de stock inter-bodega y control de recepciones.</p>
+                                </div>
+                                <div style="display: flex; gap: var(--space-3);">
+                                    <button class="btn btn-primary" id="btn-nueva-transferencia" style="border-radius: var(--radius-lg); font-weight: 700; display: flex; align-items: center; gap: var(--space-2);">
+                                        <span>🚛</span> Generar Movimiento
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255,255,255,0.01); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88em;">
+                                        <thead>
+                                            <tr style="text-align: left; border-bottom: 1px solid var(--border-subtle);">
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Fecha</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Remito</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Origen</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">➡️</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Destino</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Producto</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Cant.</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Estado</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-transferencias"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div class="modal fade" id="modalFactura" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header">
+                        <h5 class="modal-title font-display">Subir Nueva Documentación</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-factura">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">Proveedor</label>
+                                    <input type="text" name="proveedor" required class="form-control">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">N° Documento</label>
+                                    <input type="text" name="nroFactura" required class="form-control">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">Fecha</label>
+                                    <input type="date" name="fecha" required class="form-control">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">Monto Total</label>
+                                    <input type="number" name="monto" required class="form-control">
+                                </div>
+                                <div style="grid-column: span 2;">
+                                    <label class="small text-tertiary">Logística</label>
+                                    <select name="logistica" class="form-select">
+                                        <option value="con_factura">Llegó con Factura (Cerrado)</option>
+                                        <option value="separados">Entrega Diferida (Remitos)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btn-save-factura">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalTransferencia" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle);">
+                        <h5 class="modal-title font-display" style="font-weight: 800;">Generar Remito Interno</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="padding: var(--space-6);">
+                        <form id="form-transferencia">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Bodega Origen</label>
+                                    <select name="bodegaOrigen" class="form-select doc-select-bodega" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Bodega Destino</label>
+                                    <select name="bodegaDestino" class="form-select doc-select-bodega" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Producto / Insumo</label>
+                                    <select name="productoId" class="form-select doc-select-producto" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Cantidad a Mover</label>
+                                    <input type="number" name="cantidad" step="0.01" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 2;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Notas de Transporte</label>
+                                    <textarea name="notas" rows="2" class="form-control" placeholder="Ej: Chofer Juan Perez, Camion patente ABC-123" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btn-save-transferencia">Emitir Remito Interno</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalConfirmarTransferencia" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header">
+                        <h5 class="modal-title font-display">Confirmar Recepción Interna</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="transfer-info-confirm" class="mb-4 p-3 rounded bg-glass border-subtle"></div>
+                        <form id="form-confirm-transfer">
+                            <div>
+                                <label class="form-label small text-tertiary">Recibido por (Nombre):</label>
+                                <input type="text" name="receptor" required class="form-control mb-3">
+                                <label class="form-label small text-tertiary">Observaciones de Recepción:</label>
+                                <textarea name="notas" rows="2" class="form-control"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary w-100" id="btn-do-confirm-transfer">Confirmar Ingreso a Bodega</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+export function renderTransferRows(transfers) {
+    if (!transfers || transfers.length === 0) {
+        return `<tr><td colspan="9" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay remitos internos registrados.</td></tr>`;
+    }
+
+    return transfers.map(t => {
+        const statusColor = t.status === 'En Tránsito' ? '#f59e0b' : '#10b981';
+        return `
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap;">${new Date(t.fecha).toLocaleDateString()}</td>
+                <td style="padding: var(--space-4); font-family: monospace; color: var(--color-primary-400);">${t.nroRemito}</td>
+                <td style="padding: var(--space-4); font-weight: 600;">${t.bodegaOrigenNombre}</td>
+                <td style="padding: var(--space-4); text-align: center; color: var(--text-tertiary);">➡️</td>
+                <td style="padding: var(--space-4); font-weight: 600;">${t.bodegaDestinoNombre}</td>
+                <td style="padding: var(--space-4);">${t.productoNombre}</td>
+                <td style="padding: var(--space-4); text-align: center; font-weight: 800;">${t.cantidad}</td>
+                <td style="padding: var(--space-4); text-align: center;">
+                    <span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: ${statusColor}15; color: ${statusColor}; font-size: 0.8em; font-weight: 700;">
+                        ${t.status}
+                    </span>
+                </td>
+                <td style="padding: var(--space-4); text-align: center;">
+                    ${t.status === 'En Tránsito' ? `
+                        <button class="btn btn-primary btn-sm btn-confirm-transfer" data-id="${t.id}" style="padding: 4px 12px; font-size: 0.75em;">
+                            Confirmar
+                        </button>
+                    ` : `<span style="color: var(--color-success); font-size: 1.1em;">✔️</span>`}
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+export function renderDocumentacionRows(invoices) {
+    if (!invoices || invoices.length === 0) {
+        return `<tr><td colspan="6" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No se encontró documentación cargada.</td></tr>`;
+    }
+
+    return invoices.map(v => {
+        let statusBadge = '';
+        if (v.status === 'Pendiente de Entrega') {
+            statusBadge = `<span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(245,158,11,0.1); color: #f59e0b; font-size: 0.8em; font-weight: 700;">⏳ Pendiente</span>`;
+        } else if (v.status === 'Entrega Parcial') {
+            statusBadge = `<span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(59,130,246,0.1); color: #3b82f6; font-size: 0.8em; font-weight: 700;">📦 Parcial (${v.remitos_asociados.length})</span>`;
+        } else {
+            statusBadge = `<span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(16,185,129,0.1); color: #10b981; font-size: 0.8em; font-weight: 700;">✅ Completado</span>`;
+        }
+
+        return `
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.01)'" onmouseleave="this.style.background=''">
+                <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap; text-align: center;">${new Date(v.fecha).toLocaleDateString()}</td>
+                <td style="padding: var(--space-4); text-align: center;">
+                    <div style="font-weight: 700; color: var(--text-primary);">${v.proveedor}</div>
+                </td>
+                <td style="padding: var(--space-4); font-family: monospace; color: var(--color-primary-400); text-align: center;">${v.nroFactura}</td>
+                <td style="padding: var(--space-4); text-align: right; font-weight: 800; color: var(--text-primary);">$ ${parseFloat(v.monto).toLocaleString('es-AR')}</td>
+                <td style="padding: var(--space-4); text-align: center;">${statusBadge}</td>
+                <td style="padding: var(--space-4); text-align: center;">
+                    <div style="display: flex; gap: var(--space-2); justify-content: center;">
+                        ${v.status !== 'Completado' ? `
+                            <button class="btn btn-primary btn-sm btn-add-remito" data-id="${v.id}" title="Registrar Remito" style="padding: var(--space-2) var(--space-3); font-size: 0.75em; font-weight: 700; border-radius: var(--radius-md);">
+                                🚛 Recibir
+                            </button>
+                        ` : `
+                            <button class="btn btn-ghost btn-sm" disabled style="opacity: 0.3;">✔️</button>
+                        `}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
