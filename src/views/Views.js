@@ -2411,6 +2411,7 @@ export function renderInformeAplicaciones(cycles, fincas, predios, cuarteles, us
       <button class="tab-btn active" data-subtab="resumen">Resumen</button>
       <button class="tab-btn" data-subtab="foliares">Foliares</button>
       <button class="tab-btn" data-subtab="herbicidas">Herbicidas</button>
+      <button class="tab-btn" data-subtab="dron">Dron (AF-DRON)</button>
       <button class="tab-btn" data-subtab="fertilizacion">Fertilización Comparativa</button>
     </div>
 
@@ -2450,6 +2451,11 @@ export function renderSofiaResumen(resumen) {
         <div class="metric-card-header"><div class="metric-card-icon purple">🧪</div></div>
         <div class="metric-value">${resumen.fertilizacion.count}</div>
         <div class="metric-label">Fertilización · ${fmtCost(resumen.fertilizacion.costo)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-header"><div class="metric-card-icon indigo">🚁</div></div>
+        <div class="metric-value">${resumen.dron.count}</div>
+        <div class="metric-label">Dron (AF-DRON) · ${fmtCost(resumen.dron.costo)}</div>
       </div>
     </div>
 
@@ -2495,6 +2501,60 @@ export function renderSofiaResumen(resumen) {
         </table>
     </div>
 `;
+}
+
+export function renderSofiaDron(data) {
+  return `
+  <div class="data-table-container">
+      <div class="table-header">
+        <h3>🚁 Aplicaciones con Dron — <span style="color:var(--text-tertiary)">Faena Aplicaciones / Labor AF-DRON</span></h3>
+        <div class="table-actions">
+          <span class="status-badge active"><span class="status-dot"></span> ${data.length} registros</span>
+        </div>
+      </div>
+      
+      <table class="data-table">
+        <thead><tr>
+          <th>Predio / Cuartel</th><th>Fecha</th><th>Labor</th><th>Producto</th>
+          <th>Cant. (L)</th><th>Dosis</th><th>Costo Unit.</th><th>Costo Total</th>
+        </tr></thead>
+        <tbody>
+          ${data.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text-tertiary);padding:var(--space-8);">Sin registros</td></tr>' :
+      (() => {
+        const grouped = data.reduce((acc, r) => {
+          const key = r.finca_original || r.finca || 'Otros';
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(r);
+          return acc;
+        }, {});
+
+        return Object.entries(grouped).map(([finca, rows]) => `
+          <tr class="table-group-header" style="background: rgba(168, 85, 247, 0.05);">
+            <td colspan="8" style="font-weight: 700; color: var(--color-purple-400); padding: var(--space-3) var(--space-4);">
+              🏡 ${finca}
+            </td>
+          </tr>
+          ${rows.map(r => `
+          <tr>
+            <td style="padding-left: var(--space-8);">
+              <span style="color: var(--text-tertiary); font-size: 0.85em;">${r.clasifica || ''}</span><br/>
+              <strong>${r.cuartel}</strong>
+            </td>
+            <td>${formatDate ? formatDate(r.fecha_aplicacion) : r.fecha_aplicacion}</td>
+            <td><span class="status-badge" style="background: var(--bg-secondary); font-size: 0.85em;">${r.labor_codigo}</span></td>
+            <td><strong>${r.producto}</strong></td>
+            <td>${r.cantidad.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
+            <td>${r.dosis}</td>
+            <td>$${r.costo_unitario.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
+            <td style="font-weight: 700; color: var(--text-primary);">$${(r.costo_total || 0).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
+          </tr>
+          `).join('')}
+        `).join('')
+      })()}
+        </tbody>
+      </table>
+  </div>
+  `;
 }
 
 export function renderSofiaFoliares(data) {
@@ -4537,12 +4597,40 @@ export function renderPomDetalleTable(matrix) {
         `;
 
         Object.entries(predios).forEach(([predio, records]) => {
+            // Calculate predio-level summary for collapsed view
+            const predioTotalProy = records.reduce((s, p) => s + (p.jornalesProyectados || 0), 0);
+            const predioTotalReal = records.reduce((s, p) => s + (p.jornalesReales || 0), 0);
+            const predioHasReal = records.some(p => p.jornalesReales != null);
+            const predioDesvio = predioTotalProy > 0 && predioHasReal
+                ? ((predioTotalReal - predioTotalProy) / predioTotalProy * 100)
+                : null;
+            const desvioColor = predioDesvio != null
+                ? (predioDesvio > 10 ? '#ef4444' : predioDesvio < -10 ? '#10b981' : '#f59e0b')
+                : 'var(--text-tertiary)';
+            const cuartelesCount = new Set(records.map(p => p.cuartel)).size;
+            const predioHa = records.reduce((s, p, i, arr) => {
+                // avoid double counting hectareas for same cuartel with multiple labors
+                const first = arr.findIndex(x => x.cuartel === p.cuartel);
+                return first === i ? s + (p.hectareas || 0) : s;
+            }, 0);
+            const predioId = `pom-predio-${finca}-${predio}`.replace(/[^a-zA-Z0-9]/g, '_');
+
             html += `
-            <div style="margin-bottom: var(--space-4); margin-left: var(--space-4);">
-                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); padding: var(--space-2) var(--space-3); background: rgba(59,130,246,0.05); border-radius: var(--radius-md); border-left: 3px solid rgba(59,130,246,0.4);">
+            <div style="margin-bottom: var(--space-3); margin-left: var(--space-4);">
+                <div onclick="(function(el){var body=document.getElementById('${predioId}');var arrow=el.querySelector('.pom-arrow');if(body.style.display==='none'){body.style.display='block';arrow.textContent='▼';}else{body.style.display='none';arrow.textContent='▶';}})(this)"
+                     style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); background: rgba(59,130,246,0.05); border-radius: var(--radius-md); border-left: 3px solid rgba(59,130,246,0.4); cursor: pointer; user-select: none; transition: background 0.15s;"
+                     onmouseenter="this.style.background='rgba(59,130,246,0.1)'" onmouseleave="this.style.background='rgba(59,130,246,0.05)'">
+                    <span class="pom-arrow" style="font-size: 0.7em; color: var(--text-tertiary); width: 12px; text-align: center; transition: transform 0.2s;">▶</span>
                     <span style="font-size: 1em;">📍</span>
-                    <strong style="color: var(--text-primary); font-size: 0.95em;">${predio}</strong>
+                    <strong style="color: var(--text-primary); font-size: 0.95em; flex: 1;">${predio}</strong>
+                    <div style="display: flex; gap: var(--space-4); align-items: center; font-size: 0.8em; flex-wrap: wrap;">
+                        <span style="color: var(--text-tertiary);">${cuartelesCount} cuart. · ${predioHa.toFixed(1)} ha</span>
+                        <span style="color: #10b981; font-weight: 700;" title="Jornales Proyectados">${predioTotalProy.toLocaleString('es-AR')} proy</span>
+                        <span style="color: #3b82f6; font-weight: 700;" title="Jornales Reales">${predioHasReal ? predioTotalReal.toFixed(0) + ' real' : '—'}</span>
+                        <span style="color: ${desvioColor}; font-weight: 700;" title="Desvío">${predioDesvio != null ? (predioDesvio > 0 ? '+' : '') + predioDesvio.toFixed(1) + '%' : '—'}</span>
+                    </div>
                 </div>
+                <div id="${predioId}" style="display: none; margin-top: var(--space-2);">
                 <div style="overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
                     <table class="data-table pom-table" style="width: 100%; font-size: 0.82em; border-collapse: collapse;">
                         <thead>
@@ -4614,6 +4702,7 @@ export function renderPomDetalleTable(matrix) {
             html += `
                         </tbody>
                     </table>
+                </div>
                 </div>
             </div>
             `;

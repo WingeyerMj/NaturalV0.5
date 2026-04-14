@@ -7,21 +7,21 @@ const COLUMNS_MAP = {
     'Fecha': ['Fecha Inicio Aplica', 'Fecha Inicio', 'Fecha', 'Fecha de Aplicación', 'Date', 'Fecha Apl.'],
     'Labor': ['Labor', 'Labor Code', 'Faena', 'Tarea', 'Operación'],
     'Producto': ['Nombre Producto', 'Producto', 'Insumo', 'Product', 'Artículo'],
-    'Cantidad': ['Cantidad', 'Real Aplicado', 'Cantidad Periodo', 'Monto', 'Cant.'],
+    'Cantidad': ['Cantidad', 'Real Aplicado', 'Ha. Aplicadas', 'Cantidad Periodo', 'Monto', 'Cant.'],
     'Tipo': ['tipo', 'Tipo Registro', 'Tipo', 'Categoría'],
-    'Cuartel': ['Cuartel', 'Cuadro', 'Sector', 'Lote', 'Potrero'],
+    'Cuartel': ['Cuartel', 'Cuadro', 'Sector', 'Lote', 'Potrero', 'Cuartel/Potrero'],
     'CodCuartel': ['Cod Cuartel', 'Código Cuartel', 'ID Cuartel'],
     'Dosis': ['Dosis', 'Dose', 'Dosis/Ha'],
     'Finca': ['Predio', 'Finca', 'Farm', 'Establecimiento'],
     'Clasifica': ['Clasifica', 'Clasificación', 'Sub-Predio', 'Variación'],
     'Estado': ['Estado', 'Status', 'Situación'],
     'Variedad': ['Variedad', 'Cepa', 'Grape Variety'],
-    'Costo': ['Total Producto', 'Costo', 'Cost', 'Importe', 'Monto USD', 'Monto en USD', 'Total USD', 'Monto en USDO'],
+    'Costo': ['Total Producto', 'Total Faena', 'Costo', 'Cost', 'Importe', 'Monto USD', 'Monto en USD', 'Total USD', 'Monto en USDO'],
     'N': ['unidades n', 'Unidades N', 'N', 'Nitrogeno', 'Units N', 'Unid N', 'Nitrógeno'],
     'P': ['unidades p', 'Unidades P', 'P', 'Fosforo', 'Units P', 'Unid P', 'Fósforo', 'P2O5'],
     'K': ['Potasio', 'Units K', 'Unid K', 'K2O'],
     'Ca': ['unidades k', 'Unidades K', 'Unidades Ca', 'Ca', 'Calcio', 'Calcium'],
-    'Has': ['Has Totales', 'Hectáreas', 'Area', 'Hectareas', 'Ha']
+    'Has': ['Has Totales', 'Ha. Aplicadas', 'Hectáreas', 'Area', 'Hectareas', 'Ha']
 };
 
 const REQUIRED_KEYS = ['Fecha', 'Labor', 'Producto', 'Cantidad'];
@@ -49,8 +49,8 @@ export class SofiaImportModel {
             return { error: "Archivo sin datos" };
         }
 
-        const header = lines[0].split(';').map(h => h.trim().replace(/^[\uFEFF]/, ''));
-        console.log(`[SofiaModel] Parsing CSV with ${header.length} columns. Example columns: ${header.slice(0, 5).join(', ')}`);
+        const header = lines[0].split(';').map(h => h.trim().replace(/^[\uFEFF]/, '').replace(/^['"]|['"]$/g, ''));
+        console.log(`[SofiaModel] Parsing CSV with ${header.length} columns. Header keys: ${header.join('|')}`);
 
         const colMap = {};
         Object.keys(COLUMNS_MAP).forEach(key => {
@@ -74,7 +74,7 @@ export class SofiaImportModel {
             if (idx !== -1) colMap[key] = idx;
         });
 
-        const missing = REQUIRED_KEYS.filter(k => colMap[k] === undefined);
+        const missing = ['Fecha', 'Labor', 'Cantidad'].filter(k => colMap[k] === undefined);
         if (missing.length > 0) {
             console.error(`[SofiaModel] Missing required columns: ${missing.join(', ')}`);
             return { error: `Faltan columnas esenciales: ${missing.join(', ')}` };
@@ -110,7 +110,7 @@ export class SofiaImportModel {
             }
 
             const labor = colMap['Labor'] !== undefined ? cols[colMap['Labor']] : 'Desconocido';
-            let producto = colMap['Producto'] !== undefined ? cols[colMap['Producto']] : '';
+            let producto = colMap['Producto'] !== undefined ? cols[colMap['Producto']] : (labor === 'AF-DRON' ? 'Servicio Dron' : labor);
 
             // Product name normalization
             if (producto) {
@@ -219,7 +219,10 @@ export class SofiaImportModel {
                 original_index: i // To distinguish otherwise identical rows within the same file import
             });
         }
-        console.log(`[SofiaModel] Parse complete: ${rows.length} rows kept, ${skippedEmpty} empty/invalid skipped, ${skippedPendiente} pendientes skipped.`);
+        console.log(`[SofiaModel] Parse complete: ${rows.length} rows kept (Last few categories: ${rows.slice(-5).map(r => r.categoria).join(', ')}), ${skippedEmpty} empty/invalid skipped, ${skippedPendiente} pendientes skipped.`);
+        if (rows.length > 0) {
+            console.log('[SofiaModel] Sample rows:', rows.slice(0, 3).map(r => `(Finca: ${r.finca}, Cat: ${r.categoria}, Ciclo: ${r.ciclo}, Fecha: ${r.fecha_aplicacion})`));
+        }
         this.importRows(rows);
         return { rows };
     }
@@ -239,7 +242,10 @@ export class SofiaImportModel {
         // 3. Fertilización: Strictly "FERTILIZACION" or close variants
         if (lab.includes('FERTILIZACI') || lab.includes('FERTILIZANTE') || lab === 'FERT' || lab === 'ABONO' || prod.includes('nutri') || tipo.includes('pre-cosecha') || tipo.includes('pos-cosecha')) return 'Fertilizacion';
 
-        // 4. Dynamic category: Take the name of the labor if not recognized above
+        // 4. Dron: Specific labor
+        if (lab === 'AF-DRON' || lab.includes('DRON')) return 'Dron';
+
+        // 5. Dynamic category: Take the name of the labor if not recognized above
         return lab || 'Otros';
     }
 
@@ -333,6 +339,7 @@ export class SofiaImportModel {
             foliares: { count: all.filter(r => r.categoria === 'Foliares').length, costo: sumCost('Foliares') },
             herbicidas: { count: all.filter(r => r.categoria === 'Herbicidas').length, costo: sumCost('Herbicidas') },
             fertilizacion: { count: all.filter(r => r.categoria === 'Fertilizacion').length, costo: sumCost('Fertilizacion') },
+            dron: { count: all.filter(r => r.categoria === 'Dron').length, costo: sumCost('Dron') },
             distribution,
             topProducts
         };
@@ -340,6 +347,13 @@ export class SofiaImportModel {
 
     static getFoliares(filters = {}) {
         return this.applyFilters(this.REGISTROS.filter(r => r.categoria === 'Foliares'), filters);
+    }
+
+    static getDron(filters = {}) {
+        const unfiltered = this.REGISTROS.filter(r => r.categoria === 'Dron');
+        const filtered = this.applyFilters(unfiltered, filters);
+        console.log(`[SofiaModel] getDron: Found ${unfiltered.length} total, ${filtered.length} after filters. filters:`, filters);
+        return filtered;
     }
 
     static getCategoriaPorPredioStats(categoria, filters = {}) {

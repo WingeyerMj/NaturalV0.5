@@ -536,7 +536,21 @@ export class SofiaApiModel {
                 cuartel: r.cuartel || r.Cuartel || info.code,
                 variedad: r.variedad || r.variedades || r.Variedad || r.Variedades || info.variedad,
                 isCosecha,
-                labor_normalized: (r.finca === 'El Espejo' && (r.labor === 'Poda' || r.labor === 'Poda dov')) ? 'Poda' : r.labor,
+                labor_normalized: (() => {
+                    const l = (r.labor || '').trim().toUpperCase();
+                    if (l.includes('PODA')) return 'Poda';
+                    if (l.includes('ATADA') || l.includes('GUIADO')) return 'Atada';
+                    if (l.includes('DESBROTE') && !l.includes('PODA')) return 'Desbrote de troncos';
+                    if (l.includes('DESBROTE') && l.includes('PODA')) return 'Desbrote crit. Poda';
+                    if (l.includes('RALEO')) return 'Raleo de Racimos';
+                    if (l.includes('DESHOJE') || l.includes('DESNIETE')) return 'Desniete Deshoje';
+                    if (l.includes('ACOMODO')) return 'Acomodo de brotes';
+                    if (l.includes('RIEGO')) return 'Riego';
+                    if (l.includes('LEVANTADO')) return 'Levantado';
+                    if (l.includes('MOCHILA')) return 'Malezas Mochila';
+                    if (l.includes('DESMALEZAR') && l.includes('MANUAL')) return 'Desmalezar manual';
+                    return r.labor;
+                })(),
                 fecha: (() => {
                     let d = r.fecha || r.Fecha || r.date || r.Date;
                     if (d && typeof d === 'string' && d.includes('-') && d.split('-')[0].length === 2) {

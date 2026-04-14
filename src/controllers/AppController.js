@@ -4435,7 +4435,9 @@ async loadStaticSofiaData() {
 
     const files = [
         { name: 'EE_aplicaciones.csv', finca: 'El Espejo' },
-        { name: 'FV_aplicaciones.csv', finca: 'Fincas Viejas' }
+        { name: 'FV_aplicaciones.csv', finca: 'Fincas Viejas' },
+        { name: 'AplicacionDron-EE.csv', finca: 'El Espejo' },
+        { name: 'AplicacionDron-FV.csv', finca: 'Fincas Viejas' }
     ];
 
     // Load both CSVs in PARALLEL instead of sequentially
@@ -4467,7 +4469,11 @@ async loadStaticSofiaData() {
     for (const result of results) {
         if (result.status === 'fulfilled' && result.value) {
             SofiaImportModel.importRows(result.value.rows);
-            console.log(`[AppController] Loaded ${result.value.rows.length} rows from ${result.value.file.name}`);
+            console.log(`[AppController] Successfully loaded ${result.value.rows.length} rows from ${result.value.file.name}`);
+        } else if (result.status === 'rejected') {
+            console.error(`[AppController] Failed to load file:`, result.reason);
+        } else {
+            console.warn(`[AppController] File loading failed or empty:`, result);
         }
     }
 
@@ -4575,6 +4581,11 @@ renderSofiaSubTab(tab) {
                 this.renderHerbicidasChart(herbiStats);
                 this.renderHerbicidasProductosChart(productosStats);
             });
+            break;
+        }
+        case 'dron': {
+            const dronData = SofiaImportModel.getDron(filters);
+            content.innerHTML = renderSofiaDron(dronData);
             break;
         }
         case 'fertilizacion': {
