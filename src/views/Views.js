@@ -2503,56 +2503,225 @@ export function renderSofiaResumen(resumen) {
 `;
 }
 
-export function renderSofiaDron(data) {
-  return `
-  <div class="data-table-container">
+export function renderSofiaDron(stats) {
+  const fmtCost = (v) => '$' + formatCurrency(v);
+  const fmtNum = (v) => (v || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  if (!stats || stats.totalRegistros === 0) {
+    return `
+    <div class="data-table-container">
       <div class="table-header">
         <h3>🚁 Aplicaciones con Dron — <span style="color:var(--text-tertiary)">Faena Aplicaciones / Labor AF-DRON</span></h3>
-        <div class="table-actions">
-          <span class="status-badge active"><span class="status-dot"></span> ${data.length} registros</span>
-        </div>
       </div>
-      
-      <table class="data-table">
-        <thead><tr>
-          <th>Predio / Cuartel</th><th>Fecha</th><th>Labor</th><th>Producto</th>
-          <th>Cant. (L)</th><th>Dosis</th><th>Costo Unit.</th><th>Costo Total</th>
-        </tr></thead>
-        <tbody>
-          ${data.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text-tertiary);padding:var(--space-8);">Sin registros</td></tr>' :
-      (() => {
-        const grouped = data.reduce((acc, r) => {
-          const key = r.finca_original || r.finca || 'Otros';
-          if (!acc[key]) acc[key] = [];
-          acc[key].push(r);
-          return acc;
-        }, {});
+      <div style="padding: var(--space-12); text-align: center; color: var(--text-tertiary);">
+        <div style="font-size: 3em; margin-bottom: var(--space-4);">🚁</div>
+        <p style="font-size: 1.1em;">No se encontraron registros de aplicaciones con dron para los filtros seleccionados.</p>
+      </div>
+    </div>`;
+  }
 
-        return Object.entries(grouped).map(([finca, rows]) => `
-          <tr class="table-group-header" style="background: rgba(168, 85, 247, 0.05);">
-            <td colspan="8" style="font-weight: 700; color: var(--color-purple-400); padding: var(--space-3) var(--space-4);">
-              🏡 ${finca}
-            </td>
-          </tr>
-          ${rows.map(r => `
-          <tr>
-            <td style="padding-left: var(--space-8);">
-              <span style="color: var(--text-tertiary); font-size: 0.85em;">${r.clasifica || ''}</span><br/>
-              <strong>${r.cuartel}</strong>
-            </td>
-            <td>${formatDate ? formatDate(r.fecha_aplicacion) : r.fecha_aplicacion}</td>
-            <td><span class="status-badge" style="background: var(--bg-secondary); font-size: 0.85em;">${r.labor_codigo}</span></td>
-            <td><strong>${r.producto}</strong></td>
-            <td>${r.cantidad.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
-            <td>${r.dosis}</td>
-            <td>$${r.costo_unitario.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
-            <td style="font-weight: 700; color: var(--text-primary);">$${(r.costo_total || 0).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
-          </tr>
-          `).join('')}
-        `).join('')
-      })()}
-        </tbody>
-      </table>
+  return `
+  <!-- ═══ CONSOLIDADO DRON ═══ -->
+  <div class="section-divider" style="margin-bottom: var(--space-6);">🚁 Consolidado de Aplicaciones con Dron</div>
+
+  <!-- Metric Cards -->
+  <div class="dashboard-grid" style="margin-bottom: var(--space-8);">
+    <div class="metric-card">
+      <div class="metric-card-header"><div class="metric-card-icon purple">🚁</div></div>
+      <div class="metric-value">${stats.totalRegistros}</div>
+      <div class="metric-label">Aplicaciones Totales</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-header"><div class="metric-card-icon green">📍</div></div>
+      <div class="metric-value">${stats.predios.length}</div>
+      <div class="metric-label">Predios Aplicados</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-header"><div class="metric-card-icon blue">🗺️</div></div>
+      <div class="metric-value">${stats.cuarteles.length}</div>
+      <div class="metric-label">Cuarteles / Sectores</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-header"><div class="metric-card-icon amber">🧪</div></div>
+      <div class="metric-value">${stats.productos.length}</div>
+      <div class="metric-label">Productos Utilizados</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-header"><div class="metric-card-icon indigo">📅</div></div>
+      <div class="metric-value" style="font-size: var(--text-lg);">${stats.fechaMin} — ${stats.fechaMax}</div>
+      <div class="metric-label">Rango de Fechas</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-header"><div class="metric-card-icon green">💰</div></div>
+      <div class="metric-value" style="color: var(--color-accent);">${fmtCost(stats.totalCosto)}</div>
+      <div class="metric-label">Costo Total</div>
+    </div>
+  </div>
+
+  <!-- ═══ RESUMEN POR PREDIO ═══ -->
+  <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-8);">
+    <div class="table-header">
+      <h3>📍 Resumen por Predio — <span style="color:var(--text-tertiary)">Dónde se aplicó</span></h3>
+    </div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Finca</th><th>Predio</th><th style="text-align:center;">Aplicaciones</th>
+        <th>Cuarteles</th><th>Productos</th>
+        <th style="text-align:center;">Desde</th><th style="text-align:center;">Hasta</th>
+        <th style="text-align:right;">Cantidad</th><th style="text-align:right;">Costo</th>
+      </tr></thead>
+      <tbody>
+        ${stats.predioStats.map(p => `
+        <tr>
+          <td><span style="font-weight:600; color:var(--color-primary-400);">${p.finca}</span></td>
+          <td><strong>${p.predio}</strong></td>
+          <td style="text-align:center;"><span class="status-badge active" style="min-width:40px; justify-content:center;">${p.count}</span></td>
+          <td style="max-width: 250px;">
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              ${p.cuarteles.map(c => `<span style="background:rgba(99,102,241,0.1); color:var(--color-indigo-400); padding:2px 8px; border-radius:6px; font-size:0.8em; white-space:nowrap;">${c}</span>`).join('')}
+            </div>
+          </td>
+          <td style="max-width: 200px;">
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              ${p.productos.map(pr => `<span style="background:rgba(168,85,247,0.1); color:var(--color-purple-400); padding:2px 8px; border-radius:6px; font-size:0.8em; white-space:nowrap;">${pr}</span>`).join('')}
+            </div>
+          </td>
+          <td style="text-align:center; font-size:0.9em; color:var(--text-secondary);">${p.fechaMin}</td>
+          <td style="text-align:center; font-size:0.9em; color:var(--text-secondary);">${p.fechaMax}</td>
+          <td style="text-align:right;">${fmtNum(p.cantidad)}</td>
+          <td style="text-align:right; font-weight:700; color:var(--color-accent);">${fmtCost(p.costo)}</td>
+        </tr>
+        `).join('')}
+        <tr style="background:rgba(168,85,247,0.08); font-weight:700;">
+          <td colspan="2" style="color:var(--color-purple-400);">TOTAL</td>
+          <td style="text-align:center;">${stats.totalRegistros}</td>
+          <td>${stats.cuarteles.length} cuarteles</td>
+          <td>${stats.productos.length} productos</td>
+          <td style="text-align:center;">${stats.fechaMin}</td>
+          <td style="text-align:center;">${stats.fechaMax}</td>
+          <td style="text-align:right;">${fmtNum(stats.totalCantidad)}</td>
+          <td style="text-align:right; color:var(--color-accent);">${fmtCost(stats.totalCosto)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ PRODUCTOS UTILIZADOS ═══ -->
+  <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-8);">
+    <div class="table-header">
+      <h3>🧪 Productos Utilizados — <span style="color:var(--text-tertiary)">Qué se aplicó</span></h3>
+    </div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Producto</th><th style="text-align:center;">Aplicaciones</th>
+        <th>Predios</th><th style="text-align:center;">Cuarteles</th>
+        <th style="text-align:right;">Cantidad Total</th><th style="text-align:right;">Costo Total</th>
+      </tr></thead>
+      <tbody>
+        ${stats.productoStats.map(p => `
+        <tr>
+          <td><strong style="color:var(--color-purple-400);">${p.producto}</strong></td>
+          <td style="text-align:center;"><span class="status-badge active" style="min-width:40px; justify-content:center;">${p.count}</span></td>
+          <td>
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              ${p.predios.map(pr => `<span style="background:rgba(16,185,129,0.1); color:var(--color-green-400); padding:2px 8px; border-radius:6px; font-size:0.8em;">${pr}</span>`).join('')}
+            </div>
+          </td>
+          <td style="text-align:center;">${p.cuarteles.length}</td>
+          <td style="text-align:right; font-weight:600;">${fmtNum(p.cantidad)}</td>
+          <td style="text-align:right; font-weight:700; color:var(--color-accent);">${fmtCost(p.costo)}</td>
+        </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ CRONOLOGÍA POR FECHA ═══ -->
+  <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-8);">
+    <div class="table-header">
+      <h3>📅 Cronología de Aplicaciones — <span style="color:var(--text-tertiary)">Cuándo se aplicó</span></h3>
+    </div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Fecha</th><th style="text-align:center;">Aplicaciones</th>
+        <th>Predios</th><th>Cuarteles</th><th>Productos</th>
+        <th style="text-align:right;">Cantidad</th><th style="text-align:right;">Costo</th>
+      </tr></thead>
+      <tbody>
+        ${stats.fechaStats.map(f => `
+        <tr>
+          <td style="font-weight:600; color:var(--text-primary); white-space:nowrap;">${formatDate(f.fecha)}</td>
+          <td style="text-align:center;"><span class="status-badge active" style="min-width:40px; justify-content:center;">${f.count}</span></td>
+          <td>
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              ${f.predios.map(pr => `<span style="background:rgba(16,185,129,0.1); color:var(--color-green-400); padding:2px 8px; border-radius:6px; font-size:0.8em;">${pr}</span>`).join('')}
+            </div>
+          </td>
+          <td>
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              ${f.cuarteles.slice(0, 6).map(c => `<span style="background:rgba(99,102,241,0.1); color:var(--color-indigo-400); padding:2px 8px; border-radius:6px; font-size:0.8em;">${c}</span>`).join('')}
+              ${f.cuarteles.length > 6 ? `<span style="color:var(--text-tertiary); font-size:0.8em;">+${f.cuarteles.length - 6} más</span>` : ''}
+            </div>
+          </td>
+          <td>
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              ${f.productos.map(pr => `<span style="background:rgba(168,85,247,0.1); color:var(--color-purple-400); padding:2px 8px; border-radius:6px; font-size:0.8em;">${pr}</span>`).join('')}
+            </div>
+          </td>
+          <td style="text-align:right;">${fmtNum(f.cantidad)}</td>
+          <td style="text-align:right; font-weight:700; color:var(--color-accent);">${fmtCost(f.costo)}</td>
+        </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ DETALLE COMPLETO ═══ -->
+  <div class="data-table-container animate-fade-in">
+    <div class="table-header">
+      <h3>🚁 Detalle Completo — <span style="color:var(--text-tertiary)">Todos los registros AF-DRON</span></h3>
+      <div class="table-actions">
+        <span class="status-badge active"><span class="status-dot"></span> ${stats.totalRegistros} registros</span>
+      </div>
+    </div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Predio / Cuartel</th><th>Fecha</th><th>Labor</th><th>Producto</th>
+        <th>Cant. (Kg/L)</th><th>Ha. Aplica</th><th>Costo Total</th>
+      </tr></thead>
+      <tbody>
+        ${(() => {
+          const grouped = stats.raw.reduce((acc, r) => {
+            const key = r.finca_original || r.finca || 'Otros';
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(r);
+            return acc;
+          }, {});
+
+          return Object.entries(grouped).map(([finca, rows]) => `
+            <tr class="table-group-header" style="background: rgba(168, 85, 247, 0.05);">
+              <td colspan="7" style="font-weight: 700; color: var(--color-purple-400); padding: var(--space-3) var(--space-4);">
+                🏡 ${finca} — <span style="font-weight:400; color:var(--text-tertiary);">${rows.length} aplicaciones</span>
+              </td>
+            </tr>
+            ${rows.map(r => `
+            <tr>
+              <td style="padding-left: var(--space-8);">
+                <span style="color: var(--text-tertiary); font-size: 0.85em;">${r.clasifica || ''}</span><br/>
+                <strong>${r.cuartel}</strong>
+              </td>
+              <td>${formatDate(r.fecha_aplicacion)}</td>
+              <td><span class="status-badge" style="background: var(--bg-secondary); font-size: 0.85em;">${r.labor_codigo}</span></td>
+              <td><strong>${r.producto}</strong></td>
+              <td>${fmtNum(r.cantidad)}</td>
+              <td>${fmtNum(r.has_totales)}</td>
+              <td style="font-weight: 700; color: var(--text-primary);">${fmtCost(r.costo_total)}</td>
+            </tr>
+            `).join('')}
+          `).join('');
+        })()}
+      </tbody>
+    </table>
   </div>
   `;
 }

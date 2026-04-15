@@ -4584,8 +4584,8 @@ renderSofiaSubTab(tab) {
             break;
         }
         case 'dron': {
-            const dronData = SofiaImportModel.getDron(filters);
-            content.innerHTML = renderSofiaDron(dronData);
+            const dronStats = SofiaImportModel.getDronStats(filters);
+            content.innerHTML = renderSofiaDron(dronStats);
             break;
         }
         case 'fertilizacion': {

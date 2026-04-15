@@ -356,6 +356,131 @@ export class SofiaImportModel {
         return filtered;
     }
 
+    static getDronStats(filters = {}) {
+        const data = this.getDron(filters);
+        
+        // Helper to parse dates
+        const parseDate = (str) => {
+            if (!str) return null;
+            const s = str.toString().trim();
+            if (s.includes('/')) {
+                const parts = s.split('/');
+                if (parts.length === 3) {
+                    const y = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+                    return new Date(parseInt(y), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                }
+            } else if (s.includes('-')) {
+                const parts = s.split('-');
+                if (parts.length === 3) {
+                    if (parts[0].length === 4) return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    else return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                }
+            }
+            return null;
+        };
+
+        const fmtDate = (d) => d ? d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
+
+        // Unique values
+        const predios = [...new Set(data.map(r => r.clasifica).filter(v => v && v !== 'General'))];
+        const cuarteles = [...new Set(data.map(r => r.cuartel).filter(v => v && v !== 'Sin Asignar'))];
+        const productos = [...new Set(data.map(r => r.producto).filter(v => v))];
+        const fincas = [...new Set(data.map(r => r.finca_original || r.finca).filter(v => v))];
+
+        // Date range
+        const dates = data.map(r => parseDate(r.fecha_aplicacion)).filter(d => d && !isNaN(d.getTime()));
+        const minDate = dates.length > 0 ? new Date(Math.min(...dates)) : null;
+        const maxDate = dates.length > 0 ? new Date(Math.max(...dates)) : null;
+
+        // Totals
+        const totalCosto = data.reduce((s, r) => s + (r.costo_total || 0), 0);
+        const totalCantidad = data.reduce((s, r) => s + (r.cantidad || 0), 0);
+        const totalHas = data.reduce((s, r) => s + (r.has_totales || 0), 0);
+
+        // Group by Predio (Clasifica)
+        const byPredio = {};
+        data.forEach(r => {
+            const key = r.clasifica || 'General';
+            if (!byPredio[key]) byPredio[key] = { predio: key, finca: r.finca_original || r.finca, count: 0, costo: 0, cantidad: 0, has: 0, cuarteles: new Set(), productos: new Set(), fechas: [] };
+            byPredio[key].count++;
+            byPredio[key].costo += (r.costo_total || 0);
+            byPredio[key].cantidad += (r.cantidad || 0);
+            byPredio[key].has += (r.has_totales || 0);
+            byPredio[key].cuarteles.add(r.cuartel);
+            byPredio[key].productos.add(r.producto);
+            const d = parseDate(r.fecha_aplicacion);
+            if (d) byPredio[key].fechas.push(d);
+        });
+
+        const predioStats = Object.values(byPredio).map(p => ({
+            ...p,
+            cuarteles: [...p.cuarteles].filter(c => c && c !== 'Sin Asignar'),
+            productos: [...p.productos],
+            fechaMin: p.fechas.length > 0 ? fmtDate(new Date(Math.min(...p.fechas))) : '—',
+            fechaMax: p.fechas.length > 0 ? fmtDate(new Date(Math.max(...p.fechas))) : '—',
+        })).sort((a, b) => a.finca.localeCompare(b.finca) || a.predio.localeCompare(b.predio));
+
+        // Group by Product
+        const byProducto = {};
+        data.forEach(r => {
+            const key = r.producto || 'Desconocido';
+            if (!byProducto[key]) byProducto[key] = { producto: key, count: 0, costo: 0, cantidad: 0, predios: new Set(), cuarteles: new Set() };
+            byProducto[key].count++;
+            byProducto[key].costo += (r.costo_total || 0);
+            byProducto[key].cantidad += (r.cantidad || 0);
+            byProducto[key].predios.add(r.clasifica || 'General');
+            byProducto[key].cuarteles.add(r.cuartel);
+        });
+
+        const productoStats = Object.values(byProducto).map(p => ({
+            ...p,
+            predios: [...p.predios],
+            cuarteles: [...p.cuarteles].filter(c => c && c !== 'Sin Asignar'),
+        })).sort((a, b) => b.count - a.count);
+
+        // Group by Fecha
+        const byFecha = {};
+        data.forEach(r => {
+            const key = r.fecha_aplicacion || 'Sin Fecha';
+            if (!byFecha[key]) byFecha[key] = { fecha: key, count: 0, costo: 0, cantidad: 0, predios: new Set(), cuarteles: new Set(), productos: new Set() };
+            byFecha[key].count++;
+            byFecha[key].costo += (r.costo_total || 0);
+            byFecha[key].cantidad += (r.cantidad || 0);
+            byFecha[key].predios.add(r.clasifica || 'General');
+            byFecha[key].cuarteles.add(r.cuartel);
+            byFecha[key].productos.add(r.producto);
+        });
+
+        const fechaStats = Object.values(byFecha).map(f => ({
+            ...f,
+            predios: [...f.predios],
+            cuarteles: [...f.cuarteles].filter(c => c && c !== 'Sin Asignar'),
+            productos: [...f.productos],
+        })).sort((a, b) => {
+            const da = parseDate(a.fecha);
+            const db = parseDate(b.fecha);
+            if (da && db) return da - db;
+            return 0;
+        });
+
+        return {
+            totalRegistros: data.length,
+            totalCosto,
+            totalCantidad,
+            totalHas,
+            predios,
+            cuarteles,
+            productos,
+            fincas,
+            fechaMin: fmtDate(minDate),
+            fechaMax: fmtDate(maxDate),
+            predioStats,
+            productoStats,
+            fechaStats,
+            raw: data
+        };
+    }
+
     static getCategoriaPorPredioStats(categoria, filters = {}) {
         const all = this.applyFilters(this.REGISTROS.filter(r => r.categoria === categoria), filters);
         const predioMap = {};
