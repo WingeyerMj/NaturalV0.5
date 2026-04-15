@@ -378,12 +378,16 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
           </div>
         </header>
         ` : `
-        <header style="background: var(--bg-primary); padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-                <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="Logo" style="width:32px;">
-                <span style="font-weight:600; color:white;">Operador ${user.name}</span>
+        <header style="background: var(--bg-primary); padding: 0.8rem 1.2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 1000;">
+            <div style="display:flex; align-items:center; gap:0.8rem;">
+                ${activeSection !== 'home' ? `
+                    <button id="btn-carga-back" class="btn btn-ghost" style="padding: 0.4rem 0.8rem; font-size: 0.9rem; color: var(--color-primary-400); border: 1px solid rgba(16, 185, 129, 0.3);">⬅️ Volver</button>
+                ` : `
+                    <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="Logo" style="width:28px;">
+                `}
+                <span style="font-weight:600; color:white; font-size: 0.95rem;">${user.name}</span>
             </div>
-            <button id="btn-mobile-logout" onclick="localStorage.removeItem('nf_user'); window.location.reload();" style="background:transparent; border:none; color:var(--color-error); font-weight:bold;">Salir</button>
+            <button id="btn-mobile-logout" style="background:transparent; border:none; color:var(--color-error); font-weight:600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">🚪 Salir</button>
         </header>
         `}
 
@@ -526,6 +530,85 @@ export function renderDashboardHome() {
       </p>
     </div>
   `;
+}
+
+export function renderCargaHome() {
+  return `
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; gap: 3rem;">
+        <div style="text-align: center;">
+            <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="Logo" style="width: 120px; margin-bottom: 2rem; animation: coinFlip 6s ease-in-out infinite;">
+            <h2 style="color: white; font-family: 'Outfit'; font-size: 2.2rem; margin-bottom: 0.5rem;">Panel de Operaciones</h2>
+            <p style="color: var(--text-tertiary); font-size: 1.1rem;">Selecciona una tarea para comenzar:</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; width: 100%; max-width: 400px;" class="animate-fade-in animate-delay-2">
+            <button class="carga-task-card" data-section="admin-carga-trabajo">
+                <div class="carga-task-icon">📝</div>
+                <div class="carga-task-info">
+                    <h3>Carga de Trabajo</h3>
+                    <p>Registro de jornales y tareas</p>
+                </div>
+            </button>
+            <button class="carga-task-card" data-section="admin-bodegas-movimientos">
+                <div class="carga-task-icon">📦</div>
+                <div class="carga-task-info">
+                    <h3>Movimientos Stock</h3>
+                    <p>Traslados y remitos externos</p>
+                </div>
+            </button>
+        </div>
+    </div>
+    
+    <style>
+        .carga-task-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            width: 100%;
+            outline: none;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .carga-task-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.05);
+            border-color: var(--color-primary-400);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 20px rgba(16, 185, 129, 0.1);
+        }
+        .carga-task-card:active {
+            transform: translateY(0) scale(0.98);
+        }
+        .carga-task-icon {
+            font-size: 2.2rem;
+            background: rgba(16, 185, 129, 0.1);
+            width: 72px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .carga-task-info h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'Outfit';
+        }
+        .carga-task-info p {
+            margin: 6px 0 0;
+            color: var(--text-tertiary);
+            font-size: 0.95rem;
+        }
+    </style>
+    `;
 }
 
 // ── Fincas View ──
@@ -1204,8 +1287,8 @@ export function renderHectareasPorPredio(hectareasData) {
             </thead>
             <tbody>
               ${g.predios.map(p => {
-                const pct = g.totalHa > 0 ? (p.hectareas / g.totalHa * 100) : 0;
-                return `
+      const pct = g.totalHa > 0 ? (p.hectareas / g.totalHa * 100) : 0;
+      return `
                 <tr>
                   <td><strong>${p.name}</strong></td>
                   <td style="text-align: center;">${fmtNum(p.cuarteles)}</td>
@@ -1221,7 +1304,7 @@ export function renderHectareasPorPredio(hectareasData) {
                   </td>
                 </tr>
                 `;
-              }).join('')}
+    }).join('')}
             </tbody>
             <tfoot style="background: ${colors.bg}; font-weight: 700;">
               <tr>
@@ -1256,9 +1339,9 @@ export function renderHectareasPorPredio(hectareasData) {
             </tr>
           </thead>
           <tbody>
-            ${hectareasData.groups.flatMap(g => 
-              g.predios.flatMap(p => 
-                (p.cuartelesList || []).map(c => `
+            ${hectareasData.groups.flatMap(g =>
+    g.predios.flatMap(p =>
+      (p.cuartelesList || []).map(c => `
                   <tr>
                     <td><span style="font-size: 0.85em; color: var(--text-tertiary);">${g.name}</span></td>
                     <td><strong>${p.name}</strong></td>
@@ -1270,8 +1353,8 @@ export function renderHectareasPorPredio(hectareasData) {
                     </td>
                   </tr>
                 `)
-              )
-            ).join('')}
+    )
+  ).join('')}
           </tbody>
         </table>
       </div>
@@ -1856,7 +1939,7 @@ export function renderLevantadoPorPlaya(playaStats) {
   }
 
   const fincaNames = Object.keys(playaStats.byFinca).sort();
-  
+
   // Find all unique pass numbers across all playas (both levantado and cosecha)
   const allPasses = new Set();
   playaStats.playas.forEach(p => {
@@ -1883,7 +1966,7 @@ export function renderLevantadoPorPlaya(playaStats) {
   ];
 
   // Compute global factor 
-  const globalFactor = playaStats.grandTotalKg > 0 && playaStats.grandTotalKgFresco > 0 
+  const globalFactor = playaStats.grandTotalKg > 0 && playaStats.grandTotalKgFresco > 0
     ? (playaStats.grandTotalKgFresco / playaStats.grandTotalKg) : 0;
 
   const getFColor = (f) => f > 0 ? (f <= 4.4 ? '#10b981' : '#ef4444') : '#f59e0b';
@@ -1904,27 +1987,27 @@ export function renderLevantadoPorPlaya(playaStats) {
     </div>
 
     ${fincaNames.map(fincaName => {
-      const fData = playaStats.byFinca[fincaName];
-      const colors = fincaColors[fincaName] || fincaColors['Fincas Viejas'];
-      const fincaFactor = fData.totalKg > 0 && fData.totalKgFresco > 0 
-        ? (fData.totalKgFresco / fData.totalKg) : 0;
-      
-      // Group playas by predio within this finca
-      const byPredio = {};
-      fData.playas.forEach(p => {
-        const pName = p.predio || 'Sin Predio';
-        if (!byPredio[pName]) byPredio[pName] = { playas: [], totalKg: 0, totalKgFresco: 0 };
-        byPredio[pName].playas.push(p);
-        byPredio[pName].totalKg += p.kg;
-        byPredio[pName].totalKgFresco += (p.kgFresco || 0);
-      });
-      // Sort predios by name
-      const predioNames = Object.keys(byPredio).sort();
+    const fData = playaStats.byFinca[fincaName];
+    const colors = fincaColors[fincaName] || fincaColors['Fincas Viejas'];
+    const fincaFactor = fData.totalKg > 0 && fData.totalKgFresco > 0
+      ? (fData.totalKgFresco / fData.totalKg) : 0;
 
-      // Check if there's any cosecha data in this finca
-      const hasCosechaData = fData.totalKgFresco > 0;
+    // Group playas by predio within this finca
+    const byPredio = {};
+    fData.playas.forEach(p => {
+      const pName = p.predio || 'Sin Predio';
+      if (!byPredio[pName]) byPredio[pName] = { playas: [], totalKg: 0, totalKgFresco: 0 };
+      byPredio[pName].playas.push(p);
+      byPredio[pName].totalKg += p.kg;
+      byPredio[pName].totalKgFresco += (p.kgFresco || 0);
+    });
+    // Sort predios by name
+    const predioNames = Object.keys(byPredio).sort();
 
-      return `
+    // Check if there's any cosecha data in this finca
+    const hasCosechaData = fData.totalKgFresco > 0;
+
+    return `
       <div class="data-table-container animate-fade-in animate-delay-1" style="padding: var(--space-6); border-left: 4px solid ${colors.accent}; margin-bottom: var(--space-6);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3);">
           <h4 style="font-family: 'Outfit'; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-2); margin: 0;">
@@ -1960,23 +2043,23 @@ export function renderLevantadoPorPlaya(playaStats) {
             </thead>
             <tbody>
               ${predioNames.map((predioName, pi) => {
-                const pData = byPredio[predioName];
-                const pColor = predioTextColors[pi % predioTextColors.length];
-                const pBg = predioColors[pi % predioColors.length];
-                const predioPlayas = pData.playas.sort((a, b) => {
-                  if (fincaName === 'El Espejo' || fincaName === 'Fincas Viejas') {
-                    return a.nombre.localeCompare(b.nombre, undefined, { numeric: true });
-                  }
-                  return b.kg - a.kg;
-                });
-                const predioFactor = pData.totalKg > 0 && pData.totalKgFresco > 0 
-                  ? (pData.totalKgFresco / pData.totalKg) : 0;
-                
-                // Skip predio header/footer if it's El Espejo or a single predio matching finca name
-                const isSingleGroup = fincaName === 'El Espejo' || (predioNames.length === 1 && predioName === fincaName);
+      const pData = byPredio[predioName];
+      const pColor = predioTextColors[pi % predioTextColors.length];
+      const pBg = predioColors[pi % predioColors.length];
+      const predioPlayas = pData.playas.sort((a, b) => {
+        if (fincaName === 'El Espejo' || fincaName === 'Fincas Viejas') {
+          return a.nombre.localeCompare(b.nombre, undefined, { numeric: true });
+        }
+        return b.kg - a.kg;
+      });
+      const predioFactor = pData.totalKg > 0 && pData.totalKgFresco > 0
+        ? (pData.totalKgFresco / pData.totalKg) : 0;
 
-                // Predio sub-header row
-                const predioHeader = isSingleGroup ? '' : `
+      // Skip predio header/footer if it's El Espejo or a single predio matching finca name
+      const isSingleGroup = fincaName === 'El Espejo' || (predioNames.length === 1 && predioName === fincaName);
+
+      // Predio sub-header row
+      const predioHeader = isSingleGroup ? '' : `
                 <tr>
                   <td colspan="${2 + passes.length + 3}" style="background: ${pBg}; padding: 8px 16px; border-bottom: 2px solid ${pColor}30;">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -1985,23 +2068,23 @@ export function renderLevantadoPorPlaya(playaStats) {
                     </div>
                   </td>
                 </tr>`;
-                
-                // Playa rows for this predio - now with 2 rows per playa (Pasa + Fresco)
-                const playaRows = predioPlayas.map(playa => {
-                  const hasPlayaCosecha = (playa.kgFresco || 0) > 0;
-                  const hasPlayaPasaHumeda = (playa.kgPasaHumeda || 0) > 0;
-                  const totalPlayaKg = (playa.kg || 0);
-                  const playaRowsCount = 1 + (hasPlayaCosecha ? 1 : 0) + (hasPlayaPasaHumeda ? 1 : 0);
 
-                  const pct = playaStats.grandTotalKg > 0 ? (totalPlayaKg / playaStats.grandTotalKg * 100) : 0;
-                  const playaFactor = totalPlayaKg > 0 && playa.kgFresco > 0 
-                    ? (playa.kgFresco / totalPlayaKg) : 0;
+      // Playa rows for this predio - now with 2 rows per playa (Pasa + Fresco)
+      const playaRows = predioPlayas.map(playa => {
+        const hasPlayaCosecha = (playa.kgFresco || 0) > 0;
+        const hasPlayaPasaHumeda = (playa.kgPasaHumeda || 0) > 0;
+        const totalPlayaKg = (playa.kg || 0);
+        const playaRowsCount = 1 + (hasPlayaCosecha ? 1 : 0) + (hasPlayaPasaHumeda ? 1 : 0);
 
-                  const borderStyle = (isLast) => isLast ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: none;';
+        const pct = playaStats.grandTotalKg > 0 ? (totalPlayaKg / playaStats.grandTotalKg * 100) : 0;
+        const playaFactor = totalPlayaKg > 0 && playa.kgFresco > 0
+          ? (playa.kgFresco / totalPlayaKg) : 0;
 
-                  // Row 1: Levantado (Pasa)
-                  const isPasaLast = !hasPlayaCosecha && !hasPlayaPasaHumeda;
-                  let rows = `
+        const borderStyle = (isLast) => isLast ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: none;';
+
+        // Row 1: Levantado (Pasa)
+        const isPasaLast = !hasPlayaCosecha && !hasPlayaPasaHumeda;
+        let rows = `
                   <tr style="${borderStyle(isPasaLast)}">
                     <td rowspan="${playaRowsCount}" style="padding-left: 28px; vertical-align: middle; border-bottom: 2px solid var(--border-subtle);">
                       <div style="display: flex; align-items: center; gap: var(--space-2);">
@@ -2011,9 +2094,9 @@ export function renderLevantadoPorPlaya(playaStats) {
                     </td>
                     <td style="font-size: 0.8em; color: var(--color-accent-400); font-weight: 600;">🫘 Pasa</td>
                     ${passes.map(n => {
-                      const val = playa.pasadas[n] || 0;
-                      return `<td style="text-align: right; ${val > 0 ? 'color: var(--color-accent-400); font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
-                    }).join('')}
+          const val = playa.pasadas[n] || 0;
+          return `<td style="text-align: right; ${val > 0 ? 'color: var(--color-accent-400); font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
+        }).join('')}
                     <td style="text-align: right; font-weight: 700; color: var(--color-accent-500);">${fmt(playa.kg)}</td>
                     <td rowspan="${playaRowsCount}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: ${getFColor(playaFactor)}; background: ${getFBg(playaFactor)}; border-bottom: 2px solid var(--border-subtle);">${playaFactor > 0 ? playaFactor.toFixed(2) : '—'}</td>
                     <td rowspan="${playaRowsCount}" style="text-align: right; vertical-align: middle; border-bottom: 2px solid var(--border-subtle);">
@@ -2026,46 +2109,46 @@ export function renderLevantadoPorPlaya(playaStats) {
                     </td>
                   </tr>`;
 
-                  // Row 2: Cosecha (Fresco)
-                  if (hasPlayaCosecha) {
-                    const isFrescoLast = !hasPlayaPasaHumeda;
-                    rows += `
+        // Row 2: Cosecha (Fresco)
+        if (hasPlayaCosecha) {
+          const isFrescoLast = !hasPlayaPasaHumeda;
+          rows += `
                     <tr style="${borderStyle(isFrescoLast)}">
                       <td style="font-size: 0.8em; color: #10b981; font-weight: 600;">🍇 Fresco</td>
                       ${passes.map(n => {
-                        const val = (playa.cosechaPasadas || {})[n] || 0;
-                        return `<td style="text-align: right; ${val > 0 ? 'color: #10b981; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
-                      }).join('')}
+            const val = (playa.cosechaPasadas || {})[n] || 0;
+            return `<td style="text-align: right; ${val > 0 ? 'color: #10b981; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
+          }).join('')}
                       <td style="text-align: right; font-weight: 700; color: #059669;">${fmt(playa.kgFresco)}</td>
                     </tr>`;
-                  }
+        }
 
-                  // Row 3: Pasa Húmeda
-                  if (hasPlayaPasaHumeda) {
-                    rows += `
+        // Row 3: Pasa Húmeda
+        if (hasPlayaPasaHumeda) {
+          rows += `
                     <tr style="border-bottom: 2px solid var(--border-subtle);">
                       <td style="font-size: 0.8em; color: #3b82f6; font-weight: 600;">💧 Pasa Húm.</td>
                       ${passes.map(n => {
-                        const val = (playa.pasaHumedaPasadas || {})[n] || 0;
-                        return `<td style="text-align: right; ${val > 0 ? 'color: #3b82f6; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
-                      }).join('')}
+            const val = (playa.pasaHumedaPasadas || {})[n] || 0;
+            return `<td style="text-align: right; ${val > 0 ? 'color: #3b82f6; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;'}">${val > 0 ? fmt(val) : '—'}</td>`;
+          }).join('')}
                       <td style="text-align: right; font-weight: 700; color: #2563eb;">${fmt(playa.kgPasaHumeda)}</td>
                     </tr>`;
-                  }
+        }
 
-                  return rows;
-                }).join('');
+        return rows;
+      }).join('');
 
-                // Predio subtotal row  
-                const predioSubFresco = predioPlayas.reduce((s, p) => s + (p.kgFresco || 0), 0);
-                const predioSubtotal = isSingleGroup ? '' : `
+      // Predio subtotal row  
+      const predioSubFresco = predioPlayas.reduce((s, p) => s + (p.kgFresco || 0), 0);
+      const predioSubtotal = isSingleGroup ? '' : `
                 <tr style="background: ${pBg}; font-weight: 600; border-bottom: none;">
                   <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="padding-left: 28px; color: ${pColor}; font-size: 0.85em; vertical-align: middle; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">Subtotal ${predioName}</td>
                   <td style="font-size: 0.75em;">🫘</td>
                   ${passes.map(n => {
-                    const sub = predioPlayas.reduce((s, p) => s + (p.pasadas[n] || 0), 0);
-                    return `<td style="text-align: right; color: ${pColor}; font-size: 0.9em;">${sub > 0 ? fmt(sub) : '—'}</td>`;
-                  }).join('')}
+        const sub = predioPlayas.reduce((s, p) => s + (p.pasadas[n] || 0), 0);
+        return `<td style="text-align: right; color: ${pColor}; font-size: 0.9em;">${sub > 0 ? fmt(sub) : '—'}</td>`;
+      }).join('')}
                   <td style="text-align: right; color: ${pColor};">${fmt(pData.totalKg)}</td>
                   <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-weight: 800; color: ${getFColor(predioFactor)}; background: ${getFBg(predioFactor)}; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">${predioFactor > 0 ? predioFactor.toFixed(2) : '—'}</td>
                   <td rowspan="${predioSubFresco > 0 ? '2' : '1'}" style="text-align: right; color: var(--text-secondary); font-size: 0.85em; vertical-align: middle; ${predioSubFresco > 0 ? 'border-bottom: 2px solid var(--border-subtle);' : 'border-bottom: 2px solid var(--border-subtle);'}">
@@ -2076,23 +2159,23 @@ export function renderLevantadoPorPlaya(playaStats) {
                 <tr style="background: ${pBg}; font-weight: 600; border-bottom: 2px solid var(--border-subtle);">
                   <td style="font-size: 0.75em;">🍇</td>
                   ${passes.map(n => {
-                    const sub = predioPlayas.reduce((s, p) => s + ((p.cosechaPasadas || {})[n] || 0), 0);
-                    return `<td style="text-align: right; color: #10b981; font-size: 0.9em;">${sub > 0 ? fmt(sub) : '—'}</td>`;
-                  }).join('')}
+        const sub = predioPlayas.reduce((s, p) => s + ((p.cosechaPasadas || {})[n] || 0), 0);
+        return `<td style="text-align: right; color: #10b981; font-size: 0.9em;">${sub > 0 ? fmt(sub) : '—'}</td>`;
+      }).join('')}
                   <td style="text-align: right; color: #059669;">${fmt(predioSubFresco)}</td>
                 </tr>` : ''}`;
-                
-                return predioHeader + playaRows + predioSubtotal;
-              }).join('')}
+
+      return predioHeader + playaRows + predioSubtotal;
+    }).join('')}
             </tbody>
             <tfoot style="background: ${colors.bg}; font-weight: 700;">
               <tr style="border-bottom: none;">
                 <td rowspan="${hasCosechaData ? '2' : '1'}" style="vertical-align: middle;">Total ${fincaName}</td>
                 <td style="font-size: 0.75em;">🫘</td>
                 ${passes.map(n => {
-                  const subtotal = fData.playas.reduce((s, p) => s + (p.pasadas[n] || 0), 0);
-                  return `<td style="text-align: right; color: var(--color-accent-500);">${subtotal > 0 ? fmt(subtotal) : '—'}</td>`;
-                }).join('')}
+      const subtotal = fData.playas.reduce((s, p) => s + (p.pasadas[n] || 0), 0);
+      return `<td style="text-align: right; color: var(--color-accent-500);">${subtotal > 0 ? fmt(subtotal) : '—'}</td>`;
+    }).join('')}
                 <td style="text-align: right; color: var(--color-accent-600);">${fmt(fData.totalKg)}</td>
                 <td rowspan="${hasCosechaData ? '2' : '1'}" style="text-align: center; vertical-align: middle; font-size: 1.2em; font-weight: 800; color: ${getFColor(fincaFactor)};">${fincaFactor > 0 ? fincaFactor.toFixed(2) : '—'}</td>
                 <td rowspan="${hasCosechaData ? '2' : '1'}" style="text-align: right; color: var(--text-secondary); vertical-align: middle;">
@@ -2103,16 +2186,16 @@ export function renderLevantadoPorPlaya(playaStats) {
               <tr>
                 <td style="font-size: 0.75em;">🍇</td>
                 ${passes.map(n => {
-                  const subtotal = fData.playas.reduce((s, p) => s + ((p.cosechaPasadas || {})[n] || 0), 0);
-                  return `<td style="text-align: right; color: #10b981;">${subtotal > 0 ? fmt(subtotal) : '—'}</td>`;
-                }).join('')}
+      const subtotal = fData.playas.reduce((s, p) => s + ((p.cosechaPasadas || {})[n] || 0), 0);
+      return `<td style="text-align: right; color: #10b981;">${subtotal > 0 ? fmt(subtotal) : '—'}</td>`;
+    }).join('')}
                 <td style="text-align: right; color: #059669;">${fmt(fData.totalKgFresco)}</td>
               </tr>` : ''}
             </tfoot>
           </table>
         </div>
       </div>`;
-    }).join('')}
+  }).join('')}
   `;
 }
 
@@ -2416,7 +2499,7 @@ export function renderInformeAplicaciones(cycles, fincas, predios, cuarteles, us
     </div>
 
     <div id="sofia-subtab-content" class="animate-fade-in animate-delay-3"></div>
-    </div >
+    </div>
   `;
 }
 
@@ -2691,14 +2774,14 @@ export function renderSofiaDron(stats) {
       </tr></thead>
       <tbody>
         ${(() => {
-          const grouped = stats.raw.reduce((acc, r) => {
-            const key = r.finca_original || r.finca || 'Otros';
-            if (!acc[key]) acc[key] = [];
-            acc[key].push(r);
-            return acc;
-          }, {});
+      const grouped = stats.raw.reduce((acc, r) => {
+        const key = r.finca_original || r.finca || 'Otros';
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(r);
+        return acc;
+      }, {});
 
-          return Object.entries(grouped).map(([finca, rows]) => `
+      return Object.entries(grouped).map(([finca, rows]) => `
             <tr class="table-group-header" style="background: rgba(168, 85, 247, 0.05);">
               <td colspan="7" style="font-weight: 700; color: var(--color-purple-400); padding: var(--space-3) var(--space-4);">
                 🏡 ${finca} — <span style="font-weight:400; color:var(--text-tertiary);">${rows.length} registros de aplicación</span>
@@ -2716,7 +2799,7 @@ export function renderSofiaDron(stats) {
             </tr>
             `).join('')}
           `).join('');
-        })()}
+    })()}
       </tbody>
     </table>
   </div>
@@ -2791,7 +2874,7 @@ export function renderSofiaFoliares(data) {
       })()}
         </tbody>
       </table>
-    </div > `;
+    </div> `;
 }
 
 export function renderSofiaHerbicidas(data) {
@@ -2862,7 +2945,7 @@ export function renderSofiaHerbicidas(data) {
       })()}
         </tbody>
       </table>
-    </div > `;
+    </div> `;
 }
 
 export function renderFertilizacionComparativa(data) {
@@ -2885,7 +2968,7 @@ export function renderFertilizacionComparativa(data) {
       </div>
       <div class="metric-card">
         <div class="metric-card-header"><div class="metric-card-icon ${totalDesvio > 0 ? 'amber' : 'green'}">📐</div></div>
-        <div class="metric-value desvio-value ${totalDesvio > 0 ? 'over' : totalDesvio < 0 ? 'under' : ''}">${totalDesvio > 0 ? '+' : ''}${formatCurrency(totalDesvio)} L</div>
+        <div class="metric-value desvio-value ${totalDesvio > 0 ? 'over' : totalDesvio <0 ? 'under' : ''}">${totalDesvio > 0 ? '+' : ''}${formatCurrency(totalDesvio)} L</div>
         <div class="metric-label">Desvío Total (${totalPct > 0 ? '+' : ''}${totalPct}%)</div>
       </div>
     </div>
@@ -3093,8 +3176,8 @@ export function renderFertilizacionComparativa(data) {
             <td>${formatCurrency(r.pos)}</td>
             <td style="font-weight:600;">${formatCurrency(r.metaAnual)}</td>
             <td style="font-weight:600; color:var(--color-accent-400)">${formatCurrency(r.real)}</td>
-            <td><span class="desvio-badge ${r.desvio > 0 ? 'over' : r.desvio < 0 ? 'under' : 'on-target'}">${r.desvio > 0 ? '⛔ +' : r.desvio < 0 ? '⚠️ ' : '✅ '}${formatCurrency(r.desvio)}</span></td>
-            <td><span class="desvio-badge ${r.desvioPct > 0 ? 'over' : r.desvioPct < 0 ? 'under' : 'on-target'}">${r.desvioPct > 0 ? '⛔ +' : r.desvioPct < 0 ? '⚠️ ' : '✅ '}${r.desvioPct}%</span></td>
+            <td><span class="desvio-badge ${r.desvio > 0 ? 'over' : r.desvio <0 ? 'under' : 'on-target'}">${r.desvio > 0 ? '⛔ +' : r.desvio <0 ? '⚠️ ' : '✅ '}${formatCurrency(r.desvio)}</span></td>
+            <td><span class="desvio-badge ${r.desvioPct > 0 ? 'over' : r.desvioPct <0 ? 'under' : 'on-target'}">${r.desvioPct > 0 ? '⛔ +' : r.desvioPct <0 ? '⚠️ ' : '✅ '}${r.desvioPct}%</span></td>
           </tr>
           `).join('')}
         `).join('');
@@ -3398,22 +3481,22 @@ export function renderAdminCrudView(config, data, catalogs = {}, sectionId = '')
               `;
     }
     if (col.type === 'select-model') {
-       const opts = catalogs[col.model] || [];
-       return `
+      const opts = catalogs[col.model] || [];
+      return `
                 <div class="form-group" style="margin-bottom: var(--space-4);">
                   <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
                   <select id="admin-crud-${col.key}" class="form-select" style="padding-left: var(--space-4);"${col.required ? ' required' : ''}>
                     <option value="">Seleccionar ${col.label}...</option>
                     ${opts.map(opt => {
-                        const name = opt.nombre || opt.name || opt.numero || '';
-                        let extra = '';
-                        // Special for Quartel form: Show Finca next to Predio
-                        if (sectionId === 'admin-cuarteles' && col.key === 'predio_id') {
-                            const finca = catalogs['admin-fincas']?.find(f => f.id == opt.finca_id);
-                            if (finca) extra = ` (${finca.nombre})`;
-                        }
-                        return `<option value="${opt.id}">${name}${extra}</option>`;
-                    }).join('')}
+        const name = opt.nombre || opt.name || opt.numero || '';
+        let extra = '';
+        // Special for Quartel form: Show Finca next to Predio
+        if (sectionId === 'admin-cuarteles' && col.key === 'predio_id') {
+          const finca = catalogs['admin-fincas']?.find(f => f.id == opt.finca_id);
+          if (finca) extra = ` (${finca.nombre})`;
+        }
+        return `<option value="${opt.id}">${name}${extra}</option>`;
+      }).join('')}
                   </select>
                 </div>
               `;
@@ -3945,19 +4028,19 @@ export function renderPresupuestoProyeccionView() {
 
 // ── Render Execution View (Planificado vs Real) ──
 export function renderEjecucionPresupuesto(comparison) {
-    if (!comparison) return '';
-    const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
-    const fmtDec = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
-    const pctColor = (pct) => pct > 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
-    const estadoIcon = (estado) => estado === 'excedido' || estado === 'superado' ? '🔴' : estado === 'alerta' || estado === 'bueno' ? '🟡' : '🟢';
+  if (!comparison) return '';
+  const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+  const fmtDec = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+  const pctColor = (pct) => pct > 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
+  const estadoIcon = (estado) => estado === 'excedido' || estado === 'superado' ? '🔴' : estado === 'alerta' || estado === 'bueno' ? '🟡' : '🟢';
 
-    const t = comparison.totals;
-    const jPct = t.jornalesPlan > 0 ? (t.jornalesReal / t.jornalesPlan * 100) : 0;
-    const gPct = t.gastosPlan > 0 ? (t.gastosReal / t.gastosPlan * 100) : 0;
-    const uPct = t.uvaPlan > 0 ? (t.uvaReal / t.uvaPlan * 100) : 0;
-    const pPct = t.pasaPlan > 0 ? (t.pasaReal / t.pasaPlan * 100) : 0;
+  const t = comparison.totals;
+  const jPct = t.jornalesPlan > 0 ? (t.jornalesReal / t.jornalesPlan * 100) : 0;
+  const gPct = t.gastosPlan > 0 ? (t.gastosReal / t.gastosPlan * 100) : 0;
+  const uPct = t.uvaPlan > 0 ? (t.uvaReal / t.uvaPlan * 100) : 0;
+  const pPct = t.pasaPlan > 0 ? (t.pasaReal / t.pasaPlan * 100) : 0;
 
-    return `
+  return `
     <div class="animate-fade-in">
         <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
             <div class="metric-card" style="border-left: 4px solid ${pctColor(jPct)};">
@@ -4278,8 +4361,8 @@ export function renderGastosHistoricosView() {
 
 // ── Control de Carga View ──
 export function renderControlCargaView() {
-    const today = new Date().toISOString().split('T')[0];
-    return `
+  const today = new Date().toISOString().split('T')[0];
+  return `
     <div id="control-carga-view" class="view animate-fade-in" style="padding: 1.5rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <div>
@@ -4353,9 +4436,9 @@ export function renderControlCargaView() {
 }
 
 export function renderStockMovementView(movements, catalogs, user) {
-    const { productos } = catalogs;
-    
-    return `
+  const { productos } = catalogs;
+
+  return `
     <div class="work-log-view animate-fade-in">
         <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
             <div>
@@ -4428,16 +4511,17 @@ export function renderStockMovementView(movements, catalogs, user) {
                                 <th style="text-align: center;">Acción</th>
                             </tr>
                         </thead>
-                        <tbody id="tbody-op-transferencias"></tbody>
+        <tbody id="tbody-op-transferencias"></tbody>
                     </table>
                 </div>
             </div>
         </div>
+        
+        <!-- Inventory Modals (Shadowed for this view) -->
+        ${renderInventoryModals()}
     </div>
     `;
 }
-
-
 /**
  * Helper to render the Excel budget summary.
  */
@@ -4445,18 +4529,18 @@ export function renderExcelBudgetSummary(data) {
     if (!data || !data.byFinca) return '<div class="alert alert-info">Sin datos para mostrar.</div>';
 
     return `
-        <div style="overflow-x: auto;">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>FINCA</th>
-                        <th style="text-align: right;">Presupuesto USD</th>
-                        <th style="text-align: right;">Presupuesto ARS</th>
-                        <th style="text-align: right;">Items Registrados</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${data.byFinca.map(f => `
+    <div style="overflow-x: auto;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>FINCA</th>
+          <th style="text-align: right;">Presupuesto USD</th>
+          <th style="text-align: right;">Presupuesto ARS</th>
+          <th style="text-align: right;">Items Registrados</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.byFinca.map(f => `
                         <tr>
                             <td style="font-weight: 600;">${f.finca}</td>
                             <td style="text-align: right; color: var(--color-success);">${f.usd.toLocaleString('es-AR', { style: 'currency', currency: 'USD' })}</td>
@@ -4464,20 +4548,20 @@ export function renderExcelBudgetSummary(data) {
                             <td style="text-align: right;">${f.items.length}</td>
                         </tr>
                     `).join('')}
-                </tbody>
-                <tfoot style="font-weight: 700; border-top: 2px solid var(--color-border);">
-                    <tr>
-                        <td>TOTAL GENERAL</td>
-                        <td style="text-align: right; color: var(--color-success);">
-                            ${data.byFinca.reduce((s, f) => s + f.usd, 0).toLocaleString('es-AR', { style: 'currency', currency: 'USD' })}
-                        </td>
-                        <td style="text-align: right;">
-                            ${data.byFinca.reduce((s, f) => s + f.ars, 0).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })}
-                        </td>
-                        <td style="text-align: right;">${data.raw.length}</td>
-                    </tr>
-                </tfoot>
-            </table>
+      </tbody>
+      <tfoot style="font-weight: 700; border-top: 2px solid var(--color-border);">
+        <tr>
+          <td>TOTAL GENERAL</td>
+          <td style="text-align: right; color: var(--color-success);">
+            ${data.byFinca.reduce((s, f) => s + f.usd, 0).toLocaleString('es-AR', { style: 'currency', currency: 'USD' })}
+          </td>
+          <td style="text-align: right;">
+            ${data.byFinca.reduce((s, f) => s + f.ars, 0).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })}
+          </td>
+          <td style="text-align: right;">${data.raw.length}</td>
+        </tr>
+      </tfoot>
+    </table>
         </div>
     `;
 }
@@ -4500,7 +4584,7 @@ export function renderInformePlanificacion(data) {
             <p style="margin: 4px 0 0; color: var(--text-tertiary); font-size: 0.9em;">Basado en ejecución histórica vs proyección estratégica.</p>
         </div>
 
-        <!-- Metric Cards -->
+        <!--Metric Cards-->
         <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6);">
             <div class="metric-card" style="border-bottom: 3px solid var(--color-primary-500);">
                 <div class="metric-label" style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px;">Jornales Proyectados</div>
@@ -4524,7 +4608,7 @@ export function renderInformePlanificacion(data) {
             </div>
         </div>
 
-        <!-- Charts Row -->
+        <!--Charts Row-->
         <div class="charts-row" style="margin-bottom: var(--space-6); display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-6);">
             <div class="chart-container" style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-5); border: 1px solid var(--border-subtle);">
                 <div class="chart-header" style="margin-bottom: var(--space-4);">
@@ -4544,74 +4628,74 @@ export function renderInformePlanificacion(data) {
             </div>
         </div>
 
-        <!-- Tables Row -->
-        <div class="dashboard-grid" style="grid-template-columns: 1.6fr 1fr; gap: var(--space-6); align-items: start;">
-            <!-- Jornales Table -->
-            <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-secondary); border-radius: 16px;">
-                <div style="padding: var(--space-4) var(--space-5); background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
-                    <h4 style="margin: 0; color: var(--text-primary); font-family: 'Outfit'; font-size: 1rem;">👷 Labores Estratégicas</h4>
-                    <span style="font-size: 0.75em; color: var(--text-tertiary); background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 12px; font-weight: 600;">Total: ${data.jornales.length} faenas</span>
-                </div>
-                <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
-                    <table class="data-table" style="margin: 0;">
-                        <thead>
-                            <tr>
-                                <th style="background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Labor / Faena</th>
-                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Jornales</th>
-                                <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Costo Est.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.jornales.map(l => `
+        <!--Tables Row-->
+  <div class="dashboard-grid" style="grid-template-columns: 1.6fr 1fr; gap: var(--space-6); align-items: start;">
+    <!-- Jornales Table -->
+    <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-secondary); border-radius: 16px;">
+      <div style="padding: var(--space-4) var(--space-5); background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+        <h4 style="margin: 0; color: var(--text-primary); font-family: 'Outfit'; font-size: 1rem;">👷 Labores Estratégicas</h4>
+        <span style="font-size: 0.75em; color: var(--text-tertiary); background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 12px; font-weight: 600;">Total: ${data.jornales.length} faenas</span>
+      </div>
+      <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+        <table class="data-table" style="margin: 0;">
+          <thead>
+            <tr>
+              <th style="background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Labor / Faena</th>
+              <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Jornales</th>
+              <th style="text-align: right; background: var(--bg-tertiary); position: sticky; top: 0; z-index: 10; color: white; opacity: 0.9;">Costo Est.</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.jornales.map(l => `
                                 <tr>
                                     <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5); color: white;">${l.labor}</td>
                                     <td style="text-align: right; font-weight: 700; color: var(--color-primary-400); padding: var(--space-3) var(--space-5);">${fmtDec(l.jornales)}</td>
                                     <td style="text-align: right; color: white; opacity: 0.8; font-size: 0.85em; padding: var(--space-3) var(--space-5);">${fmtMoney(l.costoArs)}</td>
                                 </tr>
                             `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-            <!-- Gastos Table -->
-            <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-secondary); border-radius: 16px;">
-                <div style="padding: var(--space-4) var(--space-5); background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-subtle);">
-                    <h4 style="margin: 0; color: var(--text-primary); font-family: 'Outfit'; font-size: 1rem;">💰 Inversión por Origen</h4>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="data-table" style="margin: 0;">
-                        <thead>
-                            <tr>
-                                <th style="padding: var(--space-3) var(--space-5); color: white; opacity: 0.9;">Unidad de Negocio</th>
-                                <th style="text-align: right; padding: var(--space-3) var(--space-5); color: white; opacity: 0.9;">Presupuesto (USD)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${(() => {
-                                const byFinca = {};
-                                data.gastosGral.forEach(g => {
-                                    byFinca[g.finca] = (byFinca[g.finca] || 0) + g.usd;
-                                });
-                                return Object.entries(byFinca)
-                                    .sort((a,b) => b[1] - a[1])
-                                    .map(([f, usd]) => `
+    <!-- Gastos Table -->
+    <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-secondary); border-radius: 16px;">
+      <div style="padding: var(--space-4) var(--space-5); background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-subtle);">
+        <h4 style="margin: 0; color: var(--text-primary); font-family: 'Outfit'; font-size: 1rem;">💰 Inversión por Origen</h4>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="data-table" style="margin: 0;">
+          <thead>
+            <tr>
+              <th style="padding: var(--space-3) var(--space-5); color: white; opacity: 0.9;">Unidad de Negocio</th>
+              <th style="text-align: right; padding: var(--space-3) var(--space-5); color: white; opacity: 0.9;">Presupuesto (USD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(() => {
+              const byFinca = {};
+              data.gastosGral.forEach(g => {
+                byFinca[g.finca] = (byFinca[g.finca] || 0) + g.usd;
+              });
+              return Object.entries(byFinca)
+                .sort((a, b) => b[1] - a[1])
+                .map(([f, usd]) => `
                                         <tr>
                                             <td style="font-weight: 500; font-size: 0.9em; padding: var(--space-3) var(--space-5); color: white;">${f}</td>
                                             <td style="text-align: right; font-weight: 700; color: #10b981; padding: var(--space-3) var(--space-5);">${fmtUsd(usd)}</td>
                                         </tr>
                                     `).join('');
-                            })()}
-                        </tbody>
-                    </table>
-                </div>
-                <div style="padding: var(--space-4); background: rgba(16, 185, 129, 0.03); color: white; opacity: 0.5; font-size: 0.75em; text-align: center; border-top: 1px solid var(--border-subtle);">
-                    Dato consolidado de importación de Excel General.
-                </div>
-            </div>
-        </div>
+            })()}
+          </tbody>
+        </table>
+      </div>
+      <div style="padding: var(--space-4); background: rgba(16, 185, 129, 0.03); color: white; opacity: 0.5; font-size: 0.75em; text-align: center; border-top: 1px solid var(--border-subtle);">
+        Dato consolidado de importación de Excel General.
+      </div>
     </div>
-    `;
+  </div>
+    </div>
+  `;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4620,8 +4704,8 @@ export function renderInformePlanificacion(data) {
 
 export function renderProyeccionJornalView() {
     return `
-    <div class="animate-fade-in" style="padding: var(--space-2) 0;">
-        <!-- Header & Filters -->
+  <div class="animate-fade-in" style = "padding: var(--space-2) 0;" >
+        < !--Header & Filters-->
         <div style="display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-end; margin-bottom: var(--space-6); padding: var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(59,130,246,0.04)); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle);">
             <div style="flex: 1; min-width: 200px;">
                 <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin: 0 0 var(--space-1) 0; display: flex; align-items: center; gap: var(--space-2);">
@@ -4661,7 +4745,7 @@ export function renderProyeccionJornalView() {
             </div>
         </div>
 
-        <!-- Summary Cards -->
+        <!--Summary Cards-->
         <div id="pom-summary-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
             <div class="stat-card" style="background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02)); border: 1px solid rgba(16,185,129,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
                 <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(16,185,129,0.8); font-weight: 700; margin-bottom: var(--space-2);">Jornales Proyectados</div>
@@ -4681,7 +4765,7 @@ export function renderProyeccionJornalView() {
             </div>
         </div>
 
-        <!-- Tab Navigation -->
+        <!--Tab Navigation-->
         <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); flex-wrap: wrap;">
             <button class="btn btn-primary" id="pom-tab-detalle" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">📋 Detalle por Cuartel</button>
             <button class="btn btn-ghost" id="pom-tab-resumen" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">🏡 Resumen por Finca</button>
@@ -4691,7 +4775,7 @@ export function renderProyeccionJornalView() {
             <button class="btn btn-ghost" id="btn-pom-save" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4); color: var(--color-success);">💾 Guardar</button>
         </div>
 
-        <!-- Content Areas -->
+        <!--Content Areas-->
         <div id="pom-content-detalle">
             <div style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); font-size: 1.1em;">
                 <div style="font-size: 3rem; margin-bottom: var(--space-4); opacity: 0.3;">📊</div>
@@ -4702,7 +4786,7 @@ export function renderProyeccionJornalView() {
         <div id="pom-content-resumen" style="display: none;"></div>
         <div id="pom-content-calendario" style="display: none;"></div>
     </div>
-    `;
+  `;
 }
 
 export function renderPomDetalleTable(matrix) {
@@ -4723,12 +4807,12 @@ export function renderPomDetalleTable(matrix) {
     let html = '';
     Object.entries(grouped).forEach(([finca, predios]) => {
         html += `
-        <div style="margin-bottom: var(--space-6);">
-            <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); padding: var(--space-3) var(--space-4); background: linear-gradient(90deg, rgba(16,185,129,0.12), transparent); border-radius: var(--radius-lg); border-left: 4px solid #10b981;">
-                <span style="font-size: 1.3em;">🏡</span>
-                <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${finca}</h3>
-            </div>
-        `;
+  <div style = "margin-bottom: var(--space-6);" >
+    <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); padding: var(--space-3) var(--space-4); background: linear-gradient(90deg, rgba(16,185,129,0.12), transparent); border-radius: var(--radius-lg); border-left: 4px solid #10b981;">
+      <span style="font-size: 1.3em;">🏡</span>
+      <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${finca}</h3>
+    </div>
+`;
 
         Object.entries(predios).forEach(([predio, records]) => {
             // Calculate predio-level summary for collapsed view
@@ -4747,10 +4831,10 @@ export function renderPomDetalleTable(matrix) {
                 const first = arr.findIndex(x => x.cuartel === p.cuartel);
                 return first === i ? s + (p.hectareas || 0) : s;
             }, 0);
-            const predioId = `pom-predio-${finca}-${predio}`.replace(/[^a-zA-Z0-9]/g, '_');
+            const predioId = `pom - predio - ${ finca } -${ predio } `.replace(/[^a-zA-Z0-9]/g, '_');
 
             html += `
-            <div style="margin-bottom: var(--space-3); margin-left: var(--space-4);">
+  <div style = "margin-bottom: var(--space-3); margin-left: var(--space-4);" >
                 <div onclick="(function(el){var body=document.getElementById('${predioId}');var arrow=el.querySelector('.pom-arrow');if(body.style.display==='none'){body.style.display='block';arrow.textContent='▼';}else{body.style.display='none';arrow.textContent='▶';}})(this)"
                      style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); background: rgba(59,130,246,0.05); border-radius: var(--radius-md); border-left: 3px solid rgba(59,130,246,0.4); cursor: pointer; user-select: none; transition: background 0.15s;"
                      onmouseenter="this.style.background='rgba(59,130,246,0.1)'" onmouseleave="this.style.background='rgba(59,130,246,0.05)'">
@@ -4839,7 +4923,7 @@ export function renderPomDetalleTable(matrix) {
                 </div>
                 </div>
             </div>
-            `;
+  `;
         });
 
         html += '</div>';
@@ -4861,8 +4945,8 @@ export function renderPomResumenFinca(resumen) {
             : 'var(--text-tertiary)';
 
         html += `
-        <div style="background: var(--bg-secondary); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
-            <!-- Finca Header -->
+  <div style = "background: var(--bg-secondary); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;" >
+            < !--Finca Header-->
             <div style="padding: var(--space-4) var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.04)); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
                 <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.15em; display: flex; align-items: center; gap: var(--space-2);">
                     <span style="font-size: 1.3em;">🏡</span> ${f.finca}
@@ -4883,7 +4967,7 @@ export function renderPomResumenFinca(resumen) {
                 </div>
             </div>
 
-            <!-- Totals Row -->
+            <!--Totals Row-->
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle);">
                 <div style="text-align: center; padding: var(--space-3); background: rgba(16,185,129,0.05); border-radius: var(--radius-md);">
                     <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(16,185,129,0.7); font-weight: 700;">J. Proyectados</div>
@@ -4903,19 +4987,19 @@ export function renderPomResumenFinca(resumen) {
                 </div>
             </div>
 
-            <!-- Labor Breakdown Table -->
-            <div style="padding: var(--space-4) var(--space-5);">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid var(--border-subtle);">
-                            <th style="text-align: left; padding: var(--space-2) var(--space-3); color: var(--text-tertiary); font-weight: 600; font-size: 0.88em;">Labor / Faena</th>
-                            <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #10b981; font-weight: 600; font-size: 0.88em;">Proyectados</th>
-                            <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #3b82f6; font-weight: 600; font-size: 0.88em;">Reales</th>
-                            <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #a855f7; font-weight: 600; font-size: 0.88em;">Sugeridos</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${f.labores.map(l => `
+            <!--Labor Breakdown Table-->
+  <div style="padding: var(--space-4) var(--space-5);">
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+          <th style="text-align: left; padding: var(--space-2) var(--space-3); color: var(--text-tertiary); font-weight: 600; font-size: 0.88em;">Labor / Faena</th>
+          <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #10b981; font-weight: 600; font-size: 0.88em;">Proyectados</th>
+          <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #3b82f6; font-weight: 600; font-size: 0.88em;">Reales</th>
+          <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #a855f7; font-weight: 600; font-size: 0.88em;">Sugeridos</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${f.labores.map(l => `
                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
                                 <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary); font-weight: 500;">${l.nombre}</td>
                                 <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #10b981; font-weight: 700;">${l.jornalesP.toFixed(1)}</td>
@@ -4923,11 +5007,11 @@ export function renderPomResumenFinca(resumen) {
                                 <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #a855f7; font-weight: 700;">${l.jornalesS > 0 ? l.jornalesS.toFixed(1) : '—'}</td>
                             </tr>
                         `).join('')}
-                    </tbody>
-                </table>
-            </div>
+      </tbody>
+    </table>
+  </div>
         </div>
-        `;
+  `;
     });
 
     html += '</div>';
@@ -4953,58 +5037,58 @@ export function renderPomCalendario(months) {
     };
 
     let html = `
-    <div style="overflow-x: auto; border-radius: var(--radius-xl); border: 1px solid var(--border-subtle);">
-        <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
-            <thead>
-                <tr style="background: rgba(255,255,255,0.03);">
-                    ${months.map(m => `
+  <div style = "overflow-x: auto; border-radius: var(--radius-xl); border: 1px solid var(--border-subtle);" >
+    <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
+      <thead>
+        <tr style="background: rgba(255,255,255,0.03);">
+          ${months.map(m => `
                         <th style="padding: var(--space-3) var(--space-2); text-align: center; color: var(--text-secondary); font-weight: 700; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; border-right: 1px solid var(--border-subtle); min-width: 75px;">${m.label}</th>
                     `).join('')}
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    ${months.map(m => {
-                        // Aggregate labores by type for this month
-                        const laborAgg = {};
-                        m.labores.forEach(l => {
-                            if (!laborAgg[l.labor]) laborAgg[l.labor] = { count: 0, jornales: 0, fincas: new Set() };
-                            laborAgg[l.labor].count++;
-                            laborAgg[l.labor].jornales += l.jornales;
-                            laborAgg[l.labor].fincas.add(l.finca);
-                        });
-                        const entries = Object.entries(laborAgg).sort((a, b) => b[1].jornales - a[1].jornales);
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          ${months.map(m => {
+            // Aggregate labores by type for this month
+            const laborAgg = {};
+            m.labores.forEach(l => {
+              if (!laborAgg[l.labor]) laborAgg[l.labor] = { count: 0, jornales: 0, fincas: new Set() };
+              laborAgg[l.labor].count++;
+              laborAgg[l.labor].jornales += l.jornales;
+              laborAgg[l.labor].fincas.add(l.finca);
+            });
+            const entries = Object.entries(laborAgg).sort((a, b) => b[1].jornales - a[1].jornales);
 
-                        return `
+            return `
                         <td style="padding: var(--space-2); border-right: 1px solid var(--border-subtle); vertical-align: top;">
                             <div style="font-weight: 800; color: var(--text-primary); margin-bottom: var(--space-2); text-align: center; font-size: 0.9em; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05);">${m.totalJornales.toFixed(0)}</div>
                             <div style="display: flex; flex-direction: column; gap: 4px;">
                                 ${entries.map(([labor, data]) => {
-                                    const percentage = (data.jornales / m.totalJornales) * 100;
-                                    const color = LABOR_COLORS[labor] || '#818cf8';
-                                    return `
+              const percentage = (data.jornales / m.totalJornales) * 100;
+              const color = LABOR_COLORS[labor] || '#818cf8';
+              return `
                                     <div style="font-size: 0.68em; background: ${color}15; color: ${color}; padding: 3px 6px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border: 1px solid ${color}30;" title="${labor} - ${data.jornales.toFixed(1)} j.">
                                         <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 50px;">${labor}</span>
                                         <span style="font-weight: 800;">${percentage.toFixed(0)}%</span>
                                     </div>
                                     `;
-                                }).join('')}
+            }).join('')}
                             </div>
                         </td>
                         `;
-                    }).join('')}
-                </tr>
-            </tbody>
-        </table>
+          }).join('')}
+        </tr>
+      </tbody>
+    </table>
     </div>
-    `;
+  `;
     return html;
 }
 
 export function renderCargaDocumentacionView() {
     return `
-        <div class="container-fluid animate-fade-in" style="padding: var(--space-4);">
-            <!-- Tab Navigation -->
+  <div class="container-fluid animate-fade-in" style = "padding: var(--space-4);" >
+            < !--Tab Navigation-->
             <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5);">
                 <button class="btn btn-primary" id="doc-tab-facturas" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">📄 Facturas Proveedores</button>
                 <button class="btn btn-ghost" id="doc-tab-servicios" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">⚡ Facturas Servicios</button>
@@ -5012,7 +5096,7 @@ export function renderCargaDocumentacionView() {
                 <button class="btn btn-ghost" id="doc-tab-transferencias" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">🏢 Remitos Internos</button>
             </div>
 
-            <!-- VIEW: FACTURAS -->
+            <!--VIEW: FACTURAS-->
             <div id="view-facturas">
                 <div class="row mb-4">
                     <div class="col-12">
@@ -5055,7 +5139,7 @@ export function renderCargaDocumentacionView() {
                 </div>
             </div>
 
-            <!-- VIEW: SERVICIOS -->
+            <!--VIEW: SERVICIOS-->
             <div id="view-servicios" style="display: none;">
                 <div class="row mb-4">
                     <div class="col-12">
@@ -5095,7 +5179,7 @@ export function renderCargaDocumentacionView() {
                 </div>
             </div>
 
-            <!-- VIEW: REMITOS EXTERNOS -->
+            <!--VIEW: REMITOS EXTERNOS-->
             <div id="view-remitos-ext" style="display: none;">
                 <div class="row mb-4">
                     <div class="col-12">
@@ -5135,47 +5219,47 @@ export function renderCargaDocumentacionView() {
                 </div>
             </div>
 
-            <!-- VIEW: TRANSFERENCIAS -->
-            <div id="view-transferencias" style="display: none;">
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
-                                <div>
-                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">🏢 Remitos <span style="color: var(--color-primary-400);">Internos</span></h2>
-                                    <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Movimiento de stock inter-bodega y control de recepciones.</p>
-                                </div>
-                                <div style="display: flex; gap: var(--space-3);">
-                                    <button class="btn btn-primary" id="btn-nueva-transferencia" style="border-radius: var(--radius-lg); font-weight: 700; display: flex; align-items: center; gap: var(--space-2);">
-                                        <span>🏢</span> Generar Movimiento
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div style="background: rgba(255,255,255,0.01); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
-                                <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88em;">
-                                        <thead>
-                                            <tr style="text-align: left; border-bottom: 1px solid var(--border-subtle);">
-                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Fecha</th>
-                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Remito</th>
-                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Origen</th>
-                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">➡️</th>
-                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Destino</th>
-                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Producto</th>
-                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Cant.</th>
-                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Estado</th>
-                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tbody-transferencias"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!--VIEW: TRANSFERENCIAS-->
+  <div id="view-transferencias" style="display: none;">
+    <div class="row mb-4">
+      <div class="col-12">
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+            <div>
+              <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">🏢 Remitos <span style="color: var(--color-primary-400);">Internos</span></h2>
+              <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Movimiento de stock inter-bodega y control de recepciones.</p>
             </div>
+            <div style="display: flex; gap: var(--space-3);">
+              <button class="btn btn-primary" id="btn-nueva-transferencia" style="border-radius: var(--radius-lg); font-weight: 700; display: flex; align-items: center; gap: var(--space-2);">
+                <span>🏢</span> Generar Movimiento
+              </button>
+            </div>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.01); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.88em;">
+                <thead>
+                  <tr style="text-align: left; border-bottom: 1px solid var(--border-subtle);">
+                    <th style="padding: var(--space-4); color: var(--text-tertiary);">Fecha</th>
+                    <th style="padding: var(--space-4); color: var(--text-tertiary);">Remito</th>
+                    <th style="padding: var(--space-4); color: var(--text-tertiary);">Origen</th>
+                    <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">➡️</th>
+                    <th style="padding: var(--space-4); color: var(--text-tertiary);">Destino</th>
+                    <th style="padding: var(--space-4); color: var(--text-tertiary);">Producto</th>
+                    <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Cant.</th>
+                    <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Estado</th>
+                    <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-transferencias"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
         </div>
 
         <div class="modal fade" id="modalServicio" tabindex="-1" aria-hidden="true">
@@ -5234,7 +5318,7 @@ export function renderCargaDocumentacionView() {
             </div>
         </div>
 
-        <!-- Modals -->
+        <!--Modals -->
         <div class="modal fade" id="modalFactura" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
@@ -5344,64 +5428,18 @@ export function renderCargaDocumentacionView() {
             </div>
         </div>
 
-        <div class="modal fade" id="modalRemitoExterno" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
-                    <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle);">
-                        <h5 class="modal-title font-display" style="font-weight: 800;">🚛 Cargar Remito Externo</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body" style="padding: var(--space-6);">
-                        <form id="form-remito-ext">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-                                <div style="grid-column: span 1;">
-                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Proveedor / Remitente</label>
-                                    <input type="text" name="proveedor" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
-                                </div>
-                                <div style="grid-column: span 1;">
-                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">N° de Remito</label>
-                                    <input type="text" name="nroRemito" required class="form-control" placeholder="Ej: 0001-0000456" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
-                                </div>
-                                <div style="grid-column: span 1;">
-                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Bodega de Ingreso</label>
-                                    <select name="bodegaDestino" class="form-select doc-select-bodega" required></select>
-                                </div>
-                                <div style="grid-column: span 1;">
-                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Producto / Insumo</label>
-                                    <select name="productoId" class="form-select doc-select-producto" required></select>
-                                </div>
-                                <div style="grid-column: span 1;">
-                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Cantidad Recibida</label>
-                                    <input type="number" name="cantidad" step="0.01" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
-                                </div>
-                                <div style="grid-column: span 1;">
-                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Fecha de Recepción</label>
-                                    <input type="date" name="fecha" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
-                                </div>
-                                <div style="grid-column: span 2;">
-                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Notas / Observaciones</label>
-                                    <textarea name="notas" rows="2" class="form-control" placeholder="Ej: Recibido sin daños, coincide con lo pedido." style="background: var(--bg-primary); border: 1px solid var(--border-subtle);"></textarea>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" id="btn-save-remito-ext">Registrar Ingreso Externo</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+        ${ renderInventoryModals() }
+`;
+    return html;
 }
 
 export function renderRemitoExtRows(remitos) {
     if (!remitos || remitos.length === 0) {
-        return `<tr><td colspan="7" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay remitos externos registrados.</td></tr>`;
+        return `<tr > <td colspan="7" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay remitos externos registrados.</td></tr> `;
     }
 
     return remitos.map(r => `
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+  <tr style = "border-bottom: 1px solid rgba(255,255,255,0.02);" >
             <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap;">${new Date(r.fecha).toLocaleDateString()}</td>
             <td style="padding: var(--space-4); font-family: monospace; color: var(--color-primary-400);">${r.nroRemito}</td>
             <td style="padding: var(--space-4); font-weight: 600;">${r.proveedor}</td>
@@ -5412,16 +5450,16 @@ export function renderRemitoExtRows(remitos) {
                 <span style="color: var(--color-success); font-size: 1.1em;">✔️</span>
             </td>
         </tr>
-    `).join('');
+  `).join('');
 }
 
 export function renderServicioRows(servicios) {
     if (!servicios || servicios.length === 0) {
-        return `<tr><td colspan="7" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay facturas de servicios registradas.</td></tr>`;
+        return `<tr > <td colspan="7" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay facturas de servicios registradas.</td></tr> `;
     }
 
     return servicios.map(s => `
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+  <tr style = "border-bottom: 1px solid rgba(255,255,255,0.02);" >
             <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap;">${new Date(s.fecha).toLocaleDateString()}</td>
             <td style="padding: var(--space-4);">
                 <span style="display: block; font-weight: 700; color: var(--text-primary);">${s.categoria}</span>
@@ -5437,18 +5475,18 @@ export function renderServicioRows(servicios) {
                 <span style="color: var(--color-success); font-size: 1.1em;">✔️</span>
             </td>
         </tr>
-    `).join('');
+  `).join('');
 }
 
 export function renderTransferRows(transfers) {
     if (!transfers || transfers.length === 0) {
-        return `<tr><td colspan="9" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay remitos internos registrados.</td></tr>`;
+        return `<tr > <td colspan="9" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay remitos internos registrados.</td></tr> `;
     }
 
     return transfers.map(t => {
         const statusColor = t.status === 'En Tránsito' ? '#f59e0b' : '#10b981';
         return `
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+  <tr style = "border-bottom: 1px solid rgba(255,255,255,0.02);" >
                 <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap;">${new Date(t.fecha).toLocaleDateString()}</td>
                 <td style="padding: var(--space-4); font-family: monospace; color: var(--color-primary-400);">${t.nroRemito}</td>
                 <td style="padding: var(--space-4); font-weight: 600;">${t.bodegaOrigenNombre}</td>
@@ -5469,27 +5507,27 @@ export function renderTransferRows(transfers) {
                     ` : `<span style="color: var(--color-success); font-size: 1.1em;">✔️</span>`}
                 </td>
             </tr>
-        `;
+  `;
     }).join('');
 }
 
 export function renderDocumentacionRows(invoices) {
     if (!invoices || invoices.length === 0) {
-        return `<tr><td colspan="6" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No se encontró documentación cargada.</td></tr>`;
+        return `<tr > <td colspan="6" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No se encontró documentación cargada.</td></tr> `;
     }
 
     return invoices.map(v => {
         let statusBadge = '';
         if (v.status === 'Pendiente de Entrega') {
-            statusBadge = `<span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(245,158,11,0.1); color: #f59e0b; font-size: 0.8em; font-weight: 700;">⏳ Pendiente</span>`;
+            statusBadge = `<span style = "display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(245,158,11,0.1); color: #f59e0b; font-size: 0.8em; font-weight: 700;" >⏳ Pendiente</span> `;
         } else if (v.status === 'Entrega Parcial') {
-            statusBadge = `<span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(59,130,246,0.1); color: #3b82f6; font-size: 0.8em; font-weight: 700;">📦 Parcial (${v.remitos_asociados.length})</span>`;
+            statusBadge = `<span style = "display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(59,130,246,0.1); color: #3b82f6; font-size: 0.8em; font-weight: 700;" >📦 Parcial(${ v.remitos_asociados.length })</span> `;
         } else {
-            statusBadge = `<span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(16,185,129,0.1); color: #10b981; font-size: 0.8em; font-weight: 700;">✅ Completado</span>`;
+            statusBadge = `<span style = "display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(16,185,129,0.1); color: #10b981; font-size: 0.8em; font-weight: 700;" >✅ Completado</span> `;
         }
 
         return `
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.01)'" onmouseleave="this.style.background=''">
+  <tr style = "border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.15s;" onmouseenter = "this.style.background='rgba(255,255,255,0.01)'" onmouseleave = "this.style.background=''" >
                 <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap; text-align: center;">${new Date(v.fecha).toLocaleDateString()}</td>
                 <td style="padding: var(--space-4); text-align: center;">
                     <div style="font-weight: 700; color: var(--text-primary);">${v.proveedor}</div>
@@ -5509,13 +5547,13 @@ export function renderDocumentacionRows(invoices) {
                     </div>
                 </td>
             </tr>
-        `;
+  `;
     }).join('');
 }
 
 export function renderRemitoPrintTemplate(t) {
     return `
-    <html>
+  <html >
     <head>
         <title>Remito Interno - ${t.nroRemito}</title>
         <style>
@@ -5604,6 +5642,128 @@ export function renderRemitoPrintTemplate(t) {
             Generado por ${t.usuario_id || 'Personal de Campo'} el ${new Date().toLocaleString()}
         </div>
     </body>
-    </html>
-    `;
+    </html >
+  `;
+}
+
+export function renderInventoryModals() {
+    return `
+  < !--Modal Remito Externo-->
+        <div class="modal fade" id="modalRemitoExterno" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle);">
+                        <h5 class="modal-title font-display" style="font-weight: 800;">🚛 Cargar Remito Externo</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="padding: var(--space-6);">
+                        <form id="form-remito-ext">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Proveedor / Remitente</label>
+                                    <input type="text" name="proveedor" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">N° de Remito</label>
+                                    <input type="text" name="nroRemito" required class="form-control" placeholder="Ej: 0001-0000456" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Bodega de Ingreso</label>
+                                    <select name="bodegaDestino" class="form-select doc-select-bodega" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Fecha Recepción</label>
+                                    <input type="date" name="fecha" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Producto / Insumo</label>
+                                    <select name="productoId" class="form-select doc-select-producto" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Cantidad Recibida</label>
+                                    <input type="number" name="cantidad" step="0.01" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 2;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Notas / Observaciones</label>
+                                    <textarea name="notas" rows="2" class="form-control" placeholder="Estado del empaque, precintos, etc." style="background: var(--bg-primary); border: 1px solid var(--border-subtle);"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btn-save-remito-ext">Confirmar Recepción</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Modal Transferencia(Interno)-->
+        <div class="modal fade" id="modalTransferencia" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle);">
+                        <h5 class="modal-title font-display" style="font-weight: 800;">🏢 Generar Remito Interno</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="padding: var(--space-6);">
+                        <form id="form-transferencia">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Bodega Origen</label>
+                                    <select name="bodegaOrigen" class="form-select doc-select-bodega" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Bodega Destino</label>
+                                    <select name="bodegaDestino" class="form-select doc-select-bodega" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Producto / Insumo</label>
+                                    <select name="productoId" class="form-select doc-select-producto" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Cantidad a Mover</label>
+                                    <input type="number" name="cantidad" step="0.01" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 2;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Notas de Transporte</label>
+                                    <textarea name="notas" rows="2" class="form-control" placeholder="Ej: Chofer Juan Perez, Camion patente ABC-123" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btn-save-transferencia">Emitir Remito Interno</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Modal Confirmar Recepción-->
+  <div class="modal fade" id="modalConfirmarTransferencia" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+        <div class="modal-header">
+          <h5 class="modal-title font-display">Confirmar Recepción Interna</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="transfer-info-confirm" class="mb-4 p-3 rounded bg-glass border-subtle"></div>
+          <form id="form-confirm-transfer">
+            <div>
+              <label class="form-label small text-tertiary">Recibido por (Nombre):</label>
+              <input type="text" name="receptor" required class="form-control mb-3">
+                <label class="form-label small text-tertiary">Observaciones de Recepción:</label>
+                <textarea name="notas" rows="2" class="form-control"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary w-100" id="btn-do-confirm-transfer">Confirmar Ingreso a Bodega</button>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
 }

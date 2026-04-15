@@ -40,7 +40,7 @@ import {
     renderEjecucionPresupuesto, renderInformePlanificacion,
     renderProyeccionJornalView, renderPomDetalleTable, renderPomResumenFinca, renderPomCalendario,
     renderCargaDocumentacionView, renderDocumentacionRows, renderTransferRows, renderRemitoExtRows, renderServicioRows,
-    renderStockMovementView, renderRemitoPrintTemplate
+    renderStockMovementView, renderRemitoPrintTemplate, renderCargaHome
 } from '../views/Views.js';
 import { renderInversionesKanbanView } from '../views/InversionesView.js';
 
@@ -146,7 +146,8 @@ const ROLE_MENUS = {
     'Carga': [
         {
             id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
-                { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' }
+                { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
+                { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' }
             ]
         },
     ],
@@ -282,7 +283,7 @@ export class AppController {
         if (user) {
             this.loadDashboard(user);
         } else {
-            this.loadLanding();
+            this.loadLogin(); // Redirigir directamente al login para comenzar a operar
         }
     }
 
@@ -312,7 +313,7 @@ export class AppController {
 
         // Default section
         if (!section) {
-            section = (user.role === 'Carga' || user.rol === 'Carga') ? 'admin-carga-trabajo' : 'home';
+            section = 'home'; // All roles now start at home for consistent experience
         }
         this.currentSection = section;
 
@@ -404,6 +405,30 @@ export class AppController {
         const content = document.getElementById('page-content');
         const title = document.getElementById('page-title');
 
+        // Dynamic Header Update for "Carga" user (Mobile/Field Interface)
+        if (user.role === 'Carga' || user.rol === 'Carga') {
+            const headerContainer = document.querySelector('header > div:first-child');
+            if (headerContainer) {
+                if (section !== 'home') {
+                    // Show Back Button, Hide Logo if needed
+                    headerContainer.innerHTML = `
+                        <button id="btn-carga-back" class="btn btn-ghost" style="padding: 0.4rem 0.8rem; font-size: 0.9rem; color: var(--color-primary-400); border: 1px solid rgba(16, 185, 129, 0.3);">⬅️ Volver</button>
+                        <span style="font-weight:600; color:white; font-size: 0.95rem;">${user.name}</span>
+                    `;
+                    // Re-bind just the back button
+                    document.getElementById('btn-carga-back')?.addEventListener('click', () => this.loadSection('home', user));
+                } else {
+                    // Show Logo, Hide Back Button
+                    headerContainer.innerHTML = `
+                        <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="Logo" style="width:28px;">
+                        <span style="font-weight:600; color:white; font-size: 0.95rem;">${user.name}</span>
+                    `;
+                }
+            }
+        }
+        
+        this.currentSection = section; // Update before loading
+
         // Destroy existing charts
         Object.values(this.charts).forEach(c => { try { c.destroy(); } catch (e) { } });
         this.charts = {};
@@ -411,23 +436,23 @@ export class AppController {
         try {
             switch (section) {
             case 'home':
-                title.textContent = 'Bienvenido';
-                content.innerHTML = renderDashboardHome();
+                if (title) title.textContent = 'Bienvenido';
+                content.innerHTML = user.role === 'Carga' ? renderCargaHome() : renderDashboardHome();
                 break;
             case 'jornales':
-                title.textContent = 'Informe de Jornales';
+                if (title) title.textContent = 'Informe de Jornales';
                 await this.renderJornalesSection(content);
                 break;
             case 'cosecha':
-                title.textContent = 'Informe de Cosecha';
+                if (title) title.textContent = 'Informe de Cosecha';
                 await this.renderCosechaSection(content);
                 break;
             case 'fincas':
-                title.textContent = 'Informe de Fincas';
-                await this.renderFincasSection(content);
+                if (title) title.textContent = 'Informe de Fincas';
+                await this.renderJornalesSection(content); // Fallback if no specific fincas section
                 break;
             case 'aplicaciones-sofia':
-                title.textContent = 'Informe de Aplicaciones';
+                if (title) title.textContent = 'Informe de Aplicaciones';
                 if (!this._sofiaDataLoaded) {
                     await this.loadStaticSofiaData();
                     this._sofiaDataLoaded = true;
@@ -435,16 +460,16 @@ export class AppController {
                 this.renderAplicacionesSofiaModule(content);
                 break;
             case 'informe-gastos':
-                title.textContent = 'Informe de Gastos';
+                if (title) title.textContent = 'Informe de Gastos';
                 content.innerHTML = renderGastosView();
                 break;
             case 'informe-gastos-historicos':
-                title.textContent = 'Informe de Gastos Históricos';
+                if (title) title.textContent = 'Informe de Gastos Históricos';
                 content.innerHTML = renderGastosHistoricosView();
                 this.renderGastosHistoricosSection();
                 break;
             case 'informe-secaderos':
-                title.textContent = 'Informe de Secaderos';
+                if (title) title.textContent = 'Informe de Secaderos';
                 content.innerHTML = renderSecaderosView();
                 setTimeout(() => {
                     const btnGrid = document.getElementById('btn-secadero-grid');
@@ -473,47 +498,47 @@ export class AppController {
                 }, 50);
                 break;
             case 'control-carga':
-                title.textContent = 'Control de Carga de Labores';
+                if (title) title.textContent = 'Control de Carga de Labores';
                 content.innerHTML = renderControlCargaView();
                 this.renderControlCarga(content);
                 break;
             case 'presupuesto':
-                title.textContent = 'Presupuesto — Proyección de Ciclo';
+                if (title) title.textContent = 'Presupuesto — Proyección de Ciclo';
                 content.innerHTML = renderPresupuestoProyeccionView();
                 this.initPresupuestoSection();
                 break;
             case 'informe-planificacion':
-                title.textContent = 'Presupuesto Aprobado — Resumen Ejecutivo';
+                if (title) title.textContent = 'Presupuesto Aprobado — Resumen Ejecutivo';
                 await this.renderInformePlanificacionSection(content);
                 break;
             case 'carga-documentacion':
-                title.textContent = 'Carga de Documentación Administrativa';
+                if (title) title.textContent = 'Carga de Documentación Administrativa';
                 content.innerHTML = renderCargaDocumentacionView();
                 this.initCargaDocumentacionSection();
                 break;
             case 'pom-avanzado':
-                title.textContent = 'POM Avanzado — Proyección de Jornal Específico';
+                if (title) title.textContent = 'POM Avanzado — Proyección de Jornal Específico';
                 content.innerHTML = renderProyeccionJornalView();
                 this.initPomAvanzadoSection();
                 break;
             case 'usuarios':
-                title.textContent = 'Gestión de Usuarios';
+                if (title) title.textContent = 'Gestión de Usuarios';
                 content.innerHTML = ''; // Clear previous content to avoid collisions
                 await this.renderUsuariosSection(content);
                 break;
             case 'admin-carga-trabajo':
-                title.textContent = 'Carga de Trabajo de Campo';
+                if (title) title.textContent = 'Carga de Trabajo de Campo';
                 this.renderCargaTrabajoSection(content);
                 break;
             case 'admin-bodegas-movimientos':
-                title.textContent = 'Movimientos Stock';
+                if (title) title.textContent = 'Movimientos Stock';
                 this.renderInventarioSection(content);
                 break;
             default:
                 // Handle all admin-* sections dynamically
                 if (section && section.startsWith('admin-') && ADMIN_TABLE_CONFIG[section]) {
                     const cfg = ADMIN_TABLE_CONFIG[section];
-                    title.textContent = cfg.title;
+                    if (title) title.textContent = cfg.title;
                     this.renderAdminCrudSection(content, section);
                 }
                 break;
@@ -3691,7 +3716,18 @@ bindDashboardEvents(user) {
     // Logout
     document.getElementById('btn-logout')?.addEventListener('click', () => {
         UserModel.logout();
-        window.location.reload(); // Hard reload to clear all states/charts
+        window.location.reload(); 
+    });
+
+    // Mobile/Carga Logout
+    document.getElementById('btn-mobile-logout')?.addEventListener('click', () => {
+        UserModel.logout();
+        window.location.reload();
+    });
+
+    // Carga "Volver" to Home
+    document.getElementById('btn-carga-back')?.addEventListener('click', () => {
+        this.loadSection('home', user);
     });
 
     // Mobile menu
@@ -3707,6 +3743,15 @@ bindDashboardEvents(user) {
 
     // Notification bell
     this.bindNotificationBell();
+
+    // Click handler for Home Task Cards (Field personnel)
+    document.getElementById('page-content')?.addEventListener('click', (e) => {
+        const card = e.target.closest('.carga-task-card');
+        if (card) {
+            const section = card.dataset.section;
+            this.loadSection(section, user);
+        }
+    });
 }
 
     // ── Update UI parts ──
@@ -7918,33 +7963,29 @@ renderFertUnidadesChart() {
                     return;
                 }
 
-                // Get Names for storage
+                // Get Names and check STOCK availability
                 const bodegas = await ADMIN_MODELS['admin-bodegas'].getAll();
                 const productos = await ADMIN_MODELS['admin-productos'].getAll();
                 const bOrg = bodegas.find(b => b.id == bodegaOrigenId);
                 const bDst = bodegas.find(b => b.id == bodegaDestinoId);
-                const prod = productos.find(p => p.id == productoId);
+                const prodRef = productos.find(p => p.id == productoId);
 
-                // Deduct stock from Origin immediately
+                // Find the EXACT record in the origin bodega to check its specific stock
+                const sourceRecord = productos.find(p => p.nombre === prodRef.nombre && p.bodega_id == bodegaOrigenId);
+                
+                if (!sourceRecord || (parseFloat(sourceRecord.stock) || 0) < cantidad) {
+                    this.showToast(`Stock insuficiente en ${bOrg?.nombre || 'Bodega Origen'}. Disponible: ${sourceRecord ? sourceRecord.stock : 0}`, 'error');
+                    return;
+                }
+
+                // Deduct stock from Origin
                 try {
-                    const prodSource = await ADMIN_MODELS['admin-productos'].getById(productoId);
-                    if (prodSource) {
-                        // Ensure we are deducting from the correct record (source bodega)
-                        // If the picked product is already at the source, we update it.
-                        // If it's the wrong record (different bodega), we find the right one.
-                        let sourceRecord = prodSource;
-                        if (prodSource.bodega_id != bodegaOrigenId) {
-                            const all = await ADMIN_MODELS['admin-productos'].getAll();
-                            sourceRecord = all.find(p => p.nombre === prodSource.nombre && p.bodega_id == bodegaOrigenId);
-                        }
-
-                        if (sourceRecord) {
-                            const newStockOrg = (parseFloat(sourceRecord.stock) || 0) - cantidad;
-                            await ADMIN_MODELS['admin-productos'].update(sourceRecord.id, { ...sourceRecord, stock: newStockOrg });
-                        }
-                    }
+                    const newStockOrg = (parseFloat(sourceRecord.stock) || 0) - cantidad;
+                    await ADMIN_MODELS['admin-productos'].update(sourceRecord.id, { ...sourceRecord, stock: newStockOrg });
                 } catch (err) {
                     console.error('Error deducting stock on emission:', err);
+                    this.showToast('No se pudo actualizar el stock en la bodega de origen.', 'error');
+                    return;
                 }
 
                 const data = {
@@ -7953,20 +7994,37 @@ renderFertUnidadesChart() {
                     bodegaDestinoId,
                     bodegaDestinoNombre: bDst?.nombre || 'Destino',
                     productoId,
-                    productoNombre: prod?.nombre || 'Producto',
+                    productoNombre: prodRef?.nombre || 'Producto',
                     cantidad,
                     notas: formData.get('notas'),
                     fecha: new Date().toISOString()
                 };
 
                 const newT = DocumentacionModel.saveTransfer(data);
+
+                // Add Notification for the destination team
+                NotificationModel.add({
+                    title: '📦 Envío en Camino',
+                    message: `Se emitió el remito ${newT.nroRemito} de ${data.bodegaOrigenNombre} hacia ${data.bodegaDestinoNombre} (${data.cantidad} ${prodRef?.unidad || 'un'} de ${data.productoNombre}).`,
+                    type: 'info',
+                    time: 'Ahora',
+                    read: false,
+                    actionType: 'confirm_transfer',
+                    transferId: newT.id
+                });
+
                 this.showToast('Remito Interno emitido y stock descontado de origen.', 'success');
                 bootstrap.Modal.getInstance(document.getElementById('modalTransferencia')).hide();
+                
+                // Refresh tables
                 this.renderTransfersTable();
+                if (this.currentSection === 'admin-bodegas-movimientos') {
+                    this.updateInventarioTables();
+                }
                 window.dispatchEvent(new CustomEvent('document-saved'));
 
                 // Auto Print Option
-                if (confirm('¿Desea imprimir el remito interno para el chofer?')) {
+                if (confirm(`Remito emitido: ${newT.nroRemito}\n¿Desea imprimir el remito interno para el chofer?`)) {
                     this.printTransferRemito(newT.id);
                 }
             };
@@ -7985,16 +8043,19 @@ renderFertUnidadesChart() {
             };
         }
 
+        const handleConfirmClick = (e) => {
+            const btnConfirm = e.target.closest('.btn-confirm-transfer');
+            if (btnConfirm) {
+                const id = btnConfirm.dataset.id;
+                this.openConfirmTransferModal(id);
+            }
+        };
+
         const tbodyTransf = document.getElementById('tbody-transferencias');
-        if (tbodyTransf) {
-            tbodyTransf.onclick = (e) => {
-                const btnConfirm = e.target.closest('.btn-confirm-transfer');
-                if (btnConfirm) {
-                    const id = btnConfirm.dataset.id;
-                    this.openConfirmTransferModal(id);
-                }
-            };
-        }
+        if (tbodyTransf) tbodyTransf.onclick = handleConfirmClick;
+        
+        const tbodyOpTransf = document.getElementById('tbody-op-transferencias');
+        if (tbodyOpTransf) tbodyOpTransf.onclick = handleConfirmClick;
 
         const btnDoConfirmTransf = document.getElementById('btn-do-confirm-transfer');
         if (btnDoConfirmTransf) {
@@ -8018,9 +8079,6 @@ renderFertUnidadesChart() {
                 const t = transfers.find(x => x.id === transferId);
                 if (t && t.status === 'En Tránsito') {
                     try {
-                        // (Stock was already deducted from source on emission)
-                        
-                        // Add to Destination (Search by name in that bodega)
                         const allProds = await ADMIN_MODELS['admin-productos'].getAll();
                         const prodSourceRef = await ADMIN_MODELS['admin-productos'].getById(t.productoId);
                         
@@ -8030,7 +8088,6 @@ renderFertUnidadesChart() {
                             const newStockDest = (parseFloat(prodDest.stock) || 0) + parseFloat(t.cantidad);
                             await ADMIN_MODELS['admin-productos'].update(prodDest.id, { ...prodDest, stock: newStockDest });
                         } else {
-                            // Create new record in destination bodega if it doesn't exist
                             await ADMIN_MODELS['admin-productos'].create({
                                 nombre: t.productoNombre,
                                 categoria: prodSourceRef?.categoria || 'Insumo',
@@ -8041,8 +8098,13 @@ renderFertUnidadesChart() {
                             });
                         }
                         
-                        // 3. Update Transfer Status
                         DocumentacionModel.confirmTransfer(transferId, data);
+
+                        // Mark related notifications as read
+                        const allNotifs = await NotificationModel.getAll();
+                        const myNotif = allNotifs.find(n => n.transferId === transferId);
+                        if (myNotif) NotificationModel.markAsRead(myNotif.id);
+
                         this.showToast('Ingreso a bodega confirmado y stock actualizado.', 'success');
                     } catch (err) {
                         console.error('Stock sync error:', err);
@@ -8079,8 +8141,22 @@ renderFertUnidadesChart() {
             const bodegas = await ADMIN_MODELS['admin-bodegas'].getAll();
             const productos = await ADMIN_MODELS['admin-productos'].getAll();
 
+            // Pre-find user bodega if assigned to a finca
+            let userBodegaId = null;
+            if (this.currentUser?.finca) {
+                const userFinca = this.currentUser.finca;
+                // Try to find a bodega where fincaId matches our finca
+                // First get all fincas to find the ID of the finca with name userFinca
+                const fincas = await ADMIN_MODELS['admin-fincas'].getAll();
+                const myFinca = fincas.find(f => f.nombre === userFinca);
+                if (myFinca) {
+                    const myBodega = bodegas.find(b => b.finca_id == myFinca.id);
+                    if (myBodega) userBodegaId = myBodega.id;
+                }
+            }
+
             document.querySelectorAll('.doc-select-bodega').forEach(sel => {
-                const currentVal = sel.value;
+                const currentVal = sel.value || (sel.name === 'bodegaOrigen' ? userBodegaId : null);
                 sel.innerHTML = '<option value="">Seleccionar Bodega...</option>' +
                     bodegas.map(b => `<option value="${b.id}">${b.nombre}</option>`).join('');
                 if (currentVal) sel.value = currentVal;
@@ -8089,7 +8165,13 @@ renderFertUnidadesChart() {
             document.querySelectorAll('.doc-select-producto').forEach(sel => {
                 const currentVal = sel.value;
                 sel.innerHTML = '<option value="">Seleccionar Insumo...</option>' +
-                    productos.map(p => `<option value="${p.id}">${p.nombre} (Stock: ${p.stock || 0})</option>`).join('');
+                    productos.map(p => {
+                        // If we have a pre-selected bodega, only show products from that bodega or all?
+                        // User said products usually "are destinaded to a predio", so we show everything 
+                        // but maybe we should show stock relative to the selected bodega.
+                        // For now, keep it simple: show all products but include global stock info.
+                        return `<option value="${p.id}">${p.nombre} (Stock: ${p.stock || 0})</option>`;
+                    }).join('');
                 if (currentVal) sel.value = currentVal;
             });
         } catch (e) {
