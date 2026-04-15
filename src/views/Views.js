@@ -4354,117 +4354,85 @@ export function renderControlCargaView() {
 
 export function renderStockMovementView(movements, catalogs, user) {
     const { productos } = catalogs;
-    const canLoadFactura = user.role === 'Administrador';
-    const canLoadRemito = user.role === 'Administrador' || user.role === 'Carga' || user.role === 'Ingeniero';
-
+    
     return `
     <div class="work-log-view animate-fade-in">
-      <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
-        <div>
-          <h2 style="font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em;">📦 Movimientos Stock</h2>
-          <p style="color: var(--text-tertiary);">Facturas de Compra (Admin) y Remitos de Entrega (Carga)</p>
-        </div>
-        <button class="btn btn-primary" id="btn-add-stock-move" style="box-shadow: var(--shadow-lg);">
-          <span style="margin-right: 8px;">➕</span> Cargar Movimiento
-        </button>
-      </div>
-
-      <div class="card" style="margin-bottom: var(--space-6);">
-        <div style="padding: var(--space-5); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="font-size: 1.1em; color: var(--text-secondary);">Últimos Movimientos de Entrada/Ajuste</h3>
-            <input type="text" id="search-stock-moves" class="form-input" placeholder="🔍 Buscar por comprobante o producto..." style="max-width: 300px;" />
-        </div>
-        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-            <table class="table" id="table-stock-moves">
-                <thead style="position: sticky; top: 0; background: var(--bg-secondary); z-index: 10;">
-                    <tr>
-                        <th style="padding: var(--space-4);">Fecha</th>
-                        <th>Producto</th>
-                        <th>Tipo</th>
-                        <th>Nº Comprobante</th>
-                        <th>Cantidad</th>
-                        <th>Usuario</th>
-                        <th>Notas</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${movements.map(m => `
-                        <tr>
-                            <td style="padding: var(--space-4);">
-                                <div style="font-weight: 600;">${new Date(m.fecha).toLocaleDateString('es-AR')}</div>
-                                <div style="font-size: 0.8em; opacity: 0.6;">${new Date(m.fecha).toLocaleTimeString('es-AR')}</div>
-                            </td>
-                            <td><div style="font-weight: 600;">${m.producto_nombre || 'ID: ' + m.producto_id}</div></td>
-                            <td>
-                                <span class="badge" style="background: ${m.tipo_movimiento === 'factura' ? 'rgba(139, 92, 246, 0.15)' : (m.tipo_movimiento === 'remito' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)')}; color: ${m.tipo_movimiento === 'factura' ? '#a78bfa' : (m.tipo_movimiento === 'remito' ? '#4ade80' : '#f87171')};">
-                                    ${m.tipo_movimiento.toUpperCase()}
-                                </span>
-                            </td>
-                            <td><code>${m.nro_comprobante || '-'}</code></td>
-                            <td style="font-weight: 800; color: ${m.cantidad > 0 ? '#10b981' : '#ef4444'}">
-                                ${m.cantidad > 0 ? '+' : ''}${m.cantidad}
-                            </td>
-                            <td><div style="font-size: 0.9em;">${m.usuario_nombre || 'S/U'}</div></td>
-                            <td style="font-size: 0.85em; opacity: 0.8; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.notas}">${m.notas || '-'}</td>
-                        </tr>
-                    `).join('')}
-                    ${movements.length === 0 ? '<tr><td colspan="7" style="text-align: center; padding: 4rem; color: var(--text-tertiary); font-style: italic;">No hay movimientos registrados recientemente</td></tr>' : ''}
-                </tbody>
-            </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal Movimiento Stock -->
-    <div id="stock-move-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(8px); align-items:center; justify-content:center;">
-      <div style="background: var(--bg-secondary); border-radius: 24px; padding: var(--space-8); max-width: 500px; width: 94%; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8); border: 1px solid var(--border-subtle); overflow: hidden; position: relative;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-6);">
-          <div>
-            <h3 style="font-size: 1.4em; font-weight: 800;">📦 Registro de Ingreso</h3>
-            <p style="color: var(--text-tertiary); font-size: 0.9em;">Actualización de inventario físico</p>
-          </div>
-          <button type="button" class="btn btn-ghost" id="btn-close-stock-modal" style="font-size: 1.5em; padding: 0;">×</button>
-        </div>
-
-        <form id="form-stock-move" autocomplete="off">
-          <div class="form-group" style="margin-bottom: var(--space-5);">
-            <label class="form-label" style="font-weight: 600;">Tipo de Comprobante</label>
-            <select id="move-tipo" class="form-select" required style="background: rgba(255,255,255,0.03);">
-                ${canLoadFactura ? '<option value="factura">📄 Factura de Compra (Admin)</option>' : ''}
-                ${canLoadRemito ? '<option value="remito">🚚 Remito de Entrega (Recepción)</option>' : ''}
-            </select>
-          </div>
-
-          <div class="form-group" style="margin-bottom: var(--space-5);">
-            <label class="form-label" style="font-weight: 600;">Producto / Insumo</label>
-            <select id="move-producto" class="form-select" required style="background: rgba(255,255,255,0.03);">
-                <option value="">Seleccionar producto...</option>
-                ${productos.map(p => `<option value="${p.id}">${p.nombre} (Stock: ${p.stock} ${p.unidad || ''})</option>`).join('')}
-            </select>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-5);">
-            <div class="form-group">
-                <label class="form-label" style="font-weight: 600;">Cantidad</label>
-                <input type="number" step="any" id="move-cantidad" class="form-input" required placeholder="0.00" style="background: rgba(255,255,255,0.03);" />
+        <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+            <div>
+                <h2 style="font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em;">📦 Gestión de <span style="color: var(--color-primary-400);">Stock en Campo</span></h2>
+                <p style="color: var(--text-tertiary);">Control de recepciones y movimientos inter-bodega.</p>
             </div>
-            <div class="form-group">
-                <label class="form-label" style="font-weight: 600;">Nº Comprobante</label>
-                <input type="text" id="move-comprobante" class="form-input" required placeholder="Ej: 001-4567" style="background: rgba(255,255,255,0.03);" />
+        </div>
+
+        <!-- Tab Navigation -->
+        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5);">
+            <button class="btn btn-primary" id="stock-tab-recepciones" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-6);">🚚 Recepciones (Externos)</button>
+            <button class="btn btn-ghost" id="stock-tab-transferencias" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-6);">🏢 Movimientos Internos</button>
+        </div>
+
+        <!-- VIEW: RECEPCIONES -->
+        <div id="stock-view-recepciones">
+            <div class="card" style="margin-bottom: var(--space-6);">
+                <div style="padding: var(--space-6); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
+                    <div>
+                        <h3 style="font-size: 1.1em; color: var(--text-primary); font-weight: 700;">Remitos de Proveedores</h3>
+                        <p style="color: var(--text-tertiary); font-size: 0.85em; margin: 0;">Insumos recibidos recientemente en finca.</p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-op-nuevo-remito-ext" style="font-weight: 700;">
+                        <span>🚚</span> Recibir Mercadería
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="table-op-recepciones" style="font-size: 0.9em;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.02);">
+                                <th style="padding: var(--space-4);">Fecha</th>
+                                <th>Remito N°</th>
+                                <th>Proveedor</th>
+                                <th>Bodega</th>
+                                <th>Producto</th>
+                                <th style="text-align: center;">Cant.</th>
+                                <th style="text-align: center;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-op-recepciones"></tbody>
+                    </table>
+                </div>
             </div>
-          </div>
+        </div>
 
-          <div class="form-group" style="margin-bottom: var(--space-6);">
-            <label class="form-label" style="font-weight: 600;">Notas / Observaciones</label>
-            <textarea id="move-notas" class="form-input" style="min-height: 80px; background: rgba(255,255,255,0.03);" placeholder="Detalles adicionales..."></textarea>
-          </div>
-
-          <div style="display: flex; gap: var(--space-4); justify-content: flex-end;">
-            <button type="button" class="btn btn-ghost" id="btn-cancel-stock-move" style="padding: var(--space-2) var(--space-6);">Cancelar</button>
-            <button type="submit" class="btn btn-primary" id="btn-submit-stock-move" style="padding: var(--space-2) var(--space-8); font-weight: 600;">💾 Guardar Ingreso</button>
-          </div>
-        </form>
-      </div>
+        <!-- VIEW: TRANSFERENCIAS -->
+        <div id="stock-view-transferencias" style="display: none;">
+            <div class="card" style="margin-bottom: var(--space-6);">
+                <div style="padding: var(--space-6); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
+                    <div>
+                        <h3 style="font-size: 1.1em; color: var(--text-primary); font-weight: 700;">Movimientos Inter-Bodega</h3>
+                        <p style="color: var(--text-tertiary); font-size: 0.85em; margin: 0;">Traslado de insumos entre depósitos propios.</p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-op-nueva-transferencia" style="font-weight: 700;">
+                        <span>🏢</span> Generar Envío
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" style="font-size: 0.9em;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.02);">
+                                <th style="padding: var(--space-4);">Fecha</th>
+                                <th>Remito N°</th>
+                                <th>Origen</th>
+                                <th style="text-align: center;"></th>
+                                <th>Destino</th>
+                                <th>Producto</th>
+                                <th style="text-align: center;">Cant.</th>
+                                <th style="text-align: center;">Estado</th>
+                                <th style="text-align: center;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-op-transferencias"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
     `;
 }
@@ -5038,8 +5006,10 @@ export function renderCargaDocumentacionView() {
         <div class="container-fluid animate-fade-in" style="padding: var(--space-4);">
             <!-- Tab Navigation -->
             <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5);">
-                <button class="btn btn-primary" id="doc-tab-facturas" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">📄 Facturas de Proveedores</button>
-                <button class="btn btn-ghost" id="doc-tab-transferencias" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">🚛 Remitos Internos (Inter-Bodega)</button>
+                <button class="btn btn-primary" id="doc-tab-facturas" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">📄 Facturas Proveedores</button>
+                <button class="btn btn-ghost" id="doc-tab-servicios" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">⚡ Facturas Servicios</button>
+                <button class="btn btn-ghost" id="doc-tab-remitos-ext" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">🚚 Remitos Externos</button>
+                <button class="btn btn-ghost" id="doc-tab-transferencias" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">🏢 Remitos Internos</button>
             </div>
 
             <!-- VIEW: FACTURAS -->
@@ -5049,11 +5019,10 @@ export function renderCargaDocumentacionView() {
                         <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
                                 <div>
-                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">📂 Carga de <span style="color: var(--color-primary-400);">Documentación</span></h2>
+                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">📂 Facturas de <span style="color: var(--color-primary-400);">Proveedores</span></h2>
                                     <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Gestión administrativa de facturas y enlace logístico con operativa.</p>
                                 </div>
                                 <div style="display: flex; gap: var(--space-3); align-items: center;">
-                                    <!-- Stats Mini -->
                                     <div style="display: flex; gap: var(--space-4); margin-right: var(--space-4);">
                                         <div style="text-align: right;"><span id="doc-stat-total" style="font-weight: 800; color: var(--text-primary); display: block;">0</span><small style="font-size: 0.7em; color: var(--text-tertiary);">Total</small></div>
                                         <div style="text-align: right;"><span id="doc-stat-pending" style="font-weight: 800; color: #f59e0b; display: block;">0</span><small style="font-size: 0.7em; color: var(--text-tertiary);">Pendientes</small></div>
@@ -5086,6 +5055,86 @@ export function renderCargaDocumentacionView() {
                 </div>
             </div>
 
+            <!-- VIEW: SERVICIOS -->
+            <div id="view-servicios" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+                                <div>
+                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">⚡ Facturas de <span style="color: var(--color-primary-400);">Servicios</span></h2>
+                                    <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Registro de gastos operativos: Electricidad, Agua, Impuestos, etc.</p>
+                                </div>
+                                <div style="display: flex; gap: var(--space-3);">
+                                    <button class="btn btn-primary" id="btn-nuevo-servicio" style="border-radius: var(--radius-lg); font-weight: 700; display: flex; align-items: center; gap: var(--space-2);">
+                                        <span>⚡</span> Cargar Servicio
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255,255,255,0.01); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88em;">
+                                        <thead>
+                                            <tr style="text-align: left; border-bottom: 1px solid var(--border-subtle);">
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Fecha</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Servicio / Categoría</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Proveedor</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">N° Factura</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: right;">Monto</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Estado</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-servicios"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: REMITOS EXTERNOS -->
+            <div id="view-remitos-ext" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+                                <div>
+                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">🚚 Remitos <span style="color: var(--color-primary-400);">Externos</span></h2>
+                                    <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Ingreso de mercadería desde proveedores externos (Remitentes).</p>
+                                </div>
+                                <div style="display: flex; gap: var(--space-3);">
+                                    <button class="btn btn-primary" id="btn-nuevo-remito-ext" style="border-radius: var(--radius-lg); font-weight: 700; display: flex; align-items: center; gap: var(--space-2);">
+                                        <span>🚚</span> Cargar Remito
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255,255,255,0.01); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88em;">
+                                        <thead>
+                                            <tr style="text-align: left; border-bottom: 1px solid var(--border-subtle);">
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Fecha</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Remito N°</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Proveedor</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Bodega Destino</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary);">Producto</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Cant.</th>
+                                                <th style="padding: var(--space-4); color: var(--text-tertiary); text-align: center;">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-remitos-ext"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- VIEW: TRANSFERENCIAS -->
             <div id="view-transferencias" style="display: none;">
                 <div class="row mb-4">
@@ -5093,12 +5142,12 @@ export function renderCargaDocumentacionView() {
                         <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: var(--space-6); box-shadow: var(--shadow-lg);">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
                                 <div>
-                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">🚚 Remitos <span style="color: var(--color-primary-400);">Internos</span></h2>
+                                    <h2 style="font-family: var(--font-display); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">🏢 Remitos <span style="color: var(--color-primary-400);">Internos</span></h2>
                                     <p style="color: var(--text-tertiary); font-size: 0.9em; margin: 0;">Movimiento de stock inter-bodega y control de recepciones.</p>
                                 </div>
                                 <div style="display: flex; gap: var(--space-3);">
                                     <button class="btn btn-primary" id="btn-nueva-transferencia" style="border-radius: var(--radius-lg); font-weight: 700; display: flex; align-items: center; gap: var(--space-2);">
-                                        <span>🚛</span> Generar Movimiento
+                                        <span>🏢</span> Generar Movimiento
                                     </button>
                                 </div>
                             </div>
@@ -5124,6 +5173,62 @@ export function renderCargaDocumentacionView() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalServicio" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle);">
+                        <h5 class="modal-title font-display" style="font-weight: 800;">⚡ Cargar Factura de Servicio</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="padding: var(--space-6);">
+                        <form id="form-servicio">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Proveedor del Servicio</label>
+                                    <input type="text" name="proveedor" required class="form-control" placeholder="Ej: EDEMSA, Irrigación, Telefónica" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Categoría</label>
+                                    <select name="categoria" class="form-select" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                        <option value="Energía Eléctrica">Energía Eléctrica ⚡</option>
+                                        <option value="Agua / Riego">Agua / Riego 💧</option>
+                                        <option value="Telecomunicaciones">Telecomunicaciones 📱</option>
+                                        <option value="Impuestos / Tasas">Impuestos / Tasas ⚖️</option>
+                                        <option value="Honorarios Prof.">Honorarios Prof. 👨‍💼</option>
+                                        <option value="Otros Servicios">Otros Servicios 🛠️</option>
+                                    </select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">N° de Factura</label>
+                                    <input type="text" name="nroFactura" required class="form-control" placeholder="Ej: B-0001-0000123" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Fecha Emisión</label>
+                                    <input type="date" name="fecha" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Monto Total (ARS)</label>
+                                    <input type="number" name="monto" step="0.01" required class="form-control" placeholder="0.00" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Vencimiento</label>
+                                    <input type="date" name="fechaVenc" class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 2;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Descripción / Notas</label>
+                                    <textarea name="notas" rows="2" class="form-control" placeholder="Detalle del periodo, sucursal, etc." style="background: var(--bg-primary); border: 1px solid var(--border-subtle);"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btn-save-servicio">Registrar Factura de Servicio</button>
                     </div>
                 </div>
             </div>
@@ -5238,7 +5343,101 @@ export function renderCargaDocumentacionView() {
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="modalRemitoExterno" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">
+                    <div class="modal-header" style="border-bottom: 1px solid var(--border-subtle);">
+                        <h5 class="modal-title font-display" style="font-weight: 800;">🚛 Cargar Remito Externo</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="padding: var(--space-6);">
+                        <form id="form-remito-ext">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Proveedor / Remitente</label>
+                                    <input type="text" name="proveedor" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">N° de Remito</label>
+                                    <input type="text" name="nroRemito" required class="form-control" placeholder="Ej: 0001-0000456" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Bodega de Ingreso</label>
+                                    <select name="bodegaDestino" class="form-select doc-select-bodega" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Producto / Insumo</label>
+                                    <select name="productoId" class="form-select doc-select-producto" required></select>
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Cantidad Recibida</label>
+                                    <input type="number" name="cantidad" step="0.01" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Fecha de Recepción</label>
+                                    <input type="date" name="fecha" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                </div>
+                                <div style="grid-column: span 2;">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Notas / Observaciones</label>
+                                    <textarea name="notas" rows="2" class="form-control" placeholder="Ej: Recibido sin daños, coincide con lo pedido." style="background: var(--bg-primary); border: 1px solid var(--border-subtle);"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btn-save-remito-ext">Registrar Ingreso Externo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
+}
+
+export function renderRemitoExtRows(remitos) {
+    if (!remitos || remitos.length === 0) {
+        return `<tr><td colspan="7" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay remitos externos registrados.</td></tr>`;
+    }
+
+    return remitos.map(r => `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+            <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap;">${new Date(r.fecha).toLocaleDateString()}</td>
+            <td style="padding: var(--space-4); font-family: monospace; color: var(--color-primary-400);">${r.nroRemito}</td>
+            <td style="padding: var(--space-4); font-weight: 600;">${r.proveedor}</td>
+            <td style="padding: var(--space-4);">${r.bodegaNombre}</td>
+            <td style="padding: var(--space-4);">${r.productoNombre}</td>
+            <td style="padding: var(--space-4); text-align: center; font-weight: 800;">${r.cantidad}</td>
+            <td style="padding: var(--space-4); text-align: center;">
+                <span style="color: var(--color-success); font-size: 1.1em;">✔️</span>
+            </td>
+        </tr>
+    `).join('');
+}
+
+export function renderServicioRows(servicios) {
+    if (!servicios || servicios.length === 0) {
+        return `<tr><td colspan="7" style="padding: var(--space-12); text-align: center; color: var(--text-tertiary); opacity: 0.5;">No hay facturas de servicios registradas.</td></tr>`;
+    }
+
+    return servicios.map(s => `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+            <td style="padding: var(--space-4); color: var(--text-secondary); white-space: nowrap;">${new Date(s.fecha).toLocaleDateString()}</td>
+            <td style="padding: var(--space-4);">
+                <span style="display: block; font-weight: 700; color: var(--text-primary);">${s.categoria}</span>
+                <small style="color: var(--text-tertiary); font-size: 0.75em;">${s.notas || 'Sin descripción'}</small>
+            </td>
+            <td style="padding: var(--space-4); font-weight: 600;">${s.proveedor}</td>
+            <td style="padding: var(--space-4); font-family: monospace; color: var(--color-primary-400);">${s.nroFactura}</td>
+            <td style="padding: var(--space-4); text-align: right; font-weight: 800; color: var(--color-danger); opacity: 0.9;">$${parseFloat(s.monto).toLocaleString('es-AR')}</td>
+            <td style="padding: var(--space-4); text-align: center;">
+                <span style="display: inline-block; padding: 2px 10px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 0.8em; font-weight: 700;">Registrado</span>
+            </td>
+            <td style="padding: var(--space-4); text-align: center;">
+                <span style="color: var(--color-success); font-size: 1.1em;">✔️</span>
+            </td>
+        </tr>
+    `).join('');
 }
 
 export function renderTransferRows(transfers) {
@@ -5312,4 +5511,99 @@ export function renderDocumentacionRows(invoices) {
             </tr>
         `;
     }).join('');
+}
+
+export function renderRemitoPrintTemplate(t) {
+    return `
+    <html>
+    <head>
+        <title>Remito Interno - ${t.nroRemito}</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
+            body { font-family: 'Inter', sans-serif; padding: 40px; color: #111; line-height: 1.4; }
+            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 30px; }
+            .logo { font-size: 24px; font-weight: 800; color: #6366f1; }
+            .remito-info { text-align: right; }
+            .remito-label { font-size: 10px; text-transform: uppercase; color: #666; font-weight: 700; }
+            .remito-num { font-size: 20px; font-weight: 800; margin-top: 4px; }
+            .section { margin-bottom: 25px; }
+            .section-title { font-size: 11px; text-transform: uppercase; color: #666; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+            .data-box { background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
+            .label { font-size: 10px; color: #666; margin-bottom: 4px; }
+            .val { font-size: 14px; font-weight: 700; }
+            .main-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            .main-table th { background: #000; color: #fff; padding: 10px; text-align: left; font-size: 12px; }
+            .main-table td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+            .footer-sig { margin-top: 80px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; text-align: center; }
+            .sig-box { border-top: 1px solid #000; padding-top: 10px; font-size: 10px; font-weight: 700; }
+            @media print { .no-print { display: none; } }
+        </style>
+    </head>
+    <body onload="window.print(); window.close();">
+        <div class="header">
+            <div class="logo">NATURALFOOD</div>
+            <div class="remito-info">
+                <div class="remito-label">Documento Interno de Traslado</div>
+                <div class="remito-num">${t.nroRemito}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="grid">
+                <div class="data-box">
+                    <div class="section-title">Origen de Mercadería</div>
+                    <div class="label">Bodega / Finca</div>
+                    <div class="val">${t.bodegaOrigenNombre}</div>
+                </div>
+                <div class="data-box">
+                    <div class="section-title">Destino de Mercadería</div>
+                    <div class="label">Bodega / Finca</div>
+                    <div class="val">${t.bodegaDestinoNombre}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Detalle del Traslado</div>
+            <table class="main-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%">FECHA</th>
+                        <th style="width: 50%">PRODUCTO / INSUMO</th>
+                        <th style="width: 15%; text-align: center;">CANTIDAD</th>
+                        <th style="width: 20%">UNIDAD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>${new Date(t.fecha).toLocaleDateString()}</td>
+                        <td style="font-weight: 800;">${t.productoNombre}</td>
+                        <td style="text-align: center; font-weight: 800;">${t.cantidad}</td>
+                        <td>Insumo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" style="margin-top: 40px;">
+            <div class="section-title">Notas de Transporte</div>
+            <div class="data-box" style="min-height: 60px;">
+                ${t.notas || 'Sin observaciones adicionales.'}
+            </div>
+        </div>
+
+        <div class="footer-sig">
+            <div class="sig-box">FIRMA DESPACHO (ORIGEN)</div>
+            <div class="sig-box">FIRMA CHOFER / TRANSPORTISTA</div>
+            <div class="sig-box">FIRMA RECEPCIÓN (DESTINO)</div>
+        </div>
+
+        <div style="margin-top: 50px; font-size: 9px; text-align: center; color: #999;">
+            Este documento es un registro interno de NaturalFood Plataforma de Gestión Agrícola.<br>
+            Generado por ${t.usuario_id || 'Personal de Campo'} el ${new Date().toLocaleString()}
+        </div>
+    </body>
+    </html>
+    `;
 }

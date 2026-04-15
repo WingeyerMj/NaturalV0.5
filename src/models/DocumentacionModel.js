@@ -10,6 +10,8 @@ export class DocumentacionModel {
     static STORAGE_KEY = 'naturalfood_documentacion';
     static REMITOS_KEY = 'naturalfood_remitos';
     static TRANSFERS_KEY = 'naturalfood_transfers';
+    static REMITOS_EXT_KEY = 'naturalfood_remitos_ext';
+    static SERVICIOS_KEY = 'naturalfood_servicios';
 
     static INVOICE_STATUS = {
         PENDING: 'Pendiente de Entrega',
@@ -23,6 +25,42 @@ export class DocumentacionModel {
         COMPLETED: 'Recibido',
         CANCELLED: 'Cancelado'
     };
+
+    /** ── SERVICE INVOICES (Gastos Operativos) ── **/
+    static saveServicio(data) {
+        const servicios = this.getServicios();
+        const newServicio = {
+            id: 'SERV-' + Date.now(),
+            fecha_registro: new Date().toISOString(),
+            ...data
+        };
+        servicios.push(newServicio);
+        localStorage.setItem(this.SERVICIOS_KEY, JSON.stringify(servicios));
+        return newServicio;
+    }
+
+    static getServicios() {
+        const stored = localStorage.getItem(this.SERVICIOS_KEY);
+        return stored ? JSON.parse(stored) : [];
+    }
+
+    /** ── EXTERNAL REMITTANCES (Proveedores) ── **/
+    static saveRemitoExt(data) {
+        const remitos = this.getRemitosExt();
+        const newRemito = {
+            id: 'REXT-' + Date.now(),
+            fecha_registro: new Date().toISOString(),
+            ...data
+        };
+        remitos.push(newRemito);
+        localStorage.setItem(this.REMITOS_EXT_KEY, JSON.stringify(remitos));
+        return newRemito;
+    }
+
+    static getRemitosExt() {
+        const stored = localStorage.getItem(this.REMITOS_EXT_KEY);
+        return stored ? JSON.parse(stored) : [];
+    }
 
     /**
      * Save an invoice to storage
@@ -94,14 +132,32 @@ export class DocumentacionModel {
     }
 
     /** ── INTERNAL TRANSFERS (Inter-Bodega) ── **/
+    static getNextTransferNumber(bodegaId) {
+        const transfers = this.getTransfers();
+        const fromBodega = transfers.filter(t => t.bodegaOrigenId == bodegaId);
+        if (fromBodega.length === 0) return 1;
+        
+        const numbers = fromBodega.map(t => {
+            const parts = t.nroRemito.split('-');
+            const last = parseInt(parts[parts.length - 1]);
+            return isNaN(last) ? 0 : last;
+        });
+        
+        return Math.max(...numbers, 0) + 1;
+    }
 
     static saveTransfer(data) {
         const transfers = this.getTransfers();
+        const nextNum = this.getNextTransferNumber(data.bodegaOrigenId);
+        // Format: RINT-[BodegaID]-[Sequential] (e.g. RINT-1-0005)
+        const formattedNum = `RINT-${data.bodegaOrigenId}-${nextNum.toString().padStart(4, '0')}`;
+
         const newTransfer = {
             id: 'TRANS-' + Date.now(),
             fecha_emision: new Date().toISOString(),
             status: this.TRANSFER_STATUS.PENDING,
-            ...data
+            ...data,
+            nroRemito: formattedNum // Use generated sequential number
         };
         transfers.push(newTransfer);
         localStorage.setItem(this.TRANSFERS_KEY, JSON.stringify(transfers));

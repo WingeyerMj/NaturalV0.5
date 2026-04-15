@@ -39,7 +39,8 @@ import {
     renderControlCargaView, renderPresupuestoProyeccionView, renderExcelBudgetSummary,
     renderEjecucionPresupuesto, renderInformePlanificacion,
     renderProyeccionJornalView, renderPomDetalleTable, renderPomResumenFinca, renderPomCalendario,
-    renderCargaDocumentacionView, renderDocumentacionRows, renderTransferRows
+    renderCargaDocumentacionView, renderDocumentacionRows, renderTransferRows, renderRemitoExtRows, renderServicioRows,
+    renderStockMovementView, renderRemitoPrintTemplate
 } from '../views/Views.js';
 import { renderInversionesKanbanView } from '../views/InversionesView.js';
 
@@ -1051,7 +1052,8 @@ export class AppController {
                         activeResumen.innerHTML = renderPomResumenFinca(resumen);
                     }
 
-                    this.showToast('Proyección generada correctamente', 'success');
+                    localStorage.setItem('has_loaded_pom', 'true');
+                    this.showToast('Proyección generada y guardada en servidor', 'success');
 
                 } catch (error) {
                     console.error('[POM] Error generating projection:', error);
@@ -1091,7 +1093,9 @@ export class AppController {
         // --- AUTO-LOAD PERSISTENCE ---
         const checkAutoLoad = async () => {
             const hasOverrides = Object.keys(ProyeccionJornalModel.loadOverrides(currentCiclo)).length > 0;
-            if (hasOverrides && btnLoad) {
+            const wasLoaded = localStorage.getItem('has_loaded_pom') === 'true';
+            
+            if ((hasOverrides || wasLoaded) && btnLoad) {
                 console.log('[POM] Auto-loading previous state...');
                 btnLoad.click(); 
             }
@@ -6039,73 +6043,93 @@ renderFertUnidadesChart() {
     async renderInventarioSection(container) {
         container.innerHTML = `<div style="padding: 2rem; text-align: center;">⌛ Cargando movimientos de inventario...</div>`;
         try {
-            const [movements, products] = await Promise.all([
-                fetch(`${VITE_API_URL}/inventario/movimientos`).then(r => r.json()),
-                ADMIN_MODELS['admin-productos'].getAll()
-            ]);
-
-            container.innerHTML = renderStockMovementView(movements, { productos: products }, this.currentUser);
-            this.bindInventarioEvents(container, movements, { productos: products });
+            // Load from model (Persistence)
+            const remitosExt = DocumentacionModel.getRemitosExt();
+            const transfers = DocumentacionModel.getTransfers();
+            
+            // Render the main structure
+            container.innerHTML = renderStockMovementView([], { productos: [] }, this.currentUser);
+            
+            // Populate tables
+            this.updateInventarioTables();
+            
+            // Bind events
+            this.bindInventarioEvents(container);
+            this.bindDocumentacionEvents(); // Ensure save buttons in modals are bound
         } catch (e) {
             console.error('Inventario load error:', e);
             container.innerHTML = `<div class="alert alert-error">Error al cargar datos de inventario.</div>`;
         }
     }
 
-    bindInventarioEvents(container, movements, catalogs) {
-        const refresh = () => this.renderInventarioSection(container);
-        const modal = document.getElementById('stock-move-modal-overlay');
-        const form = document.getElementById('form-stock-move');
+    updateInventarioTables() {
+        const tbodyRemitos = document.getElementById('tbody-op-recepciones');
+        const tbodyTransfers = document.getElementById('tbody-op-transferencias');
+        
+        if (tbodyRemitos) {
+            tbodyRemitos.innerHTML = renderRemitoExtRows(DocumentacionModel.getRemitosExt());
+        }
+        if (tbodyTransfers) {
+            tbodyTransfers.innerHTML = renderTransferRows(DocumentacionModel.getTransfers());
+        }
+    }
 
-        document.getElementById('btn-add-stock-move')?.addEventListener('click', () => {
-            form.reset();
-            modal.style.display = 'flex';
-        });
+    bindInventarioEvents(container) {
+        // Tab switching
+        const tabRec = document.getElementById('stock-tab-recepciones');
+        const tabTrans = document.getElementById('stock-tab-transferencias');
+        const viewRec = document.getElementById('stock-view-recepciones');
+        const viewTrans = document.getElementById('stock-view-transferencias');
 
-        const closeModal = () => modal.style.display = 'none';
-        document.getElementById('btn-close-stock-modal')?.addEventListener('click', closeModal);
-        document.getElementById('btn-cancel-stock-move')?.addEventListener('click', closeModal);
-
-        document.getElementById('search-stock-moves')?.addEventListener('input', (e) => {
-            const q = e.target.value.toLowerCase();
-            document.querySelectorAll('#table-stock-moves tbody tr').forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        if (tabRec && tabTrans) {
+            tabRec.addEventListener('click', () => {
+                tabRec.className = 'btn btn-primary';
+                tabTrans.className = 'btn btn-ghost';
+                viewRec.style.display = 'block';
+                viewTrans.style.display = 'none';
             });
+            tabTrans.addEventListener('click', () => {
+                tabRec.className = 'btn btn-ghost';
+                tabTrans.className = 'btn btn-primary';
+                viewRec.style.display = 'none';
+                viewTrans.style.display = 'block';
+            });
+        }
+
+        // New Document Buttons
+        document.getElementById('btn-op-nuevo-remito-ext')?.addEventListener('click', () => {
+            const modalEl = document.getElementById('modalRemitoExterno');
+            if (modalEl) {
+                // Populate catalogs in modal
+                this.populateCargaDocumentacionCatalogs(); 
+                const bsModal = new bootstrap.Modal(modalEl);
+                bsModal.show();
+            }
         });
 
-        form?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = document.getElementById('btn-submit-stock-move');
-            submitBtn.disabled = true;
-            submitBtn.textContent = '...';
+        document.getElementById('btn-op-nueva-transferencia')?.addEventListener('click', () => {
+            const modalEl = document.getElementById('modalTransferencia');
+            if (modalEl) {
+                this.populateCargaDocumentacionCatalogs();
+                const bsModal = new bootstrap.Modal(modalEl);
+                bsModal.show();
+            }
+        });
 
-            const payload = {
-                producto_id: document.getElementById('move-producto').value,
-                tipo_movimiento: document.getElementById('move-tipo').value,
-                cantidad: parseFloat(document.getElementById('move-cantidad').value),
-                nro_comprobante: document.getElementById('move-comprobante').value,
-                usuario_id: this.currentUser.id,
-                notas: document.getElementById('move-notas').value
-            };
-
-            try {
-                const res = await fetch(`${VITE_API_URL}/inventario/movimiento`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                }).then(r => r.json());
-
-                if (res.success) {
-                    modal.style.display = 'none';
-                    refresh();
-                } else {
-                    this.showAlert('Error: ' + res.message);
-                }
-            } catch (err) {
-                this.showAlert('Error al registrar movimiento');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '💾 Guardar Ingreso';
+        // The save buttons were already bound globally in bindDocumentacionEvents 
+        // if they have the same ID. Let me check the IDs in renderStockMovementView.
+        // I used 'btn-op-nuevo-remito-ext' and 'btn-op-nueva-transferencia' for OPENING the modals.
+        // The modals themselves have 'btn-save-remito-ext' and 'btn-save-transferencia'.
+        // Those IDs are already handled in bindDocumentacionEvents.
+        // I just need to make sure that when those events fire, they ALSO update THESE tables if we are in this view.
+        
+        // Wait, bindDocumentacionEvents is only called when loading the 'carga-documentacion' section.
+        // I should call it or a subset of it to ensure save buttons work even if we are in 'admin-bodegas-movimientos'.
+        
+        // I'll add a listener to refresh these tables when a document is saved.
+        window.addEventListener('document-saved', () => {
+            if (this.currentSection === 'admin-bodegas-movimientos') {
+                this.updateInventarioTables();
             }
         });
     }
@@ -7607,6 +7631,8 @@ renderFertUnidadesChart() {
     /** ── DOCUMENTACION SECTION LOGIC ── **/
     initCargaDocumentacionSection() {
         this.renderInvoicesTable();
+        this.renderServiciosTable();
+        this.renderRemitosExtTable();
         this.renderTransfersTable();
         this.bindDocumentacionEvents();
     }
@@ -7622,8 +7648,17 @@ renderFertUnidadesChart() {
         const total = invoices.length;
         const pending = invoices.filter(v => v.status === 'Pendiente de Entrega').length;
         
-        document.getElementById('doc-stat-total').textContent = total;
-        document.getElementById('doc-stat-pending').textContent = pending;
+        const elTotal = document.getElementById('doc-stat-total');
+        const elPending = document.getElementById('doc-stat-pending');
+        if (elTotal) elTotal.textContent = total;
+        if (elPending) elPending.textContent = pending;
+    }
+
+    renderServiciosTable() {
+        const servicios = DocumentacionModel.getServicios();
+        const tbody = document.getElementById('tbody-servicios');
+        if (!tbody) return;
+        tbody.innerHTML = renderServicioRows(servicios);
     }
 
     renderTransfersTable() {
@@ -7633,29 +7668,46 @@ renderFertUnidadesChart() {
         tbody.innerHTML = renderTransferRows(transfers);
     }
 
+    renderRemitosExtTable() {
+        const remitos = DocumentacionModel.getRemitosExt();
+        const tbody = document.getElementById('tbody-remitos-ext');
+        if (!tbody) return;
+        tbody.innerHTML = renderRemitoExtRows(remitos);
+    }
+
     bindDocumentacionEvents() {
         // --- TAB SWITCHING ---
         const tabFacturas = document.getElementById('doc-tab-facturas');
+        const tabServicios = document.getElementById('doc-tab-servicios');
+        const tabRemExt = document.getElementById('doc-tab-remitos-ext');
         const tabTransf = document.getElementById('doc-tab-transferencias');
+        
         const viewFacturas = document.getElementById('view-facturas');
+        const viewServicios = document.getElementById('view-servicios');
+        const viewRemExt = document.getElementById('view-remitos-ext');
         const viewTransf = document.getElementById('view-transferencias');
 
-        if (tabFacturas && tabTransf) {
-            tabFacturas.onclick = () => {
-                tabFacturas.classList.replace('btn-ghost', 'btn-primary');
-                tabTransf.classList.replace('btn-primary', 'btn-ghost');
-                viewFacturas.style.display = 'block';
-                viewTransf.style.display = 'none';
-            };
-            tabTransf.onclick = () => {
-                tabTransf.classList.replace('btn-ghost', 'btn-primary');
-                tabFacturas.classList.replace('btn-primary', 'btn-ghost');
-                viewTransf.style.display = 'block';
-                viewFacturas.style.display = 'none';
-            };
-        }
+        const tabs = [
+            { btn: tabFacturas, view: viewFacturas },
+            { btn: tabServicios, view: viewServicios },
+            { btn: tabRemExt, view: viewRemExt },
+            { btn: tabTransf, view: viewTransf }
+        ];
 
-        // --- INVOICE EVENTS ---
+        tabs.forEach(t => {
+            if (t.btn) {
+                t.btn.onclick = () => {
+                    tabs.forEach(x => {
+                        if (x.btn) x.btn.classList.replace('btn-primary', 'btn-ghost');
+                        if (x.view) x.view.style.display = 'none';
+                    });
+                    t.btn.classList.replace('btn-ghost', 'btn-primary');
+                    t.view.style.display = 'block';
+                };
+            }
+        });
+
+        // --- INVOICE EVENTS (Providers) ---
         const btnNueva = document.getElementById('btn-nueva-factura');
         if (btnNueva) {
             btnNueva.onclick = () => {
@@ -7683,9 +7735,143 @@ renderFertUnidadesChart() {
                 }
 
                 DocumentacionModel.saveInvoice(data);
-                this.showToast('Documentación guardada.', 'success');
+                this.showToast('Factura de proveedor guardada.', 'success');
                 bootstrap.Modal.getInstance(document.getElementById('modalFactura')).hide();
                 this.renderInvoicesTable();
+                window.dispatchEvent(new CustomEvent('document-saved'));
+            };
+        }
+
+        // --- SERVICIOS EVENTS ---
+        const btnNuevoServ = document.getElementById('btn-nuevo-servicio');
+        if (btnNuevoServ) {
+            btnNuevoServ.onclick = () => {
+                document.getElementById('form-servicio').reset();
+                new bootstrap.Modal(document.getElementById('modalServicio')).show();
+            };
+        }
+
+        const btnSaveServ = document.getElementById('btn-save-servicio');
+        if (btnSaveServ) {
+            btnSaveServ.onclick = () => {
+                const form = document.getElementById('form-servicio');
+                const formData = new FormData(form);
+                const data = {
+                    proveedor: formData.get('proveedor'),
+                    categoria: formData.get('categoria'),
+                    nroFactura: formData.get('nroFactura'),
+                    fecha: formData.get('fecha'),
+                    fechaVenc: formData.get('fechaVenc'),
+                    monto: parseFloat(formData.get('monto')),
+                    notas: formData.get('notas')
+                };
+
+                if (!data.proveedor || !data.nroFactura || !data.fecha || isNaN(data.monto)) {
+                    this.showToast('Complete los campos obligatorios.', 'error');
+                    return;
+                }
+
+                DocumentacionModel.saveServicio(data);
+                this.showToast('Gasto de servicio registrado.', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('modalServicio')).hide();
+                this.renderServiciosTable();
+                window.dispatchEvent(new CustomEvent('document-saved'));
+            };
+        }
+
+        // --- REMITOS EXTERNOS EVENTS ---
+        const btnNuevoRemitoExt = document.getElementById('btn-nuevo-remito-ext');
+        if (btnNuevoRemitoExt) {
+            btnNuevoRemitoExt.onclick = async () => {
+                const bodegas = await ADMIN_MODELS['admin-bodegas'].getAll();
+                const productos = await ADMIN_MODELS['admin-productos'].getAll();
+
+                document.querySelectorAll('.doc-select-bodega').forEach(sel => {
+                    sel.innerHTML = '<option value="">Seleccionar Bodega...</option>' +
+                        bodegas.map(b => `<option value="${b.id}">${b.nombre}</option>`).join('');
+                });
+
+                document.querySelectorAll('.doc-select-producto').forEach(sel => {
+                    sel.innerHTML = '<option value="">Seleccionar Insumo...</option>' +
+                        productos.map(p => `<option value="${p.id}">${p.nombre} (Stock: ${p.stock || 0})</option>`).join('');
+                });
+
+                document.getElementById('form-remito-ext').reset();
+                new bootstrap.Modal(document.getElementById('modalRemitoExterno')).show();
+            };
+        }
+
+        const btnSaveRemitoExt = document.getElementById('btn-save-remito-ext');
+        if (btnSaveRemitoExt) {
+            btnSaveRemitoExt.onclick = async () => {
+                const form = document.getElementById('form-remito-ext');
+                const formData = new FormData(form);
+                
+                const bodegaDestinoId = formData.get('bodegaDestino');
+                const productoId = formData.get('productoId');
+                const cantidad = parseFloat(formData.get('cantidad'));
+                const proveedor = formData.get('proveedor');
+                const nroRemito = formData.get('nroRemito');
+                const fecha = formData.get('fecha');
+
+                if (!bodegaDestinoId || !productoId || isNaN(cantidad) || !proveedor || !nroRemito || !fecha) {
+                    this.showToast('Complete todos los campos del remito.', 'error');
+                    return;
+                }
+
+                const bodegas = await ADMIN_MODELS['admin-bodegas'].getAll();
+                const productos = await ADMIN_MODELS['admin-productos'].getAll();
+                const bDst = bodegas.find(b => b.id == bodegaDestinoId);
+                const prod = productos.find(p => p.id == productoId);
+
+                const data = {
+                    proveedor,
+                    nroRemito,
+                    bodegaDestinoId,
+                    bodegaNombre: bDst?.nombre || 'Destino',
+                    productoId,
+                    productoNombre: prod?.nombre || 'Producto',
+                    cantidad,
+                    fecha,
+                    notas: formData.get('notas')
+                };
+
+                // Save Document
+                DocumentacionModel.saveRemitoExt(data);
+                
+                // --- Update physical stock via ADMIN_MODELS ---
+                try {
+                    const allProds = await ADMIN_MODELS['admin-productos'].getAll();
+                    const prodSourceRef = await ADMIN_MODELS['admin-productos'].getById(productoId);
+                    
+                    if (prodSourceRef) {
+                        // Find matching record in the TARGET bodega
+                        let targetRecord = allProds.find(p => p.nombre === prodSourceRef.nombre && p.bodega_id == bodegaDestinoId);
+                        
+                        if (targetRecord) {
+                            const newStock = (parseFloat(targetRecord.stock) || 0) + cantidad;
+                            await ADMIN_MODELS['admin-productos'].update(targetRecord.id, { ...targetRecord, stock: newStock });
+                        } else {
+                            // Create new record for this product in the target bodega
+                            await ADMIN_MODELS['admin-productos'].create({
+                                nombre: prodSourceRef.nombre,
+                                categoria: prodSourceRef.categoria || 'Insumo',
+                                bodega_id: bodegaDestinoId,
+                                unidad: prodSourceRef.unidad || 'un',
+                                stock: cantidad,
+                                notas: `Ingreso inicial por remito externo ${nroRemito}`
+                            });
+                        }
+                        this.showToast('Remito registrado e ingreso a stock completado.', 'success');
+                    }
+                } catch (err) {
+                    console.error('Error auto-updating stock for Remito Ext:', err);
+                    this.showToast('Documento guardado, pero no se pudo actualizar el stock físico.', 'warning');
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById('modalRemitoExterno')).hide();
+                this.renderRemitosExtTable();
+                window.dispatchEvent(new CustomEvent('document-saved'));
             };
         }
 
@@ -7739,6 +7925,28 @@ renderFertUnidadesChart() {
                 const bDst = bodegas.find(b => b.id == bodegaDestinoId);
                 const prod = productos.find(p => p.id == productoId);
 
+                // Deduct stock from Origin immediately
+                try {
+                    const prodSource = await ADMIN_MODELS['admin-productos'].getById(productoId);
+                    if (prodSource) {
+                        // Ensure we are deducting from the correct record (source bodega)
+                        // If the picked product is already at the source, we update it.
+                        // If it's the wrong record (different bodega), we find the right one.
+                        let sourceRecord = prodSource;
+                        if (prodSource.bodega_id != bodegaOrigenId) {
+                            const all = await ADMIN_MODELS['admin-productos'].getAll();
+                            sourceRecord = all.find(p => p.nombre === prodSource.nombre && p.bodega_id == bodegaOrigenId);
+                        }
+
+                        if (sourceRecord) {
+                            const newStockOrg = (parseFloat(sourceRecord.stock) || 0) - cantidad;
+                            await ADMIN_MODELS['admin-productos'].update(sourceRecord.id, { ...sourceRecord, stock: newStockOrg });
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error deducting stock on emission:', err);
+                }
+
                 const data = {
                     bodegaOrigenId,
                     bodegaOrigenNombre: bOrg?.nombre || 'Origen',
@@ -7748,14 +7956,19 @@ renderFertUnidadesChart() {
                     productoNombre: prod?.nombre || 'Producto',
                     cantidad,
                     notas: formData.get('notas'),
-                    nroRemito: 'REMI-' + Math.floor(1000 + Math.random() * 9000),
                     fecha: new Date().toISOString()
                 };
 
-                DocumentacionModel.saveTransfer(data);
-                this.showToast('Remito Interno emitido exitosamente.', 'success');
+                const newT = DocumentacionModel.saveTransfer(data);
+                this.showToast('Remito Interno emitido y stock descontado de origen.', 'success');
                 bootstrap.Modal.getInstance(document.getElementById('modalTransferencia')).hide();
                 this.renderTransfersTable();
+                window.dispatchEvent(new CustomEvent('document-saved'));
+
+                // Auto Print Option
+                if (confirm('¿Desea imprimir el remito interno para el chofer?')) {
+                    this.printTransferRemito(newT.id);
+                }
             };
         }
 
@@ -7800,20 +8013,17 @@ renderFertUnidadesChart() {
                     return;
                 }
 
-                // ── Inventory Sync Logic ──
+                // ── Inventory Sync Logic (Finalize arrival) ──
                 const transfers = DocumentacionModel.getTransfers();
                 const t = transfers.find(x => x.id === transferId);
                 if (t && t.status === 'En Tránsito') {
                     try {
-                        // 1. Deduct from Source
-                        const prodSource = await ADMIN_MODELS['admin-productos'].getById(t.productoId);
-                        if (prodSource) {
-                            const newStockSource = (parseFloat(prodSource.stock) || 0) - parseFloat(t.cantidad);
-                            await ADMIN_MODELS['admin-productos'].update(t.productoId, { ...prodSource, stock: newStockSource });
-                        }
-
-                        // 2. Add to Destination (Search by name in that bodega)
+                        // (Stock was already deducted from source on emission)
+                        
+                        // Add to Destination (Search by name in that bodega)
                         const allProds = await ADMIN_MODELS['admin-productos'].getAll();
+                        const prodSourceRef = await ADMIN_MODELS['admin-productos'].getById(t.productoId);
+                        
                         let prodDest = allProds.find(p => p.nombre === t.productoNombre && p.bodega_id == t.bodegaDestinoId);
                         
                         if (prodDest) {
@@ -7823,26 +8033,26 @@ renderFertUnidadesChart() {
                             // Create new record in destination bodega if it doesn't exist
                             await ADMIN_MODELS['admin-productos'].create({
                                 nombre: t.productoNombre,
-                                categoria: prodSource?.categoria || 'Insumo',
+                                categoria: prodSourceRef?.categoria || 'Insumo',
                                 bodega_id: t.bodegaDestinoId,
-                                unidad: prodSource?.unidad || 'un',
-                                stock: t.cantidad,
+                                unidad: prodSourceRef?.unidad || 'un',
+                                stock: parseFloat(t.cantidad),
                                 notas: `Ingresado por remito interno ${t.nroRemito}`
                             });
                         }
                         
                         // 3. Update Transfer Status
                         DocumentacionModel.confirmTransfer(transferId, data);
-                        this.showToast('Transferencia completada y stock sincronizado.', 'success');
+                        this.showToast('Ingreso a bodega confirmado y stock actualizado.', 'success');
                     } catch (err) {
                         console.error('Stock sync error:', err);
-                        this.showToast('Error al sincronizar stock, pero se registró la recepción.', 'warning');
-                        DocumentacionModel.confirmTransfer(transferId, data);
+                        this.showToast('Error al sincronizar stock.', 'error');
                     }
                 }
 
                 bootstrap.Modal.getInstance(document.getElementById('modalConfirmarTransferencia')).hide();
                 this.renderTransfersTable();
+                window.dispatchEvent(new CustomEvent('document-saved'));
             };
         }
     }
@@ -7863,5 +8073,37 @@ renderFertUnidadesChart() {
         `;
 
         new bootstrap.Modal(document.getElementById('modalConfirmarTransferencia')).show();
+    }
+    async populateCargaDocumentacionCatalogs() {
+        try {
+            const bodegas = await ADMIN_MODELS['admin-bodegas'].getAll();
+            const productos = await ADMIN_MODELS['admin-productos'].getAll();
+
+            document.querySelectorAll('.doc-select-bodega').forEach(sel => {
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="">Seleccionar Bodega...</option>' +
+                    bodegas.map(b => `<option value="${b.id}">${b.nombre}</option>`).join('');
+                if (currentVal) sel.value = currentVal;
+            });
+
+            document.querySelectorAll('.doc-select-producto').forEach(sel => {
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="">Seleccionar Insumo...</option>' +
+                    productos.map(p => `<option value="${p.id}">${p.nombre} (Stock: ${p.stock || 0})</option>`).join('');
+                if (currentVal) sel.value = currentVal;
+            });
+        } catch (e) {
+            console.error('Populate catalogs error:', e);
+        }
+    }
+
+    printTransferRemito(transferId) {
+        const transfers = DocumentacionModel.getTransfers();
+        const t = transfers.find(x => x.id === transferId);
+        if (!t) return;
+
+        const printWin = window.open('', '_blank', 'width=800,height=900');
+        printWin.document.write(renderRemitoPrintTemplate(t));
+        printWin.document.close();
     }
 }
