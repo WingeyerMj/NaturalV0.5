@@ -80,11 +80,7 @@ export class ProyeccionJornalModel {
                     hectareas: parseFloat(row[2]) || 0,
                     variedad: row[3] || '',
                     plantas: parseInt(row[7]) || 0,
-<<<<<<< Updated upstream
                     predio: this._normalizePredioFromClasifica(row[95] ? row[95].toString().trim() : (row[0] || '').toString().trim()),
-=======
-                    predio: row[95] ? row[95].toString().trim() : (row[0] || '').toString().trim(),
->>>>>>> Stashed changes
                     rendimientosOriginales: rendimientos,
                     jornalesOriginales: jornales
                 };
@@ -247,11 +243,7 @@ export class ProyeccionJornalModel {
         allData.forEach(r => {
             const predio = this._normalizePredioFromClasifica(r.clasifica);
             if (!predio) return;
-<<<<<<< Updated upstream
             const labor = r.isCosecha ? 'cosecha' : (r.labor_normalized || r.labor || '').trim().toLowerCase();
-=======
-            const labor = (r.labor_normalized || r.labor || '').toLowerCase();
->>>>>>> Stashed changes
             const key = `${predio}|${labor}`;
 
             if (!realByPredioLabor[key]) {
@@ -270,11 +262,7 @@ export class ProyeccionJornalModel {
 
         // Cross each projection with real data
         projectionMatrix.forEach(proj => {
-<<<<<<< Updated upstream
             const laborNorm = (proj.laborNombre || '').trim().toLowerCase();
-=======
-            const laborNorm = (proj.laborNombre || '').toLowerCase();
->>>>>>> Stashed changes
             const key = `${proj.predio}|${laborNorm}`;
             const real = realByPredioLabor[key];
 
@@ -337,7 +325,6 @@ export class ProyeccionJornalModel {
         if (upper.includes('CAMINO TRUNCADO') || upper.includes('TRUNCADO')) return 'Camino Truncado';
         if (upper.includes('CHIMBERA')) return 'La Chimbera';
         if (upper.includes('PUENTE ALTO') || upper.includes('P. ALTO') || upper.includes('P.ALTO')) return 'Puente Alto';
-<<<<<<< Updated upstream
         if (upper.includes('EEIII') || upper.includes('ESPEJO 3') || upper.includes('ESPEJO III')) return 'El Espejo 3';
         if (upper.includes('EEII') || upper.includes('ESPEJO 2') || upper.includes('ESPEJO II')) return 'El Espejo 2';
         if (upper.includes('EEI') || upper.includes('ESPEJO 1') || upper.includes('ESPEJO I')) return 'El Espejo 1';
@@ -345,17 +332,6 @@ export class ProyeccionJornalModel {
         if (upper.includes('FINCAS VIEJAS') || upper.includes('F. VIEJAS')) return 'Fincas Viejas';
         if (upper.includes('TERCEROS')) return 'Terceros';
         return clasifica.trim();
-=======
-        if (upper.includes('EEIII') || upper.includes('ESPEJO 3') || upper.includes('ESPEJO III')) return 'El Espejo III';
-        if (upper.includes('EEI') || upper.includes('ESPEJO 1') || upper.includes('ESPEJO I') || 
-            upper.includes('EEII') || upper.includes('ESPEJO 2') || upper.includes('ESPEJO II')) {
-            return 'El Espejo I y II';
-        }
-        if (upper.includes('EL ESPEJO')) return 'El Espejo I y II'; // Default for other Espejo
-        if (upper.includes('FINCAS VIEJAS') || upper.includes('F. VIEJAS')) return 'Fincas Viejas';
-        if (upper.includes('TERCEROS')) return 'Terceros';
-        return null;
->>>>>>> Stashed changes
     }
 
     // ═══════════════════════════════════════════════════════
