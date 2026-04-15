@@ -1081,7 +1081,11 @@ export class AppController {
             }
             const overrides = ProyeccionJornalModel.loadOverrides(currentCiclo);
             const saved = await ProyeccionJornalModel.saveToServer(currentCiclo, overrides);
-            this.showToast(saved ? 'Proyección guardada en el servidor' : 'Guardado local (sin servidor)', saved ? 'success' : 'warning');
+            
+            // Also save the CSV report to the server reflecting the current edits
+            await ProyeccionJornalModel.saveCSVToServer(currentMatrix, currentCiclo);
+            
+            this.showToast(saved ? 'Proyección y reportes guardados en el servidor' : 'Guardado local finalizado', saved ? 'success' : 'success');
         });
 
         // --- AUTO-LOAD PERSISTENCE ---
