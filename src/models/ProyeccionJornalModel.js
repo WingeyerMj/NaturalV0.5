@@ -463,11 +463,14 @@ export class ProyeccionJornalModel {
     /**
      * Apply a user override to a specific cell.
      */
-    static applyOverride(ciclo, key, field, value) {
+    static async applyOverride(ciclo, key, field, value) {
         const overrides = this.loadOverrides(ciclo);
         if (!overrides[key]) overrides[key] = {};
         overrides[key][field] = value;
         this.saveOverrides(ciclo, overrides);
+        
+        // Auto-save to server for persistence across refreshes
+        await this.saveToServer(ciclo, overrides);
     }
 
     /**
@@ -493,6 +496,27 @@ export class ProyeccionJornalModel {
     }
 
     /**
+     * Save full matrix as CSV to the server.
+     */
+    static async saveCSVToServer(matrix, ciclo) {
+        const csvContent = this.generateCSVContent(matrix, ciclo);
+        try {
+            const response = await fetch('/api/save-jornales-budget', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: `ReporteSpec_Proyeccion_${ciclo}.csv`,
+                    content: csvContent
+                })
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('[ProyeccionJornal] Error saving CSV to server:', error);
+            return null;
+        }
+    }
+
+    /**
      * Load overrides from server.
      */
     static async loadFromServer(ciclo) {
@@ -510,10 +534,10 @@ export class ProyeccionJornalModel {
     }
 
     // ═══════════════════════════════════════════════════════
-    // EXPORT
+    // EXPORT & CONTENT GENERATION
     // ═══════════════════════════════════════════════════════
 
-    static exportToCSV(matrix, ciclo) {
+    static generateCSVContent(matrix, ciclo) {
         let csv = `PROYECCIÓN JORNAL ESPECÍFICO — CICLO ${ciclo}\n\n`;
         csv += 'Finca;Predio;Cuartel;Ha;Plantas;Variedad;Labor;Rend. Proy.;Jorn. Proy.;Rend. Real;Jorn. Reales;Desvío %;Rend. Sugerido;Jorn. Sugeridos;Fecha Inicio;Fecha Fin;Fuente\n';
 
@@ -525,7 +549,11 @@ export class ProyeccionJornalModel {
             csv += `${p.rendimientoSugerido || '-'};${p.jornalesSugeridos || '-'};`;
             csv += `${p.fechaInicio || '-'};${p.fechaFin || '-'};${p.fuente}\n`;
         });
+        return csv;
+    }
 
+    static exportToCSV(matrix, ciclo) {
+        const csv = this.generateCSVContent(matrix, ciclo);
         const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);

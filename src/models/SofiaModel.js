@@ -5,11 +5,11 @@
 
 const COLUMNS_MAP = {
     'Fecha': ['Fecha Inicio Aplica', 'Fecha Inicio', 'Fecha', 'Fecha de Aplicación', 'Date', 'Fecha Apl.'],
-    'Labor': ['Labor', 'Labor Code', 'Faena', 'Tarea', 'Operación'],
+    'Labor': ['Labor', 'Labor Code', 'Labor Codigo', 'Faena', 'Tarea', 'Operación'],
     'Producto': ['Nombre Producto', 'Producto', 'Insumo', 'Product', 'Artículo'],
     'Cantidad': ['Cantidad', 'Real Aplicado', 'Ha. Aplicadas', 'Cantidad Periodo', 'Monto', 'Cant.'],
     'Tipo': ['tipo', 'Tipo Registro', 'Tipo', 'Categoría'],
-    'Cuartel': ['Cuartel', 'Cuadro', 'Sector', 'Lote', 'Potrero', 'Cuartel/Potrero'],
+    'Cuartel': ['Cuartel / Pot', 'Cuartel / Potrero', 'Cuartel', 'Cuadro', 'Sector', 'Lote', 'Potrero'],
     'CodCuartel': ['Cod Cuartel', 'Código Cuartel', 'ID Cuartel'],
     'Dosis': ['Dosis', 'Dose', 'Dosis/Ha'],
     'Finca': ['Predio', 'Finca', 'Farm', 'Establecimiento'],
@@ -40,7 +40,7 @@ export class SofiaImportModel {
         console.log(`[SofiaImportModel] Imported ${newRows.length} new rows. Skipped ${rows.length - newRows.length} duplicates. Total: ${this.REGISTROS.length}`);
     }
 
-    static parseCSV(csvText, defaultFinca) {
+    static parseCSV(csvText, defaultFinca, fileName = '') {
         if (!csvText) return { error: "Archivo vacío" };
         const lines = csvText.split(/\r\n|\r|\n/).filter(l => l.trim() !== '');
         console.log(`[SofiaModel] Splitting ${csvText.length} chars resulted in ${lines.length} lines.`);
@@ -209,14 +209,15 @@ export class SofiaImportModel {
                 clasifica: clasifica,
                 estado: estado,
                 variedad: variety,
-                categoria: this.classify(labor, producto, tipoRaw),
+                categoria: this.classify(labor, producto, tipoRaw, fileName),
                 ciclo: this.getCycle(fecha),
                 n_units: colMap['N'] !== undefined ? parseNum(cols[colMap['N']]) : 0,
                 k_units: colMap['K'] !== undefined ? parseNum(cols[colMap['K']]) : 0,
                 p_units: colMap['P'] !== undefined ? parseNum(cols[colMap['P']]) : 0,
                 ca_units: colMap['Ca'] !== undefined ? parseNum(cols[colMap['Ca']]) : 0,
                 has_totales: colMap['Has'] !== undefined ? parseNum(cols[colMap['Has']]) : 0,
-                original_index: i // To distinguish otherwise identical rows within the same file import
+                original_index: i,
+                source_file: fileName
             });
         }
         console.log(`[SofiaModel] Parse complete: ${rows.length} rows kept (Last few categories: ${rows.slice(-5).map(r => r.categoria).join(', ')}), ${skippedEmpty} empty/invalid skipped, ${skippedPendiente} pendientes skipped.`);
@@ -228,10 +229,18 @@ export class SofiaImportModel {
     }
 
 
-    static classify(laborCode, producto, tipoRaw = '') {
+    static classify(laborCode, producto, tipoRaw = '', fileName = '') {
         const lab = (laborCode || '').toUpperCase().trim();
         const prod = (producto || '').toLowerCase();
         const tipo = (tipoRaw || '').toLowerCase();
+        const fn = (fileName || '').toLowerCase();
+
+        // 0. EXCLUSIVITY: If file name is specific to Drone, classify as Dron immediately
+        if (fn.includes('aplicaciondron')) return 'Dron';
+
+        // 0b. LABOR-BASED DRON: Specific labor 'AF-DRON' (as requested for reports)
+        // We use includes to catch variants like "APLICACION AF-DRON" seen in Excel
+        if (lab.includes('AF-DRON') || lab === 'DRON') return 'Dron';
 
         // 1. Foliares: Starts with "AF -" or is "FITOSANITARIO"
         if (lab.startsWith('AF -') || lab === 'AF' || lab.includes('FOLIAR') || lab === 'FITOSANITARIO') return 'Foliares';
@@ -242,8 +251,7 @@ export class SofiaImportModel {
         // 3. Fertilización: Strictly "FERTILIZACION" or close variants
         if (lab.includes('FERTILIZACI') || lab.includes('FERTILIZANTE') || lab === 'FERT' || lab === 'ABONO' || prod.includes('nutri') || tipo.includes('pre-cosecha') || tipo.includes('pos-cosecha')) return 'Fertilizacion';
 
-        // 4. Dron: Specific labor
-        if (lab === 'AF-DRON' || lab.includes('DRON')) return 'Dron';
+        // 4. Dron: (Removed labor-based check to enforce strict file-based exclusivity per user request)
 
         // 5. Dynamic category: Take the name of the labor if not recognized above
         return lab || 'Otros';

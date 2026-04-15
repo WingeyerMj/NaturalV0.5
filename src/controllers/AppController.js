@@ -32,7 +32,7 @@ import {
     renderInformeParametros, renderAplicacionesView,
     renderPresupuestoView, renderUsuariosView,
     renderInformeAplicaciones, renderSofiaResumen, renderSofiaFoliares,
-    renderSofiaHerbicidas, renderFertilizacionComparativa, formatCurrency,
+    renderSofiaHerbicidas, renderSofiaDron, renderFertilizacionComparativa, formatCurrency,
     renderHectareasPorPredio, renderEficienciaChartSection,
     renderCosechaLevantadoTable, renderLevantadoPorPlaya, renderAdminCrudView, renderWorkLogView,
     renderGastosView, renderSecaderosView, renderGastosHistoricosView,
@@ -1031,17 +1031,20 @@ export class AppController {
                     // 4. Cross with real Sofia data
                     currentMatrix = await ProyeccionJornalModel.crossWithRealData(currentMatrix, currentCiclo);
 
-                    // 5. Render detail table
+                    // 5. AUTO-SAVE CSV to server (Requirement: Save in a CSV every time generated)
+                    await ProyeccionJornalModel.saveCSVToServer(currentMatrix, currentCiclo);
+
+                    // 6. Render detail table
                     const detalleContainer = document.getElementById('pom-content-detalle');
                     if (detalleContainer) {
                         detalleContainer.innerHTML = renderPomDetalleTable(currentMatrix);
                         this.bindPomEditableInputs(currentCiclo, currentMatrix);
                     }
 
-                    // 6. Update summary cards
+                    // 7. Update summary cards
                     this.updatePomSummaryCards(currentMatrix);
 
-                    // 7. If other tabs are active, also render them
+                    // 8. If other tabs are active, also render them
                     const activeResumen = document.getElementById('pom-content-resumen');
                     if (activeResumen && activeResumen.style.display !== 'none') {
                         const resumen = ProyeccionJornalModel.getResumenPorFinca(currentMatrix);
@@ -1080,6 +1083,16 @@ export class AppController {
             const saved = await ProyeccionJornalModel.saveToServer(currentCiclo, overrides);
             this.showToast(saved ? 'Proyección guardada en el servidor' : 'Guardado local (sin servidor)', saved ? 'success' : 'warning');
         });
+
+        // --- AUTO-LOAD PERSISTENCE ---
+        const checkAutoLoad = async () => {
+            const hasOverrides = Object.keys(ProyeccionJornalModel.loadOverrides(currentCiclo)).length > 0;
+            if (hasOverrides && btnLoad) {
+                console.log('[POM] Auto-loading previous state...');
+                btnLoad.click(); 
+            }
+        };
+        setTimeout(checkAutoLoad, 500); 
     }
 
     bindPomEditableInputs(ciclo, matrix) {
@@ -4451,7 +4464,7 @@ async loadStaticSofiaData() {
                 }
                 const buffer = await response.arrayBuffer();
                 const csvText = new TextDecoder('iso-8859-1').decode(buffer);
-                const result = SofiaImportModel.parseCSV(csvText, file.finca);
+                const result = SofiaImportModel.parseCSV(csvText, file.finca, file.name);
                 if (!result.error) {
                     return { rows: result.rows, file };
                 } else {

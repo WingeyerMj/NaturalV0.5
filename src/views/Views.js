@@ -2686,8 +2686,8 @@ export function renderSofiaDron(stats) {
     </div>
     <table class="data-table">
       <thead><tr>
-        <th>Predio / Cuartel</th><th>Fecha</th><th>Labor</th><th>Producto</th>
-        <th>Cant. (Kg/L)</th><th>Ha. Aplica</th><th>Costo Total</th>
+        <th>Finca (Predio)</th><th>Clasifica</th><th>Cuartel</th><th>Producto</th>
+        <th style="text-align:right;">Cantidad</th><th style="text-align:center;">Fecha</th><th style="text-align:right;">Costo Total</th>
       </tr></thead>
       <tbody>
         ${(() => {
@@ -2701,21 +2701,18 @@ export function renderSofiaDron(stats) {
           return Object.entries(grouped).map(([finca, rows]) => `
             <tr class="table-group-header" style="background: rgba(168, 85, 247, 0.05);">
               <td colspan="7" style="font-weight: 700; color: var(--color-purple-400); padding: var(--space-3) var(--space-4);">
-                🏡 ${finca} — <span style="font-weight:400; color:var(--text-tertiary);">${rows.length} aplicaciones</span>
+                🏡 ${finca} — <span style="font-weight:400; color:var(--text-tertiary);">${rows.length} registros de aplicación</span>
               </td>
             </tr>
             ${rows.map(r => `
             <tr>
-              <td style="padding-left: var(--space-8);">
-                <span style="color: var(--text-tertiary); font-size: 0.85em;">${r.clasifica || ''}</span><br/>
-                <strong>${r.cuartel}</strong>
-              </td>
-              <td>${formatDate(r.fecha_aplicacion)}</td>
-              <td><span class="status-badge" style="background: var(--bg-secondary); font-size: 0.85em;">${r.labor_codigo}</span></td>
+              <td><strong>${r.finca_original || r.finca}</strong></td>
+              <td><span style="color: var(--text-secondary);">${r.clasifica || '-'}</span></td>
+              <td><span class="status-badge" style="background:rgba(99,102,241,0.1); color:var(--color-indigo-400);">${r.cuartel}</span></td>
               <td><strong>${r.producto}</strong></td>
-              <td>${fmtNum(r.cantidad)}</td>
-              <td>${fmtNum(r.has_totales)}</td>
-              <td style="font-weight: 700; color: var(--text-primary);">${fmtCost(r.costo_total)}</td>
+              <td style="text-align:right; font-weight:600;">${fmtNum(r.cantidad)}</td>
+              <td style="text-align:center; font-size:0.9em; color:var(--text-tertiary);">${formatDate(r.fecha_aplicacion)}</td>
+              <td style="text-align:right; font-weight: 700; color: var(--text-primary);">${fmtCost(r.costo_total)}</td>
             </tr>
             `).join('')}
           `).join('');
