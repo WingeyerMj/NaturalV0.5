@@ -258,8 +258,8 @@ app.post('/api/save-jornales-budget', async (req, res) => {
     }
 
     try {
-        // Use root Fuentes directory instead of public/Fuentes
-        const dirPath = path.join(__dirname, '../Fuentes');
+        // Use Fuentes/Presupuestos for CSV reports as well
+        const dirPath = path.join(__dirname, '../Fuentes/Presupuestos');
         if (!fs.existsSync(dirPath)) {
             fs.mkdirSync(dirPath, { recursive: true });
         }

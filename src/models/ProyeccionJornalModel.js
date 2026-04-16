@@ -505,7 +505,7 @@ export class ProyeccionJornalModel {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    filename: `ReporteSpec_Proyeccion_${ciclo}.csv`,
+                    filename: 'nuevoPrecupuesto.csv',
                     content: csvContent
                 })
             });
@@ -517,7 +517,7 @@ export class ProyeccionJornalModel {
     }
 
     /**
-     * Load overrides from server.
+     * Load overrides from server (JSON).
      */
     static async loadFromServer(ciclo) {
         try {
@@ -533,6 +533,50 @@ export class ProyeccionJornalModel {
         }
     }
 
+    /**
+     * Load and parse CSV from server.
+     */
+    static async loadCSVFromServer() {
+        try {
+            const response = await fetch('/Fuentes/Presupuestos/nuevoPrecupuesto.csv');
+            if (!response.ok) return null;
+            const text = await response.text();
+            
+            const lines = text.split('\n').filter(l => l.trim().length > 0);
+            if (lines.length < 3) return null; // Skip title and header
+            
+            // Skip first 2 lines (Title and Header)
+            const rows = lines.slice(2);
+            
+            return rows.map(row => {
+                const cols = row.split(';');
+                // Column mapping based on generateCSVContent
+                return {
+                    finca: cols[0],
+                    predio: cols[1],
+                    cuartel: cols[2],
+                    hectareas: parseFloat(cols[3]) || 0,
+                    plantas: parseInt(cols[4]) || 0,
+                    variedad: cols[5],
+                    laborNombre: cols[6],
+                    rendimientoProyectado: parseFloat(cols[7]) || 0,
+                    jornalesProyectados: parseFloat(cols[8]) || 0,
+                    rendimientoReal: cols[9] === '-' ? null : parseFloat(cols[9]),
+                    jornalesReales: cols[10] === '-' ? null : parseFloat(cols[10]),
+                    desvioJornales: cols[11] === '-' ? null : parseFloat(cols[11].replace('%','')),
+                    rendimientoSugerido: cols[12] === '-' ? null : parseFloat(cols[12]),
+                    jornalesSugeridos: cols[13] === '-' ? null : parseFloat(cols[13]),
+                    fechaInicio: cols[14] === '-' ? null : cols[14],
+                    fechaFin: cols[15] === '-' ? null : cols[15],
+                    fuente: cols[16] || 'CSV'
+                };
+            });
+        } catch (error) {
+            console.error('[POM] Error loading CSV from server:', error);
+            return null;
+        }
+    }
+
     // ═══════════════════════════════════════════════════════
     // EXPORT & CONTENT GENERATION
     // ═══════════════════════════════════════════════════════
@@ -543,7 +587,7 @@ export class ProyeccionJornalModel {
 
         matrix.forEach(p => {
             csv += `${p.finca};${p.predio};${p.cuartel};${p.hectareas};${p.plantas};${p.variedad};`;
-            csv += `${p.laborNombre};${p.rendimientoProyectado};${p.jornalesProyectados};`;
+            csv += `${p.laborNombre};${p.rendimientoProyectado || 0};${p.jornalesProyectados || 0};`;
             csv += `${p.rendimientoReal || '-'};${p.jornalesReales || '-'};`;
             csv += `${p.desvioJornales != null ? p.desvioJornales.toFixed(1) + '%' : '-'};`;
             csv += `${p.rendimientoSugerido || '-'};${p.jornalesSugeridos || '-'};`;

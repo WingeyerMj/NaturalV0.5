@@ -4771,6 +4771,7 @@ export function renderProyeccionJornalView() {
             <button class="btn btn-ghost" id="pom-tab-resumen" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">🏡 Resumen por Finca</button>
             <button class="btn btn-ghost" id="pom-tab-calendario" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4);">📅 Calendario</button>
             <div style="flex: 1;"></div>
+            <button class="btn btn-ghost" id="btn-pom-import-csv" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4); color: var(--color-accent-400);">📂 Importar CSV</button>
             <button class="btn btn-ghost" id="btn-pom-export" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4); color: var(--color-primary-400);">📥 Exportar CSV</button>
             <button class="btn btn-ghost" id="btn-pom-save" style="border-radius: var(--radius-lg); font-size: 0.85em; padding: var(--space-2) var(--space-4); color: var(--color-success);">💾 Guardar</button>
         </div>

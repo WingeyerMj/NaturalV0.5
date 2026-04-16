@@ -816,7 +816,7 @@ export class AppController {
                                 const saveResp = await fetch('/api/save-jornales-budget', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ filename: file.name, content })
+                                    body: JSON.stringify({ filename: 'nuevoPrecupuesto.csv', content })
                                 });
                                 const saveRes = await saveResp.json();
                                 if (saveRes.success) {
@@ -1044,14 +1044,13 @@ export class AppController {
             const esAbril = today.getMonth() === 3; // 0-indexed, 3 = Abril
             const wasLoaded = localStorage.getItem('has_loaded_pom') === 'true';
 
-            // Disable button if not in April or already generated once
-            if (!esAbril || wasLoaded) {
+            // Disable button ONLY if not in April
+            if (!esAbril) {
                 btnLoad.disabled = true;
-                if (!esAbril && !wasLoaded) {
-                    btnLoad.title = "La generación solo está habilitada durante el mes de Abril";
-                } else if (wasLoaded) {
-                    btnLoad.title = "La proyección ya fue generada. Está visualizando los datos guardados.";
-                }
+                btnLoad.title = "La generación solo está habilitada durante el mes de Abril";
+            } else {
+                btnLoad.disabled = false;
+                btnLoad.title = "Asegúrese de guardar sus cambios antes de generar una nueva proyección.";
             }
 
             const generateOloadData = async (isManualGeneration) => {
@@ -1091,9 +1090,6 @@ export class AppController {
                     // 4. Cross with real Sofia data
                     currentMatrix = await ProyeccionJornalModel.crossWithRealData(currentMatrix, currentCiclo);
 
-                    // 5. AUTO-SAVE CSV to server (Requirement: Save in a CSV every time generated)
-                    await ProyeccionJornalModel.saveCSVToServer(currentMatrix, currentCiclo);
-
                     // 6. Render detail table
                     const detalleContainer = document.getElementById('pom-content-detalle');
                     if (detalleContainer) {
@@ -1114,8 +1110,7 @@ export class AppController {
                     // Save to server only if it is a fresh generation
                     if (isManualGeneration) {
                         await ProyeccionJornalModel.saveCSVToServer(currentMatrix, currentCiclo);
-                        localStorage.setItem('has_loaded_pom', 'true');
-                        this.showToast('Proyección generada y guardada en servidor', 'success');
+                        this.showToast('Proyección generada a partir de base Excel y Sofía', 'success');
                     }
 
                 } catch (error) {
@@ -1123,7 +1118,7 @@ export class AppController {
                     this.showToast('Error al procesar la proyección: ' + error.message, 'error');
                 } finally {
                     btnLoad.innerHTML = originalText;
-                    if (!esAbril || localStorage.getItem('has_loaded_pom') === 'true') {
+                    if (!esAbril) {
                         btnLoad.disabled = true;
                     } else {
                         btnLoad.disabled = false;
@@ -1133,6 +1128,32 @@ export class AppController {
 
             btnLoad.addEventListener('click', () => generateOloadData(true));
         }
+
+        // Import CSV from server
+        document.getElementById('btn-pom-import-csv')?.addEventListener('click', async () => {
+             try {
+                 const serverData = await ProyeccionJornalModel.loadCSVFromServer();
+                 
+                 if (!serverData) {
+                     this.showToast('No se encontró el archivo "nuevoPrecupuesto.csv" en el servidor', 'warning');
+                     return;
+                 }
+                 
+                 currentMatrix = serverData;
+                 
+                 // Render
+                 const detalleContainer = document.getElementById('pom-content-detalle');
+                 if (detalleContainer) {
+                     detalleContainer.innerHTML = renderPomDetalleTable(currentMatrix);
+                     this.bindPomEditableInputs(currentCiclo, currentMatrix);
+                 }
+                 this.updatePomSummaryCards(currentMatrix);
+                 
+                 this.showToast('Presupuesto importado desde "nuevoPrecupuesto.csv"', 'success');
+             } catch (error) {
+                 this.showToast('Error al importar CSV: ' + error.message, 'error');
+             }
+        });
 
         // Export CSV
         document.getElementById('btn-pom-export')?.addEventListener('click', () => {
@@ -1153,7 +1174,7 @@ export class AppController {
             const overrides = ProyeccionJornalModel.loadOverrides(currentCiclo);
             const saved = await ProyeccionJornalModel.saveToServer(currentCiclo, overrides);
             
-            // Also save the CSV report to the server reflecting the current edits
+            // Save to server (CSV)
             await ProyeccionJornalModel.saveCSVToServer(currentMatrix, currentCiclo);
             
             this.showToast(saved ? 'Proyección y reportes guardados en el servidor' : 'Guardado local finalizado', saved ? 'success' : 'success');
@@ -1170,22 +1191,20 @@ export class AppController {
                  const serverOverrides = await ProyeccionJornalModel.loadFromServer(currentCiclo);
                  if (serverOverrides) {
                      serverHasIt = true;
-                     localStorage.setItem('has_loaded_pom', 'true');
+                     // We don't set has_loaded_pom here to keep the button enabled as requested
                  }
             }
 
             if ((hasOverrides || wasLoaded || serverHasIt) && btnLoad) {
                 console.log('[POM] Auto-loading previous state from file...');
-                // We call our internal function, bypassing manual generation flag
                 const esAbril = new Date().getMonth() === 3;
-                btnLoad.disabled = true;
-                if (!esAbril) {
-                     btnLoad.title = "Generación deshabilitada fuera de abril";
-                } else {
-                     btnLoad.title = "La proyección ya fue generada. Ajuste y guarde.";
-                }
                 
-                // We invoke the fetch directly, avoiding manual generation flag
+                if (!esAbril) {
+                     btnLoad.disabled = true;
+                     btnLoad.title = "Generación deshabilitada fuera de abril";
+                } 
+                
+                // We invoke the fetch directly
                 generateOloadData(false);
             }
         };
@@ -7933,14 +7952,16 @@ renderFertUnidadesChart() {
                                 
                                 if (!targetProd) {
                                     // Create new product if not found
-                                    const newP = await ADMIN_MODELS['admin-productos'].create({
+                                    const createRes = await ADMIN_MODELS['admin-productos'].create({
                                         nombre: data.producto,
                                         bodega_id: bodegaDestinoId,
                                         categoria: 'Insumo',
                                         unidad: 'un',
                                         stock: 0
                                     });
-                                    targetProd = newP;
+                                    if (createRes && createRes.id) {
+                                        targetProd = { id: createRes.id, stock: 0 };
+                                    }
                                 }
                             }
 
