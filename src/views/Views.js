@@ -4705,7 +4705,7 @@ export function renderInformePlanificacion(data) {
 export function renderProyeccionJornalView() {
     return `
   <div class="animate-fade-in" style = "padding: var(--space-2) 0;" >
-        < !--Header & Filters-->
+        <!--Header & Filters-->
         <div style="display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-end; margin-bottom: var(--space-6); padding: var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(59,130,246,0.04)); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle);">
             <div style="flex: 1; min-width: 200px;">
                 <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin: 0 0 var(--space-1) 0; display: flex; align-items: center; gap: var(--space-2);">
@@ -4946,7 +4946,7 @@ export function renderPomResumenFinca(resumen) {
 
         html += `
   <div style = "background: var(--bg-secondary); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;" >
-            < !--Finca Header-->
+            <!--Finca Header-->
             <div style="padding: var(--space-4) var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.04)); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
                 <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.15em; display: flex; align-items: center; gap: var(--space-2);">
                     <span style="font-size: 1.3em;">🏡</span> ${f.finca}
@@ -5088,7 +5088,7 @@ export function renderPomCalendario(months) {
 export function renderCargaDocumentacionView() {
     return `
   <div class="container-fluid animate-fade-in" style = "padding: var(--space-4);" >
-            < !--Tab Navigation-->
+            <!--Tab Navigation-->
             <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5);">
                 <button class="btn btn-primary" id="doc-tab-facturas" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">📄 Facturas Proveedores</button>
                 <button class="btn btn-ghost" id="doc-tab-servicios" style="border-radius: var(--radius-lg); font-size: 0.9em; padding: var(--space-2) var(--space-5);">⚡ Facturas Servicios</button>
@@ -5331,19 +5331,35 @@ export function renderCargaDocumentacionView() {
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
                                 <div style="grid-column: span 1;">
                                     <label class="small text-tertiary">Proveedor</label>
-                                    <input type="text" name="proveedor" required class="form-control">
+                                    <input type="text" name="proveedor" required class="form-control" placeholder="Nombre FantasÃa">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">CUIT del Proveedor</label>
+                                    <input type="text" name="cuitProveedor" required class="form-control" placeholder="XX-XXXXXXXX-X">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">Producto / Insumo</label>
+                                    <input type="text" name="producto" required class="form-control" placeholder="Ej: Fertilizante NPK">
                                 </div>
                                 <div style="grid-column: span 1;">
                                     <label class="small text-tertiary">N° Documento</label>
-                                    <input type="text" name="nroFactura" required class="form-control">
+                                    <input type="text" name="nroFactura" required class="form-control" placeholder="0001-00000001">
                                 </div>
                                 <div style="grid-column: span 1;">
                                     <label class="small text-tertiary">Fecha</label>
                                     <input type="date" name="fecha" required class="form-control">
                                 </div>
                                 <div style="grid-column: span 1;">
-                                    <label class="small text-tertiary">Monto Total</label>
-                                    <input type="number" name="monto" required class="form-control">
+                                    <label class="small text-tertiary">Precio Unitario ($)</label>
+                                    <input type="number" name="precioUnitario" step="0.01" required class="form-control" placeholder="0.00">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">Impuesto / IVA ($)</label>
+                                    <input type="number" name="impuesto" step="0.01" required class="form-control" placeholder="0.00">
+                                </div>
+                                <div style="grid-column: span 1;">
+                                    <label class="small text-tertiary">Monto Total ($)</label>
+                                    <input type="number" name="monto" required class="form-control" placeholder="Total c/ IVA">
                                 </div>
                                 <div style="grid-column: span 2;">
                                     <label class="small text-tertiary">Logística</label>
@@ -5648,7 +5664,7 @@ export function renderRemitoPrintTemplate(t) {
 
 export function renderInventoryModals() {
     return `
-  < !--Modal Remito Externo-->
+  <!--Modal Remito Externo-->
         <div class="modal fade" id="modalRemitoExterno" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--border-strong); border-radius: var(--radius-xl);">

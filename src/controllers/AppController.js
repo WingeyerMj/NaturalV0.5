@@ -361,18 +361,35 @@ export class AppController {
                 if (progressMessage) progressMessage.textContent = `Sincronizando ciclo actual (${currentCycle})...`;
                 if (progressBar) progressBar.style.width = `50%`;
 
-                // -- NEW: Sync Business Data from MySQL --
+                // -- NEW: Sync Business Data from MySQL with timeout --
                 if (progressDetails) progressDetails.textContent = 'Sincronizando datos de negocio...';
-                await Promise.all([
-                    UserModel.sync(),
-                    FincaModel.sync(),
-                    PredioModel.sync(),
-                    VariedadModel.sync(),
-                    EmpleadoModel.sync(),
-                    LaborModel.sync(),
-                    PresupuestoModel.sync(),
-                    AplicacionModel.sync()
-                ]);
+                
+                // Helper for timeout
+                const withTimeout = (promise, ms) => {
+                    let timeout = new Promise((_, reject) => {
+                        let id = setTimeout(() => {
+                            clearTimeout(id);
+                            reject(new Error(`Timeout de ${ms}ms`))
+                        }, ms)
+                    });
+                    return Promise.race([promise, timeout]);
+                };
+
+                try {
+                    await withTimeout(Promise.all([
+                        UserModel.sync(),
+                        FincaModel.sync(),
+                        PredioModel.sync(),
+                        VariedadModel.sync(),
+                        EmpleadoModel.sync(),
+                        LaborModel.sync(),
+                        PresupuestoModel.sync(),
+                        AplicacionModel.sync()
+                    ]), 5000); // 5 second timeout for sync
+                } catch (syncError) {
+                    console.warn("Sync failed or timed out, using local cache:", syncError);
+                    if (progressDetails) progressDetails.textContent = 'Usando datos locales (asíncrono)...';
+                }
 
                 // No artificial delay — proceed immediately after sync
                 if (progressBar) progressBar.style.width = `80%`;
@@ -7768,14 +7785,18 @@ renderFertUnidadesChart() {
                 const formData = new FormData(form);
                 const data = {
                     proveedor: formData.get('proveedor'),
+                    cuitProveedor: formData.get('cuitProveedor'),
                     nroFactura: formData.get('nroFactura'),
+                    producto: formData.get('producto'),
                     fecha: formData.get('fecha'),
+                    precioUnitario: parseFloat(formData.get('precioUnitario')),
+                    impuesto: parseFloat(formData.get('impuesto')),
                     monto: parseFloat(formData.get('monto')),
                     entregaEnFactura: formData.get('logistica') === 'con_factura'
                 };
 
-                if (!data.proveedor || !data.nroFactura || !data.fecha || isNaN(data.monto)) {
-                    this.showToast('Por favor complete todos los campos.', 'error');
+                if (!data.proveedor || !data.nroFactura || !data.fecha || isNaN(data.monto) || !data.producto || !data.cuitProveedor) {
+                    this.showToast('Por favor complete todos los campos obligatorios.', 'error');
                     return;
                 }
 
