@@ -87,6 +87,7 @@ const ROLE_MENUS = {
                 { id: 'admin-faenas', label: 'Faenas', icon: '📋' },
                 { id: 'admin-labor', label: 'Labor', icon: '🔨' },
                 { id: 'admin-productos', label: 'Productos', icon: '📦' },
+                { id: 'admin-proveedores', label: 'Proveedores', icon: '🤝' },
                 { id: 'admin-institucional', label: 'Institucional', icon: '🏛️' },
                 { id: 'presupuesto', label: 'Presupuesto', icon: '📊' },
                 { id: 'admin-planificacion', label: 'Planificación', icon: '📅' },
@@ -7737,7 +7738,34 @@ renderFertUnidadesChart() {
         tbody.innerHTML = renderRemitoExtRows(remitos);
     }
 
-    bindDocumentacionEvents() {
+    async bindDocumentacionEvents() {
+        // --- PROVIDERS POPULATION ---
+        const populateProveedores = async () => {
+            const proveedores = await ADMIN_MODELS['admin-proveedores'].getAll();
+            const optionsHtml = '<option value="">Seleccione o escriba nuevo abajo...</option>' + 
+                proveedores.map(p => `<option value="${p.id}" data-nombre="${p.nombre}" data-cuit="${p.cuit || ''}">${p.nombre}</option>`).join('');
+            
+            document.querySelectorAll('.doc-select-proveedor').forEach(sel => sel.innerHTML = optionsHtml);
+        };
+        populateProveedores();
+
+        const setupProviderSelect = (selectId, nameInputId, cuitInputId) => {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            sel.addEventListener('change', (e) => {
+                const option = e.target.selectedOptions[0];
+                if (option && option.value) {
+                    const nameInput = document.getElementById(nameInputId);
+                    const cuitInput = document.getElementById(cuitInputId);
+                    if (nameInput) nameInput.value = option.dataset.nombre || '';
+                    if (cuitInput) cuitInput.value = option.dataset.cuit || '';
+                }
+            });
+        };
+
+        setupProviderSelect('buscar-prov-factura', 'nombre-prov-factura', 'cuit-prov-factura');
+        setupProviderSelect('buscar-prov-servicio', 'nombre-prov-servicio', null);
+        setupProviderSelect('buscar-prov-remito-ext', 'nombre-prov-remito-ext', null);
         // --- TAB SWITCHING ---
         const tabFacturas = document.getElementById('doc-tab-facturas');
         const tabServicios = document.getElementById('doc-tab-servicios');
@@ -7769,18 +7797,44 @@ renderFertUnidadesChart() {
             }
         });
 
+        // --- LOGISTICA TOGGLE ---
+        const logisticaSelect = document.getElementById('select-logistica-factura');
+        if (logisticaSelect) {
+            logisticaSelect.addEventListener('change', (e) => {
+                const container = document.getElementById('container-ingreso-stock');
+                if (container) {
+                    container.style.display = e.target.value === 'con_factura' ? 'grid' : 'none';
+                }
+            });
+        }
+
         // --- INVOICE EVENTS (Providers) ---
         const btnNueva = document.getElementById('btn-nueva-factura');
         if (btnNueva) {
-            btnNueva.onclick = () => {
+            btnNueva.onclick = async () => {
+                const bodegas = await ADMIN_MODELS['admin-bodegas'].getAll();
+                const productos = await ADMIN_MODELS['admin-productos'].getAll();
+
+                document.querySelectorAll('.doc-select-bodega').forEach(sel => {
+                    sel.innerHTML = '<option value="">Seleccionar Bodega...</option>' +
+                        bodegas.map(b => `<option value="${b.id}">${b.nombre}</option>`).join('');
+                });
+
+                document.querySelectorAll('.doc-select-producto').forEach(sel => {
+                    sel.innerHTML = '<option value="">-- Nuevo Producto / No en lista --</option>' +
+                        productos.map(p => `<option value="${p.id}">${p.nombre} (Stock: ${p.stock || 0})</option>`).join('');
+                });
+
                 document.getElementById('form-factura').reset();
+                const container = document.getElementById('container-ingreso-stock');
+                if (container) container.style.display = 'grid'; // because 'con_factura' is the default
                 new bootstrap.Modal(document.getElementById('modalFactura')).show();
             };
         }
 
         const btnSave = document.getElementById('btn-save-factura');
         if (btnSave) {
-            btnSave.onclick = () => {
+            btnSave.onclick = async () => {
                 const form = document.getElementById('form-factura');
                 const formData = new FormData(form);
                 const data = {
@@ -7800,7 +7854,58 @@ renderFertUnidadesChart() {
                     return;
                 }
 
+                // Auto-create new provider if it does not exist
+                const proveedoresObj = await ADMIN_MODELS['admin-proveedores'].getAll();
+                const existProv = proveedoresObj.find(p => p.nombre.toLowerCase() === data.proveedor.toLowerCase());
+                if (!existProv) {
+                    await ADMIN_MODELS['admin-proveedores'].create({
+                         nombre: data.proveedor,
+                         cuit: data.cuitProveedor || '',
+                         tipo: 'Insumos'
+                    });
+                    populateProveedores();
+                }
+
                 DocumentacionModel.saveInvoice(data);
+                
+                // --- Update physical stock via ADMIN_MODELS ---
+                if (data.entregaEnFactura) {
+                    const bodegaDestinoId = formData.get('bodegaDestinoId');
+                    let productoId = formData.get('productoId');
+                    const cantidad = parseFloat(formData.get('cantidadIngresada'));
+                    
+                    if (!isNaN(cantidad) && bodegaDestinoId) {
+                        try {
+                            const allProds = await ADMIN_MODELS['admin-productos'].getAll();
+                            let targetProd = null;
+
+                            if (productoId) {
+                                targetProd = await ADMIN_MODELS['admin-productos'].getById(productoId);
+                            } else if (data.producto) {
+                                // Search by name in the target bodega
+                                targetProd = allProds.find(p => p.nombre.toLowerCase() === data.producto.toLowerCase() && p.bodega_id == bodegaDestinoId);
+                                
+                                if (!targetProd) {
+                                    // Create new product if not found
+                                    const newP = await ADMIN_MODELS['admin-productos'].create({
+                                        nombre: data.producto,
+                                        bodega_id: bodegaDestinoId,
+                                        categoria: 'Insumo',
+                                        unidad: 'un',
+                                        stock: 0
+                                    });
+                                    targetProd = newP;
+                                }
+                            }
+
+                            if (targetProd) {
+                                const nuevoStock = (Number(targetProd.stock) || 0) + cantidad;
+                                await ADMIN_MODELS['admin-productos'].update(targetProd.id, { ...targetProd, stock: nuevoStock });
+                            }
+                        } catch(e) { console.warn("Could not update/create product stock", e); }
+                    }
+                }
+
                 this.showToast('Factura de proveedor guardada.', 'success');
                 bootstrap.Modal.getInstance(document.getElementById('modalFactura')).hide();
                 this.renderInvoicesTable();
@@ -7819,7 +7924,7 @@ renderFertUnidadesChart() {
 
         const btnSaveServ = document.getElementById('btn-save-servicio');
         if (btnSaveServ) {
-            btnSaveServ.onclick = () => {
+            btnSaveServ.onclick = async () => {
                 const form = document.getElementById('form-servicio');
                 const formData = new FormData(form);
                 const data = {
@@ -7835,6 +7940,17 @@ renderFertUnidadesChart() {
                 if (!data.proveedor || !data.nroFactura || !data.fecha || isNaN(data.monto)) {
                     this.showToast('Complete los campos obligatorios.', 'error');
                     return;
+                }
+
+                // Auto-create new provider if it does not exist
+                const proveedoresObj = await ADMIN_MODELS['admin-proveedores'].getAll();
+                const existProv = proveedoresObj.find(p => p.nombre.toLowerCase() === data.proveedor.toLowerCase());
+                if (!existProv) {
+                    await ADMIN_MODELS['admin-proveedores'].create({
+                         nombre: data.proveedor,
+                         tipo: 'Servicios'
+                    });
+                    populateProveedores();
                 }
 
                 DocumentacionModel.saveServicio(data);
@@ -7901,6 +8017,17 @@ renderFertUnidadesChart() {
                     fecha,
                     notas: formData.get('notas')
                 };
+
+                // Auto-create new provider if it does not exist
+                const proveedoresObj = await ADMIN_MODELS['admin-proveedores'].getAll();
+                const existProv = proveedoresObj.find(p => p.nombre.toLowerCase() === proveedor.toLowerCase());
+                if (!existProv) {
+                    await ADMIN_MODELS['admin-proveedores'].create({
+                         nombre: proveedor,
+                         tipo: 'Otro'
+                    });
+                    populateProveedores();
+                }
 
                 // Save Document
                 DocumentacionModel.saveRemitoExt(data);

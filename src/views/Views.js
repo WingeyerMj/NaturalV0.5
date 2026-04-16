@@ -5273,8 +5273,12 @@ export function renderCargaDocumentacionView() {
                         <form id="form-servicio">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
                                 <div style="grid-column: span 1;">
-                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Proveedor del Servicio</label>
-                                    <input type="text" name="proveedor" required class="form-control" placeholder="Ej: EDEMSA, Irrigación, Telefónica" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Buscar Proveedor</label>
+                                    <select id="buscar-prov-servicio" class="form-select doc-select-proveedor" style="background: var(--bg-primary); border: 1px solid var(--border-subtle); margin-bottom: 8px;">
+                                        <option value="">Seleccione o escriba nuevo abajo...</option>
+                                    </select>
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Proveedor del Servicio (Nombre)</label>
+                                    <input type="text" name="proveedor" id="nombre-prov-servicio" required class="form-control" placeholder="Ej: EDEMSA, Telefónica" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
                                 </div>
                                 <div style="grid-column: span 1;">
                                     <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Categoría</label>
@@ -5329,13 +5333,19 @@ export function renderCargaDocumentacionView() {
                     <div class="modal-body">
                         <form id="form-factura">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                <div style="grid-column: span 2;">
+                                    <label class="small text-tertiary">Buscar Proveedor Guardado</label>
+                                    <select id="buscar-prov-factura" class="form-select doc-select-proveedor" style="margin-bottom: 8px;">
+                                        <option value="">Seleccione o escriba nuevo abajo...</option>
+                                    </select>
+                                </div>
                                 <div style="grid-column: span 1;">
-                                    <label class="small text-tertiary">Proveedor</label>
-                                    <input type="text" name="proveedor" required class="form-control" placeholder="Nombre FantasÃa">
+                                    <label class="small text-tertiary">Razón Social / Nombre Proveedor</label>
+                                    <input type="text" name="proveedor" id="nombre-prov-factura" required class="form-control" placeholder="Nombre Fantasía">
                                 </div>
                                 <div style="grid-column: span 1;">
                                     <label class="small text-tertiary">CUIT del Proveedor</label>
-                                    <input type="text" name="cuitProveedor" required class="form-control" placeholder="XX-XXXXXXXX-X">
+                                    <input type="text" name="cuitProveedor" id="cuit-prov-factura" required class="form-control" placeholder="XX-XXXXXXXX-X">
                                 </div>
                                 <div style="grid-column: span 1;">
                                     <label class="small text-tertiary">Producto / Insumo</label>
@@ -5363,10 +5373,25 @@ export function renderCargaDocumentacionView() {
                                 </div>
                                 <div style="grid-column: span 2;">
                                     <label class="small text-tertiary">Logística</label>
-                                    <select name="logistica" class="form-select">
+                                    <select name="logistica" id="select-logistica-factura" class="form-select">
                                         <option value="con_factura">Llegó con Factura (Cerrado)</option>
                                         <option value="separados">Entrega Diferida (Remitos)</option>
                                     </select>
+                                </div>
+                                <div id="container-ingreso-stock" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4); margin-top: 10px; padding: 15px; border: 1px solid var(--border-subtle); border-radius: 8px; background: rgba(0,0,0,0.1);">
+                                    <div style="grid-column: span 3; font-weight: bold; font-size: 0.85em; color: var(--color-primary-400);">Ingreso Directo a Stock (Llegó con Factura)</div>
+                                    <div style="grid-column: span 1;">
+                                        <label class="small text-tertiary">Insumo (Catálogo)</label>
+                                        <select name="productoId" id="factura-producto-id" class="form-select doc-select-producto"></select>
+                                    </div>
+                                    <div style="grid-column: span 1;">
+                                        <label class="small text-tertiary">Bodega Destino</label>
+                                        <select name="bodegaDestinoId" id="factura-bodega-id" class="form-select doc-select-bodega"></select>
+                                    </div>
+                                    <div style="grid-column: span 1;">
+                                        <label class="small text-tertiary">Cantidad a Ingresar</label>
+                                        <input type="number" step="any" name="cantidadIngresada" id="factura-cantidad" class="form-control" placeholder="0">
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -5676,8 +5701,12 @@ export function renderInventoryModals() {
                         <form id="form-remito-ext">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
                                 <div style="grid-column: span 1;">
-                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Proveedor / Remitente</label>
-                                    <input type="text" name="proveedor" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Buscar Proveedor</label>
+                                    <select id="buscar-prov-remito-ext" class="form-select doc-select-proveedor" style="background: var(--bg-primary); border: 1px solid var(--border-subtle); margin-bottom: 8px;">
+                                        <option value="">Seleccione o escriba nuevo abajo...</option>
+                                    </select>
+                                    <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">Proveedor / Remitente (Nombre)</label>
+                                    <input type="text" name="proveedor" id="nombre-prov-remito-ext" required class="form-control" style="background: var(--bg-primary); border: 1px solid var(--border-subtle);">
                                 </div>
                                 <div style="grid-column: span 1;">
                                     <label style="display: block; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; font-weight: 700;">N° de Remito</label>

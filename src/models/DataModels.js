@@ -587,6 +587,7 @@ export const AdminSistemaRiegoModel = new AdminCrudModel('admin_sistema_riego', 
 export const AdminPlanificacionModel = new AdminCrudModel('admin_planificacion', 'Planificación');
 export const AdminContratosModel = new AdminCrudModel('admin_contratos', 'Contratos');
 export const AdminInversionesModel = new AdminCrudModel('inversiones_propuestas', 'Inversiones');
+export const AdminProveedoresModel = new AdminCrudModel('admin_proveedores', 'Proveedores');
 
 // Mapa para acceso rápido por ID de sección
 export const ADMIN_MODELS = {
@@ -604,6 +605,7 @@ export const ADMIN_MODELS = {
   'admin-planificacion': AdminPlanificacionModel,
   'admin-contratos': AdminContratosModel,
   'admin-carga-trabajo': new AdminCrudModel('trabajo_campo_logs', 'Carga Trabajo'),
+  'admin-proveedores': AdminProveedoresModel,
   'inversiones-propuestas': AdminInversionesModel,
 };
 
@@ -727,6 +729,20 @@ export const ADMIN_TABLE_CONFIG = {
       { key: 'telefono', label: 'Teléfono', type: 'text' },
       { key: 'email', label: 'Email', type: 'email' },
       { key: 'contacto', label: 'Contacto', type: 'text' },
+      { key: 'notas', label: 'Notas', type: 'textarea' },
+    ]
+  },
+  'admin-proveedores': {
+    title: 'Gestión de Proveedores',
+    icon: '🤝',
+    columns: [
+      { key: 'nombre', label: 'Razón Social / Nombre', type: 'text', required: true },
+      { key: 'cuit', label: 'CUIT / DNI', type: 'text' },
+      { key: 'tipo', label: 'Tipo', type: 'select', options: ['Insumos', 'Servicios', 'Logística', 'Otro'] },
+      { key: 'telefono', label: 'Teléfono', type: 'text' },
+      { key: 'email', label: 'Email', type: 'email' },
+      { key: 'direccion', label: 'Dirección', type: 'text' },
+      { key: 'contacto_nombre', label: 'Nombre de Contacto', type: 'text' },
       { key: 'notas', label: 'Notas', type: 'textarea' },
     ]
   },
