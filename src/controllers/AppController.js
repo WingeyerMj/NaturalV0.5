@@ -1039,9 +1039,25 @@ export class AppController {
         // Load projection
         const btnLoad = document.getElementById('btn-pom-load');
         if (btnLoad) {
-            btnLoad.addEventListener('click', async () => {
+            // Check date window (April 1st to April 30th)
+            const today = new Date();
+            const esAbril = today.getMonth() === 3; // 0-indexed, 3 = Abril
+            const wasLoaded = localStorage.getItem('has_loaded_pom') === 'true';
+
+            // Disable button if not in April or already generated once
+            if (!esAbril || wasLoaded) {
                 btnLoad.disabled = true;
-                btnLoad.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;margin-right:6px;"></span> Generando...';
+                if (!esAbril && !wasLoaded) {
+                    btnLoad.title = "La generación solo está habilitada durante el mes de Abril";
+                } else if (wasLoaded) {
+                    btnLoad.title = "La proyección ya fue generada. Está visualizando los datos guardados.";
+                }
+            }
+
+            const generateOloadData = async (isManualGeneration) => {
+                const originalText = btnLoad.innerHTML;
+                btnLoad.disabled = true;
+                btnLoad.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;margin-right:6px;"></span> Cargando...';
 
                 try {
                     currentCiclo = document.getElementById('pom-ciclo')?.value || '2025-2026';
@@ -1095,17 +1111,27 @@ export class AppController {
                         activeResumen.innerHTML = renderPomResumenFinca(resumen);
                     }
 
-                    localStorage.setItem('has_loaded_pom', 'true');
-                    this.showToast('Proyección generada y guardada en servidor', 'success');
+                    // Save to server only if it is a fresh generation
+                    if (isManualGeneration) {
+                        await ProyeccionJornalModel.saveCSVToServer(currentMatrix, currentCiclo);
+                        localStorage.setItem('has_loaded_pom', 'true');
+                        this.showToast('Proyección generada y guardada en servidor', 'success');
+                    }
 
                 } catch (error) {
-                    console.error('[POM] Error generating projection:', error);
-                    this.showToast('Error al generar la proyección: ' + error.message, 'error');
+                    console.error('[POM] Error load/generating projection:', error);
+                    this.showToast('Error al procesar la proyección: ' + error.message, 'error');
                 } finally {
-                    btnLoad.disabled = false;
-                    btnLoad.innerHTML = '<span>🚀</span> Generar Proyección';
+                    btnLoad.innerHTML = originalText;
+                    if (!esAbril || localStorage.getItem('has_loaded_pom') === 'true') {
+                        btnLoad.disabled = true;
+                    } else {
+                        btnLoad.disabled = false;
+                    }
                 }
-            });
+            };
+
+            btnLoad.addEventListener('click', () => generateOloadData(true));
         }
 
         // Export CSV
@@ -1138,9 +1164,29 @@ export class AppController {
             const hasOverrides = Object.keys(ProyeccionJornalModel.loadOverrides(currentCiclo)).length > 0;
             const wasLoaded = localStorage.getItem('has_loaded_pom') === 'true';
             
-            if ((hasOverrides || wasLoaded) && btnLoad) {
-                console.log('[POM] Auto-loading previous state...');
-                btnLoad.click(); 
+            // Try to see if server has it if not manually saved locally
+            let serverHasIt = false;
+            if (!wasLoaded) {
+                 const serverOverrides = await ProyeccionJornalModel.loadFromServer(currentCiclo);
+                 if (serverOverrides) {
+                     serverHasIt = true;
+                     localStorage.setItem('has_loaded_pom', 'true');
+                 }
+            }
+
+            if ((hasOverrides || wasLoaded || serverHasIt) && btnLoad) {
+                console.log('[POM] Auto-loading previous state from file...');
+                // We call our internal function, bypassing manual generation flag
+                const esAbril = new Date().getMonth() === 3;
+                btnLoad.disabled = true;
+                if (!esAbril) {
+                     btnLoad.title = "Generación deshabilitada fuera de abril";
+                } else {
+                     btnLoad.title = "La proyección ya fue generada. Ajuste y guarde.";
+                }
+                
+                // We invoke the fetch directly, avoiding manual generation flag
+                generateOloadData(false);
             }
         };
         setTimeout(checkAutoLoad, 500); 
