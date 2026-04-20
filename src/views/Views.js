@@ -1825,6 +1825,12 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
         <div class="metric-value" style="font-size: 1.8em; color: ${getFColor(globalFactor)};">${globalFactor.toFixed(2)}</div>
         <div class="metric-label">Factor de Reducción Global</div>
       </div>
+      <div class="metric-card" style="padding: var(--space-5); border-left: 4px solid #06b6d4;">
+        <div class="metric-card-header"><div class="metric-card-icon" style="background: rgba(6, 182, 212, 0.12); color: #06b6d4;">📊</div></div>
+        <div class="metric-value" style="font-size: 1.8em; color: #06b6d4;">${fmt(clStats.grandTotalHaEmpresa > 0 ? (clStats.grandTotalLevantado / clStats.grandTotalHaEmpresa) : 0)} <small style="font-size: 0.35em; color: var(--text-tertiary);">kg/ha</small></div>
+        <div class="metric-label">Pasa por Hectárea</div>
+        <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">${fmt(clStats.grandTotalLevantado)} kg ÷ ${clStats.grandTotalHaEmpresa > 0 ? clStats.grandTotalHaEmpresa.toFixed(1) : '0'} ha</p>
+      </div>
     </div>
 
     <!-- EVOLUCIÓN PASA CHART -->

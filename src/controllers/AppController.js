@@ -467,7 +467,7 @@ export class AppController {
                 break;
             case 'fincas':
                 if (title) title.textContent = 'Informe de Fincas';
-                await this.renderJornalesSection(content); // Fallback if no specific fincas section
+                await this.renderFincasSection(content);
                 break;
             case 'aplicaciones-sofia':
                 if (title) title.textContent = 'Informe de Aplicaciones';
@@ -1469,6 +1469,10 @@ export class AppController {
             const clStats = SofiaApiModel.getCosechaLevantadoStats(fullFiltered);
             const pasaEvolStats = SofiaApiModel.getCosechaComparativaPorPredio(fullFiltered);
             const playaStats = SofiaApiModel.getLevantadoPorPlayaStats(fullFiltered);
+
+            // Get TOTAL company hectares from all cuarteles (same source as Fincas section)
+            const hectareasEmpresa = SofiaApiModel.getHectareasPorPredio(fullCycleData);
+            clStats.grandTotalHaEmpresa = hectareasEmpresa.grandTotalHa;
 
             const filtersHtml = `
             <div class="sofia-filters animate-fade-in" style="margin-bottom: var(--space-6); background: var(--bg-secondary); padding: var(--space-4); border-radius: 12px; border: 1px solid var(--border-subtle);">

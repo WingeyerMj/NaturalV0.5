@@ -1119,6 +1119,15 @@ export class SofiaApiModel {
                 predioMap[predioName].levantado[idx] += kg;
                 predioMap[predioName].totalLevantado += kg;
             }
+
+            // --- HECTARES TRACKING ---
+            if (!predioMap[predioName].cuarteles) predioMap[predioName].cuarteles = new Set();
+            if (r.cuartel && !predioMap[predioName].cuarteles.has(r.cuartel)) {
+                predioMap[predioName].cuarteles.add(r.cuartel);
+                const info = this.parseCuartelInfo(r.cuartel);
+                if (!predioMap[predioName].hectareas) predioMap[predioName].hectareas = 0;
+                predioMap[predioName].hectareas += info.ha;
+            }
         });
 
         // Group by finca
@@ -1141,7 +1150,8 @@ export class SofiaApiModel {
         return {
             groups,
             grandTotalCosecha: groups.reduce((s, g) => s + g.totalCosecha, 0),
-            grandTotalLevantado: groups.reduce((s, g) => s + g.totalLevantado, 0)
+            grandTotalLevantado: groups.reduce((s, g) => s + g.totalLevantado, 0),
+            grandTotalHectareas: groups.reduce((s, g) => s + g.predios.reduce((ps, p) => ps + (p.hectareas || 0), 0), 0)
         };
     }
 
