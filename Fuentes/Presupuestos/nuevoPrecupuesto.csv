@@ -1,0 +1,1371 @@
+PROYECCIÓN JORNAL ESPECÍFICO — CICLO 2025-2026
+
+Finca;Predio;Cuartel;Ha;Plantas;Variedad;Labor;Rend. Proy.;Jorn. Proy.;Rend. Real;Jorn. Reales;Desvío %;Rend. Sugerido;Jorn. Sugeridos;Fecha Inicio;Fecha Fin;Fuente
+El Espejo;El Espejo 1;GALPON;1;0;;Poda;300;0;-;4.3;-;-;-;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Atada;400;0;-;2.5;-;-;-;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Desbrote de troncos;500;0;-;1.3;-;-;-;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Acomodo de brotes;300;0;-;0.4;-;-;-;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Desniete Deshoje;400;0;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Desbrote crit. Poda;500;0;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Raleo de Racimos;1000;0;-;1.1;-;-;-;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Riego;10;1;0.4;2.4;140.0%;3;1;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Malezas Mochila;5;1;0.3;3.4;240.0%;2;1;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Cosecha;250;0;-;1.2;-;-;-;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;GALPON;1;0;;Levantado;350;0;-;1;-;-;-;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Poda;300;23;508;13.4;-41.7%;446;16;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Atada;400;18;862;7.9;-56.1%;723;10;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Desbrote de troncos;500;14;1621;4.2;-70.0%;1285;6;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Acomodo de brotes;300;23;4863;1.4;-93.9%;3494;2;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Desbrote crit. Poda;500;14;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Raleo de Racimos;1000;7;1945;3.5;-50.0%;1662;5;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Riego;10;1;0.4;7.6;660.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Malezas Mochila;5;1;0.3;10.7;970.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Cosecha;250;28;1792;3.8;-86.4%;1329;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;1;3.13;6808;;Levantado;350;20;2128;3.2;-84.0%;1595;5;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Poda;300;21;511;12.2;-41.9%;448;14;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Atada;400;16;866;7.2;-55.0%;726;9;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Desbrote de troncos;500;13;1641;3.8;-70.8%;1299;5;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Acomodo de brotes;300;21;4798;1.3;-93.8%;3449;2;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Desniete Deshoje;400;16;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Desbrote crit. Poda;500;13;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Raleo de Racimos;1000;7;1949;3.2;-54.3%;1664;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Riego;10;1;0.4;6.9;590.0%;3;1;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Malezas Mochila;5;1;0.3;9.7;870.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Cosecha;250;25;1782;3.5;-86.0%;1322;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;2;2.85;6237;;Levantado;350;18;2151;2.9;-83.9%;1611;4;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Poda;300;46;506;27.1;-41.1%;444;31;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Atada;400;35;857;16;-54.3%;720;20;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Desbrote de troncos;500;28;1632;8.4;-70.0%;1292;11;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Acomodo de brotes;300;46;4896;2.8;-93.9%;3517;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Desniete Deshoje;400;35;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Desbrote crit. Poda;500;28;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Raleo de Racimos;1000;14;1931;7.1;-49.3%;1652;9;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Riego;10;1;0.4;15.3;1430.0%;3;3;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Malezas Mochila;5;2;0.3;21.5;975.0%;2;4;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Cosecha;250;55;1780;7.7;-86.0%;1321;11;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;3;6.31;13708;;Levantado;350;40;2142;6.4;-84.0%;1604;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Poda;300;46;506;27.1;-41.1%;444;31;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Atada;400;35;857;16;-54.3%;720;20;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Desbrote de troncos;500;28;1632;8.4;-70.0%;1292;11;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Acomodo de brotes;300;46;4896;2.8;-93.9%;3517;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Desniete Deshoje;400;35;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Desbrote crit. Poda;500;28;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Raleo de Racimos;1000;14;1931;7.1;-49.3%;1652;9;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Riego;10;1;0.4;15.3;1430.0%;3;3;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Malezas Mochila;5;2;0.3;21.5;975.0%;2;4;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Cosecha;250;55;1780;7.7;-86.0%;1321;11;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;4;6.31;13708;;Levantado;350;40;2142;6.4;-84.0%;1604;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Poda;300;25;380;19.7;-21.2%;356;22;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Atada;400;19;646;11.6;-38.9%;572;14;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Desbrote de troncos;500;15;1229;6.1;-59.3%;1010;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Acomodo de brotes;300;25;3747;2;-92.0%;2713;3;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Desniete Deshoje;400;19;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Raleo de Racimos;1000;8;1469;5.1;-36.3%;1328;6;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Riego;10;1;0.4;11.1;1010.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Malezas Mochila;5;1;0.3;15.6;1460.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Cosecha;250;30;1338;5.6;-81.3%;1012;8;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;5;4.58;7494;;Levantado;350;22;1594;4.7;-78.6%;1221;7;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Poda;300;15;508;8.7;-42.0%;446;10;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Atada;400;12;866;5.1;-57.5%;726;7;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Desbrote de troncos;500;9;1636;2.7;-70.0%;1295;4;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Acomodo de brotes;300;15;4909;0.9;-94.0%;3526;2;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Desniete Deshoje;400;12;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Desbrote crit. Poda;500;9;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Raleo de Racimos;1000;5;1921;2.3;-54.0%;1645;3;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Riego;10;1;0.4;4.9;390.0%;3;1;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Malezas Mochila;5;1;0.3;6.9;590.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Cosecha;250;18;1767;2.5;-86.1%;1312;4;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;6;2.03;4418;;Levantado;350;13;2104;2.1;-83.8%;1578;3;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Poda;300;44;506;25.8;-41.4%;444;30;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Atada;400;33;859;15.2;-53.9%;721;19;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Desbrote de troncos;500;27;1631;8;-70.4%;1292;11;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Acomodo de brotes;300;44;4833;2.7;-93.9%;3473;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Desniete Deshoje;400;33;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Desbrote crit. Poda;500;27;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Raleo de Racimos;1000;14;1948;6.7;-52.1%;1664;8;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Riego;10;1;0.4;14.5;1350.0%;3;3;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Malezas Mochila;5;2;0.3;20.5;925.0%;2;4;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Cosecha;250;53;1788;7.3;-86.2%;1327;10;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;7;6.01;13050;;Levantado;350;38;2139;6.1;-83.9%;1602;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Poda;300;36;511;20.7;-42.5%;448;24;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Atada;400;27;868;12.2;-54.8%;728;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Desbrote de troncos;500;22;1654;6.4;-70.9%;1308;9;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Acomodo de brotes;300;36;5040;2.1;-94.2%;3618;3;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Desniete Deshoje;400;27;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Desbrote crit. Poda;500;22;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Raleo de Racimos;1000;11;1960;5.4;-50.9%;1672;7;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Riego;10;1;0.4;11.7;1070.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Malezas Mochila;5;1;0.3;16.5;1550.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Cosecha;250;43;1794;5.9;-86.3%;1331;8;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;8;4.83;10585;;Levantado;350;31;2160;4.9;-84.2%;1617;7;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Poda;300;49;507;28.9;-41.0%;445;33;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Atada;400;37;861;17;-54.1%;723;21;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Desbrote de troncos;500;30;1627;9;-70.0%;1289;12;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Acomodo de brotes;300;49;4881;3;-93.9%;3507;5;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Desniete Deshoje;400;37;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Desbrote crit. Poda;500;30;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Raleo de Racimos;1000;15;1952;7.5;-50.0%;1666;9;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Riego;10;1;0.4;16.3;1530.0%;3;3;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Malezas Mochila;5;2;0.3;22.9;1045.0%;2;4;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Cosecha;250;59;1786;8.2;-86.1%;1325;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;9;6.73;14642;;Levantado;350;42;2122;6.9;-83.6%;1590;10;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Poda;300;9;384;7;-22.2%;359;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Atada;400;7;639;4.2;-40.0%;567;5;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Desbrote de troncos;500;6;1220;2.2;-63.3%;1004;3;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Acomodo de brotes;300;9;3836;0.7;-92.2%;2775;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Desniete Deshoje;400;7;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Desbrote crit. Poda;500;6;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Raleo de Racimos;1000;3;1492;1.8;-40.0%;1344;2;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Riego;10;1;0.4;4;300.0%;3;1;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Malezas Mochila;5;1;0.3;5.6;460.0%;2;1;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Cosecha;250;11;1343;2;-81.8%;1015;3;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;10;1.64;2685;;Levantado;350;8;1579;1.7;-78.8%;1210;3;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Poda;300;23;380;17.5;-23.9%;356;19;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Atada;400;17;645;10.3;-39.4%;572;12;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Desbrote de troncos;500;14;1231;5.4;-61.4%;1012;7;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Acomodo de brotes;300;23;3693;1.8;-92.2%;2675;3;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Desniete Deshoje;400;17;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Desbrote crit. Poda;500;14;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Raleo de Racimos;1000;7;1445;4.6;-34.3%;1312;6;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Riego;10;1;0.4;9.8;880.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Malezas Mochila;5;1;0.3;13.9;1290.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Cosecha;250;27;1357;4.9;-81.9%;1025;7;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;11;4.07;6647;;Levantado;350;19;1621;4.1;-78.4%;1240;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Poda;300;13;389;9.8;-24.6%;362;11;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Atada;400;10;658;5.8;-42.0%;581;7;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Desbrote de troncos;500;8;1271;3;-62.5%;1040;4;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Acomodo de brotes;300;13;3814;1;-92.3%;2760;2;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Desniete Deshoje;400;10;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Desbrote crit. Poda;500;8;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Raleo de Racimos;1000;4;1467;2.6;-35.0%;1327;3;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Riego;10;1;0.4;5.5;450.0%;3;1;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Malezas Mochila;5;1;0.3;7.8;680.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Cosecha;250;16;1362;2.8;-82.5%;1028;4;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;12;2.29;3814;;Levantado;350;11;1658;2.3;-79.1%;1266;4;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Poda;300;28;382;21.9;-21.8%;357;24;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Atada;400;21;648;12.9;-38.6%;574;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Desbrote de troncos;500;17;1229;6.8;-60.0%;1010;9;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Acomodo de brotes;300;28;3635;2.3;-91.8%;2635;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Desniete Deshoje;400;21;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Desbrote crit. Poda;500;17;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Raleo de Racimos;1000;9;1467;5.7;-36.7%;1327;7;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Riego;10;1;0.4;12.4;1140.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Malezas Mochila;5;2;0.3;17.4;770.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Cosecha;250;34;1348;6.2;-81.8%;1019;9;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 1;14;5.11;8360;;Levantado;350;24;1608;5.2;-78.3%;1231;7;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Poda;300;0;-;-;-;-;-;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Atada;400;0;-;-;-;-;-;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Desbrote de troncos;500;0;-;-;-;-;-;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Acomodo de brotes;300;0;-;-;-;-;-;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Desniete Deshoje;400;0;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Desbrote crit. Poda;500;0;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Raleo de Racimos;1000;0;-;-;-;-;-;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Riego;10;0;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Malezas Mochila;5;0;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Desmalezar manual;4;0;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Cosecha;250;0;-;-;-;-;-;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;Reservorio;0;0;;Levantado;350;0;-;-;-;-;-;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;1;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;2;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;3;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;4;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;5;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;6;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;7;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;8;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;9;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;10;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;11;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Poda;300;41;880;13.7;-66.6%;706;18;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Atada;400;31;988;12.2;-60.6%;812;15;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Desbrote de troncos;500;25;2152;5.6;-77.6%;1656;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Acomodo de brotes;300;41;5240;2.3;-94.4%;3758;4;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Desniete Deshoje;400;31;30130;0.4;-98.7%;21211;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Desbrote crit. Poda;500;25;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Raleo de Racimos;1000;13;4635;2.6;-80.0%;3545;4;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Riego;10;1;0.2;36.5;3550.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Malezas Mochila;5;2;0.3;21.1;955.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Cosecha;250;49;1435;8.4;-82.9%;1080;12;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;12;5.54;12052;;Levantado;350;35;1854;6.5;-81.4%;1403;9;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Poda;300;13;665;5.6;-56.9%;556;7;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Atada;400;10;745;5;-50.0%;642;6;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Desbrote de troncos;500;8;1620;2.3;-71.3%;1284;3;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Acomodo de brotes;300;13;4140;0.9;-93.1%;2988;2;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Desniete Deshoje;400;10;18630;0.2;-98.0%;13161;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Desbrote crit. Poda;500;8;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Raleo de Racimos;1000;4;3387;1.1;-72.5%;2671;2;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Riego;10;1;0.2;15;1400.0%;3;1;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Malezas Mochila;5;1;0.3;8.7;770.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Cosecha;250;15;1065;3.5;-76.7%;821;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;14;2.28;3726;;Levantado;350;11;1380;2.7;-75.5%;1071;4;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Poda;300;19;661;8.5;-55.3%;553;11;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Atada;400;15;739;7.6;-49.3%;637;9;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Desbrote de troncos;500;12;1605;3.5;-70.8%;1274;5;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Acomodo de brotes;300;19;4014;1.4;-92.6%;2900;2;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Desniete Deshoje;400;15;18730;0.3;-98.0%;13231;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Desbrote crit. Poda;500;12;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Raleo de Racimos;1000;6;3512;1.6;-73.3%;2758;3;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Riego;10;1;0.2;22.6;2160.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Malezas Mochila;5;1;0.3;13.1;1210.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Cosecha;250;23;1081;5.2;-77.4%;832;7;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;15;3.44;5619;;Levantado;350;17;1370;4.1;-75.9%;1064;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Poda;300;28;674;12.1;-56.8%;562;15;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Atada;400;21;756;10.8;-48.6%;649;13;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Desbrote de troncos;500;17;1632;5;-70.6%;1292;7;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Acomodo de brotes;300;28;4080;2;-92.9%;2946;3;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Desniete Deshoje;400;21;20400;0.4;-98.1%;14400;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Desbrote crit. Poda;500;17;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Raleo de Racimos;1000;9;3548;2.3;-74.4%;2784;3;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Riego;10;1;0.2;32.3;3130.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Malezas Mochila;5;1;0.3;18.7;1770.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Cosecha;250;33;1103;7.4;-77.6%;847;10;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;16;4.9;8160;;Levantado;350;24;1407;5.8;-75.8%;1090;8;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Poda;300;26;888;8.5;-67.3%;712;11;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Atada;400;19;1006;7.5;-60.5%;824;10;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Desbrote de troncos;500;16;2155;3.5;-78.1%;1659;5;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Acomodo de brotes;300;26;5389;1.4;-94.6%;3862;2;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Desniete Deshoje;400;19;25147;0.3;-98.4%;17723;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Desbrote crit. Poda;500;16;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Raleo de Racimos;1000;8;4715;1.6;-80.0%;3601;3;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Riego;10;1;0.2;22.6;2160.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Malezas Mochila;5;1;0.3;13.1;1210.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Cosecha;250;31;1451;5.2;-83.2%;1091;7;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;17;3.43;7544;;Levantado;350;22;1886;4;-81.8%;1425;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Poda;300;12;665;5.2;-56.7%;556;7;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Atada;400;9;736;4.7;-47.8%;635;6;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Desbrote de troncos;500;7;1573;2.2;-68.6%;1251;3;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Acomodo de brotes;300;12;3844;0.9;-92.5%;2781;2;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Desniete Deshoje;400;9;17300;0.2;-97.8%;12230;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Desbrote crit. Poda;500;7;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Raleo de Racimos;1000;4;3460;1;-75.0%;2722;2;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Riego;10;1;0.2;14;1300.0%;3;1;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Malezas Mochila;5;1;0.3;8.1;710.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Cosecha;250;14;1081;3.2;-77.1%;832;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;18;2.12;3460;;Levantado;350;10;1384;2.5;-75.0%;1074;4;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Poda;300;20;659;8.9;-55.5%;551;11;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Atada;400;15;743;7.9;-47.3%;640;10;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Desbrote de troncos;500;12;1630;3.6;-70.0%;1291;5;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Acomodo de brotes;300;20;3911;1.5;-92.5%;2828;3;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Desniete Deshoje;400;15;19557;0.3;-98.0%;13810;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Desbrote crit. Poda;500;12;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Raleo de Racimos;1000;6;3451;1.7;-71.7%;2716;3;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Riego;10;1;0.2;23.6;2260.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Malezas Mochila;5;1;0.3;13.7;1270.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Cosecha;250;24;1067;5.5;-77.1%;822;8;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;19;3.59;5867;;Levantado;350;17;1397;4.2;-75.3%;1083;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Poda;300;26;660;11.6;-55.4%;552;14;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Atada;400;20;744;10.3;-48.5%;641;12;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Desbrote de troncos;500;16;1596;4.8;-70.0%;1267;7;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Acomodo de brotes;300;26;4031;1.9;-92.7%;2912;3;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Desniete Deshoje;400;20;19148;0.4;-98.0%;13524;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Desbrote crit. Poda;500;16;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Raleo de Racimos;1000;8;3481;2.2;-72.5%;2737;3;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Riego;10;1;0.2;30.8;2980.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Malezas Mochila;5;1;0.3;17.9;1690.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Cosecha;250;31;1079;7.1;-77.1%;830;10;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;20;4.68;7659;;Levantado;350;22;1393;5.5;-75.0%;1080;8;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Poda;300;18;660;7.9;-56.1%;552;10;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Atada;400;14;744;7;-50.0%;641;9;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Desbrote de troncos;500;11;1628;3.2;-70.9%;1290;5;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Acomodo de brotes;300;18;4008;1.3;-92.8%;2896;2;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Desniete Deshoje;400;14;26055;0.2;-98.6%;18359;1;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Desbrote crit. Poda;500;11;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Raleo de Racimos;1000;6;3474;1.5;-75.0%;2732;2;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Riego;10;1;0.2;21;2000.0%;3;2;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Malezas Mochila;5;1;0.3;12.2;1120.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Cosecha;250;21;1086;4.8;-77.1%;835;7;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 2;21;3.19;5211;;Levantado;350;15;1371;3.8;-74.7%;1065;5;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Poda;300;0;-;-;-;-;-;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Atada;400;0;-;-;-;-;-;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Desbrote de troncos;500;0;-;-;-;-;-;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Acomodo de brotes;300;0;-;-;-;-;-;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Desniete Deshoje;400;0;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Desbrote crit. Poda;500;0;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Raleo de Racimos;1000;0;-;-;-;-;-;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Riego;10;0;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Malezas Mochila;5;0;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Desmalezar manual;4;0;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Cosecha;250;0;-;-;-;-;-;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;BARRACA;0;0;;Levantado;350;0;-;-;-;-;-;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Poda;300;20;1247;4.8;-76.0%;963;7;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Atada;400;15;767;7.8;-48.0%;657;10;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Desbrote de troncos;500;12;1109;5.4;-55.0%;926;7;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Acomodo de brotes;300;20;59860;0.1;-99.5%;41992;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Desniete Deshoje;400;15;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Desbrote crit. Poda;500;12;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Raleo de Racimos;1000;6;29930;0.2;-96.7%;21251;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Malezas Mochila;5;1;0.4;8.5;750.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Cosecha;250;24;1814;3.3;-86.3%;1345;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;22;3.64;5986;;Levantado;350;18;1871;3.2;-82.2%;1415;5;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Poda;300;20;1247;4.8;-76.0%;963;7;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Atada;400;15;767;7.8;-48.0%;657;10;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Desbrote de troncos;500;12;1109;5.4;-55.0%;926;7;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Acomodo de brotes;300;20;59860;0.1;-99.5%;41992;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Desniete Deshoje;400;15;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Desbrote crit. Poda;500;12;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Raleo de Racimos;1000;6;29930;0.2;-96.7%;21251;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Malezas Mochila;5;1;0.4;8.5;750.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Cosecha;250;24;1814;3.3;-86.3%;1345;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;23;3.64;5986;;Levantado;350;18;1871;3.2;-82.2%;1415;5;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Poda;300;20;1247;4.8;-76.0%;963;7;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Atada;400;15;767;7.8;-48.0%;657;10;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Desbrote de troncos;500;12;1109;5.4;-55.0%;926;7;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Acomodo de brotes;300;20;59860;0.1;-99.5%;41992;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Desniete Deshoje;400;15;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Desbrote crit. Poda;500;12;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Raleo de Racimos;1000;6;29930;0.2;-96.7%;21251;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Malezas Mochila;5;1;0.4;8.5;750.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Cosecha;250;24;1814;3.3;-86.3%;1345;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;24;3.64;5986;;Levantado;350;18;1871;3.2;-82.2%;1415;5;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Poda;300;11;1254;2.6;-76.4%;968;4;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Atada;400;9;758;4.3;-52.2%;651;6;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Desbrote de troncos;500;7;1087;3;-57.1%;911;4;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Acomodo de brotes;300;11;32600;0.1;-99.1%;22910;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Desniete Deshoje;400;9;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Desbrote crit. Poda;500;7;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Raleo de Racimos;1000;4;32600;0.1;-97.5%;23120;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Malezas Mochila;5;1;0.4;4.7;370.0%;2;1;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Cosecha;250;14;1811;1.8;-87.1%;1343;3;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;25;2;3260;;Levantado;350;10;1811;1.8;-82.0%;1373;3;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Poda;300;16;1234;3.7;-76.9%;954;5;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Atada;400;12;761;6;-50.0%;653;7;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Desbrote de troncos;500;10;1087;4.2;-58.0%;911;6;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Acomodo de brotes;300;16;45650;0.1;-99.4%;32045;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Desniete Deshoje;400;12;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Raleo de Racimos;1000;5;45650;0.1;-98.0%;32255;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Malezas Mochila;5;1;0.4;6.5;550.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Cosecha;250;19;1756;2.6;-86.3%;1304;4;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;26;2.8;4565;;Levantado;350;14;1826;2.5;-82.1%;1383;4;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Poda;300;16;1223;3.8;-76.3%;946;5;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Atada;400;12;762;6.1;-49.2%;653;8;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Desbrote de troncos;500;10;1107;4.2;-58.0%;925;6;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Acomodo de brotes;300;16;46480;0.1;-99.4%;32626;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Desniete Deshoje;400;12;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Raleo de Racimos;1000;5;46480;0.1;-98.0%;32836;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Malezas Mochila;5;1;0.4;6.6;560.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Cosecha;250;19;1788;2.6;-86.3%;1327;4;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;27;2.85;4648;;Levantado;350;14;1859;2.5;-82.1%;1406;4;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Poda;300;24;1259;5.6;-76.7%;971;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Atada;400;18;766;9.2;-48.9%;656;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Desbrote de troncos;500;15;1102;6.4;-57.3%;921;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Acomodo de brotes;300;24;70500;0.1;-99.6%;49440;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Raleo de Racimos;1000;8;35250;0.2;-97.5%;24975;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Malezas Mochila;5;1;0.4;10;900.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Cosecha;250;29;1808;3.9;-86.6%;1341;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;28;4.28;7050;;Levantado;350;21;1855;3.8;-81.9%;1404;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Poda;300;13;1246;3;-76.9%;962;4;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Atada;400;10;779;4.8;-52.0%;665;6;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Desbrote de troncos;500;8;1100;3.4;-57.5%;920;5;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Acomodo de brotes;300;13;37390;0.1;-99.2%;26263;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Desniete Deshoje;400;10;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Desbrote crit. Poda;500;8;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Raleo de Racimos;1000;4;37390;0.1;-97.5%;26473;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Malezas Mochila;5;1;0.4;5.2;420.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Cosecha;250;15;1780;2.1;-86.0%;1321;3;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;29;2.25;3739;;Levantado;350;11;1870;2;-81.8%;1414;3;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Poda;300;24;1253;5.7;-76.3%;967;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Atada;400;18;768;9.3;-48.3%;658;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Desbrote de troncos;500;15;1116;6.4;-57.3%;931;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Acomodo de brotes;300;24;71400;0.1;-99.6%;50070;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Raleo de Racimos;1000;8;35700;0.2;-97.5%;25290;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Malezas Mochila;5;1;0.4;10.1;910.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Cosecha;250;29;1785;4;-86.2%;1325;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;30;4.32;7140;;Levantado;350;21;1879;3.8;-81.9%;1420;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Poda;300;24;1260;5.6;-76.7%;972;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Atada;400;18;775;9.1;-49.4%;663;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Desbrote de troncos;500;15;1120;6.3;-58.0%;934;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Acomodo de brotes;300;24;70550;0.1;-99.6%;49475;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Raleo de Racimos;1000;8;35275;0.2;-97.5%;24993;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Malezas Mochila;5;1;0.4;9.9;890.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Cosecha;250;29;1809;3.9;-86.6%;1341;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;31;4.26;7055;;Levantado;350;21;1857;3.8;-81.9%;1405;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Poda;300;25;1249;6;-76.0%;964;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Atada;400;19;764;9.8;-48.4%;655;12;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Desbrote de troncos;500;15;1102;6.8;-54.7%;921;9;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Acomodo de brotes;300;25;74910;0.1;-99.6%;52527;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Desniete Deshoje;400;19;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Raleo de Racimos;1000;8;37455;0.2;-97.5%;26519;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Malezas Mochila;5;1;0.4;10.6;960.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Cosecha;250;30;1784;4.2;-86.0%;1324;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;32;4.54;7491;;Levantado;350;22;1873;4;-81.8%;1416;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Poda;300;24;1260;5.6;-76.7%;972;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Atada;400;18;775;9.1;-49.4%;663;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Desbrote de troncos;500;15;1120;6.3;-58.0%;934;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Acomodo de brotes;300;24;70560;0.1;-99.6%;49482;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Raleo de Racimos;1000;8;35280;0.2;-97.5%;24996;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Malezas Mochila;5;1;0.4;9.9;890.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Cosecha;250;29;1809;3.9;-86.6%;1341;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;33;4.26;7056;;Levantado;350;21;1857;3.8;-81.9%;1405;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Poda;300;24;1260;5.6;-76.7%;972;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Atada;400;18;775;9.1;-49.4%;663;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Desbrote de troncos;500;15;1120;6.3;-58.0%;934;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Acomodo de brotes;300;24;70550;0.1;-99.6%;49475;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Raleo de Racimos;1000;8;35275;0.2;-97.5%;24993;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Malezas Mochila;5;1;0.4;9.9;890.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Cosecha;250;29;1809;3.9;-86.6%;1341;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;34;4.26;7055;;Levantado;350;21;1857;3.8;-81.9%;1405;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Poda;300;24;1254;5.7;-76.3%;968;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Atada;400;18;768;9.3;-48.3%;658;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Desbrote de troncos;500;15;1117;6.4;-57.3%;932;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Acomodo de brotes;300;24;71470;0.1;-99.6%;50119;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Raleo de Racimos;1000;8;35735;0.2;-97.5%;25315;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Malezas Mochila;5;1;0.4;10.1;910.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Cosecha;250;29;1787;4;-86.2%;1326;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;35;4.32;7147;;Levantado;350;21;1881;3.8;-81.9%;1422;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Poda;300;24;1253;5.7;-76.3%;967;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Atada;400;18;768;9.3;-48.3%;658;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Desbrote de troncos;500;15;1116;6.4;-57.3%;931;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Acomodo de brotes;300;24;71400;0.1;-99.6%;50070;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Raleo de Racimos;1000;8;35700;0.2;-97.5%;25290;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Malezas Mochila;5;1;0.4;10.1;910.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Cosecha;250;29;1785;4;-86.2%;1325;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;36;4.32;7140;;Levantado;350;21;1879;3.8;-81.9%;1420;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Poda;300;24;1260;5.6;-76.7%;972;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Atada;400;18;775;9.1;-49.4%;663;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Desbrote de troncos;500;15;1120;6.3;-58.0%;934;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Acomodo de brotes;300;24;70550;0.1;-99.6%;49475;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Raleo de Racimos;1000;8;35275;0.2;-97.5%;24993;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Malezas Mochila;5;1;0.4;9.9;890.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Cosecha;250;29;1809;3.9;-86.6%;1341;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;37;4.26;7055;;Levantado;350;21;1857;3.8;-81.9%;1405;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Poda;300;23;1268;5.3;-77.0%;978;7;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Atada;400;17;772;8.7;-48.8%;660;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Desbrote de troncos;500;14;1120;6;-57.1%;934;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Acomodo de brotes;300;23;67200;0.1;-99.6%;47130;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Desniete Deshoje;400;17;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Desbrote crit. Poda;500;14;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Raleo de Racimos;1000;7;33600;0.2;-97.1%;23820;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Malezas Mochila;5;1;0.4;9.5;850.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Cosecha;250;27;1816;3.7;-86.3%;1346;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;38;4.06;6720;;Levantado;350;20;1867;3.6;-82.0%;1412;5;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Poda;300;24;1260;5.6;-76.7%;972;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Atada;400;18;775;9.1;-49.4%;663;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Desbrote de troncos;500;15;1120;6.3;-58.0%;934;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Acomodo de brotes;300;24;70550;0.1;-99.6%;49475;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Raleo de Racimos;1000;8;35275;0.2;-97.5%;24993;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Malezas Mochila;5;1;0.4;9.9;890.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Cosecha;250;29;1809;3.9;-86.6%;1341;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;39;4.23;7055;;Levantado;350;21;1857;3.8;-81.9%;1405;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Poda;300;24;1260;5.6;-76.7%;972;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Atada;400;18;775;9.1;-49.4%;663;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Desbrote de troncos;500;15;1120;6.3;-58.0%;934;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Acomodo de brotes;300;24;70550;0.1;-99.6%;49475;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Raleo de Racimos;1000;8;35275;0.2;-97.5%;24993;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Malezas Mochila;5;1;0.4;9.9;890.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Cosecha;250;29;1809;3.9;-86.6%;1341;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;40;4.23;7055;;Levantado;350;21;1857;3.8;-81.9%;1405;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Poda;300;22;1261;5.1;-76.8%;973;7;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Atada;400;17;775;8.3;-51.2%;663;10;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Desbrote de troncos;500;13;1128;5.7;-56.2%;940;7;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Acomodo de brotes;300;22;64290;0.1;-99.5%;45093;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Desniete Deshoje;400;17;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Desbrote crit. Poda;500;13;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Raleo de Racimos;1000;7;32145;0.2;-97.1%;22802;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Malezas Mochila;5;1;0.4;9;800.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Cosecha;250;26;1837;3.5;-86.5%;1361;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;41;3.86;6429;;Levantado;350;19;1891;3.4;-82.1%;1429;5;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Poda;300;24;1260;5.6;-76.7%;972;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Atada;400;18;775;9.1;-49.4%;663;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Desbrote de troncos;500;15;1120;6.3;-58.0%;934;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Acomodo de brotes;300;24;70550;0.1;-99.6%;49475;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Raleo de Racimos;1000;8;35275;0.2;-97.5%;24993;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Malezas Mochila;5;1;0.4;9.9;890.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Cosecha;250;29;1809;3.9;-86.6%;1341;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;42;4.23;7055;;Levantado;350;21;1857;3.8;-81.9%;1405;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Poda;300;24;1260;5.6;-76.7%;972;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Atada;400;18;775;9.1;-49.4%;663;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Desbrote de troncos;500;15;1120;6.3;-58.0%;934;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Acomodo de brotes;300;24;70550;0.1;-99.6%;49475;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Raleo de Racimos;1000;8;35275;0.2;-97.5%;24993;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Malezas Mochila;5;1;0.4;9.9;890.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Cosecha;250;29;1809;3.9;-86.6%;1341;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;43;4.23;7055;;Levantado;350;21;1857;3.8;-81.9%;1405;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Poda;300;21;1269;4.8;-77.1%;978;7;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Atada;400;16;781;7.8;-51.2%;667;10;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Desbrote de troncos;500;13;1128;5.4;-58.5%;940;7;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Acomodo de brotes;300;21;60890;0.1;-99.5%;42713;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Desniete Deshoje;400;16;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Desbrote crit. Poda;500;13;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Raleo de Racimos;1000;7;30445;0.2;-97.1%;21612;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Malezas Mochila;5;1;0.4;8.5;750.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Cosecha;250;25;1791;3.4;-86.4%;1329;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;44;3.65;6089;;Levantado;350;18;1903;3.2;-82.2%;1437;5;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Poda;300;24;1268;5.6;-76.7%;978;8;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Atada;400;18;780;9.1;-49.4%;666;11;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Desbrote de troncos;500;15;1127;6.3;-58.0%;939;8;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Acomodo de brotes;300;24;71000;0.1;-99.6%;49790;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Raleo de Racimos;1000;8;35500;0.2;-97.5%;25150;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Malezas Mochila;5;1;0.4;9.9;890.0%;2;3;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Cosecha;250;29;1821;3.9;-86.6%;1350;6;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;45;4.26;7100;;Levantado;350;21;1868;3.8;-81.9%;1413;6;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Poda;300;22;1276;5;-77.3%;983;7;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Atada;400;16;778;8.2;-48.8%;665;10;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Desbrote de troncos;500;13;1120;5.7;-56.2%;934;7;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Acomodo de brotes;300;22;63820;0.1;-99.5%;44764;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Desniete Deshoje;400;16;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Desbrote crit. Poda;500;13;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Raleo de Racimos;1000;7;31910;0.2;-97.1%;22637;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Malezas Mochila;5;1;0.4;8.9;790.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Cosecha;250;26;1823;3.5;-86.5%;1351;5;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;46;3.83;6382;;Levantado;350;19;1877;3.4;-82.1%;1419;5;2026-02-01;2026-04-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Poda;300;16;1272;3.7;-76.9%;980;5;2026-06-01;2026-08-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Atada;400;12;772;6.1;-49.2%;660;8;2026-08-01;2026-09-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Desbrote de troncos;500;10;1121;4.2;-58.0%;935;6;2026-10-01;2026-11-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Acomodo de brotes;300;16;47070;0.1;-99.4%;33039;1;2026-10-01;2026-12-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Desniete Deshoje;400;12;-;-;-;-;-;2026-11-01;2027-01-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Raleo de Racimos;1000;5;47070;0.1;-98.0%;33249;1;2026-12-01;2027-01-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Riego;10;1;-;-;-;-;-;2026-05-01;2027-04-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Malezas Mochila;5;1;0.4;6.6;560.0%;2;2;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Cosecha;250;19;1810;2.6;-86.3%;1342;4;2026-01-01;2026-03-01;excel
+El Espejo;El Espejo 3;47;2.83;4707;;Levantado;350;14;1883;2.5;-82.1%;1423;4;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Poda;300;0;-;-;-;-;-;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Atada;400;0;-;-;-;-;-;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Desbrote de troncos;500;0;-;-;-;-;-;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Acomodo de brotes;300;0;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Desniete Deshoje;400;0;-;-;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Desbrote crit. Poda;500;0;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Raleo de Racimos;1000;0;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Riego;10;0;-;-;-;-;-;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Malezas Mochila;5;0;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Desmalezar manual;4;0;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Cosecha;250;0;-;-;-;-;-;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;SECADERO;0;0;;Levantado;350;0;-;-;-;-;-;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Poda;300;29;296;28.5;-1.7%;297;29;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Atada;400;22;615;13.7;-37.7%;551;16;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Desbrote de troncos;500;17;14047;0.6;-96.5%;9983;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Acomodo de brotes;300;29;84280;0.1;-99.7%;59086;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Desniete Deshoje;400;22;21070;0.4;-98.2%;14869;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Desbrote crit. Poda;500;17;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Raleo de Racimos;1000;9;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Riego;10;1;0.5;7.5;650.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Malezas Mochila;5;1;1;4.1;310.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Cosecha;250;34;720;11.7;-65.6%;579;15;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;2;4.08;8428;;Levantado;350;25;1532;5.5;-78.0%;1177;8;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Poda;300;0;-;28.6;-;-;-;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Atada;400;0;-;13.8;-;-;-;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Desbrote de troncos;500;0;-;0.6;-;-;-;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Acomodo de brotes;300;0;-;0.1;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Desniete Deshoje;400;0;-;0.4;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Desbrote crit. Poda;500;0;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Raleo de Racimos;1000;0;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Riego;10;1;0.5;7.6;660.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Malezas Mochila;5;1;1;4.2;320.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Cosecha;250;0;-;11.7;-;-;-;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;3;4.1;0;;Levantado;350;0;-;5.5;-;-;-;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Poda;300;17;232;20.9;22.9%;252;20;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Atada;400;13;480;10.1;-22.3%;456;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Desbrote de troncos;500;10;9706;0.5;-95.0%;6944;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Acomodo de brotes;300;17;48530;0.1;-99.4%;34061;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Desniete Deshoje;400;13;16177;0.3;-97.7%;11444;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Riego;10;1;0.5;5.5;450.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Malezas Mochila;5;1;1;3;200.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Cosecha;250;20;564;8.6;-57.0%;470;11;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;4;3;4853;;Levantado;350;14;1213;4;-71.4%;954;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Poda;300;23;229;29.4;27.8%;250;27;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Atada;400;17;477;14.1;-17.1%;454;15;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Desbrote de troncos;500;14;11218;0.6;-95.7%;8003;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Acomodo de brotes;300;23;67310;0.1;-99.6%;47207;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Desniete Deshoje;400;17;16828;0.4;-97.6%;11900;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Desbrote crit. Poda;500;14;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Raleo de Racimos;1000;7;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Riego;10;1;0.5;7.8;680.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Malezas Mochila;5;1;1;4.3;330.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Cosecha;250;27;556;12.1;-55.2%;464;15;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;5;4.21;6731;;Levantado;350;20;1181;5.7;-71.5%;932;8;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Poda;300;0;-;25.8;-;-;-;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Atada;400;0;-;12.4;-;-;-;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Desbrote de troncos;500;0;-;0.6;-;-;-;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Acomodo de brotes;300;0;-;0.1;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Desniete Deshoje;400;0;-;0.3;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Desbrote crit. Poda;500;0;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Raleo de Racimos;1000;0;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Riego;10;1;0.5;6.8;580.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Malezas Mochila;5;1;1;3.8;280.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Cosecha;250;0;-;10.6;-;-;-;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;6;3.7;0;;Levantado;350;0;-;5;-;-;-;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Poda;300;0;-;34.2;-;-;-;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Atada;400;0;-;16.5;-;-;-;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Desbrote de troncos;500;0;-;0.8;-;-;-;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Acomodo de brotes;300;0;-;0.1;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Desniete Deshoje;400;0;-;0.4;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Desbrote crit. Poda;500;0;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Raleo de Racimos;1000;0;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Riego;10;1;0.5;9.1;810.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Malezas Mochila;5;1;1;5;400.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Cosecha;250;0;-;14;-;-;-;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;7;4.9;0;;Levantado;350;0;-;6.6;-;-;-;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Poda;300;33;583;16.8;-49.1%;498;20;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Atada;400;25;1209;8.1;-67.6%;966;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Desbrote de troncos;500;20;24490;0.4;-98.0%;17293;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Acomodo de brotes;300;33;97960;0.1;-99.7%;68662;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Desniete Deshoje;400;25;48980;0.2;-99.2%;34406;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Desbrote crit. Poda;500;20;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Raleo de Racimos;1000;10;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Riego;10;1;0.5;4.4;340.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Malezas Mochila;5;1;1;2.4;140.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Cosecha;250;40;1420;6.9;-82.8%;1069;10;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;8;2.4;9796;;Levantado;350;28;3061;3.2;-88.6%;2248;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Poda;300;14;214;18.9;35.0%;240;17;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Atada;400;11;444;9.1;-17.3%;431;10;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Desbrote de troncos;500;9;10098;0.4;-95.6%;7219;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Acomodo de brotes;300;14;40390;0.1;-99.3%;28363;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Desniete Deshoje;400;11;20195;0.2;-98.2%;14257;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Desbrote crit. Poda;500;9;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Riego;10;1;0.5;5;400.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Malezas Mochila;5;1;1;2.7;170.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Cosecha;250;17;525;7.7;-54.7%;443;10;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;9;2.7;4039;;Levantado;350;12;1122;3.6;-70.0%;890;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Poda;300;11;238;13.3;20.9%;257;13;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Atada;400;8;495;6.4;-20.0%;467;7;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Desbrote de troncos;500;7;10570;0.3;-95.7%;7549;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Acomodo de brotes;300;11;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Desniete Deshoje;400;8;15855;0.2;-97.5%;11219;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Desbrote crit. Poda;500;7;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Riego;10;1;0.5;3.5;250.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Malezas Mochila;5;1;1;1.9;90.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Cosecha;250;13;587;5.4;-58.5%;486;7;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;10;1.9;3171;;Levantado;350;10;1220;2.6;-74.0%;959;4;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Poda;300;18;296;18;0.0%;297;18;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Atada;400;14;613;8.7;-37.9%;549;10;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Desbrote de troncos;500;11;13330;0.4;-96.4%;9481;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Acomodo de brotes;300;18;53320;0.1;-99.4%;37414;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Desniete Deshoje;400;14;26660;0.2;-98.6%;18782;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Desbrote crit. Poda;500;11;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Raleo de Racimos;1000;6;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Riego;10;1;0.5;4.8;380.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Malezas Mochila;5;1;1;2.6;160.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Cosecha;250;22;721;7.4;-66.4%;580;10;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;11;2.58;5332;;Levantado;350;16;1523;3.5;-78.1%;1171;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Poda;300;18;296;17.7;-1.7%;297;18;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Atada;400;14;617;8.5;-39.3%;552;10;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Desbrote de troncos;500;11;13110;0.4;-96.4%;9327;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Acomodo de brotes;300;18;52440;0.1;-99.4%;36798;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Desniete Deshoje;400;14;26220;0.2;-98.6%;18474;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Desbrote crit. Poda;500;11;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Raleo de Racimos;1000;6;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Riego;10;1;0.5;4.7;370.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Malezas Mochila;5;1;1;2.6;160.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Cosecha;250;21;718;7.3;-65.2%;578;10;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;12;2.54;5244;;Levantado;350;15;1542;3.4;-77.3%;1184;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Poda;300;11;270;12.1;10.0%;279;12;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Atada;400;9;563;5.8;-35.6%;514;7;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Desbrote de troncos;500;7;10890;0.3;-95.7%;7773;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Acomodo de brotes;300;11;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Desniete Deshoje;400;9;16335;0.2;-97.8%;11555;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Desbrote crit. Poda;500;7;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Riego;10;1;0.5;3.2;220.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Malezas Mochila;5;1;1;1.8;80.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Cosecha;250;14;653;5;-64.3%;532;7;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;13;1.73;3267;;Levantado;350;10;1420;2.3;-77.0%;1099;3;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Poda;300;14;196;20.9;49.3%;227;19;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Atada;400;11;410;10;-9.1%;407;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Desbrote de troncos;500;9;8196;0.5;-94.4%;5887;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Acomodo de brotes;300;14;40980;0.1;-99.3%;28776;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Desniete Deshoje;400;11;13660;0.3;-97.3%;9682;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Desbrote crit. Poda;500;9;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Riego;10;1;0.5;5.5;450.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Malezas Mochila;5;1;1;3;200.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Cosecha;250;17;477;8.6;-49.4%;409;11;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;14;2.99;4098;;Levantado;350;12;1025;4;-66.7%;823;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Poda;300;22;297;21.9;-0.5%;298;22;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Atada;400;17;619;10.5;-38.2%;553;12;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Desbrote de troncos;500;14;13006;0.5;-96.4%;9254;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Acomodo de brotes;300;22;65030;0.1;-99.5%;45611;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Desniete Deshoje;400;17;21677;0.3;-98.2%;15294;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Desbrote crit. Poda;500;14;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Raleo de Racimos;1000;7;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Riego;10;1;0.5;5.8;480.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Malezas Mochila;5;1;1;3.2;220.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Cosecha;250;27;723;9;-66.7%;581;12;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;15;3.14;6503;;Levantado;350;19;1548;4.2;-77.9%;1189;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Poda;300;16;196;23.3;45.6%;227;21;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Atada;400;12;408;11.2;-6.7%;406;12;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Desbrote de troncos;500;10;9136;0.5;-95.0%;6545;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Acomodo de brotes;300;16;45680;0.1;-99.4%;32066;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Desniete Deshoje;400;12;15227;0.3;-97.5%;10779;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Riego;10;1;0.5;6.2;520.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Malezas Mochila;5;1;1;3.4;240.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Cosecha;250;19;481;9.5;-50.0%;412;12;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;16;3.33;4568;;Levantado;350;14;1015;4.5;-67.9%;816;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Poda;300;21;275;22.3;6.2%;283;22;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Atada;400;16;573;10.7;-33.1%;521;12;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Desbrote de troncos;500;13;12272;0.5;-96.2%;8740;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Acomodo de brotes;300;21;61360;0.1;-99.5%;43042;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Desniete Deshoje;400;16;20453;0.3;-98.1%;14437;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Desbrote crit. Poda;500;13;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Raleo de Racimos;1000;7;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Riego;10;1;0.5;5.9;490.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Malezas Mochila;5;1;1;3.2;220.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Cosecha;250;25;667;9.2;-63.2%;542;12;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;17;3.2;6136;;Levantado;350;18;1427;4.3;-76.1%;1104;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Poda;300;12;233;14.7;22.5%;253;14;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Atada;400;9;482;7.1;-21.1%;457;8;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Desbrote de troncos;500;7;11400;0.3;-95.7%;8130;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Acomodo de brotes;300;12;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Desniete Deshoje;400;9;17100;0.2;-97.8%;12090;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Desbrote crit. Poda;500;7;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Riego;10;1;0.5;3.9;290.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Malezas Mochila;5;1;1;2.1;110.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Cosecha;250;14;570;6;-57.1%;474;8;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;18;2.1;3420;;Levantado;350;10;1221;2.8;-72.0%;960;4;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Poda;300;8;238;9.1;13.7%;257;9;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Atada;400;6;492;4.4;-26.7%;464;5;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Desbrote de troncos;500;5;10830;0.2;-96.0%;7731;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Acomodo de brotes;300;8;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Desniete Deshoje;400;6;21660;0.1;-98.3%;15282;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Desbrote crit. Poda;500;5;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Raleo de Racimos;1000;3;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Riego;10;1;0.5;2.4;140.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Malezas Mochila;5;1;1;1.3;30.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Cosecha;250;9;585;3.7;-58.9%;485;5;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;19;1.3;2166;;Levantado;350;7;1274;1.7;-75.7%;997;3;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Poda;300;9;233;10.5;16.7%;253;10;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Atada;400;7;490;5;-28.6%;463;6;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Desbrote de troncos;500;5;12245;0.2;-96.0%;8722;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Acomodo de brotes;300;9;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Desniete Deshoje;400;7;24490;0.1;-98.6%;17263;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Desbrote crit. Poda;500;5;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Raleo de Racimos;1000;3;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Riego;10;1;0.5;2.8;180.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Malezas Mochila;5;1;1;1.5;50.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Cosecha;250;10;570;4.3;-57.0%;474;6;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;20;1.5;2449;;Levantado;350;7;1225;2;-71.4%;963;3;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Poda;300;15;242;18.2;21.3%;259;17;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Atada;400;11;505;8.7;-20.9%;474;10;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Desbrote de troncos;500;9;10990;0.4;-95.6%;7843;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Acomodo de brotes;300;15;43960;0.1;-99.3%;30862;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Desniete Deshoje;400;11;21980;0.2;-98.2%;15506;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Desbrote crit. Poda;500;9;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Riego;10;1;0.5;4.8;380.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Malezas Mochila;5;1;1;2.6;160.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Cosecha;250;18;594;7.4;-58.9%;491;9;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;21;2.6;4396;;Levantado;350;13;1256;3.5;-73.1%;984;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Poda;300;16;239;19.6;22.5%;257;19;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Atada;400;12;499;9.4;-21.7%;469;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Desbrote de troncos;500;10;11730;0.4;-96.0%;8361;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Acomodo de brotes;300;16;46920;0.1;-99.4%;32934;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Desniete Deshoje;400;12;15640;0.3;-97.5%;11068;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Riego;10;1;0.5;5.2;420.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Malezas Mochila;5;1;1;2.8;180.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Cosecha;250;19;587;8;-57.9%;486;10;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;22;2.8;4692;;Levantado;350;14;1235;3.8;-72.9%;970;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Poda;300;9;246;9.8;8.9%;262;10;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Atada;400;7;513;4.7;-32.9%;479;6;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Desbrote de troncos;500;5;12060;0.2;-96.0%;8592;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Acomodo de brotes;300;9;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Desniete Deshoje;400;7;24120;0.1;-98.6%;17004;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Desbrote crit. Poda;500;5;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Raleo de Racimos;1000;3;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Riego;10;1;0.5;2.6;160.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Malezas Mochila;5;1;1;1.4;40.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Cosecha;250;10;603;4;-60.0%;497;5;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;23;1.4;2412;;Levantado;350;7;1269;1.9;-72.9%;993;3;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Poda;300;14;200;20.9;49.3%;230;19;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Atada;400;11;414;10.1;-8.2%;410;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Desbrote de troncos;500;9;8364;0.5;-94.4%;6005;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Acomodo de brotes;300;14;41820;0.1;-99.3%;29364;1;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Desniete Deshoje;400;11;13940;0.3;-97.3%;9878;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Desbrote crit. Poda;500;9;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Riego;10;1;0.5;5.5;450.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Malezas Mochila;5;1;1;3;200.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Cosecha;250;17;486;8.6;-49.4%;415;11;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;51;3;4182;;Levantado;350;12;1046;4;-66.7%;837;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Poda;300;12;238;14;16.7%;257;13;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Atada;400;9;497;6.7;-25.6%;468;8;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Desbrote de troncos;500;7;11107;0.3;-95.7%;7925;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Acomodo de brotes;300;12;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Desniete Deshoje;400;9;16660;0.2;-97.8%;11782;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Desbrote crit. Poda;500;7;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Riego;10;1;0.5;3.7;270.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Malezas Mochila;5;1;1;2;100.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Cosecha;250;14;585;5.7;-59.3%;485;7;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;52;2;3332;;Levantado;350;10;1234;2.7;-73.0%;969;4;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Poda;300;13;235;15.4;18.5%;255;15;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Atada;400;10;489;7.4;-26.0%;462;8;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Desbrote de troncos;500;8;12057;0.3;-96.3%;8590;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Acomodo de brotes;300;13;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Desniete Deshoje;400;10;18085;0.2;-98.0%;12780;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Desbrote crit. Poda;500;8;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Riego;10;1;0.5;4.1;310.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Malezas Mochila;5;1;1;2.2;120.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Cosecha;250;15;574;6.3;-58.0%;477;8;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;53;2.2;3617;;Levantado;350;11;1206;3;-72.7%;949;4;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Poda;300;6;233;7.7;28.3%;253;8;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Atada;400;5;485;3.7;-26.0%;460;4;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Desbrote de troncos;500;4;8970;0.2;-95.0%;6429;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Acomodo de brotes;300;6;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Desniete Deshoje;400;5;17940;0.1;-98.0%;12678;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Desbrote crit. Poda;500;4;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Raleo de Racimos;1000;2;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Riego;10;1;0.6;2;100.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Malezas Mochila;5;1;1;1.1;10.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Cosecha;250;8;561;3.2;-60.0%;468;4;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;54;1.1;1794;;Levantado;350;6;1196;1.5;-75.0%;942;2;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Poda;300;12;243;14.7;22.5%;260;14;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Atada;400;9;504;7.1;-21.1%;473;8;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Desbrote de troncos;500;8;11923;0.3;-96.3%;8496;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Acomodo de brotes;300;12;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Desniete Deshoje;400;9;17885;0.2;-97.8%;12640;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Desbrote crit. Poda;500;8;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Riego;10;1;0.5;3.9;290.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Malezas Mochila;5;1;1;2.1;110.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Cosecha;250;15;596;6;-60.0%;492;8;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;55;2.1;3577;;Levantado;350;11;1278;2.8;-74.5%;1000;4;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Poda;300;11;239;12.6;14.5%;257;12;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Atada;400;8;502;6;-25.0%;471;7;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Desbrote de troncos;500;7;10030;0.3;-95.7%;7171;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Acomodo de brotes;300;11;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Desniete Deshoje;400;8;15045;0.2;-97.5%;10652;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Desbrote crit. Poda;500;7;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Riego;10;1;0.5;3.3;230.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Malezas Mochila;5;1;1;1.8;80.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Cosecha;250;13;579;5.2;-60.0%;480;7;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;56;1.8;3009;;Levantado;350;9;1254;2.4;-73.3%;983;4;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Poda;300;5;248;5.6;12.0%;264;6;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Atada;400;4;515;2.7;-32.5%;481;3;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Desbrote de troncos;500;3;13910;0.1;-96.7%;9887;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Acomodo de brotes;300;5;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Desniete Deshoje;400;4;13910;0.1;-97.5%;9857;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Desbrote crit. Poda;500;3;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Raleo de Racimos;1000;2;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Riego;10;1;0.5;1.5;50.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Malezas Mochila;5;1;1;0.8;-20.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Cosecha;250;6;605;2.3;-61.7%;499;3;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;57;0.8;1391;;Levantado;350;4;1265;1.1;-72.5%;991;2;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Poda;300;12;243;14.7;22.5%;260;14;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Atada;400;9;504;7.1;-21.1%;473;8;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Desbrote de troncos;500;8;11923;0.3;-96.3%;8496;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Acomodo de brotes;300;12;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Desniete Deshoje;400;9;17885;0.2;-97.8%;12640;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Desbrote crit. Poda;500;8;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Riego;10;1;0.5;3.9;290.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Malezas Mochila;5;1;1;2.1;110.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Cosecha;250;15;596;6;-60.0%;492;8;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;58;2.1;3577;;Levantado;350;11;1278;2.8;-74.5%;1000;4;2026-02-01;2026-04-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Poda;300;5;236;6.3;26.0%;255;6;2026-06-01;2026-08-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Atada;400;4;495;3;-25.0%;467;4;2026-08-01;2026-09-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Desbrote de troncos;500;3;14860;0.1;-96.7%;10552;1;2026-10-01;2026-11-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Acomodo de brotes;300;5;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Desniete Deshoje;400;4;14860;0.1;-97.5%;10522;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Desbrote crit. Poda;500;3;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Raleo de Racimos;1000;2;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Riego;10;1;0.5;1.7;70.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Malezas Mochila;5;1;1;0.9;-10.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Cosecha;250;6;572;2.6;-56.7%;475;4;2026-01-01;2026-03-01;excel
+Fincas Viejas;Camino Truncado;59;0.9;1486;;Levantado;350;5;1238;1.2;-76.0%;972;2;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Poda;300;20;152;38.9;94.5%;196;31;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Atada;400;15;440;13.4;-10.7%;428;14;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Desbrote de troncos;500;12;766;7.7;-35.8%;686;9;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Acomodo de brotes;300;20;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Desniete Deshoje;400;15;11800;0.5;-96.7%;8380;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Desbrote crit. Poda;500;12;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Raleo de Racimos;1000;6;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Riego;10;1;0.5;6.8;580.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Malezas Mochila;5;1;0.3;11.8;1080.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Cosecha;250;24;500;11.8;-50.8%;425;14;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;15;3.7;5900;;Levantado;350;17;1093;5.4;-68.2%;870;7;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Poda;300;24;152;46.2;92.5%;196;36;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Atada;400;18;443;15.9;-11.7%;430;17;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Desbrote de troncos;500;15;765;9.2;-38.7%;686;11;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Acomodo de brotes;300;24;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Desniete Deshoje;400;18;11733;0.6;-96.7%;8333;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Raleo de Racimos;1000;8;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Riego;10;1;0.5;8.1;710.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Malezas Mochila;5;1;0.3;14;1300.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Cosecha;250;29;503;14;-51.7%;427;17;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;16;4.4;7040;;Levantado;350;21;1100;6.4;-69.5%;875;9;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Poda;300;12;155;23.1;92.5%;199;19;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Atada;400;9;448;8;-11.1%;434;9;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Desbrote de troncos;500;8;779;4.6;-42.5%;695;6;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Acomodo de brotes;300;12;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Desniete Deshoje;400;9;11947;0.3;-96.7%;8483;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Desbrote crit. Poda;500;8;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Riego;10;1;0.5;4.1;310.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Malezas Mochila;5;1;0.3;7;600.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Cosecha;250;15;512;7;-53.3%;433;9;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;17;2.2;3584;;Levantado;350;11;1120;3.2;-70.9%;889;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Poda;300;24;152;46.2;92.5%;196;36;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Atada;400;18;443;15.9;-11.7%;430;17;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Desbrote de troncos;500;15;765;9.2;-38.7%;686;11;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Acomodo de brotes;300;24;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Desniete Deshoje;400;18;11733;0.6;-96.7%;8333;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Raleo de Racimos;1000;8;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Riego;10;1;0.5;8.1;710.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Malezas Mochila;5;1;0.3;14;1300.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Cosecha;250;29;503;14;-51.7%;427;17;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;18;4.4;7040;;Levantado;350;21;1100;6.4;-69.5%;875;9;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Poda;300;12;155;23.1;92.5%;199;19;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Atada;400;9;448;8;-11.1%;434;9;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Desbrote de troncos;500;8;779;4.6;-42.5%;695;6;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Acomodo de brotes;300;12;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Desniete Deshoje;400;9;11947;0.3;-96.7%;8483;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Desbrote crit. Poda;500;8;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Riego;10;1;0.5;4.1;310.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Malezas Mochila;5;1;0.3;7;600.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Cosecha;250;15;512;7;-53.3%;433;9;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;19;2.2;3584;;Levantado;350;11;1120;3.2;-70.9%;889;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Poda;300;24;152;46.2;92.5%;196;36;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Atada;400;18;443;15.9;-11.7%;430;17;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Desbrote de troncos;500;15;765;9.2;-38.7%;686;11;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Acomodo de brotes;300;24;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Desniete Deshoje;400;18;11733;0.6;-96.7%;8333;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Raleo de Racimos;1000;8;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Riego;10;1;0.5;8.1;710.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Malezas Mochila;5;1;0.3;14;1300.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Cosecha;250;29;503;14;-51.7%;427;17;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;20;4.4;7040;;Levantado;350;21;1100;6.4;-69.5%;875;9;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Poda;300;12;155;23.1;92.5%;199;19;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Atada;400;9;448;8;-11.1%;434;9;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Desbrote de troncos;500;8;779;4.6;-42.5%;695;6;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Acomodo de brotes;300;12;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Desniete Deshoje;400;9;11947;0.3;-96.7%;8483;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Desbrote crit. Poda;500;8;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Raleo de Racimos;1000;4;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Riego;10;1;0.5;4.1;310.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Malezas Mochila;5;1;0.3;7;600.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Cosecha;250;15;512;7;-53.3%;433;9;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;21;2.2;3584;;Levantado;350;11;1120;3.2;-70.9%;889;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Poda;300;15;154;27.3;82.0%;198;22;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Atada;400;11;447;9.4;-14.5%;433;10;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Desbrote de troncos;500;9;779;5.4;-40.0%;695;7;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Acomodo de brotes;300;15;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Desniete Deshoje;400;11;10513;0.4;-96.4%;7479;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Desbrote crit. Poda;500;9;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Riego;10;1;0.5;4.8;380.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Malezas Mochila;5;1;0.3;8.3;730.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Cosecha;250;17;507;8.3;-51.2%;430;10;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;22;2.6;4205;;Levantado;350;13;1107;3.8;-70.8%;880;5;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Poda;300;16;155;29.4;83.7%;199;23;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Atada;400;12;450;10.1;-15.8%;435;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Desbrote de troncos;500;10;770;5.9;-41.0%;689;7;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Acomodo de brotes;300;16;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Desniete Deshoje;400;12;11360;0.4;-96.7%;8072;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Riego;10;1;0.5;5.2;420.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Malezas Mochila;5;1;0.3;8.9;790.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Cosecha;250;19;511;8.9;-53.2%;433;11;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;23;2.8;4544;;Levantado;350;13;1108;4.1;-68.5%;881;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Poda;300;16;154;29.4;83.7%;198;23;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Atada;400;12;449;10.1;-15.8%;434;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Desbrote de troncos;500;10;769;5.9;-41.0%;688;7;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Acomodo de brotes;300;16;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Desniete Deshoje;400;12;11340;0.4;-96.7%;8058;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Riego;10;1;0.5;5.2;420.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Malezas Mochila;5;1;0.3;8.9;790.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Cosecha;250;19;510;8.9;-53.2%;432;11;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;24;2.8;4536;;Levantado;350;13;1106;4.1;-68.5%;879;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Poda;300;16;155;29.4;83.7%;199;23;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Atada;400;12;450;10.1;-15.8%;435;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Desbrote de troncos;500;10;770;5.9;-41.0%;689;7;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Acomodo de brotes;300;16;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Desniete Deshoje;400;12;11360;0.4;-96.7%;8072;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Riego;10;1;0.5;5.2;420.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Malezas Mochila;5;1;0.3;8.9;790.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Cosecha;250;19;511;8.9;-53.2%;433;11;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;25;2.8;4544;;Levantado;350;13;1108;4.1;-68.5%;881;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Poda;300;16;151;30.5;90.6%;196;24;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Atada;400;12;439;10.5;-12.5%;427;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Desbrote de troncos;500;10;755;6.1;-39.0%;679;7;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Acomodo de brotes;300;16;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Desniete Deshoje;400;12;11520;0.4;-96.7%;8184;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Riego;10;1;0.5;5.4;440.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Malezas Mochila;5;1;0.3;9.3;830.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Cosecha;250;19;501;9.2;-51.6%;426;11;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;26;2.9;4608;;Levantado;350;14;1097;4.2;-70.0%;873;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Poda;300;16;150;30.5;90.6%;195;24;2026-06-01;2026-08-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Atada;400;12;436;10.5;-12.5%;425;11;2026-08-01;2026-09-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Desbrote de troncos;500;10;750;6.1;-39.0%;675;7;2026-10-01;2026-11-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Acomodo de brotes;300;16;-;-;-;-;-;2026-10-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Desniete Deshoje;400;12;11440;0.4;-96.7%;8128;1;2026-11-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Riego;10;1;0.5;5.4;440.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Malezas Mochila;5;1;0.3;9.3;830.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Cosecha;250;19;497;9.2;-51.6%;423;11;2026-01-01;2026-03-01;excel
+Fincas Viejas;La Chimbera;27;2.9;4576;;Levantado;350;14;1090;4.2;-70.0%;868;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Poda;300;22;134;47;113.6%;184;35;2026-06-01;2026-08-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Atada;400;16;140;45;181.3%;218;29;2026-08-01;2026-09-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Desbrote de troncos;500;13;438;14.4;10.8%;457;14;2026-10-01;2026-11-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Acomodo de brotes;300;22;1260;5;-77.3%;972;7;2026-10-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Desniete Deshoje;400;16;-;-;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Desbrote crit. Poda;500;13;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Raleo de Racimos;1000;7;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Riego;10;1;0.1;43.8;4280.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Malezas Mochila;5;1;0.2;23.9;2290.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Cosecha;250;26;584;10.8;-58.5%;484;14;2026-01-01;2026-03-01;excel
+Fincas Viejas;Puente Alto;1;4.68;6302;;Levantado;350;19;1167;5.4;-71.6%;922;7;2026-02-01;2026-04-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Poda;300;29;166;51.5;77.6%;206;42;2026-06-01;2026-08-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Atada;400;22;174;49.3;124.1%;242;36;2026-08-01;2026-09-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Desbrote de troncos;500;18;542;15.8;-12.2%;529;17;2026-10-01;2026-11-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Acomodo de brotes;300;29;1556;5.5;-81.0%;1179;8;2026-10-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Desniete Deshoje;400;22;-;-;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Desbrote crit. Poda;500;18;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Raleo de Racimos;1000;9;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Riego;10;1;0.1;48;4700.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Malezas Mochila;5;2;0.2;26.2;1210.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Cosecha;250;35;719;11.9;-66.0%;578;15;2026-01-01;2026-03-01;excel
+Fincas Viejas;Puente Alto;2;5.13;8556;;Levantado;350;25;1450;5.9;-76.4%;1120;8;2026-02-01;2026-04-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Poda;300;29;166;51.3;76.9%;206;42;2026-06-01;2026-08-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Atada;400;22;173;49.1;123.2%;241;36;2026-08-01;2026-09-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Desbrote de troncos;500;18;542;15.7;-12.8%;529;17;2026-10-01;2026-11-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Acomodo de brotes;300;29;1576;5.4;-81.4%;1193;8;2026-10-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Desniete Deshoje;400;22;-;-;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Desbrote crit. Poda;500;18;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Raleo de Racimos;1000;9;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Riego;10;1;0.1;47.8;4680.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Malezas Mochila;5;2;0.2;26.1;1205.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Cosecha;250;35;721;11.8;-66.3%;580;15;2026-01-01;2026-03-01;excel
+Fincas Viejas;Puente Alto;3;5.11;8512;;Levantado;350;25;1443;5.9;-76.4%;1115;8;2026-02-01;2026-04-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Poda;300;24;158;44.6;85.8%;201;36;2026-06-01;2026-08-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Atada;400;18;165;42.7;137.2%;236;30;2026-08-01;2026-09-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Desbrote de troncos;500;15;515;13.7;-8.7%;511;14;2026-10-01;2026-11-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Acomodo de brotes;300;24;1501;4.7;-80.4%;1141;7;2026-10-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Desniete Deshoje;400;18;-;-;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Desbrote crit. Poda;500;15;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Raleo de Racimos;1000;8;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Riego;10;1;0.1;41.5;4050.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Malezas Mochila;5;1;0.2;22.7;2170.0%;2;3;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Desmalezar manual;4;2;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Cosecha;250;29;685;10.3;-64.5%;555;13;2026-01-01;2026-03-01;excel
+Fincas Viejas;Puente Alto;4;4.44;7056;;Levantado;350;21;1384;5.1;-75.7%;1074;7;2026-02-01;2026-04-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Poda;300;16;206;23.3;45.6%;234;21;2026-06-01;2026-08-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Atada;400;12;215;22.3;85.8%;271;18;2026-08-01;2026-09-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Desbrote de troncos;500;10;675;7.1;-29.0%;623;8;2026-10-01;2026-11-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Acomodo de brotes;300;16;1918;2.5;-84.4%;1433;4;2026-10-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Desniete Deshoje;400;12;-;-;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Desbrote crit. Poda;500;10;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Raleo de Racimos;1000;5;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Riego;10;1;0.1;21.7;2070.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Malezas Mochila;5;1;0.2;11.9;1090.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Cosecha;250;20;888;5.4;-73.0%;697;7;2026-01-01;2026-03-01;excel
+Fincas Viejas;Puente Alto;5;2.32;4794;;Levantado;350;14;1776;2.7;-80.7%;1348;4;2026-02-01;2026-04-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Poda;300;22;185;35.1;59.5%;220;30;2026-06-01;2026-08-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Atada;400;17;193;33.6;97.6%;255;26;2026-08-01;2026-09-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Desbrote de troncos;500;13;600;10.8;-16.9%;570;12;2026-10-01;2026-11-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Acomodo de brotes;300;22;1752;3.7;-83.2%;1316;5;2026-10-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Desniete Deshoje;400;17;-;-;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Desbrote crit. Poda;500;13;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Raleo de Racimos;1000;7;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Riego;10;1;0.1;32.7;3170.0%;3;2;2026-05-01;2027-04-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Malezas Mochila;5;1;0.2;17.9;1690.0%;2;2;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Cosecha;250;26;800;8.1;-68.8%;635;11;2026-01-01;2026-03-01;excel
+Fincas Viejas;Puente Alto;6;3.5;6481;;Levantado;350;19;1581;4.1;-78.4%;1212;6;2026-02-01;2026-04-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Poda;300;9;213;11.5;27.8%;239;11;2026-06-01;2026-08-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Atada;400;7;221;11.1;58.6%;275;9;2026-08-01;2026-09-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Desbrote de troncos;500;5;700;3.5;-30.0%;640;4;2026-10-01;2026-11-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Acomodo de brotes;300;9;2042;1.2;-86.7%;1519;2;2026-10-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Desniete Deshoje;400;7;-;-;-;-;-;2026-11-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Desbrote crit. Poda;500;5;-;-;-;-;-;2026-11-01;2026-12-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Raleo de Racimos;1000;3;-;-;-;-;-;2026-12-01;2027-01-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Riego;10;1;0.1;10.8;980.0%;3;1;2026-05-01;2027-04-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Malezas Mochila;5;1;0.2;5.9;490.0%;2;1;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Desmalezar manual;4;1;-;-;-;-;-;2026-09-01;2027-03-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Cosecha;250;10;907;2.7;-73.0%;710;4;2026-01-01;2026-03-01;excel
+Fincas Viejas;Puente Alto;7;1.15;2450;;Levantado;350;7;1885;1.3;-81.4%;1425;2;2026-02-01;2026-04-01;excel

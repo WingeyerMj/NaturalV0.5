@@ -790,6 +790,116 @@ app.get('/api/inventario/movimientos', async (req, res) => {
     }
 });
 
+
+// ── POM AVANZADO: Presupuesto Persistente ──
+app.post('/api/pom-presupuesto', async (req, res) => {
+    const { ciclo, matrix, totals } = req.body;
+    if (!ciclo || !matrix || !Array.isArray(matrix)) {
+        return res.status(400).json({ success: false, message: 'Faltan datos (ciclo o matrix)' });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // 1. Upsert Parent
+        const parentRes = await client.query(`
+            INSERT INTO pom_presupuestos (ciclo, total_jornales_proyectados, total_jornales_reales, total_jornales_sugeridos, desvio_total, updated_at)
+            VALUES ($1, $2, $3, $4, $5, NOW())
+            ON CONFLICT (ciclo) DO UPDATE SET
+                total_jornales_proyectados = EXCLUDED.total_jornales_proyectados,
+                total_jornales_reales = EXCLUDED.total_jornales_reales,
+                total_jornales_sugeridos = EXCLUDED.total_jornales_sugeridos,
+                desvio_total = EXCLUDED.desvio_total,
+                updated_at = NOW()
+            RETURNING id
+        `, [
+            ciclo, 
+            totals.totalProy || 0, 
+            totals.totalReal || 0, 
+            totals.totalSug || 0, 
+            totals.desvio || null
+        ]);
+
+        const presupuestoId = parentRes.rows[0].id;
+
+        // 2. Clear previous details
+        await client.query('DELETE FROM pom_presupuesto_detalle WHERE presupuesto_id = $1', [presupuestoId]);
+
+        // 3. Insert Details
+        for (const row of matrix) {
+            await client.query(`
+                INSERT INTO pom_presupuesto_detalle (
+                    presupuesto_id, key, finca, predio, cuartel, hectareas, plantas, variedad,
+                    labor_id, labor_nombre, labor_categoria, unidad_base,
+                    rendimiento_original, jornales_original, rendimiento_proyectado, jornales_proyectados,
+                    rendimiento_real, jornales_reales, desvio_jornales, rendimiento_sugerido, jornales_sugeridos,
+                    fecha_inicio, fecha_fin, fuente, editado
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
+            `, [
+                presupuestoId, row.key, row.finca, row.predio, row.cuartel, row.hectareas, row.plantas, row.variedad,
+                row.laborId, row.laborNombre, row.laborCategoria, row.unidadBase,
+                row.rendimientoOriginal, row.jornalesOriginal, row.rendimientoProyectado, row.jornalesProyectados,
+                row.rendimientoReal, row.jornalesReales, row.desvioJornales, row.rendimientoSugerido, row.jornalesSugeridos,
+                row.fechaInicio, row.fechaFin, row.fuente, row.editado
+            ]);
+        }
+
+        await client.query('COMMIT');
+        res.json({ success: true, message: 'Presupuesto POM guardado exitosamente en base de datos.' });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Error guardando presupuesto POM:', error);
+        res.status(500).json({ success: false, message: 'Error interno al guardar el presupuesto' });
+    } finally {
+        client.release();
+    }
+});
+
+app.get('/api/pom-presupuesto/:ciclo', async (req, res) => {
+    const { ciclo } = req.params;
+    try {
+        const parentRes = await pool.query('SELECT * FROM pom_presupuestos WHERE ciclo = $1', [ciclo]);
+        if (parentRes.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'No hay presupuesto guardado para este ciclo' });
+        }
+
+        const detailsRes = await pool.query('SELECT * FROM pom_presupuesto_detalle WHERE presupuesto_id = $1 ORDER BY id ASC', [parentRes.rows[0].id]);
+        
+        const matrix = detailsRes.rows.map(r => ({
+            key: r.key,
+            finca: r.finca,
+            predio: r.predio,
+            cuartel: r.cuartel,
+            hectareas: parseFloat(r.hectareas),
+            plantas: parseInt(r.plantas),
+            variedad: r.variedad,
+            laborId: r.labor_id,
+            laborNombre: r.labor_nombre,
+            laborCategoria: r.labor_categoria,
+            unidadBase: r.unidad_base,
+            rendimientoOriginal: parseFloat(r.rendimiento_original),
+            jornalesOriginal: parseFloat(r.jornales_original),
+            rendimientoProyectado: parseFloat(r.rendimiento_proyectado),
+            jornalesProyectados: parseFloat(r.jornales_proyectados),
+            rendimientoReal: r.rendimiento_real ? parseFloat(r.rendimiento_real) : null,
+            jornalesReales: r.jornales_reales ? parseFloat(r.jornales_reales) : null,
+            desvioJornales: r.desvio_jornales ? parseFloat(r.desvio_jornales) : null,
+            rendimientoSugerido: r.rendimiento_sugerido ? parseFloat(r.rendimiento_sugerido) : null,
+            jornalesSugeridos: r.jornales_sugeridos ? parseFloat(r.jornales_sugeridos) : null,
+            fechaInicio: r.fecha_inicio,
+            fechaFin: r.fecha_fin,
+            fuente: r.fuente,
+            editado: r.editado
+        }));
+
+        res.json({ success: true, matrix, totals: parentRes.rows[0] });
+    } catch (error) {
+        console.error('Error recuperando presupuesto POM:', error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    }
+});
+
 // ── ARCHIVAR CICLO DE PRODUCCIÓN (HISTÓRICO) ──
 app.post('/api/archive-cycle', async (req, res) => {
     const { ciclo, data } = req.body;

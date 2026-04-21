@@ -1060,6 +1060,24 @@ export class AppController {
 
                 try {
                     currentCiclo = document.getElementById('pom-ciclo')?.value || '2025-2026';
+                    
+                    // --- DB PERSISTENCE CHECK ---
+                    // If not a manual generation (auto-load), try the database first
+                    if (!isManualGeneration) {
+                        const dbMatrix = await ProyeccionJornalModel.loadMatrixFromDB(currentCiclo);
+                        if (dbMatrix && dbMatrix.length > 0) {
+                            console.log('[POM] Data loaded from database.');
+                            currentMatrix = dbMatrix;
+                            const detalleContainer = document.getElementById('pom-content-detalle');
+                            if (detalleContainer) {
+                                detalleContainer.innerHTML = renderPomDetalleTable(currentMatrix);
+                                this.bindPomEditableInputs(currentCiclo, currentMatrix);
+                            }
+                            this.updatePomSummaryCards(currentMatrix);
+                            return; 
+                        }
+                    }
+
                     const fincaFilter = document.getElementById('pom-finca-filter')?.value || '';
                     const laborFilterVal = document.getElementById('pom-labor-filter')?.value || '';
 
@@ -1171,41 +1189,59 @@ export class AppController {
                 this.showToast('Genere una proyección primero', 'warning');
                 return;
             }
-            const overrides = ProyeccionJornalModel.loadOverrides(currentCiclo);
-            const saved = await ProyeccionJornalModel.saveToServer(currentCiclo, overrides);
-            
-            // Save to server (CSV)
-            await ProyeccionJornalModel.saveCSVToServer(currentMatrix, currentCiclo);
-            
-            this.showToast(saved ? 'Proyección y reportes guardados en el servidor' : 'Guardado local finalizado', saved ? 'success' : 'success');
+
+            const btn = document.getElementById('btn-pom-save');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;margin-right:6px;"></span> Guardando...';
+
+            try {
+                // Calculate totals for DB storage
+                const totalProy = currentMatrix.reduce((s, p) => s + (p.jornalesProyectados || 0), 0);
+                const totalReal = currentMatrix.reduce((s, p) => s + (p.jornalesReales || 0), 0);
+                const totalSug = currentMatrix.reduce((s, p) => s + (p.jornalesSugeridos || p.jornalesProyectados || 0), 0);
+                const desvio = totalProy > 0 && totalReal > 0 ? ((totalReal - totalProy) / totalProy * 100) : null;
+                const totals = { totalProy, totalReal, totalSug, desvio };
+
+                // 1. Save FULL matrix to Database (The requested Source of Truth)
+                const savedDB = await ProyeccionJornalModel.saveMatrixToDB(currentMatrix, currentCiclo, totals);
+                
+                // 2. Fallback / Legacy saves
+                const overrides = ProyeccionJornalModel.loadOverrides(currentCiclo);
+                await ProyeccionJornalModel.saveToServer(currentCiclo, overrides);
+                await ProyeccionJornalModel.saveCSVToServer(currentMatrix, currentCiclo);
+
+                if (savedDB) {
+                    this.showToast('Presupuesto guardado permanentemente en la base de datos', 'success');
+                    localStorage.setItem('has_loaded_pom', 'true');
+                } else {
+                    this.showToast('Error al guardar en BD. Se guardó respaldo en archivos.', 'warning');
+                }
+            } catch (error) {
+                console.error('[POM] Error saving:', error);
+                this.showToast('Error crítico al guardar el presupuesto', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
         });
 
         // --- AUTO-LOAD PERSISTENCE ---
         const checkAutoLoad = async () => {
-            const hasOverrides = Object.keys(ProyeccionJornalModel.loadOverrides(currentCiclo)).length > 0;
+            currentCiclo = document.getElementById('pom-ciclo')?.value || '2025-2026';
             const wasLoaded = localStorage.getItem('has_loaded_pom') === 'true';
             
-            // Try to see if server has it if not manually saved locally
-            let serverHasIt = false;
-            if (!wasLoaded) {
-                 const serverOverrides = await ProyeccionJornalModel.loadFromServer(currentCiclo);
-                 if (serverOverrides) {
-                     serverHasIt = true;
-                     // We don't set has_loaded_pom here to keep the button enabled as requested
-                 }
-            }
-
-            if ((hasOverrides || wasLoaded || serverHasIt) && btnLoad) {
-                console.log('[POM] Auto-loading previous state from file...');
-                const esAbril = new Date().getMonth() === 3;
-                
-                if (!esAbril) {
-                     btnLoad.disabled = true;
-                     btnLoad.title = "Generación deshabilitada fuera de abril";
-                } 
-                
-                // We invoke the fetch directly
+            // If already loaded or specifically flagged as having data, try to load
+            if (wasLoaded && btnLoad) {
+                console.log('[POM] Auto-loading previous state...');
                 generateOloadData(false);
+            } else if (btnLoad) {
+                // Check if DB has it even if localStorage is empty (e.g. first time on this browser but saved on server)
+                const dbMatrix = await ProyeccionJornalModel.loadMatrixFromDB(currentCiclo);
+                if (dbMatrix && dbMatrix.length > 0) {
+                    console.log('[POM] Found data in DB, auto-loading...');
+                    generateOloadData(false);
+                }
             }
         };
         setTimeout(checkAutoLoad, 500); 

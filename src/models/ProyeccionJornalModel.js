@@ -604,4 +604,37 @@ export class ProyeccionJornalModel {
         link.download = `Proyeccion_Jornal_${ciclo}.csv`;
         link.click();
     }
+
+    /**
+     * Save full matrix to database for permanent persistence.
+     */
+    static async saveMatrixToDB(matrix, ciclo, totals) {
+        try {
+            const response = await fetch('/api/pom-presupuesto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ciclo, matrix, totals })
+            });
+            const result = await response.json();
+            return result.success;
+        } catch (error) {
+            console.error('[POM] Error saving to DB:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Load matrix from database.
+     */
+    static async loadMatrixFromDB(ciclo) {
+        try {
+            const response = await fetch(`/api/pom-presupuesto/${ciclo}`);
+            if (!response.ok) return null;
+            const res = await response.json();
+            return res.success ? res.matrix : null;
+        } catch (error) {
+            console.error('[POM] Error loading from DB:', error);
+            return null;
+        }
+    }
 }
