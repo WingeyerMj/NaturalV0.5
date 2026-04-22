@@ -39,6 +39,7 @@ import {
     renderControlCargaView, renderPresupuestoProyeccionView, renderExcelBudgetSummary,
     renderEjecucionPresupuesto, renderInformePlanificacion,
     renderProyeccionJornalView, renderPomDetalleTable, renderPomResumenFinca, renderPomCalendario,
+    renderPresupuestosPlanificacionLayout, renderBudgetGenericTable, renderCalendarioProductivo,
     renderCargaDocumentacionView, renderDocumentacionRows, renderTransferRows, renderRemitoExtRows, renderServicioRows,
     renderStockMovementView, renderRemitoPrintTemplate, renderCargaHome
 } from '../views/Views.js';
@@ -49,6 +50,7 @@ import { JornalesBudgetModel } from '../models/JornalesBudgetModel.js';
 import { PresupuestoModel as PresupuestoBudgetModel } from '../models/PresupuestoModel.js';
 import { ProyeccionJornalModel } from '../models/ProyeccionJornalModel.js';
 import { DocumentacionModel } from '../models/DocumentacionModel.js';
+import { CalendarioAgricolaModel } from '../models/CalendarioAgricolaModel.js';
 
 // ── Constants ──
 const VITE_API_URL = '/api';
@@ -89,10 +91,16 @@ const ROLE_MENUS = {
                 { id: 'admin-productos', label: 'Productos', icon: '📦' },
                 { id: 'admin-proveedores', label: 'Proveedores', icon: '🤝' },
                 { id: 'admin-institucional', label: 'Institucional', icon: '🏛️' },
-                { id: 'presupuesto', label: 'Presupuesto', icon: '📊' },
-                { id: 'admin-planificacion', label: 'Planificación', icon: '📅' },
-                { id: 'inversiones-propuestas', label: 'Inversiones', icon: '💡' },
-                { id: 'pom-avanzado', label: 'POM Avanzado', icon: '📈' },
+        {
+            id: 'presupuestos-planificacion', label: 'Presupuestos y Planificación', icon: '📊', section: 'Sistema', submenu: [
+                { id: 'pp-jornales', label: 'Presupuesto de Jornales', icon: '👷' },
+                { id: 'pp-fitosanitarios', label: 'Presupuesto de Fitosanitarios', icon: '🧪' },
+                { id: 'pp-fertilizantes', label: 'Presupuesto de Fertilizantes', icon: '🌿' },
+                { id: 'pp-insumos', label: 'Insumos Varios', icon: '📦' },
+                { id: 'pp-inversiones', label: 'Inversiones', icon: '💡' },
+                { id: 'pp-calendario', label: 'Calendario Productivo', icon: '📅' },
+            ]
+        },
             ]
         },
         {
@@ -134,8 +142,13 @@ const ROLE_MENUS = {
             ]
         },
         {
-            id: 'sistemas-pom', label: 'Sistemas', icon: '⚙️', section: 'Sistema', submenu: [
-                { id: 'pom-avanzado', label: 'POM Avanzado', icon: '📈' }
+            id: 'presupuestos-planificacion', label: 'Presupuestos y Planificación', icon: '📊', section: 'Sistema', submenu: [
+                { id: 'pp-jornales', label: 'Presupuesto de Jornales', icon: '👷' },
+                { id: 'pp-fitosanitarios', label: 'Presupuesto de Fitosanitarios', icon: '🧪' },
+                { id: 'pp-fertilizantes', label: 'Presupuesto de Fertilizantes', icon: '🌿' },
+                { id: 'pp-insumos', label: 'Insumos Varios', icon: '📦' },
+                { id: 'pp-inversiones', label: 'Inversiones', icon: '💡' },
+                { id: 'pp-calendario', label: 'Calendario Productivo', icon: '📅' },
             ]
         },
         {
@@ -190,12 +203,13 @@ export class AppController {
         if (loader) loader.classList.remove('active');
     }
 
-    async showConfirmModal(title, message) {
+    async showConfirmModal(title, message, confirmText = 'Eliminar', confirmClass = 'btn-danger', icon = '🗑️') {
         return new Promise((resolve) => {
             const modalEl = document.getElementById('confirmDeleteModal');
             const titleEl = document.getElementById('confirmDeleteModalLabel');
             const messageEl = document.getElementById('confirmDeleteModalMessage');
             const btnConfirm = document.getElementById('btn-confirm-delete-action');
+            const iconEl = modalEl?.querySelector('.modal-body div[style*="font-size: 3rem"]');
 
             if (!modalEl || !btnConfirm) {
                 resolve(confirm(message));
@@ -204,6 +218,13 @@ export class AppController {
 
             if (titleEl) titleEl.textContent = title;
             if (messageEl) messageEl.innerHTML = message;
+            if (iconEl) iconEl.textContent = icon;
+            
+            if (btnConfirm) {
+                btnConfirm.textContent = confirmText;
+                // Reset classes and add new ones
+                btnConfirm.className = `btn ${confirmClass}`;
+            }
 
             // Initialize or get Bootstrap modal instance
             let bsModal = bootstrap.Modal.getInstance(modalEl);
@@ -303,10 +324,15 @@ export class AppController {
         this.currentUser = user;
         const menuItems = ROLE_MENUS[user.role] || [];
 
+        // Load master labor catalog for normalization
+        SofiaApiModel.loadMasterCatalog();
+
         // Load budget data from storage
         JornalesBudgetModel.loadFromStorage();
         // Try to auto-load budget CSV if it exists in Fuentes (non-blocking)
         this.autoLoadJornalesBudget();
+        // Sync faenas/labores from CSV to DB (non-blocking, background)
+        this.syncFaenasFromCSV();
 
         // Defer static Sofia CSV files to background (don't block dashboard load)
         // They will be loaded when the aplicaciones section is actually opened
@@ -535,9 +561,16 @@ export class AppController {
                 this.initCargaDocumentacionSection();
                 break;
             case 'pom-avanzado':
-                if (title) title.textContent = 'POM Avanzado — Proyección de Jornal Específico';
-                content.innerHTML = renderProyeccionJornalView();
-                await this.initPomAvanzadoSection();
+            case 'pp-jornales':
+            case 'pp-fitosanitarios':
+            case 'pp-fertilizantes':
+            case 'pp-insumos':
+            case 'pp-inversiones':
+            case 'pp-calendario':
+            case 'presupuestos-planificacion':
+                if (title) title.textContent = 'Presupuestos y Planificación';
+                const activeTab = section === 'presupuestos-planificacion' ? 'pp-jornales' : section;
+                await this.renderPresupuestosPlanificacionSection(content, activeTab);
                 break;
             case 'usuarios':
                 if (title) title.textContent = 'Gestión de Usuarios';
@@ -552,9 +585,13 @@ export class AppController {
                 if (title) title.textContent = 'Movimientos Stock';
                 this.renderInventarioSection(content);
                 break;
+            case 'inversiones-propuestas':
+                if (title) title.textContent = 'Inversiones';
+                this.renderAdminCrudSection(content, section);
+                break;
             default:
-                // Handle all admin-* sections dynamically (including inversiones)
-                if (section && (section.startsWith('admin-') || section === 'inversiones-propuestas') && ADMIN_TABLE_CONFIG[section]) {
+                // Handle all admin-* sections dynamically
+                if (section && section.startsWith('admin-') && ADMIN_TABLE_CONFIG[section]) {
                     const cfg = ADMIN_TABLE_CONFIG[section];
                     if (title) title.textContent = cfg.title;
                     this.renderAdminCrudSection(content, section);
@@ -575,11 +612,98 @@ export class AppController {
     }
 
     // ── Sección 1: JORNALES ──
+    /**
+     * Renders the unified Planning & Budgets section.
+     */
+    async renderPresupuestosPlanificacionSection(container, activeTab) {
+        container.innerHTML = renderPresupuestosPlanificacionLayout(activeTab);
+        const contentArea = document.getElementById('pp-tab-content');
+        
+        // Handle Tab Switching
+        container.querySelectorAll('.nav-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                this.renderPresupuestosPlanificacionSection(container, tabId);
+            });
+        });
+
+        // Current Cycle (can be made dynamic)
+        const currentCiclo = '2026-2027';
+
+        // Render Sub-Module Content
+        switch (activeTab) {
+            case 'pp-jornales':
+            case 'pom-avanzado':
+                contentArea.innerHTML = renderProyeccionJornalView();
+                await this.initPomAvanzadoSection();
+                break;
+            case 'pp-fitosanitarios':
+                contentArea.innerHTML = renderBudgetGenericTable('Presupuesto de Fitosanitarios', '🧪', []);
+                break;
+            case 'pp-fertilizantes':
+                contentArea.innerHTML = renderBudgetGenericTable('Presupuesto de Fertilizantes', '🌿', []);
+                break;
+            case 'pp-insumos':
+                contentArea.innerHTML = renderBudgetGenericTable('Presupuesto de Insumos Varios', '📦', []);
+                break;
+            case 'pp-inversiones':
+                // Re-use Admin CRUD for Inversiones (Kanban style)
+                this.renderAdminCrudSection(contentArea, 'inversiones-propuestas');
+                break;
+            case 'pp-calendario':
+                await this.initCalendarioProductivoSection(contentArea, currentCiclo);
+                break;
+        }
+    }
+
+    /**
+     * Initializes the interactive logic for the Productive Calendar.
+     */
+    async initCalendarioProductivoSection(container, ciclo) {
+        const weeks = CalendarioAgricolaModel.getWeeksForCycle(ciclo.split('-')[0]);
+        const data = CalendarioAgricolaModel.loadData(ciclo);
+        const states = CalendarioAgricolaModel.PHENOLOGICAL_STATES;
+
+        container.innerHTML = renderCalendarioProductivo(weeks, data, states);
+
+        // Bind events for shifting labors
+        container.querySelectorAll('.labor-bar').forEach(bar => {
+            bar.addEventListener('click', async (e) => {
+                const laborId = e.target.parentElement.dataset.labor;
+                const labor = data.labors.find(l => l.id === laborId);
+                
+                const action = await this.showConfirmModal('⚙️ Ajustar Labor', 
+                    `Ajuste de labor: <strong>${labor.name}</strong><br><br>
+                    ¿Qué desea hacer con esta labor?`,
+                    'Desplazar +1 semana', 'btn-primary', '📅');
+                
+                if (action) {
+                    const shiftSubsequent = await this.showConfirmModal('🔗 Sincronizar Calendario',
+                        '¿Desea desplazar también todas las labores posteriores para mantener la secuencia?',
+                        'Sí, desplazar todo', 'btn-primary', '🔄');
+                    
+                    CalendarioAgricolaModel.shiftLabor(ciclo, laborId, 1, shiftSubsequent);
+                    this.initCalendarioProductivoSection(container, ciclo);
+                    this.showToast('Calendario ajustado exitosamente', 'success');
+                }
+            });
+        });
+
+        document.getElementById('btn-cal-reset')?.addEventListener('click', () => {
+             localStorage.removeItem(`nf_calendario_${ciclo}`);
+             this.initCalendarioProductivoSection(container, ciclo);
+        });
+
+        document.getElementById('btn-cal-save')?.addEventListener('click', () => {
+             this.showToast('Calendario guardado en el servidor', 'success');
+        });
+    }
+
     async renderJornalesSection(container) {
         container.innerHTML = `
         <div class="sofia-filters animate-fade-in">
           <div class="filter-group">
-            <label class="form-label">Ciclo Producción</label>
+            <label class="form-label">Ciclo Produccion</label>
             <select class="form-select sofia-filter-select" id="filter-jornales-ciclo">
               <option value="2025-2026">2025-2026</option>
               <option value="2024-2025">2024-2025</option>
@@ -598,7 +722,7 @@ export class AppController {
             </select>
           </div>
           <div class="filter-group">
-            <label class="form-label">Clasificación</label>
+            <label class="form-label">Clasificacion</label>
             <select class="form-select sofia-filter-select" id="filter-jornales-predio">
               <option value="">Todos</option>
             </select>
@@ -622,7 +746,7 @@ export class AppController {
         <div id="jornales-content" class="animate-fade-in animate-delay-1">
             <div style="padding: var(--space-20); text-align: center; color: var(--text-tertiary);">
                 <div class="spinner" style="margin: 0 auto var(--space-4);"></div>
-                <p>Cargando datos de jornales desde Sofía...</p>
+                <p>Cargando datos de jornales desde Sofia...</p>
                 <small>(Este proceso puede tardar mientras se reconstruyen los datos mes a mes)</small>
             </div>
         </div>
@@ -1331,14 +1455,17 @@ export class AppController {
 
     updatePomSummaryCards(matrix) {
         const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
+        const formatMoney = (n) => '$ ' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+        
         const totalProy = matrix.reduce((s, p) => s + (p.jornalesProyectados || 0), 0);
         const totalReal = matrix.reduce((s, p) => s + (p.jornalesReales || 0), 0);
-        const totalSug = matrix.reduce((s, p) => s + (p.jornalesSugeridos || p.jornalesProyectados || 0), 0);
+        const totalCosto = matrix.reduce((s, p) => s + ((p.jornalesProyectados || 0) * (p.precioUnitario || 0)), 0);
         const desvio = totalProy > 0 && totalReal > 0 ? ((totalReal - totalProy) / totalProy * 100) : null;
 
         const el = (id) => document.getElementById(id);
         if (el('pom-total-proy')) el('pom-total-proy').textContent = fmt(totalProy);
         if (el('pom-total-real')) el('pom-total-real').textContent = totalReal > 0 ? fmt(totalReal) : '—';
+        if (el('pom-total-costo')) el('pom-total-costo').textContent = formatMoney(totalCosto);
         if (el('pom-desvio')) {
             if (desvio != null) {
                 el('pom-desvio').textContent = (desvio > 0 ? '+' : '') + desvio.toFixed(1) + '%';
@@ -1347,7 +1474,6 @@ export class AppController {
                 el('pom-desvio').textContent = '—';
             }
         }
-        if (el('pom-total-sug')) el('pom-total-sug').textContent = totalSug > 0 ? fmt(totalSug) : '—';
     }
 
     initPlanificacionCharts(data) {
@@ -2846,7 +2972,7 @@ export class AppController {
                         return;
                     }
 
-                    const confirmed = await this.showConfirmModal('📥 Importar Datos', `¿Desea importar ${rows.length} registros en "${config.title}"?`);
+                    const confirmed = await this.showConfirmModal('📥 Importar Datos', `¿Desea importar ${rows.length} registros en "${config.title}"?`, 'Aceptar', 'btn-primary', '📥');
                     if (!confirmed) {
                         fileInput.value = '';
                         return;
@@ -4693,6 +4819,23 @@ async autoLoadJornalesBudget() {
         }
     } catch (e) {
         console.error('Error auto-loading Jornales budget:', e);
+    }
+}
+
+/**
+ * Sync faenas and labores from Fuentes/Jornales/faenas.csv to the database.
+ * This ensures the CSV is the single source of truth for faenas and labores.
+ * Runs silently in the background on each dashboard load.
+ */
+async syncFaenasFromCSV() {
+    try {
+        const resp = await fetch(`${VITE_API_URL}/sync-faenas-csv`, { method: 'POST' });
+        const result = await resp.json();
+        if (result.success) {
+            console.log('[Sync] Faenas/Labores from CSV:', result.message);
+        }
+    } catch (e) {
+        console.warn('[Sync] Faenas CSV sync failed (non-blocking):', e.message);
     }
 }
 

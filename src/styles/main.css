@@ -2842,3 +2842,82 @@ img {
 #pom-content-calendario td:hover {
     background: rgba(255, 255, 255, 0.03) !important;
 }
+
+/* ── PREUPUESTOS Y PLANIFICACIÓN TABS ── */
+.nav-tab-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: white;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-tab-btn.active::after {
+    width: 30%;
+}
+
+.nav-tab-btn:hover:not(.active) {
+    background: rgba(255,255,255,0.05) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ── CALENDARIO PRODUCTIVO ── */
+.cal-cell {
+    position: relative;
+}
+
+.cal-cell:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.labor-bar {
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.labor-bar:hover {
+    transform: scaleY(1.1);
+    opacity: 1 !important;
+    z-index: 5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.labor-bar.is-start::before {
+    content: '→';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: white;
+    opacity: 0.5;
+}
+
+/* Custom Scrollbar for Calendar */
+#pp-tab-content ::-webkit-scrollbar {
+    height: 8px;
+}
+
+#pp-tab-content ::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+#pp-tab-content ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 4px;
+}
+
+#pp-tab-content ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+

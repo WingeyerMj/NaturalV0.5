@@ -113,6 +113,56 @@ export class SofiaApiModel {
     /**
      * Connects to the Sofia API and fetches ALL data for a cycle
      */
+    static _laborMapping = new Map();
+    static _masterLabors = [];
+
+    /**
+     * Loads the master labor catalog from the database to enable normalization.
+     */
+    static async loadMasterCatalog() {
+        try {
+            const resp = await fetch('/api/admin-labor');
+            const data = await resp.json();
+            if (Array.isArray(data)) {
+                this._masterLabors = data;
+                this._laborMapping.clear();
+                data.forEach(item => {
+                    // We look for "ID Sofia: XXX" in the description to create the map
+                    const desc = item.descripcion || '';
+                    const match = desc.match(/ID Sofia:\s*(\w+)/i);
+                    if (match && match[1]) {
+                        this._laborMapping.set(match[1].toUpperCase(), item.nombre);
+                    }
+                    // Also map by name if no ID Sofia is found
+                    this._laborMapping.set(item.nombre.toUpperCase(), item.nombre);
+                });
+                console.log(`[SofiaApiModel] Labor mapping initialized: ${this._laborMapping.size} rules.`);
+            }
+        } catch (e) {
+            console.warn('[SofiaApiModel] Failed to load labor mapping:', e);
+        }
+    }
+
+    /**
+     * Normalizes a raw labor name or ID from Sofia using the master catalog.
+     */
+    static normalizeLabor(rawLabor) {
+        if (!rawLabor) return 'Sin Labor';
+        const key = rawLabor.toString().toUpperCase().trim();
+        return this._laborMapping.get(key) || rawLabor;
+    }
+
+    /**
+     * Normalizes a raw faena name.
+     */
+    static normalizeFaena(rawFaena) {
+        // Find if this faena belongs to a canonical labor
+        const normalizedLabor = this.normalizeLabor(rawFaena);
+        const laborObj = this._masterLabors.find(l => l.nombre === normalizedLabor);
+        if (laborObj && laborObj.tipo) return laborObj.tipo; // 'tipo' stores the faena name in admin_labor
+        return rawFaena || 'Sin Faena';
+    }
+
     /**
      * Connects to the Sofia API and fetches ALL data for a cycle
      * Implements caching to avoid redundant network requests.
@@ -536,21 +586,8 @@ export class SofiaApiModel {
                 cuartel: r.cuartel || r.Cuartel || info.code,
                 variedad: r.variedad || r.variedades || r.Variedad || r.Variedades || info.variedad,
                 isCosecha,
-                labor_normalized: (() => {
-                    const l = (r.labor || '').trim().toUpperCase();
-                    if (l.includes('PODA')) return 'Poda';
-                    if (l.includes('ATADA') || l.includes('GUIADO')) return 'Atada';
-                    if (l.includes('DESBROTE') && !l.includes('PODA')) return 'Desbrote de troncos';
-                    if (l.includes('DESBROTE') && l.includes('PODA')) return 'Desbrote crit. Poda';
-                    if (l.includes('RALEO')) return 'Raleo de Racimos';
-                    if (l.includes('DESHOJE') || l.includes('DESNIETE')) return 'Desniete Deshoje';
-                    if (l.includes('ACOMODO')) return 'Acomodo de brotes';
-                    if (l.includes('RIEGO')) return 'Riego';
-                    if (l.includes('LEVANTADO')) return 'Levantado';
-                    if (l.includes('MOCHILA')) return 'Malezas Mochila';
-                    if (l.includes('DESMALEZAR') && l.includes('MANUAL')) return 'Desmalezar manual';
-                    return r.labor;
-                })(),
+                labor_normalized: this.normalizeLabor(r.labor),
+                faena: this.normalizeFaena(r.labor),
                 fecha: (() => {
                     let d = r.fecha || r.Fecha || r.date || r.Date;
                     if (d && typeof d === 'string' && d.includes('-') && d.split('-')[0].length === 2) {

@@ -38,24 +38,29 @@ export class ProyeccionJornalModel {
                         const data = results.data;
                         const catalog = [];
                         
-                        // Parse faenas-labores.csv structure:
-                        // "ID";"Code";"Faena";"Category";"Locations";"Labor";"Cost";"0";"";"DB_ID"
+                        // Parse faenas.csv structure:
+                        // "ID";"CODIGO";"NOMBRE DE FAENA";"NOMBRE LABOR";"PRECIO";"RENDIMIENTO";"ID LABOR"
                         data.forEach(row => {
-                            if (row.length < 6) return;
+                            if (row.length < 4) return;
                             const faena = (row[2] || '').trim();
-                            const laborName = (row[5] || '').trim();
-                            const dbId = row[9];
+                            const laborName = (row[3] || '').trim();
+                            const dbId = (row[6] || '').toString().trim();
+                            const rendimiento = parseFloat((row[5] || '0').toString().replace(',', '.')) || 0;
                             
-                            if (!laborName || laborName === 'Labor') return;
+                            const precio = parseFloat((row[4] || '0').toString().replace(',', '.')) || 0;
+                            
+                            if (!laborName || laborName === 'NOMBRE LABOR') return;
 
                             // Map to internal format
                             catalog.push({
                                 id: dbId || laborName.toLowerCase().replace(/\s+/g, '_'),
                                 nombre: laborName,
                                 faena: faena,
-                                categoria: row[3] || 'General',
+                                categoria: faena || 'General',
+                                codigo: (row[1] || '').trim(),
                                 unidadBase: laborName.toLowerCase().includes('hectarea') ? 'hectareas' : 'plantas',
-                                rendimientoDefault: 100, // Default to be adjusted
+                                rendimientoDefault: rendimiento > 0 ? rendimiento : 100,
+                                precioUnitario: precio,
                                 mesInicio: 5, // Default
                                 mesFin: 4,    // Default
                             });
@@ -245,6 +250,8 @@ export class ProyeccionJornalModel {
                     rendimientoProyectado: rendimiento,
                     jornalesProyectados: jornales,
                     jornalesCalculados: jornalesAuto,
+                    precioUnitario: labor.precioUnitario || 0,
+                    costoProyectado: jornales * (labor.precioUnitario || 0),
                     fechaInicio,
                     fechaFin,
                     fuente: override.rendimiento || override.jornales ? 'manual' : (orgRend ? 'excel' : 'catalog'),
@@ -252,6 +259,7 @@ export class ProyeccionJornalModel {
                     // Real data & Sugerencia
                     rendimientoReal: null,
                     jornalesReales: null,
+                    costoReal: null,
                     fechaRealInicio: null,
                     fechaRealFin: null,
                     desvioRendimiento: null,

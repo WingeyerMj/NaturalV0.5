@@ -4757,6 +4757,10 @@ export function renderProyeccionJornalView() {
                 <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(16,185,129,0.8); font-weight: 700; margin-bottom: var(--space-2);">Jornales Proyectados</div>
                 <div id="pom-total-proy" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #10b981;">—</div>
             </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(82, 190, 128, 0.08), rgba(82, 190, 128, 0.02)); border: 1px solid rgba(82, 190, 128, 0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
+                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: #27ae60; font-weight: 700; margin-bottom: var(--space-2);">Costo Total Proyectado</div>
+                <div id="pom-total-costo" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #27ae60;">$ —</div>
+            </div>
             <div class="stat-card" style="background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02)); border: 1px solid rgba(59,130,246,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
                 <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(59,130,246,0.8); font-weight: 700; margin-bottom: var(--space-2);">Jornales Reales</div>
                 <div id="pom-total-real" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #3b82f6;">—</div>
@@ -4765,11 +4769,8 @@ export function renderProyeccionJornalView() {
                 <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(245,158,11,0.8); font-weight: 700; margin-bottom: var(--space-2);">Desvío Total</div>
                 <div id="pom-desvio" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #f59e0b;">—</div>
             </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(168,85,247,0.02)); border: 1px solid rgba(168,85,247,0.15); border-radius: var(--radius-xl); padding: var(--space-5); text-align: center;">
-                <div style="font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(168,85,247,0.8); font-weight: 700; margin-bottom: var(--space-2);">Sugeridos Antigravity</div>
-                <div id="pom-total-sug" style="font-size: 2rem; font-weight: 900; font-family: var(--font-display); color: #a855f7;">—</div>
-            </div>
         </div>
+
 
         <!--Tab Navigation-->
         <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); flex-wrap: wrap;">
@@ -4866,6 +4867,8 @@ export function renderPomDetalleTable(matrix) {
                                 <th style="padding: var(--space-2) var(--space-3); text-align: left; color: var(--text-secondary); font-weight: 700; font-size: 0.85em;">Labor</th>
                                 <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #10b981; font-weight: 700; font-size: 0.85em;" title="Rendimiento proyectado (unidades/jornal)">Rend.Proy.</th>
                                 <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #10b981; font-weight: 700; font-size: 0.85em;" title="Jornales proyectados">Jorn.Proy.</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #27ae60; font-weight: 700; font-size: 0.85em;" title="Precio unitario por jornal">Precio</th>
+                                <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #27ae60; font-weight: 700; font-size: 0.85em;" title="Costo total proyectado">Costo.Proy</th>
                                 <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 700; font-size: 0.85em;" title="Rendimiento real observado">Rend.Real</th>
                                 <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 700; font-size: 0.85em;" title="Jornales reales ejecutados">Jorn.Real</th>
                                 <th style="padding: var(--space-2) var(--space-3); text-align: center; color: #f59e0b; font-weight: 700; font-size: 0.85em;" title="Desvío porcentual">Desvío</th>
@@ -4877,6 +4880,7 @@ export function renderPomDetalleTable(matrix) {
                         <tbody>
             `;
 
+            // ... (rest of groupings)
             const recordsByCuartel = {};
             records.forEach(p => {
                 if(!recordsByCuartel[p.cuartel]) recordsByCuartel[p.cuartel] = [];
@@ -4899,6 +4903,8 @@ export function renderPomDetalleTable(matrix) {
                         <td${rowspanAttr} style="padding: var(--space-2) var(--space-3); text-align: right; color: var(--text-secondary); vertical-align: middle; border-right: 1px solid rgba(255,255,255,0.03); background: rgba(0,0,0,0.05); border-bottom: 1px solid rgba(255,255,255,0.03);">${p.plantas.toLocaleString('es-AR')}</td>
                     ` : '';
 
+                    const costo = (p.jornalesProyectados || 0) * (p.precioUnitario || 0);
+
                     html += `
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s;" onmouseenter="this.style.background='rgba(16,185,129,0.04)'" onmouseleave="this.style.background=''">
                             ${sharedCols}
@@ -4913,13 +4919,15 @@ export function renderPomDetalleTable(matrix) {
                             <input type="number" class="pom-editable-input" data-key="${p.key}" data-field="jornales" value="${p.jornalesProyectados}" min="0"
                                 style="width: 65px; text-align: center; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; color: #10b981; font-weight: 700; padding: 3px 6px; font-size: 0.95em;" />
                         </td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #27ae60; font-weight: 600;">$${p.precioUnitario?.toLocaleString('es-AR') || '0'}</td>
+                        <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #27ae60; font-weight: 700; background: rgba(39, 174, 96, 0.05);">$${costo.toLocaleString('es-AR')}</td>
                         <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 600;">${p.rendimientoReal ?? '—'}</td>
                         <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #3b82f6; font-weight: 600;">${p.jornalesReales != null ? p.jornalesReales.toFixed(1) : '—'}</td>
                         <td style="padding: var(--space-2) var(--space-3); text-align: center; font-weight: 700; ${desvioClass}">${p.desvioJornales != null ? (p.desvioJornales > 0 ? '+' : '') + p.desvioJornales.toFixed(1) + '%' : '—'}</td>
                         <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 600;">${p.rendimientoSugerido ?? '—'}</td>
                         <td style="padding: var(--space-2) var(--space-3); text-align: center; color: #a855f7; font-weight: 600;">${p.jornalesSugeridos ?? '—'}</td>
                         <td style="padding: var(--space-2) var(--space-3); text-align: center; font-size: 0.85em;" title="${fuenteLabel}">${fuenteIcon}</td>
-                    </tr>
+                        </tr>
                 `;
                 });
             });
@@ -4952,73 +4960,70 @@ export function renderPomResumenFinca(resumen) {
             : 'var(--text-tertiary)';
 
         html += `
-  <div style = "background: var(--bg-secondary); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;" >
-            <!--Finca Header-->
-            <div style="padding: var(--space-4) var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.04)); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
-                <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.15em; display: flex; align-items: center; gap: var(--space-2);">
-                    <span style="font-size: 1.3em;">🏡</span> ${f.finca}
-                </h3>
-                <div style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin-left: auto;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Predios</div>
-                        <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.prediosCount}</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Cuarteles</div>
-                        <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.cuartelesCount}</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Hectáreas</div>
-                        <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.hectareas.toFixed(1)}</div>
+            <div style="background: var(--bg-secondary); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow: hidden;">
+                <div style="padding: var(--space-4) var(--space-5); background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.04)); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+                    <h3 style="margin: 0; font-family: var(--font-display); font-weight: 800; color: var(--text-primary); font-size: 1.15em; display: flex; align-items: center; gap: var(--space-2);">
+                        <span style="font-size: 1.3em;">🏡</span> ${f.finca}
+                    </h3>
+                    <div style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin-left: auto;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Predios</div>
+                            <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.prediosCount}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Cuarteles</div>
+                            <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.cuartelesCount}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.65em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.06em;">Hectareas</div>
+                            <div style="font-weight: 800; color: var(--text-primary); font-size: 1.1em;">${f.hectareas.toFixed(1)}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!--Totals Row-->
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle);">
-                <div style="text-align: center; padding: var(--space-3); background: rgba(16,185,129,0.05); border-radius: var(--radius-md);">
-                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(16,185,129,0.7); font-weight: 700;">J. Proyectados</div>
-                    <div style="font-size: 1.4em; font-weight: 900; color: #10b981; font-family: var(--font-display);">${f.jornalesProyectados.toLocaleString('es-AR')}</div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle);">
+                    <div style="text-align: center; padding: var(--space-3); background: rgba(16,185,129,0.05); border-radius: var(--radius-md);">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(16,185,129,0.7); font-weight: 700;">J. Proyectados</div>
+                        <div style="font-size: 1.4em; font-weight: 900; color: #10b981; font-family: var(--font-display);">${f.jornalesProyectados.toLocaleString('es-AR')}</div>
+                    </div>
+                    <div style="text-align: center; padding: var(--space-3); background: rgba(59,130,246,0.05); border-radius: var(--radius-md);">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(59,130,246,0.7); font-weight: 700;">J. Reales</div>
+                        <div style="font-size: 1.4em; font-weight: 900; color: #3b82f6; font-family: var(--font-display);">${f.jornalesReales > 0 ? f.jornalesReales.toLocaleString('es-AR') : '—'}</div>
+                    </div>
+                    <div style="text-align: center; padding: var(--space-3); background: rgba(245,158,11,0.05); border-radius: var(--radius-md);">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(245,158,11,0.7); font-weight: 700;">Desvio</div>
+                        <div style="font-size: 1.4em; font-weight: 900; color: ${desvioColor}; font-family: var(--font-display);">${f.desvioTotal != null ? (f.desvioTotal > 0 ? '+' : '') + f.desvioTotal.toFixed(1) + '%' : '—'}</div>
+                    </div>
+                    <div style="text-align: center; padding: var(--space-3); background: rgba(168,85,247,0.05); border-radius: var(--radius-md);">
+                        <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(168,85,247,0.7); font-weight: 700;">J. Sugeridos</div>
+                        <div style="font-size: 1.4em; font-weight: 900; color: #a855f7; font-family: var(--font-display);">${f.jornalesSugeridos > 0 ? f.jornalesSugeridos.toLocaleString('es-AR') : '—'}</div>
+                    </div>
                 </div>
-                <div style="text-align: center; padding: var(--space-3); background: rgba(59,130,246,0.05); border-radius: var(--radius-md);">
-                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(59,130,246,0.7); font-weight: 700;">J. Reales</div>
-                    <div style="font-size: 1.4em; font-weight: 900; color: #3b82f6; font-family: var(--font-display);">${f.jornalesReales > 0 ? f.jornalesReales.toLocaleString('es-AR') : '—'}</div>
-                </div>
-                <div style="text-align: center; padding: var(--space-3); background: rgba(245,158,11,0.05); border-radius: var(--radius-md);">
-                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(245,158,11,0.7); font-weight: 700;">Desvío</div>
-                    <div style="font-size: 1.4em; font-weight: 900; color: ${desvioColor}; font-family: var(--font-display);">${f.desvioTotal != null ? (f.desvioTotal > 0 ? '+' : '') + f.desvioTotal.toFixed(1) + '%' : '—'}</div>
-                </div>
-                <div style="text-align: center; padding: var(--space-3); background: rgba(168,85,247,0.05); border-radius: var(--radius-md);">
-                    <div style="font-size: 0.65em; text-transform: uppercase; color: rgba(168,85,247,0.7); font-weight: 700;">J. Sugeridos</div>
-                    <div style="font-size: 1.4em; font-weight: 900; color: #a855f7; font-family: var(--font-display);">${f.jornalesSugeridos > 0 ? f.jornalesSugeridos.toLocaleString('es-AR') : '—'}</div>
-                </div>
-            </div>
 
-            <!--Labor Breakdown Table-->
-  <div style="padding: var(--space-4) var(--space-5);">
-    <table style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
-      <thead>
-        <tr style="border-bottom: 1px solid var(--border-subtle);">
-          <th style="text-align: left; padding: var(--space-2) var(--space-3); color: var(--text-tertiary); font-weight: 600; font-size: 0.88em;">Labor / Faena</th>
-          <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #10b981; font-weight: 600; font-size: 0.88em;">Proyectados</th>
-          <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #3b82f6; font-weight: 600; font-size: 0.88em;">Reales</th>
-          <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #a855f7; font-weight: 600; font-size: 0.88em;">Sugeridos</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${f.labores.map(l => `
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary); font-weight: 500;">${l.nombre}</td>
-                                <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #10b981; font-weight: 700;">${l.jornalesP.toFixed(1)}</td>
-                                <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #3b82f6; font-weight: 700;">${l.jornalesR > 0 ? l.jornalesR.toFixed(1) : '—'}</td>
-                                <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #a855f7; font-weight: 700;">${l.jornalesS > 0 ? l.jornalesS.toFixed(1) : '—'}</td>
+                <div style="padding: var(--space-4) var(--space-5);">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border-subtle);">
+                                <th style="text-align: left; padding: var(--space-2) var(--space-3); color: var(--text-tertiary); font-weight: 600; font-size: 0.88em;">Labor / Faena</th>
+                                <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #10b981; font-weight: 600; font-size: 0.88em;">Proyectados</th>
+                                <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #3b82f6; font-weight: 600; font-size: 0.88em;">Reales</th>
+                                <th style="text-align: right; padding: var(--space-2) var(--space-3); color: #a855f7; font-weight: 600; font-size: 0.88em;">Sugeridos</th>
                             </tr>
-                        `).join('')}
-      </tbody>
-    </table>
-  </div>
-        </div>
-  `;
+                        </thead>
+                        <tbody>
+                            ${f.labores.map(l => `
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                    <td style="padding: var(--space-2) var(--space-3); color: var(--text-primary); font-weight: 500;">${l.nombre}</td>
+                                    <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #10b981; font-weight: 700;">${l.jornalesP.toFixed(1)}</td>
+                                    <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #3b82f6; font-weight: 700;">${l.jornalesR > 0 ? l.jornalesR.toFixed(1) : '—'}</td>
+                                    <td style="padding: var(--space-2) var(--space-3); text-align: right; color: #a855f7; font-weight: 700;">${l.jornalesS > 0 ? l.jornalesS.toFixed(1) : '—'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
     });
 
     html += '</div>';
@@ -5818,4 +5823,214 @@ export function renderInventoryModals() {
     </div>
   </div>
 `;
+}
+
+/**
+ * Renders the main container for the unified "Presupuestos y Planificación" module.
+ * @param {string} activeTab - The ID of the currently selected tab.
+ */
+export function renderPresupuestosPlanificacionLayout(activeTab = 'pp-jornales') {
+    const tabs = [
+        { id: 'pp-jornales', label: 'Jornales (POM)', icon: '👷' },
+        { id: 'pp-fitosanitarios', label: 'Fitosanitarios', icon: '🧪' },
+        { id: 'pp-fertilizantes', label: 'Fertilizantes', icon: '🌿' },
+        { id: 'pp-insumos', label: 'Insumos', icon: '📦' },
+        { id: 'pp-inversiones', label: 'Inversiones', icon: '💡' },
+        { id: 'pp-calendario', label: 'Calendario', icon: '📅' }
+    ];
+
+    return `
+        <div class="fade-in">
+            <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); background: var(--bg-secondary); padding: 6px; border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
+                ${tabs.map(tab => `
+                    <button class="nav-tab-btn ${tab.id === activeTab ? 'active' : ''}" 
+                            data-tab="${tab.id}"
+                            style="padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius-lg); font-weight: 700; font-size: 0.88em; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; background: ${tab.id === activeTab ? 'var(--color-primary-500)' : 'transparent'}; color: ${tab.id === activeTab ? 'white' : 'var(--text-tertiary)'};">
+                        <span>${tab.icon}</span> ${tab.label}
+                    </button>
+                `).join('')}
+            </div>
+
+            <div id="pp-tab-content" style="min-height: 500px;">
+                <!-- Sub-module content will be injected here -->
+                <div style="padding: 4rem; text-align: center; color: var(--text-tertiary);">
+                    <div class="spinner" style="margin: 0 auto var(--space-4);"></div>
+                    Cargando módulo...
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Renders the weekly agricultural calendar.
+ * @param {Array} weeks - The 52-week structure from the model.
+ * @param {Object} data - Current calendar state (labors, states).
+ */
+export function renderCalendarioProductivo(weeks, data, states) {
+    const COLORS = states.reduce((acc, s) => ({ ...acc, [s.id]: s.color }), {});
+    
+    return `
+        <div class="card overflow-hidden" style="border: 1px solid var(--border-strong);">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(16, 185, 129, 0.05); padding: var(--space-4) var(--space-6);">
+                <div>
+                    <h3 class="font-display mb-0" style="font-weight: 800; font-size: 1.1em; color: #10b981;">📅 Calendario Productivo — Ciclo ${data.ciclo}</h3>
+                    <p class="text-tertiary small mb-0">Planificación semanal de estados fenológicos y labores de campo</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-ghost" id="btn-cal-reset">Restablecer</button>
+                    <button class="btn btn-sm btn-primary" id="btn-cal-save" style="background: #10b981; border: none;">Guardar Calendario</button>
+                </div>
+            </div>
+            
+            <div style="overflow-x: auto; position: relative; background: rgba(0,0,0,0.1);">
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px;">
+                    <thead>
+                        <!-- Phenological States Row -->
+                        <tr style="background: rgba(0,0,0,0.2);">
+                            <th style="position: sticky; left: 0; z-index: 10; background: var(--bg-secondary); border-right: 2px solid var(--border-strong); width: 220px; padding: 12px; font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary);">Estado Fenológico</th>
+                            ${weeks.map(w => {
+                                const stateId = data.statesMapping[w.number];
+                                const state = states.find(s => s.id === stateId) || { name: '-', color: 'transparent' };
+                                return `<th style="padding: 4px; border-right: 1px solid rgba(255,255,255,0.03); background: ${state.color}15; text-align: center;" title="${state.name}">
+                                    <div style="width: 100%; height: 6px; border-radius: 3px; background: ${state.color};"></div>
+                                </th>`;
+                            }).join('')}
+                        </tr>
+                        <!-- Weeks Row -->
+                        <tr style="background: rgba(255,255,255,0.01); border-bottom: 2px solid var(--border-subtle);">
+                            <th style="position: sticky; left: 0; z-index: 10; background: var(--bg-secondary); border-right: 2px solid var(--border-strong); padding: 12px; font-size: 0.7em; text-transform: uppercase;">Semana / Fecha</th>
+                            ${weeks.map(w => `
+                                <th style="padding: 10px 4px; text-align: center; font-size: 0.65em; color: var(--text-tertiary); border-right: 1px solid rgba(255,255,255,0.03);">
+                                    <div style="font-weight: 800; color: var(--text-primary);">S${w.number}</div>
+                                    <div style="opacity: 0.5;">${w.label}</div>
+                                </th>
+                            `).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Labor Rows -->
+                        ${data.labors.map(labor => `
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                <td style="position: sticky; left: 0; z-index: 10; background: var(--bg-secondary); border-right: 2px solid var(--border-strong); padding: 12px; font-weight: 600; font-size: 0.8em; white-space: nowrap;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span style="opacity: 0.7;">🚜</span>
+                                        ${labor.name}
+                                    </div>
+                                </td>
+                                ${weeks.map(w => {
+                                    const isStart = w.number === labor.startWeek;
+                                    const isInRange = w.number >= labor.startWeek && w.number < (labor.startWeek + labor.duration);
+                                    const color = COLORS[labor.stateId] || '#3b82f6';
+                                    
+                                    return `
+                                        <td class="cal-cell ${isInRange ? 'active' : ''}" 
+                                            data-week="${w.number}" 
+                                            data-labor="${labor.id}"
+                                            style="padding: 4px 2px; border-right: 1px solid rgba(255,255,255,0.02); min-width: 30px; height: 40px;">
+                                            ${isInRange ? `
+                                                <div class="labor-bar ${isStart ? 'is-start' : ''}" 
+                                                     style="height: 28px; background: ${color}; opacity: 0.8; border-radius: ${isStart ? '6px' : '0'}; border-top-right-radius: ${w.number === labor.startWeek + labor.duration - 1 ? '6px' : '0'}; border-bottom-right-radius: ${w.number === labor.startWeek + labor.duration - 1 ? '6px' : '0'}; border-top-left-radius: ${isStart ? '6px' : '0'}; border-bottom-left-radius: ${isStart ? '6px' : '0'}; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                                                     ${isStart ? `<span style="font-size: 0.6em; font-weight: 800; color: white; white-space: nowrap; padding: 0 4px; pointer-events: none;">${labor.duration}w</span>` : ''}
+                                                </div>
+                                            ` : ''}
+                                        </td>
+                                    `;
+                                }).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer" style="padding: var(--space-4); background: rgba(0,0,0,0.2); border-top: 1px solid var(--border-subtle);">
+                <div class="d-flex flex-wrap gap-4 align-items-center">
+                    <div style="font-size: 0.7em; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Referencia de Estados:</div>
+                    ${states.map(s => `
+                        <div class="d-flex align-items-center gap-2" style="font-size: 0.7em; font-weight: 700; color: var(--text-secondary);">
+                            <div style="width: 10px; height: 10px; border-radius: 2px; background: ${s.color};"></div>
+                            ${s.name}
+                        </div>
+                    `).join('')}
+                    <div style="margin-left: auto; font-size: 0.7em; color: var(--text-tertiary); font-style: italic;">
+                        * Arrastre o use los controles para desplazar labores según la fenología real.
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Generic budget table for specialized inputs (Fitos, Fertis, Insumos).
+ */
+export function renderBudgetGenericTable(title, icon, items = []) {
+    return `
+        <div class="card fade-in" style="border: 1px solid var(--border-subtle); background: var(--bg-secondary);">
+            <div class="card-header d-flex justify-content-between align-items-center" style="padding: var(--space-5) var(--space-6);">
+                <div>
+                    <h3 class="font-display mb-0" style="font-weight: 800; font-size: 1.15em; color: var(--color-primary-400);">${icon} ${title}</h3>
+                    <p class="text-tertiary small mb-0">Gestión de costos proyectados por hectárea y por aplicación</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-ghost" style="border: 1px solid var(--border-strong);">📥 Importar Base</button>
+                    <button class="btn btn-sm btn-primary" style="background: var(--color-primary-600); border: none;">➕ Nuevo Registro</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" style="font-size: 0.88em;">
+                    <thead style="background: rgba(0,0,0,0.25);">
+                        <tr>
+                            <th style="padding: 14px 16px; color: var(--text-tertiary); font-weight: 700;">Localización</th>
+                            <th style="color: var(--text-tertiary); font-weight: 700;">Detalle Insumo</th>
+                            <th style="color: var(--text-tertiary); font-weight: 700;">Dosis/Freq</th>
+                            <th style="text-align: right; color: var(--text-tertiary); font-weight: 700;">Costo/Unid</th>
+                            <th style="text-align: right; color: var(--text-tertiary); font-weight: 700;">Presupuesto Ha</th>
+                            <th style="text-align: right; color: var(--text-tertiary); font-weight: 700;">Total Ciclo</th>
+                            <th style="text-align: center; color: var(--text-tertiary); font-weight: 700;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items.length === 0 ? `
+                            <tr>
+                                <td colspan="7" style="padding: 5rem; text-align: center; color: var(--text-tertiary);">
+                                    <div style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.3;">📦</div>
+                                    <p style="font-weight: 600; margin-bottom: 0;">No hay datos cargados para "${title}"</p>
+                                    <p class="small">Use el botón "Nuevo Registro" o importe un archivo CSV para comenzar.</p>
+                                </td>
+                            </tr>
+                        ` : items.map(it => `
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                <td style="padding: 12px 16px;">
+                                    <div style="font-weight: 700; color: var(--text-primary);">${it.finca}</div>
+                                    <div style="font-size: 0.85em; color: var(--text-tertiary);">${it.cuartel}</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600;">${it.producto}</div>
+                                    <div style="font-size: 0.85em; opacity: 0.7;">${it.categoria || 'General'}</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 700;">${it.dosis} ${it.unidad}</div>
+                                    <div style="font-size: 0.85em; color: #3b82f6;">${it.frecuencia} aplicaciones</div>
+                                </td>
+                                <td style="text-align: right; font-family: var(--font-mono);">$${(it.costoUnid || 0).toLocaleString()}</td>
+                                <td style="text-align: right; color: #10b981; font-weight: 700; font-family: var(--font-mono);">$${(it.costoHa || 0).toLocaleString()}</td>
+                                <td style="text-align: right; color: #10b981; font-weight: 900; background: rgba(16,185,129,0.05); font-family: var(--font-mono);">$${(it.costoTotal || 0).toLocaleString()}</td>
+                                <td style="text-align: center;">
+                                    <button class="btn btn-icon btn-sm" style="color: var(--color-primary-400);">✏️</button>
+                                    <button class="btn btn-icon btn-sm" style="color: #ef4444;">🗑️</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer" style="padding: var(--space-4); background: rgba(0,0,0,0.1);">
+                <div class="d-flex justify-content-end align-items-center gap-4">
+                    <div style="font-size: 0.8em; color: var(--text-tertiary); font-weight: 700;">TOTAL PRESUPUESTADO:</div>
+                    <div style="font-size: 1.25em; font-weight: 900; color: #10b981; font-family: var(--font-display);">$${items.reduce((s,i) => s + (i.costoTotal || 0), 0).toLocaleString()}</div>
+                </div>
+            </div>
+        </div>
+    `;
 }

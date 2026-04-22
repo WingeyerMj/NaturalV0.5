@@ -307,7 +307,7 @@ app.post('/api/save-budget-json', async (req, res) => {
 // GET Labores from CSV
 app.get('/api/labores-csv', (req, res) => {
     try {
-        const filePath = path.join(__dirname, '../Fuentes/jornales/faenas-labores.csv');
+        const filePath = path.join(__dirname, '../Fuentes/Jornales/faenas.csv');
         if (!fs.existsSync(filePath)) {
             return res.status(404).json({ success: false, message: 'Archivo de labores no encontrado' });
         }
@@ -316,6 +316,101 @@ app.get('/api/labores-csv', (req, res) => {
     } catch (error) {
         console.error('Error reading labors CSV:', error);
         res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// ═══════════════════════════════════════════════════════════
+// SYNC: Faenas y Labores from CSV → Database
+// Uses Fuentes/Jornales/faenas.csv as the single source of truth
+// ═══════════════════════════════════════════════════════════
+app.post('/api/sync-faenas-csv', async (req, res) => {
+    const client = await pool.connect();
+    try {
+        const filePath = path.join(__dirname, '../Fuentes/Jornales/faenas.csv');
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ success: false, message: 'Archivo faenas.csv no encontrado' });
+        }
+        const content = fs.readFileSync(filePath, 'utf8');
+        const lines = content.split(/\r?\n/).filter(l => l.trim() !== '');
+        if (lines.length < 2) {
+            return res.status(400).json({ success: false, message: 'Archivo vacío o sin datos' });
+        }
+
+        await client.query('BEGIN');
+
+        // 1. Get existing faenas from DB
+        const existingFaenas = await client.query('SELECT id, nombre FROM admin_faenas');
+        const faenasDbMap = new Map();
+        existingFaenas.rows.forEach(r => faenasDbMap.set(r.nombre.trim().toUpperCase(), r.id));
+
+        // 2. Get existing labores from DB
+        const existingLabores = await client.query('SELECT id, nombre FROM admin_labor');
+        const laboresDbMap = new Map();
+        existingLabores.rows.forEach(r => laboresDbMap.set(r.nombre.trim().toUpperCase(), r.id));
+
+        // 3. Parse CSV and extract unique faenas + labores
+        const faenasFromCSV = new Map(); // nombre -> {codigo}
+        const laboresFromCSV = []; // [{laborNombre, faenaNombre, codigo, precio, idLabor}]
+
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(';');
+            if (cols.length < 4) continue;
+
+            const faenaNombre = (cols[2] || '').trim();
+            const laborNombre = (cols[3] || '').trim();
+            const codigo = (cols[1] || '').trim();
+            const precio = parseFloat((cols[4] || '0').replace(/[\$ ]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+            const idLabor = (cols[6] || '').trim();
+
+            if (!faenaNombre || !laborNombre) continue;
+
+            if (!faenasFromCSV.has(faenaNombre)) {
+                faenasFromCSV.set(faenaNombre, { codigo });
+            }
+            laboresFromCSV.push({ laborNombre, faenaNombre, codigo, precio, idLabor });
+        }
+
+        let faenasInserted = 0;
+        let laboresInserted = 0;
+
+        // 4. Insert missing faenas
+        for (const [nombre, data] of faenasFromCSV) {
+            const key = nombre.toUpperCase();
+            if (!faenasDbMap.has(key)) {
+                const result = await client.query(
+                    `INSERT INTO admin_faenas (nombre, categoria, status) VALUES ($1, $2, 'active') RETURNING id`,
+                    [nombre, nombre]
+                );
+                faenasDbMap.set(key, result.rows[0].id);
+                faenasInserted++;
+            }
+        }
+
+        // 5. Insert missing labores
+        for (const lab of laboresFromCSV) {
+            const key = lab.laborNombre.toUpperCase();
+            if (!laboresDbMap.has(key)) {
+                const faenaId = faenasDbMap.get(lab.faenaNombre.toUpperCase());
+                await client.query(
+                    `INSERT INTO admin_labor (nombre, tipo, descripcion, costo_unitario, status) VALUES ($1, $2, $3, $4, 'active')`,
+                    [lab.laborNombre, lab.faenaNombre, `Faena: ${lab.faenaNombre} | Código: ${lab.codigo} | ID Sofia: ${lab.idLabor}`, lab.precio]
+                );
+                laboresDbMap.set(key, true);
+                laboresInserted++;
+            }
+        }
+
+        await client.query('COMMIT');
+        res.json({
+            success: true,
+            message: `Sincronización completada: ${faenasInserted} faenas nuevas (${faenasFromCSV.size} total), ${laboresInserted} labores nuevas (${laboresFromCSV.length} total).`
+        });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Sync faenas CSV error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    } finally {
+        client.release();
     }
 });
 
