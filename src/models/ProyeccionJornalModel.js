@@ -11,32 +11,75 @@
  */
 
 import { SofiaApiModel } from './SofiaApiModel.js';
+import Papa from 'papaparse';
 
 const STORAGE_KEY = 'nf_proyeccion_jornal';
 
 export class ProyeccionJornalModel {
     static _data = null;
 
-    // Default labor catalog with expected units and typical windows
-    static LABOR_CATALOG = [
-        // Especificas (Jornales Desglose)
-        { id: 'poda', nombre: 'Poda', colRend: 25, colJorn: 32, unidadBase: 'plantas', rendimientoDefault: 300, mesInicio: 6, mesFin: 8, categoria: 'Poda' },
-        { id: 'atada', nombre: 'Atada', colRend: 26, colJorn: 33, unidadBase: 'plantas', rendimientoDefault: 400, mesInicio: 8, mesFin: 9, categoria: 'Guiado/Atado' },
-        { id: 'desbrote_troncos', nombre: 'Desbrote de troncos', colRend: 27, colJorn: 34, unidadBase: 'plantas', rendimientoDefault: 500, mesInicio: 10, mesFin: 11, categoria: 'Mantenimiento' },
-        { id: 'acomodo_brotes', nombre: 'Acomodo de brotes', colRend: 28, colJorn: 35, unidadBase: 'plantas', rendimientoDefault: 300, mesInicio: 10, mesFin: 12, categoria: 'Mantenimiento' },
-        { id: 'desniete_deshoje', nombre: 'Desniete Deshoje', colRend: 29, colJorn: 36, unidadBase: 'plantas', rendimientoDefault: 400, mesInicio: 11, mesFin: 1, categoria: 'Mantenimiento' },
-        { id: 'desbrote_poda', nombre: 'Desbrote crit. Poda', colRend: 30, colJorn: 37, unidadBase: 'plantas', rendimientoDefault: 500, mesInicio: 11, mesFin: 12, categoria: 'Mantenimiento' },
-        { id: 'raleo_racimos', nombre: 'Raleo de Racimos', colRend: 31, colJorn: 38, unidadBase: 'plantas', rendimientoDefault: 1000, mesInicio: 12, mesFin: 1, categoria: 'Mantenimiento' },
-        
-        // Generales (Faenas Generales)
-        { id: 'riego', nombre: 'Riego', colJorn: 45, unidadBase: 'hectareas', rendimientoDefault: 10, mesInicio: 5, mesFin: 4, categoria: 'Riego' },
-        { id: 'malezas_mochila', nombre: 'Malezas Mochila', colJorn: 49, unidadBase: 'hectareas', rendimientoDefault: 5, mesInicio: 9, mesFin: 3, categoria: 'Mantenimiento' },
-        { id: 'desmalezar_manual', nombre: 'Desmalezar manual', colJorn: 50, unidadBase: 'hectareas', rendimientoDefault: 4, mesInicio: 9, mesFin: 3, categoria: 'Mantenimiento' },
-        
-        // Cosecha
-        { id: 'cosecha', nombre: 'Cosecha', colJorn: 71, unidadBase: 'plantas', rendimientoDefault: 250, mesInicio: 1, mesFin: 3, categoria: 'Cosecha' },
-        { id: 'levantado', nombre: 'Levantado', colJorn: 78, unidadBase: 'plantas', rendimientoDefault: 350, mesInicio: 2, mesFin: 4, categoria: 'Cosecha' },
-    ];
+    // Default labor catalog - will be populated from CSV
+    static LABOR_CATALOG = [];
+
+    /**
+     * Loads faenas and labors from CSV to populate LABOR_CATALOG.
+     */
+    static async loadLaborsFromCSV() {
+        try {
+            const response = await fetch('/api/labores-csv');
+            const result = await response.json();
+            if (!result.success) throw new Error(result.message);
+
+            return new Promise((resolve, reject) => {
+                Papa.parse(result.content, {
+                    delimiter: ";",
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        const data = results.data;
+                        const catalog = [];
+                        
+                        // Parse faenas-labores.csv structure:
+                        // "ID";"Code";"Faena";"Category";"Locations";"Labor";"Cost";"0";"";"DB_ID"
+                        data.forEach(row => {
+                            if (row.length < 6) return;
+                            const faena = (row[2] || '').trim();
+                            const laborName = (row[5] || '').trim();
+                            const dbId = row[9];
+                            
+                            if (!laborName || laborName === 'Labor') return;
+
+                            // Map to internal format
+                            catalog.push({
+                                id: dbId || laborName.toLowerCase().replace(/\s+/g, '_'),
+                                nombre: laborName,
+                                faena: faena,
+                                categoria: row[3] || 'General',
+                                unidadBase: laborName.toLowerCase().includes('hectarea') ? 'hectareas' : 'plantas',
+                                rendimientoDefault: 100, // Default to be adjusted
+                                mesInicio: 5, // Default
+                                mesFin: 4,    // Default
+                            });
+                        });
+
+                        this.LABOR_CATALOG = catalog;
+                        console.log('[ProyeccionJornalModel] Loaded labors from CSV:', catalog.length);
+                        resolve(catalog);
+                    },
+                    error: (err) => reject(err)
+                });
+            });
+        } catch (error) {
+            console.error('[ProyeccionJornalModel] Error loading labors CSV:', error);
+            // Fallback to minimal catalog if CSV fails
+            if (this.LABOR_CATALOG.length === 0) {
+                this.LABOR_CATALOG = [
+                    { id: 'poda', nombre: 'Poda', categoria: 'Poda', unidadBase: 'plantas', rendimientoDefault: 300, mesInicio: 6, mesFin: 8 },
+                    { id: 'cosecha', nombre: 'Cosecha', categoria: 'Cosecha', unidadBase: 'plantas', rendimientoDefault: 250, mesInicio: 1, mesFin: 3 }
+                ];
+            }
+            return this.LABOR_CATALOG;
+        }
+    }
 
     // ═══════════════════════════════════════════════════════
     // DATA FROM EXCEL: Build the base table from "Tabla general"

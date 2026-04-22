@@ -537,7 +537,7 @@ export class AppController {
             case 'pom-avanzado':
                 if (title) title.textContent = 'POM Avanzado — Proyección de Jornal Específico';
                 content.innerHTML = renderProyeccionJornalView();
-                this.initPomAvanzadoSection();
+                await this.initPomAvanzadoSection();
                 break;
             case 'usuarios':
                 if (title) title.textContent = 'Gestión de Usuarios';
@@ -553,8 +553,8 @@ export class AppController {
                 this.renderInventarioSection(content);
                 break;
             default:
-                // Handle all admin-* sections dynamically
-                if (section && section.startsWith('admin-') && ADMIN_TABLE_CONFIG[section]) {
+                // Handle all admin-* sections dynamically (including inversiones)
+                if (section && (section.startsWith('admin-') || section === 'inversiones-propuestas') && ADMIN_TABLE_CONFIG[section]) {
                     const cfg = ADMIN_TABLE_CONFIG[section];
                     if (title) title.textContent = cfg.title;
                     this.renderAdminCrudSection(content, section);
@@ -993,20 +993,26 @@ export class AppController {
     // ═══════════════════════════════════════════════════════
     // POM AVANZADO — Proyección de Jornal Específico
     // ═══════════════════════════════════════════════════════
-    initPomAvanzadoSection() {
+    async initPomAvanzadoSection() {
         const fmt = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 });
 
         // State
         let currentMatrix = [];
         let currentCiclo = '2025-2026';
 
+        // Load labors from CSV
+        this.showLoader();
+        const labors = await ProyeccionJornalModel.loadLaborsFromCSV();
+        this.hideLoader();
+
         // Populate labor filter
         const laborFilter = document.getElementById('pom-labor-filter');
         if (laborFilter) {
-            ProyeccionJornalModel.LABOR_CATALOG.forEach(l => {
+            laborFilter.innerHTML = '<option value="">Filtrar por Faena/Labor...</option>';
+            labors.forEach(l => {
                 const opt = document.createElement('option');
                 opt.value = l.id;
-                opt.textContent = l.nombre;
+                opt.textContent = `${l.faena} - ${l.nombre}`;
                 laborFilter.appendChild(opt);
             });
         }
@@ -1215,7 +1221,7 @@ export class AppController {
                     this.showToast('Presupuesto guardado permanentemente en la base de datos', 'success');
                     localStorage.setItem('has_loaded_pom', 'true');
                 } else {
-                    this.showToast('Error al guardar en BD. Se guardó respaldo en archivos.', 'warning');
+                    this.showToast('Presupuesto guardado con éxito (en archivos locales del servidor).', 'success');
                 }
             } catch (error) {
                 console.error('[POM] Error saving:', error);

@@ -304,6 +304,21 @@ app.post('/api/save-budget-json', async (req, res) => {
     }
 });
 
+// GET Labores from CSV
+app.get('/api/labores-csv', (req, res) => {
+    try {
+        const filePath = path.join(__dirname, '../Fuentes/jornales/faenas-labores.csv');
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ success: false, message: 'Archivo de labores no encontrado' });
+        }
+        const content = fs.readFileSync(filePath, 'utf8');
+        res.json({ success: true, content });
+    } catch (error) {
+        console.error('Error reading labors CSV:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 // ═══════════════════════════════════════════════════════════
 // MIGRACIÓN: Agregar columna 'cultivo' a admin_cuarteles
 // ═══════════════════════════════════════════════════════════
