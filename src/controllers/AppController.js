@@ -333,6 +333,7 @@ export class AppController {
         this.autoLoadJornalesBudget();
         // Sync faenas/labores from CSV to DB (non-blocking, background)
         this.syncFaenasFromCSV();
+        await this.updateAdminHeadersFromCSV();
 
         // Defer static Sofia CSV files to background (don't block dashboard load)
         // They will be loaded when the aplicaciones section is actually opened
@@ -481,7 +482,8 @@ export class AppController {
             switch (section) {
             case 'home':
                 if (title) title.textContent = 'Bienvenido';
-                content.innerHTML = user.role === 'Carga' ? renderCargaHome() : renderDashboardHome();
+                const summary = (user.role !== 'Carga' && user.rol !== 'Carga') ? await this.getAdminSyncSummary() : null;
+                content.innerHTML = (user.role === 'Carga' || user.rol === 'Carga') ? renderCargaHome() : renderDashboardHome(summary);
                 break;
             case 'jornales':
                 if (title) title.textContent = 'Informe de Jornales';
@@ -1458,7 +1460,7 @@ export class AppController {
         const formatMoney = (n) => '$ ' + n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
         
         const totalProy = matrix.reduce((s, p) => s + (p.jornalesProyectados || 0), 0);
-        const totalReal = matrix.reduce((s, p) => s + (p.jornalesReales || 0), 0);
+        const totalReal = matrix.totalRealSofia != null ? matrix.totalRealSofia : matrix.reduce((s, p) => s + (p.jornalesReales || 0), 0);
         const totalCosto = matrix.reduce((s, p) => s + ((p.jornalesProyectados || 0) * (p.precioUnitario || 0)), 0);
         const desvio = totalProy > 0 && totalReal > 0 ? ((totalReal - totalProy) / totalProy * 100) : null;
 
@@ -4836,6 +4838,82 @@ async syncFaenasFromCSV() {
         }
     } catch (e) {
         console.warn('[Sync] Faenas CSV sync failed (non-blocking):', e.message);
+    }
+}
+
+/**
+ * Updates ADMIN_TABLE_CONFIG labels dynamically from the CSV headers.
+ * Ensures the UI titles match the source file as requested.
+ */
+async updateAdminHeadersFromCSV() {
+    try {
+        const resp = await fetch('/Fuentes/Jornales/faenas.csv');
+        if (!resp.ok) return;
+        const text = await resp.text();
+        const firstLine = text.split(/\r?\n/)[0];
+        if (!firstLine) return;
+
+        const headers = firstLine.split(';');
+        if (headers.length < 4) return;
+
+        // Map to admin-faenas config
+        const faenaConfig = ADMIN_TABLE_CONFIG['admin-faenas'];
+        if (faenaConfig && faenaConfig.columns) {
+            const nameCol = faenaConfig.columns.find(c => c.key === 'nombre');
+            if (nameCol) nameCol.label = headers[2] || nameCol.label;
+            
+            const catCol = faenaConfig.columns.find(c => c.key === 'categoria');
+            if (catCol) catCol.label = headers[1] || catCol.label;
+        }
+
+        // Map to admin-labor config
+        const laborConfig = ADMIN_TABLE_CONFIG['admin-labor'];
+        if (laborConfig && laborConfig.columns) {
+            const nameCol = laborConfig.columns.find(c => c.key === 'nombre');
+            if (nameCol) nameCol.label = headers[3] || nameCol.label;
+
+            const priceCol = laborConfig.columns.find(c => c.key === 'costo_unitario');
+            if (priceCol) priceCol.label = headers[4] || priceCol.label;
+
+            const typeCol = laborConfig.columns.find(c => c.key === 'tipo');
+            if (typeCol) typeCol.label = headers[2] || typeCol.label;
+
+            const rendCol = laborConfig.columns.find(c => c.key === 'rendimiento');
+            if (rendCol) rendCol.label = headers[5] || rendCol.label;
+        }
+    } catch (e) {
+        console.warn('[Sync] Failed to update admin headers from CSV:', e);
+    }
+}
+
+/**
+ * Fetches summary statistics for the dashboard home.
+ */
+async getAdminSyncSummary() {
+    try {
+        const [faenas, labores] = await Promise.all([
+            fetch(`${VITE_API_URL}/admin-faenas`).then(r => r.json()),
+            fetch(`${VITE_API_URL}/admin-labor`).then(r => r.json())
+        ]);
+        
+        let csvUpdated = 'Hoy';
+        try {
+            // Attempt to get last modified date of the CSV file
+            const resp = await fetch('/Fuentes/Jornales/faenas.csv', { method: 'HEAD' });
+            const lastMod = resp.headers.get('Last-Modified');
+            if (lastMod) {
+                csvUpdated = new Date(lastMod).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            }
+        } catch(e) {}
+
+        return {
+            faenasCount: faenas.length || 0,
+            laboresCount: labores.length || 0,
+            csvUpdated: csvUpdated
+        };
+    } catch (e) {
+        console.warn('[Sync] Failed to fetch admin summary:', e);
+        return { faenasCount: 0, laboresCount: 0, csvUpdated: '--/--' };
     }
 }
 

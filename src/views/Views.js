@@ -517,17 +517,40 @@ function renderSidebarMenu(menuItems, activeSection) {
   return html;
 }
 
-// ── Dashboard Home Content ──
-export function renderDashboardHome() {
+export function renderDashboardHome(summary = null) {
   return `
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center; color: var(--text-secondary);">
-      <div style="margin-bottom: var(--space-8);">
-          <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 150px; height: 150px; animation: coinFlip 6s ease-in-out infinite; filter: drop-shadow(0 0 40px rgba(16, 185, 129, 0.15));">
-      </div>
-      <h2 style="font-family: 'Outfit'; color: var(--text-primary); font-size: 2.5rem; margin-bottom: var(--space-4);">¡Bienvenido a NaturalFood!</h2>
-      <p style="font-size: 1.1rem; max-width: 500px; margin: 0 auto; opacity: 0.7; line-height: 1.6;">
-        Selecciona una sección en el menú lateral para <br> comenzar a gestionar tu producción.
-      </p>
+    <div style="padding: var(--space-6);">
+        <div style="margin-bottom: var(--space-8); text-align: center;">
+            <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 100px; height: 100px; animation: coinFlip 6s ease-in-out infinite; filter: drop-shadow(0 0 40px rgba(16, 185, 129, 0.15));">
+            <h2 style="font-family: 'Outfit'; color: var(--text-primary); font-size: 2rem; margin-top: var(--space-4);">¡Bienvenido a NaturalFood!</h2>
+            <p style="color: var(--text-tertiary); opacity: 0.8;">Gestión Agrícola Inteligente</p>
+        </div>
+
+        ${summary ? `
+        <div class="summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-6); margin-top: var(--space-8);">
+            <div class="summary-card" style="background: var(--bg-secondary); padding: var(--space-6); border-radius: 20px; border: 1px solid var(--border-subtle); text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: var(--space-2);">📋</div>
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--color-primary-400); font-family: 'Outfit';">${summary.faenasCount || 0}</div>
+                <div style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: var(--text-tertiary);">Faenas Sincronizadas</div>
+            </div>
+            <div class="summary-card" style="background: var(--bg-secondary); padding: var(--space-6); border-radius: 20px; border: 1px solid var(--border-subtle); text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: var(--space-2);">🔨</div>
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--color-primary-400); font-family: 'Outfit';">${summary.laboresCount || 0}</div>
+                <div style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: var(--text-tertiary);">Labores Activas</div>
+            </div>
+            <div class="summary-card" style="background: var(--bg-secondary); padding: var(--space-6); border-radius: 20px; border: 1px solid var(--border-subtle); text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: var(--space-2);">📊</div>
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--color-primary-400); font-family: 'Outfit';">${summary.csvUpdated || '--/--'}</div>
+                <div style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: var(--text-tertiary);">Última Actualización CSV</div>
+            </div>
+        </div>
+        ` : `
+        <div style="text-align: center; color: var(--text-secondary); margin-top: var(--space-8);">
+          <p style="font-size: 1.1rem; max-width: 500px; margin: 0 auto; opacity: 0.7; line-height: 1.6;">
+            Selecciona una sección en el menú lateral para <br> comenzar a gestionar tu producción.
+          </p>
+        </div>
+        `}
     </div>
   `;
 }

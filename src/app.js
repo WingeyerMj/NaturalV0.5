@@ -37,6 +37,7 @@ app.use('/sofia-api', createProxyMiddleware({
 
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, '../dist')));
+app.use('/Fuentes', express.static(path.join(__dirname, '../Fuentes')));
 
 // -- Auth API Endpoints --
 
@@ -307,7 +308,7 @@ app.post('/api/save-budget-json', async (req, res) => {
 // GET Labores from CSV
 app.get('/api/labores-csv', (req, res) => {
     try {
-        const filePath = path.join(__dirname, '../Fuentes/Jornales/faenas.csv');
+        const filePath = path.join(__dirname, '../Fuentes/Jornales/faenas-labores.csv');
         if (!fs.existsSync(filePath)) {
             return res.status(404).json({ success: false, message: 'Archivo de labores no encontrado' });
         }
@@ -321,14 +322,14 @@ app.get('/api/labores-csv', (req, res) => {
 
 // ═══════════════════════════════════════════════════════════
 // SYNC: Faenas y Labores from CSV → Database
-// Uses Fuentes/Jornales/faenas.csv as the single source of truth
+// Uses Fuentes/Jornales/faenas-labores.csv as the single source of truth
 // ═══════════════════════════════════════════════════════════
 app.post('/api/sync-faenas-csv', async (req, res) => {
     const client = await pool.connect();
     try {
-        const filePath = path.join(__dirname, '../Fuentes/Jornales/faenas.csv');
+        const filePath = path.join(__dirname, '../Fuentes/Jornales/faenas-labores.csv');
         if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ success: false, message: 'Archivo faenas.csv no encontrado' });
+            return res.status(404).json({ success: false, message: 'Archivo faenas-labores.csv no encontrado' });
         }
         const content = fs.readFileSync(filePath, 'utf8');
         const lines = content.split(/\r?\n/).filter(l => l.trim() !== '');
@@ -350,7 +351,7 @@ app.post('/api/sync-faenas-csv', async (req, res) => {
 
         // 3. Parse CSV and extract unique faenas + labores
         const faenasFromCSV = new Map(); // nombre -> {codigo}
-        const laboresFromCSV = []; // [{laborNombre, faenaNombre, codigo, precio, idLabor}]
+        const laboresFromCSV = []; // [{laborNombre, faenaNombre, codigo, precio, idLabor, rendimiento}]
 
         for (let i = 1; i < lines.length; i++) {
             const cols = lines[i].split(';');
@@ -360,6 +361,7 @@ app.post('/api/sync-faenas-csv', async (req, res) => {
             const laborNombre = (cols[3] || '').trim();
             const codigo = (cols[1] || '').trim();
             const precio = parseFloat((cols[4] || '0').replace(/[\$ ]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+            const rendimiento = (cols[5] || '0').trim();
             const idLabor = (cols[6] || '').trim();
 
             if (!faenaNombre || !laborNombre) continue;
@@ -367,43 +369,51 @@ app.post('/api/sync-faenas-csv', async (req, res) => {
             if (!faenasFromCSV.has(faenaNombre)) {
                 faenasFromCSV.set(faenaNombre, { codigo });
             }
-            laboresFromCSV.push({ laborNombre, faenaNombre, codigo, precio, idLabor });
+            laboresFromCSV.push({ laborNombre, faenaNombre, codigo, precio, idLabor, rendimiento });
         }
 
-        let faenasInserted = 0;
-        let laboresInserted = 0;
+        let faenasSynced = 0;
+        let laboresSynced = 0;
 
-        // 4. Insert missing faenas
+        // 4. Ensure Unique Constraints for UPSERT
+        try { await client.query(`ALTER TABLE admin_faenas ADD CONSTRAINT admin_faenas_nombre_unique UNIQUE (nombre)`); } catch(e) {}
+        try { await client.query(`ALTER TABLE admin_labor ADD CONSTRAINT admin_labor_nombre_unique UNIQUE (nombre)`); } catch(e) {}
+
+        // 5. Sync faenas (UPSERT)
         for (const [nombre, data] of faenasFromCSV) {
-            const key = nombre.toUpperCase();
-            if (!faenasDbMap.has(key)) {
-                const result = await client.query(
-                    `INSERT INTO admin_faenas (nombre, categoria, status) VALUES ($1, $2, 'active') RETURNING id`,
-                    [nombre, nombre]
-                );
-                faenasDbMap.set(key, result.rows[0].id);
-                faenasInserted++;
-            }
+            await client.query(
+                `INSERT INTO admin_faenas (nombre, categoria, status) 
+                 VALUES ($1, $2, 'active') 
+                 ON CONFLICT (nombre) DO UPDATE 
+                 SET categoria = EXCLUDED.categoria, updated_at = NOW()`,
+                [nombre, data.codigo]
+            );
+            faenasSynced++;
         }
 
-        // 5. Insert missing labores
+        // 5. Sync labores (UPSERT)
+        // Ensure column 'rendimiento' exists before syncing
+        try { await client.query(`ALTER TABLE admin_labor ADD COLUMN IF NOT EXISTS rendimiento VARCHAR(100)`); } catch(e) {}
+
         for (const lab of laboresFromCSV) {
-            const key = lab.laborNombre.toUpperCase();
-            if (!laboresDbMap.has(key)) {
-                const faenaId = faenasDbMap.get(lab.faenaNombre.toUpperCase());
-                await client.query(
-                    `INSERT INTO admin_labor (nombre, tipo, descripcion, costo_unitario, status) VALUES ($1, $2, $3, $4, 'active')`,
-                    [lab.laborNombre, lab.faenaNombre, `Faena: ${lab.faenaNombre} | Código: ${lab.codigo} | ID Sofia: ${lab.idLabor}`, lab.precio]
-                );
-                laboresDbMap.set(key, true);
-                laboresInserted++;
-            }
+            await client.query(
+                `INSERT INTO admin_labor (nombre, tipo, descripcion, costo_unitario, status, rendimiento) 
+                 VALUES ($1, $2, $3, $4, 'active', $5) 
+                 ON CONFLICT (nombre) DO UPDATE 
+                 SET tipo = EXCLUDED.tipo, 
+                     descripcion = EXCLUDED.descripcion, 
+                     costo_unitario = EXCLUDED.costo_unitario, 
+                     rendimiento = EXCLUDED.rendimiento,
+                     updated_at = NOW()`,
+                [lab.laborNombre, lab.faenaNombre, `Faena: ${lab.faenaNombre} | Código: ${lab.codigo} | ID Sofia: ${lab.idLabor}`, lab.precio, lab.rendimiento]
+            );
+            laboresSynced++;
         }
 
         await client.query('COMMIT');
         res.json({
             success: true,
-            message: `Sincronización completada: ${faenasInserted} faenas nuevas (${faenasFromCSV.size} total), ${laboresInserted} labores nuevas (${laboresFromCSV.length} total).`
+            message: `Sincronización masiva completada: ${faenasSynced} faenas y ${laboresSynced} labores procesadas (creadas o actualizadas).`
         });
     } catch (error) {
         await client.query('ROLLBACK');

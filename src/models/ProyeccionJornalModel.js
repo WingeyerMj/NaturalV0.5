@@ -95,7 +95,7 @@ export class ProyeccionJornalModel {
      */
     static async loadBaseFromExcel() {
         try {
-            const response = await fetch('/Fuentes/Presupuestos/Prueba de Gral.xlsx');
+            const response = await fetch(`/Fuentes/Presupuestos/Prueba de Gral.xlsx?t=${Date.now()}`);
             if (!response.ok) throw new Error('No se pudo cargar el archivo Excel');
             
             const arrayBuffer = await response.arrayBuffer();
@@ -108,11 +108,70 @@ export class ProyeccionJornalModel {
             const raw = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
             if (raw.length < 2) return [];
 
+            const headers2 = raw[1] || []; // Row 2 has the labor names
+            const COL_CS = 96; // CS Column (0-indexed)
+
+            // DYNAMIC MAPPING: Link LABOR_CATALOG items to Excel columns
+            // We use a Set to ensure each column is only assigned to ONE labor, avoiding double counting.
+            const assignedCols = new Set();
+            const assignedRends = new Set();
+
+            this.LABOR_CATALOG.forEach(l => {
+                const searchName = l.nombre.toLowerCase().trim();
+                const searchFaena = (l.faena || '').toLowerCase().trim();
+                
+                l.colJorn = null;
+                l.colRend = null;
+
+                // Priority 1: Exact labor name match
+                for (let j = 0; j < headers2.length; j++) {
+                    const h = (headers2[j] || '').toString().toLowerCase().trim();
+                    if (!h || assignedCols.has(j)) continue;
+
+                    if (h === searchName) {
+                        l.colJorn = j;
+                        assignedCols.add(j);
+                        break;
+                    }
+                }
+
+                // Priority 2: Faena name match (if still null)
+                if (l.colJorn == null) {
+                    for (let j = 0; j < headers2.length; j++) {
+                        const h = (headers2[j] || '').toString().toLowerCase().trim();
+                        if (!h || assignedCols.has(j)) continue;
+
+                        if (h === searchFaena) {
+                            l.colJorn = j;
+                            assignedCols.add(j);
+                            break;
+                        }
+                    }
+                }
+
+                // Match Rendimiento column: "Rendimiento [Name]" or "Rend. [Name]"
+                for (let j = 0; j < headers2.length; j++) {
+                    const h = (headers2[j] || '').toString().toLowerCase().trim();
+                    if (!h || assignedRends.has(j)) continue;
+
+                    if (h.includes('rendimiento') || h.includes('rend.')) {
+                        if (h.includes(searchName) || h.includes(searchFaena)) {
+                            l.colRend = j;
+                            assignedRends.add(j);
+                            break;
+                        }
+                    }
+                }
+            });
+
             const dataRows = raw.slice(2); 
 
             const result = [];
-            dataRows.forEach(row => {
-                if (!row[0] || !row[1]) return; // Skip if no finca or no cuartel
+            dataRows.forEach((row, rowIndex) => {
+                // Row 110 in Excel is dataRows index 107 (since raw starts at 0, dataRows at 2)
+                // Actually the user said Row 110, which is row index 109 in raw.
+                // We skip rows with no finca/cuartel to avoid processing the "Total" row (Row 110).
+                if (!row[0] || !row[1] || row[0].toString().toLowerCase().includes('total')) return; 
 
                 const rendimientos = {};
                 const jornales = {};
@@ -135,6 +194,7 @@ export class ProyeccionJornalModel {
                 result.push(record);
             });
 
+            console.log(`[ProyeccionJornal] Imported ${result.length} cuarteles with dynamic column mapping.`);
             return result;
         } catch (error) {
             console.error('[ProyeccionJornal] Error loading Excel base:', error);
@@ -225,9 +285,21 @@ export class ProyeccionJornalModel {
                 const rendimiento = override.rendimiento != null ? override.rendimiento : orgRend;
                 const jornalesAuto = this.calcularJornalesProyectados(cuartel, { ...labor, rendimiento });
                 
-                // If the user hasn't edited the jornales but the Excel had a value, we might want to respect the Excel value
-                // Or if we want strictly formula-based:
-                const jornales = override.jornales != null ? override.jornales : (orgJornales > 0 && override.rendimiento == null ? orgJornales : jornalesAuto);
+                // LOGIC: If the labor exists in Excel (colJorn is set), we respect the Excel value (orgJornales)
+                // even if it's 0. We ONLY use jornalesAuto if the labor is NOT in Excel or the user explicitly edited it.
+                let jornales = 0;
+                if (override.jornales != null) {
+                    jornales = override.jornales;
+                } else if (labor.colJorn != null) {
+                    // It exists in Excel -> use Excel value (it might be 0, which is correct for that cuartel)
+                    jornales = orgJornales;
+                } else if (orgRend > 0 && orgRend !== 100) { 
+                    // Not in Excel but has a specific rendement in catalog -> calculate
+                    jornales = jornalesAuto;
+                } else {
+                    // Not in Excel and no specific rendement -> default to 0 to avoid inflating totals
+                    jornales = 0;
+                }
 
                 const currentYear = new Date().getFullYear();
                 const fechaInicio = override.fechaInicio || this._buildDefaultDate(labor.mesInicio, currentYear);
@@ -289,6 +361,9 @@ export class ProyeccionJornalModel {
     static async crossWithRealData(projectionMatrix, ciclo = '2025-2026') {
         const allData = await SofiaApiModel.fetchCycleData(ciclo);
 
+        // Calculate absolute total from Sofia API
+        const totalSofiaJornales = allData.reduce((s, r) => s + (r.totalJornadas || 0), 0);
+
         // Group real data by predio + labor
         const realByPredioLabor = {};
         allData.forEach(r => {
@@ -309,6 +384,13 @@ export class ProyeccionJornalModel {
             realByPredioLabor[key].rendimientoTotal += r.rendimiento_val || 0;
             realByPredioLabor[key].count++;
             if (r.fecha) realByPredioLabor[key].fechas.push(r.fecha);
+        });
+
+        // Attach total to the matrix object (as a non-iterable property)
+        Object.defineProperty(projectionMatrix, 'totalRealSofia', {
+            value: totalSofiaJornales,
+            enumerable: false,
+            writable: true
         });
 
         // Cross each projection with real data

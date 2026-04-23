@@ -658,9 +658,9 @@ export const ADMIN_TABLE_CONFIG = {
     title: 'Gestión de Faenas',
     icon: '📋',
     columns: [
-      { key: 'nombre', label: 'Nombre', type: 'text', required: true },
+      { key: 'nombre', label: 'NOMBRE DE FAENA', type: 'text', required: true },
+      { key: 'categoria', label: 'CODIGO', type: 'text' },
       { key: 'descripcion', label: 'Descripción', type: 'textarea' },
-      { key: 'categoria', label: 'Categoría', type: 'text' },
       { key: 'duracion_estimada', label: 'Duración Estimada', type: 'text' },
       { key: 'costo_estimado', label: 'Costo Estimado', type: 'number' },
       { key: 'notas', label: 'Notas', type: 'textarea' },
@@ -670,12 +670,13 @@ export const ADMIN_TABLE_CONFIG = {
     title: 'Gestión de Labor',
     icon: '🔨',
     columns: [
-      { key: 'nombre', label: 'Nombre', type: 'text', required: true },
+      { key: 'nombre', label: 'NOMBRE LABOR', type: 'text', required: true },
       { key: 'faena_id', label: 'Faena (ID)', type: 'number' },
-      { key: 'tipo', label: 'Tipo', type: 'text' },
+      { key: 'tipo', label: 'TIPO', type: 'text' },
       { key: 'descripcion', label: 'Descripción', type: 'textarea' },
       { key: 'unidad_medida', label: 'Unidad de Medida', type: 'text' },
-      { key: 'costo_unitario', label: 'Costo Unitario', type: 'number' },
+      { key: 'costo_unitario', label: 'PRECIO', type: 'number' },
+      { key: 'rendimiento', label: 'RENDIMIENTO', type: 'text' },
       { key: 'notas', label: 'Notas', type: 'textarea' },
     ]
   },
