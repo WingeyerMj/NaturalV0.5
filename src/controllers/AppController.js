@@ -41,7 +41,8 @@ import {
     renderProyeccionJornalView, renderPomDetalleTable, renderPomResumenFinca, renderPomCalendario,
     renderPresupuestosPlanificacionLayout, renderBudgetGenericTable, renderCalendarioProductivo,
     renderCargaDocumentacionView, renderDocumentacionRows, renderTransferRows, renderRemitoExtRows, renderServicioRows,
-    renderStockMovementView, renderRemitoPrintTemplate, renderCargaHome
+    renderStockMovementView, renderRemitoPrintTemplate, renderCargaHome,
+    renderMaquinariaView, renderMaquinariaFicha
 } from '../views/Views.js';
 import { renderInversionesKanbanView } from '../views/InversionesView.js';
 
@@ -2361,10 +2362,16 @@ export class AppController {
 
         container.innerHTML = `<div style="padding: 2rem; text-align: center;"><div class="spinner"></div><p>Cargando Maquinarias...</p></div>`;
 
-        const [data, providers] = await Promise.all([
-            model.getAll(true),
-            providersModel.getAll(true)
-        ]);
+        let data = [];
+        let providers = [];
+        try {
+            [data, providers] = await Promise.all([
+                model.getAll(true),
+                providersModel.getAll(true)
+            ]);
+        } catch (e) {
+            console.warn('Error cargando maquinarias, usando datos locales:', e);
+        }
 
         const catalogs = { 'admin-proveedores': providers };
         container.innerHTML = renderMaquinariaView(data, catalogs);
