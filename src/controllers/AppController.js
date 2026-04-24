@@ -88,6 +88,7 @@ const ROLE_MENUS = {
                 { id: 'usuarios', label: 'Usuarios', icon: '👥' },
                 { id: 'admin-faenas', label: 'Faenas', icon: '📋' },
                 { id: 'admin-labor', label: 'Labor', icon: '🔨' },
+                { id: 'admin-maquinaria', label: 'Maquinarias', icon: '🚜' },
                 { id: 'admin-productos', label: 'Productos', icon: '📦' },
                 { id: 'admin-proveedores', label: 'Proveedores', icon: '🤝' },
                 { id: 'admin-institucional', label: 'Institucional', icon: '🏛️' },
@@ -126,6 +127,7 @@ const ROLE_MENUS = {
             id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
                 { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
                 { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' },
+                { id: 'admin-maquinaria', label: 'Maquinarias', icon: '🚜' },
             ]
         },
         {
@@ -482,8 +484,7 @@ export class AppController {
             switch (section) {
             case 'home':
                 if (title) title.textContent = 'Bienvenido';
-                const summary = (user.role !== 'Carga' && user.rol !== 'Carga') ? await this.getAdminSyncSummary() : null;
-                content.innerHTML = (user.role === 'Carga' || user.rol === 'Carga') ? renderCargaHome() : renderDashboardHome(summary);
+                content.innerHTML = (user.role === 'Carga' || user.rol === 'Carga') ? renderCargaHome() : renderDashboardHome();
                 break;
             case 'jornales':
                 if (title) title.textContent = 'Informe de Jornales';
@@ -590,6 +591,10 @@ export class AppController {
             case 'inversiones-propuestas':
                 if (title) title.textContent = 'Inversiones';
                 this.renderAdminCrudSection(content, section);
+                break;
+            case 'admin-maquinaria':
+                if (title) title.textContent = 'Gestión de Maquinarias';
+                this.renderMaquinariaSection(content);
                 break;
             default:
                 // Handle all admin-* sections dynamically
@@ -2346,6 +2351,221 @@ export class AppController {
         };
 
         this.bindAdminCrudEvents(container, config, model, refreshTable, sectionId);
+    }
+
+    /** ── MAQUINARIA MODULE LOGIC ── **/
+    async renderMaquinariaSection(container) {
+        const model = ADMIN_MODELS['admin-maquinaria'];
+        const config = ADMIN_TABLE_CONFIG['admin-maquinaria'];
+        const providersModel = ADMIN_MODELS['admin-proveedores'];
+
+        container.innerHTML = `<div style="padding: 2rem; text-align: center;"><div class="spinner"></div><p>Cargando Maquinarias...</p></div>`;
+
+        const [data, providers] = await Promise.all([
+            model.getAll(true),
+            providersModel.getAll(true)
+        ]);
+
+        const catalogs = { 'admin-proveedores': providers };
+        container.innerHTML = renderMaquinariaView(data, catalogs);
+
+        this.bindMaquinariaEvents(container, data, catalogs);
+    }
+
+    bindMaquinariaEvents(container, data, catalogs) {
+        const model = ADMIN_MODELS['admin-maquinaria'];
+        const config = ADMIN_TABLE_CONFIG['admin-maquinaria'];
+
+        // Tab Switching
+        container.querySelectorAll('.nav-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                container.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                container.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+                const pane = document.getElementById(tabId + '-pane');
+                if (pane) pane.style.display = 'block';
+
+                // Reset visual state of tab buttons
+                container.querySelectorAll('.nav-tab-btn').forEach(b => {
+                    b.style.background = b.classList.contains('active') ? 'var(--color-primary-500)' : 'transparent';
+                    b.style.color = b.classList.contains('active') ? 'white' : 'var(--text-tertiary)';
+                });
+            });
+        });
+
+        // New Machine
+        document.getElementById('btn-maq-new')?.addEventListener('click', () => {
+            this.openAdminCrudModal(config, null, catalogs, async () => {
+                this.renderMaquinariaSection(container);
+            });
+        });
+
+        // Edit Machine
+        container.querySelectorAll('.btn-maq-edit').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const item = data.find(m => m.id == id);
+                if (item) {
+                    this.openAdminCrudModal(config, item, catalogs, async () => {
+                        this.renderMaquinariaSection(container);
+                    });
+                }
+            });
+        });
+
+        // View Ficha
+        container.querySelectorAll('.btn-maq-ficha').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const item = data.find(m => m.id == id);
+                if (item) {
+                    // Switch to Ficha tab
+                    const fichaTab = container.querySelector('[data-tab="maq-ficha"]');
+                    if (fichaTab) fichaTab.click();
+                    this.renderMaquinariaFichaLogic(item);
+                }
+            });
+        });
+
+        // Export
+        document.getElementById('btn-maq-export')?.addEventListener('click', () => {
+            this.exportToCSV(data, 'Inventario_Maquinarias.csv');
+        });
+    }
+
+    async renderMaquinariaFichaLogic(machine) {
+        const fichaPane = document.getElementById('maq-ficha-pane');
+        if (!fichaPane) return;
+
+        fichaPane.innerHTML = `<div style="padding: 2rem; text-align: center;"><div class="spinner"></div><p>Cargando Historial...</p></div>`;
+
+        // In a real scenario, we would fetch history from a separate table
+        // For now, we'll simulate history or use a local storage key if available
+        let history = JSON.parse(localStorage.getItem(`maq_history_${machine.id}`) || '[]');
+
+        // If no history exists, add a "Registration" entry
+        if (history.length === 0) {
+            history.push({
+                id: 1,
+                fecha: machine.createdAt || new Date().toISOString(),
+                tipo: 'Registro',
+                descripcion: 'Alta inicial de la maquinaria en el sistema.',
+                tecnico: 'Sistema',
+                costo: 0,
+                estado_final: machine.estado
+            });
+        }
+
+        fichaPane.innerHTML = renderMaquinariaFicha(machine, history);
+
+        // Bind Ficha specific events
+        fichaPane.querySelector('.btn-maq-add-service')?.addEventListener('click', () => {
+            this.openMaquinariaServiceModal(machine, 'Servicio', () => this.renderMaquinariaFichaLogic(machine));
+        });
+
+        fichaPane.querySelector('.btn-maq-add-movement')?.addEventListener('click', () => {
+            this.openMaquinariaServiceModal(machine, 'Movimiento', () => this.renderMaquinariaFichaLogic(machine));
+        });
+    }
+
+    openMaquinariaServiceModal(machine, type, callback) {
+        const body = `
+            <form id="maq-service-form">
+                <div class="form-group">
+                    <label class="form-label">Tipo de Intervención</label>
+                    <select class="form-select" id="maq-srv-type" required>
+                        <option value="Servicio Preventivo" ${type === 'Servicio' ? 'selected' : ''}>Servicio Preventivo</option>
+                        <option value="Reparación Correctiva">Reparación Correctiva</option>
+                        <option value="Movimiento Interno" ${type === 'Movimiento' ? 'selected' : ''}>Movimiento Interno</option>
+                        <option value="Auditoría">Auditoría / Inspección</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fecha</label>
+                    <input type="date" class="form-input" id="maq-srv-date" value="${new Date().toISOString().split('T')[0]}" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descripción del Trabajo / Notas</label>
+                    <textarea class="form-input" id="maq-srv-desc" rows="3" placeholder="Detalle las tareas realizadas..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Repuestos / Insumos Utilizados</label>
+                    <input type="text" class="form-input" id="maq-srv-parts" placeholder="Ej: Filtro aceite, Correas..." />
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <div class="form-group">
+                        <label class="form-label">Costo ($)</label>
+                        <input type="number" class="form-input" id="maq-srv-cost" placeholder="0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Técnico / Responsable</label>
+                        <input type="text" class="form-input" id="maq-srv-tech" placeholder="Nombre..." />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estado de la Maquina Post-Trabajo</label>
+                    <select class="form-select" id="maq-srv-status">
+                        <option value="Operativa">Operativa</option>
+                        <option value="En Reparación">En Reparación</option>
+                        <option value="Fuera de Servicio">Fuera de Servicio</option>
+                    </select>
+                </div>
+            </form>
+        `;
+        const footer = `
+            <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
+            <button class="btn btn-primary" id="modal-save">💾 Registrar Intervención</button>
+        `;
+
+        this.showModal(`🔧 Registrar ${type} - ${machine.nombre}`, body, footer);
+
+        document.getElementById('modal-cancel')?.addEventListener('click', () => this.closeModal());
+        document.getElementById('modal-save')?.addEventListener('click', async () => {
+            const entry = {
+                id: Date.now(),
+                fecha: document.getElementById('maq-srv-date').value,
+                tipo: document.getElementById('maq-srv-type').value,
+                descripcion: document.getElementById('maq-srv-desc').value,
+                repuestos: document.getElementById('maq-srv-parts').value,
+                costo: parseFloat(document.getElementById('maq-srv-cost').value) || 0,
+                tecnico: document.getElementById('maq-srv-tech').value,
+                estado_final: document.getElementById('maq-srv-status').value
+            };
+
+            if (!entry.descripcion) {
+                this.showToast('Debe ingresar una descripción', 'warning');
+                return;
+            }
+
+            // Save to local history
+            let history = JSON.parse(localStorage.getItem(`maq_history_${machine.id}`) || '[]');
+            history.unshift(entry);
+            localStorage.setItem(`maq_history_${machine.id}`, JSON.stringify(history));
+
+            // Update machine state and accumulated cost
+            const model = ADMIN_MODELS['admin-maquinaria'];
+            const updatedMachine = {
+                ...machine,
+                estado: entry.estado_final,
+                costo_mantenimiento_acumulado: (parseFloat(machine.costo_mantenimiento_acumulado) || 0) + entry.costo,
+                ultimo_servicio: entry.tipo.includes('Servicio') ? entry.fecha : machine.ultimo_servicio
+            };
+            await model.update(machine.id, updatedMachine);
+
+            // ── Budget Integration ──
+            if (entry.costo > 0) {
+                const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                const d = new Date(entry.fecha);
+                const monthLabel = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+                await PresupuestoModel.addExecuted('Maquinaria', entry.costo, monthLabel);
+            }
+
+            this.showToast('Intervención registrada correctamente', 'success');
+            this.closeModal();
+            if (callback) callback();
+        });
     }
 
     async renderCargaTrabajoSection(container) {

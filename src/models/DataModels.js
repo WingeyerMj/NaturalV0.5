@@ -426,6 +426,23 @@ export class PresupuestoModel {
     });
     return result;
   }
+
+  static async addExecuted(category, amount, month) {
+    const existing = this.CACHE.find(p => p.category === category && p.month === month);
+    if (existing) {
+      existing.executed = (Number(existing.executed) || 0) + amount;
+    } else {
+      this.CACHE.push({
+        id: this.CACHE.length + 1,
+        category,
+        planned: 0,
+        executed: amount,
+        month
+      });
+    }
+    // In a real app, this would also hit an API endpoint
+    return true;
+  }
 }
 
 // ── Aplicacion (Applications/Treatments) Model ──
@@ -606,6 +623,7 @@ export const ADMIN_MODELS = {
   'admin-contratos': AdminContratosModel,
   'admin-carga-trabajo': new AdminCrudModel('trabajo_campo_logs', 'Carga Trabajo'),
   'admin-proveedores': AdminProveedoresModel,
+  'admin-maquinaria': new AdminCrudModel('admin_maquinaria', 'Maquinarias'),
   'inversiones-propuestas': AdminInversionesModel,
 };
 
@@ -745,6 +763,30 @@ export const ADMIN_TABLE_CONFIG = {
       { key: 'direccion', label: 'Dirección', type: 'text' },
       { key: 'contacto_nombre', label: 'Nombre de Contacto', type: 'text' },
       { key: 'notas', label: 'Notas', type: 'textarea' },
+    ]
+  },
+  'admin-maquinaria': {
+    title: 'Gestión de Maquinarias',
+    icon: '🚜',
+    columns: [
+      { key: 'nombre', label: 'Nombre de la Maquinaria', type: 'text', required: true },
+      { key: 'categoria', label: 'Categoría', type: 'select', options: ['Tractor', 'Implemento', 'Herramienta Manual', 'Pulverizadora', 'Cuatriciclo', 'Motosierra', 'Mochila Fumigación', 'Otro'] },
+      { key: 'marca_modelo', label: 'Marca / Modelo', type: 'text' },
+      { key: 'anio', label: 'Año', type: 'number' },
+      { key: 'nro_serie', label: 'Número de Serie', type: 'text' },
+      { key: 'propiedad', label: 'Propiedad', type: 'select', options: ['Propia', 'Alquilada'] },
+      { key: 'proveedor_id', label: 'Proveedor (Alquiler)', type: 'select-model', model: 'admin-proveedores' },
+      { key: 'costo_alquiler', label: 'Costo Alquiler (Hora/Día)', type: 'number' },
+      { key: 'estado', label: 'Estado Actual', type: 'select', options: ['Operativa', 'En Reparación', 'Fuera de Servicio', 'Alquilada', 'Dada de Baja'] },
+      { key: 'ubicacion', label: 'Ubicación', type: 'text' },
+      { key: 'horas_uso', label: 'Horas de Uso Acumuladas', type: 'number' },
+      { key: 'kilometraje', label: 'Kilometraje (si aplica)', type: 'number' },
+      { key: 'costo_adquisicion', label: 'Costo Adquisición (USD)', type: 'number' },
+      { key: 'valor_estimado', label: 'Valor Estimado Actual (USD)', type: 'number' },
+      { key: 'ultimo_servicio', label: 'Último Servicio', type: 'date' },
+      { key: 'proximo_servicio', label: 'Próximo Servicio Programado', type: 'date' },
+      { key: 'costo_mantenimiento_acumulado', label: 'Costo Mantenimiento Acumulado', type: 'number' },
+      { key: 'notas', label: 'Notas / Auditoría', type: 'textarea' },
     ]
   },
   'admin-zonas-riego': {

@@ -526,31 +526,11 @@ export function renderDashboardHome(summary = null) {
             <p style="color: var(--text-tertiary); opacity: 0.8;">Gestión Agrícola Inteligente</p>
         </div>
 
-        ${summary ? `
-        <div class="summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-6); margin-top: var(--space-8);">
-            <div class="summary-card" style="background: var(--bg-secondary); padding: var(--space-6); border-radius: 20px; border: 1px solid var(--border-subtle); text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: var(--space-2);">📋</div>
-                <div style="font-size: 2.5rem; font-weight: 800; color: var(--color-primary-400); font-family: 'Outfit';">${summary.faenasCount || 0}</div>
-                <div style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: var(--text-tertiary);">Faenas Sincronizadas</div>
-            </div>
-            <div class="summary-card" style="background: var(--bg-secondary); padding: var(--space-6); border-radius: 20px; border: 1px solid var(--border-subtle); text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: var(--space-2);">🔨</div>
-                <div style="font-size: 2.5rem; font-weight: 800; color: var(--color-primary-400); font-family: 'Outfit';">${summary.laboresCount || 0}</div>
-                <div style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: var(--text-tertiary);">Labores Activas</div>
-            </div>
-            <div class="summary-card" style="background: var(--bg-secondary); padding: var(--space-6); border-radius: 20px; border: 1px solid var(--border-subtle); text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: var(--space-2);">📊</div>
-                <div style="font-size: 2.5rem; font-weight: 800; color: var(--color-primary-400); font-family: 'Outfit';">${summary.csvUpdated || '--/--'}</div>
-                <div style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: var(--text-tertiary);">Última Actualización CSV</div>
-            </div>
-        </div>
-        ` : `
         <div style="text-align: center; color: var(--text-secondary); margin-top: var(--space-8);">
           <p style="font-size: 1.1rem; max-width: 500px; margin: 0 auto; opacity: 0.7; line-height: 1.6;">
             Selecciona una sección en el menú lateral para <br> comenzar a gestionar tu producción.
           </p>
         </div>
-        `}
     </div>
   `;
 }
@@ -6052,6 +6032,236 @@ export function renderBudgetGenericTable(title, icon, items = []) {
                 <div class="d-flex justify-content-end align-items-center gap-4">
                     <div style="font-size: 0.8em; color: var(--text-tertiary); font-weight: 700;">TOTAL PRESUPUESTADO:</div>
                     <div style="font-size: 1.25em; font-weight: 900; color: #10b981; font-family: var(--font-display);">$${items.reduce((s,i) => s + (i.costoTotal || 0), 0).toLocaleString()}</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Renders the Machinery Management module.
+ */
+export function renderMaquinariaView(data = [], catalogs = {}) {
+    const stats = {
+        total: data.length,
+        operativas: data.filter(m => m.estado === 'Operativa').length,
+        reparacion: data.filter(m => m.estado === 'En Reparación').length,
+        costoMantenimiento: data.reduce((acc, m) => acc + (parseFloat(m.costo_mantenimiento_acumulado) || 0), 0)
+    };
+
+    return `
+        <div class="fade-in">
+            <!-- Summary Stats -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+                <div class="metric-card" style="padding: var(--space-4); background: var(--bg-secondary); border-left: 4px solid var(--color-primary-500);">
+                    <div style="font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;">Total Maquinarias</div>
+                    <div style="font-size: 1.8em; font-weight: 800; color: var(--text-primary);">${stats.total}</div>
+                </div>
+                <div class="metric-card" style="padding: var(--space-4); background: var(--bg-secondary); border-left: 4px solid #10b981;">
+                    <div style="font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;">Operativas</div>
+                    <div style="font-size: 1.8em; font-weight: 800; color: #10b981;">${stats.operativas}</div>
+                </div>
+                <div class="metric-card" style="padding: var(--space-4); background: var(--bg-secondary); border-left: 4px solid #f59e0b;">
+                    <div style="font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;">En Reparación</div>
+                    <div style="font-size: 1.8em; font-weight: 800; color: #f59e0b;">${stats.reparacion}</div>
+                </div>
+                <div class="metric-card" style="padding: var(--space-4); background: var(--bg-secondary); border-left: 4px solid #ef4444;">
+                    <div style="font-size: 0.75em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;">Gasto Mant. Total</div>
+                    <div style="font-size: 1.8em; font-weight: 800; color: var(--text-primary);">$${stats.costoMantenimiento.toLocaleString()}</div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); background: var(--bg-secondary); padding: 6px; border-radius: var(--radius-xl); border: 1px solid var(--border-subtle);">
+                <button class="nav-tab-btn active" data-tab="maq-listado" style="padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius-lg); font-weight: 700; font-size: 0.88em; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; background: var(--color-primary-500); color: white;">
+                    <span>📋</span> Listado General
+                </button>
+                <button class="nav-tab-btn" data-tab="maq-ficha" style="padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius-lg); font-weight: 700; font-size: 0.88em; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; background: transparent; color: var(--text-tertiary);">
+                    <span>🆔</span> Ficha y Auditoría
+                </button>
+            </div>
+
+            <div id="maq-tab-content">
+                <!-- Listado Tab Content -->
+                <div id="maq-listado-pane" class="tab-pane active">
+                    <div class="card" style="border: 1px solid var(--border-subtle);">
+                        <div class="card-header d-flex justify-content-between align-items-center" style="padding: var(--space-4) var(--space-6);">
+                            <h3 style="margin:0; font-size: 1.1em; font-weight: 800;">🚜 Inventario de Maquinarias</h3>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-ghost" id="btn-maq-export">📥 Exportar CSV</button>
+                                <button class="btn btn-sm btn-primary" id="btn-maq-new">➕ Registrar Maquinaria</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" style="font-size: 0.9em;">
+                                <thead style="background: rgba(0,0,0,0.1);">
+                                    <tr>
+                                        <th style="padding: 12px 16px;">Maquinaria</th>
+                                        <th>Categoría</th>
+                                        <th>Estado</th>
+                                        <th>Propiedad</th>
+                                        <th style="text-align: right;">Uso (Hs)</th>
+                                        <th>Últ. Servicio</th>
+                                        <th>Próx. Servicio</th>
+                                        <th style="text-align: right;">Costo Mant.</th>
+                                        <th style="text-align: center;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.length === 0 ? `
+                                        <tr>
+                                            <td colspan="9" style="padding: 4rem; text-align: center; color: var(--text-tertiary);">
+                                                No hay maquinarias registradas. Haga clic en "Registrar" para comenzar.
+                                            </td>
+                                        </tr>
+                                    ` : data.map(m => {
+                                        let statusColor = '#10b981';
+                                        if (m.estado === 'En Reparación') statusColor = '#f59e0b';
+                                        if (m.estado === 'Fuera de Servicio' || m.estado === 'Dada de Baja') statusColor = '#ef4444';
+                                        
+                                        return `
+                                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                                <td style="padding: 12px 16px;">
+                                                    <div style="font-weight: 700; color: var(--text-primary);">${m.nombre}</div>
+                                                    <div style="font-size: 0.8em; color: var(--text-tertiary);">${m.marca_modelo || 'N/A'}</div>
+                                                </td>
+                                                <td><span style="font-size: 0.85em; opacity: 0.8;">${m.categoria}</span></td>
+                                                <td>
+                                                    <span style="display: inline-block; padding: 2px 8px; border-radius: 99px; background: ${statusColor}15; color: ${statusColor}; font-size: 0.75em; font-weight: 800;">
+                                                        ${m.estado}
+                                                    </span>
+                                                </td>
+                                                <td><span style="font-size: 0.85em;">${m.propiedad}</span></td>
+                                                <td style="text-align: right; font-weight: 600;">${m.horas_uso || 0} hs</td>
+                                                <td><span style="font-size: 0.85em; color: var(--text-tertiary);">${m.ultimo_servicio ? new Date(m.ultimo_servicio).toLocaleDateString() : '—'}</span></td>
+                                                <td><span style="font-size: 0.85em; color: ${m.proximo_servicio && new Date(m.proximo_servicio) < new Date() ? '#ef4444' : 'var(--text-tertiary)'}; font-weight: 600;">${m.proximo_servicio ? new Date(m.proximo_servicio).toLocaleDateString() : '—'}</span></td>
+                                                <td style="text-align: right; font-weight: 700; color: var(--color-primary-400);">$${(parseFloat(m.costo_mantenimiento_acumulado) || 0).toLocaleString()}</td>
+                                                <td style="text-align: center;">
+                                                    <button class="btn btn-icon btn-sm btn-maq-edit" data-id="${m.id}" title="Editar">✏️</button>
+                                                    <button class="btn btn-icon btn-sm btn-maq-ficha" data-id="${m.id}" title="Ver Ficha">🆔</button>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ficha Tab Content (initially hidden) -->
+                <div id="maq-ficha-pane" class="tab-pane" style="display: none;">
+                    <div style="padding: 4rem; text-align: center; color: var(--text-tertiary);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                        <h3>Seleccione una maquinaria del listado</h3>
+                        <p>Haga clic en el icono 🆔 de la tabla para ver la ficha completa, auditoría e historial.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Renders the detailed "Ficha" for a specific machine.
+ */
+export function renderMaquinariaFicha(machine, history = []) {
+    if (!machine) return '<div class="alert alert-warning">No se encontró la maquinaria.</div>';
+
+    return `
+        <div class="fade-in">
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-6);">
+                <!-- Machine Info Column -->
+                <div>
+                    <div class="card" style="padding: var(--space-6); background: var(--bg-secondary); position: sticky; top: 1rem;">
+                        <div style="text-align: center; margin-bottom: var(--space-6);">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">🚜</div>
+                            <h2 style="margin:0; font-weight: 800;">${machine.nombre}</h2>
+                            <p style="color: var(--text-tertiary);">${machine.categoria} | ${machine.marca_modelo || ''}</p>
+                            <span style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 800; font-size: 0.8em;">${machine.estado}</span>
+                        </div>
+                        
+                        <div style="border-top: 1px solid var(--border-subtle); padding-top: var(--space-4);">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); font-size: 0.85em;">
+                                <div>
+                                    <label style="color: var(--text-tertiary); font-size: 0.7em; text-transform: uppercase;">Año</label>
+                                    <div style="font-weight: 700;">${machine.anio || 'N/A'}</div>
+                                </div>
+                                <div>
+                                    <label style="color: var(--text-tertiary); font-size: 0.7em; text-transform: uppercase;">Serie</label>
+                                    <div style="font-weight: 700;">${machine.nro_serie || 'N/A'}</div>
+                                </div>
+                                <div>
+                                    <label style="color: var(--text-tertiary); font-size: 0.7em; text-transform: uppercase;">Propiedad</label>
+                                    <div style="font-weight: 700;">${machine.propiedad}</div>
+                                </div>
+                                <div>
+                                    <label style="color: var(--text-tertiary); font-size: 0.7em; text-transform: uppercase;">Uso Hs</label>
+                                    <div style="font-weight: 700;">${machine.horas_uso || 0} hs</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${machine.propiedad === 'Alquilada' ? `
+                            <div style="margin-top: var(--space-4); padding: var(--space-3); background: rgba(59, 130, 246, 0.1); border-radius: var(--radius-md); border: 1px solid rgba(59, 130, 246, 0.2);">
+                                <label style="color: #3b82f6; font-size: 0.7em; font-weight: 800; text-transform: uppercase;">Info Alquiler</label>
+                                <div style="font-size: 0.9em; font-weight: 700;">$${(machine.costo_alquiler || 0).toLocaleString()} / día</div>
+                            </div>
+                        ` : ''}
+
+                        <div style="margin-top: var(--space-6); display: grid; gap: var(--space-2);">
+                            <button class="btn btn-primary w-100 btn-maq-add-service" data-id="${machine.id}">🔧 Registrar Servicio</button>
+                            <button class="btn btn-ghost w-100 btn-maq-add-movement" data-id="${machine.id}">🚛 Registrar Movimiento</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Column -->
+                <div>
+                    <div class="card">
+                        <div class="card-header" style="padding: var(--space-4) var(--space-6);">
+                            <h3 style="margin:0; font-size: 1.1em; font-weight: 800;">📜 Historial de Intervenciones y Auditoría</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" style="font-size: 0.85em;">
+                                <thead style="background: rgba(0,0,0,0.15);">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción / Repuestos</th>
+                                        <th>Técnico / Responsable</th>
+                                        <th style="text-align: right;">Costo</th>
+                                        <th>Estado Post</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${history.length === 0 ? `
+                                        <tr>
+                                            <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-tertiary);">
+                                                No hay historial registrado para esta unidad.
+                                            </td>
+                                        </tr>
+                                    ` : history.map(h => `
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                            <td style="white-space: nowrap;">${new Date(h.fecha).toLocaleDateString()}</td>
+                                            <td>
+                                                <span style="font-weight: 700; color: ${h.tipo === 'Servicio' ? '#3b82f6' : h.tipo === 'Reparación' ? '#ef4444' : '#f59e0b'};">
+                                                    ${h.tipo}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div style="font-weight: 600;">${h.descripcion}</div>
+                                                ${h.repuestos ? `<div style="font-size: 0.85em; color: var(--text-tertiary);">📦 ${h.repuestos}</div>` : ''}
+                                            </td>
+                                            <td>${h.tecnico || 'N/A'}</td>
+                                            <td style="text-align: right; font-weight: 700; color: var(--color-primary-400);">$${(parseFloat(h.costo) || 0).toLocaleString()}</td>
+                                            <td>${h.estado_final || machine.estado}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
