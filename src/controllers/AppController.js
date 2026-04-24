@@ -42,7 +42,8 @@ import {
     renderPresupuestosPlanificacionLayout, renderBudgetGenericTable, renderCalendarioProductivo,
     renderCargaDocumentacionView, renderDocumentacionRows, renderTransferRows, renderRemitoExtRows, renderServicioRows,
     renderStockMovementView, renderRemitoPrintTemplate, renderCargaHome,
-    renderMaquinariaView, renderMaquinariaFicha
+    renderMaquinariaView, renderMaquinariaFicha, renderMantenimientoOperativoView,
+    renderInformeMantenimientoView
 } from '../views/Views.js';
 import { renderInversionesKanbanView } from '../views/InversionesView.js';
 
@@ -61,6 +62,7 @@ const ROLE_MENUS = {
             id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
                 { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
                 { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' },
+                { id: 'mantenimiento-maquinaria', label: 'Mantenimiento', icon: '🔧' },
             ]
         },
         {
@@ -74,6 +76,7 @@ const ROLE_MENUS = {
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
                 { id: 'informe-planificacion', label: 'Resumen Ppto Aprobado', icon: '📊' },
+                { id: 'informe-mantenimiento', label: 'Mantenimiento', icon: '🔧' },
             ]
         },
         {
@@ -129,6 +132,7 @@ const ROLE_MENUS = {
                 { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
                 { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' },
                 { id: 'admin-maquinaria', label: 'Maquinarias', icon: '🚜' },
+                { id: 'mantenimiento-maquinaria', label: 'Mantenimiento', icon: '🔧' },
             ]
         },
         {
@@ -164,7 +168,8 @@ const ROLE_MENUS = {
         {
             id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
                 { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
-                { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' }
+                { id: 'admin-bodegas-movimientos', label: 'Movimientos Stock', icon: '📦' },
+                { id: 'mantenimiento-maquinaria', label: 'Mantenimiento', icon: '🔧' }
             ]
         },
     ],
@@ -180,6 +185,7 @@ const ROLE_MENUS = {
                 { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
                 { id: 'control-carga', label: 'Control de Carga', icon: '📋' },
                 { id: 'informe-planificacion', label: 'Ppto Aprobado', icon: '📅' },
+                { id: 'informe-mantenimiento', label: 'Mantenimiento', icon: '🔧' },
             ]
         },
     ],
@@ -559,6 +565,10 @@ export class AppController {
                 if (title) title.textContent = 'Presupuesto Aprobado — Resumen Ejecutivo';
                 await this.renderInformePlanificacionSection(content);
                 break;
+            case 'informe-mantenimiento':
+                if (title) title.textContent = 'Informe de Mantenimiento';
+                await this.renderInformeMantenimientoSection(content);
+                break;
             case 'carga-documentacion':
                 if (title) title.textContent = 'Carga de Documentación Administrativa';
                 content.innerHTML = renderCargaDocumentacionView();
@@ -596,6 +606,10 @@ export class AppController {
             case 'admin-maquinaria':
                 if (title) title.textContent = 'Gestión de Maquinarias';
                 this.renderMaquinariaSection(content);
+                break;
+            case 'mantenimiento-maquinaria':
+                if (title) title.textContent = 'Mantenimiento y Reparaciones';
+                this.renderMantenimientoSection(content);
                 break;
             default:
                 // Handle all admin-* sections dynamically
@@ -2574,6 +2588,255 @@ export class AppController {
             if (callback) callback();
         });
     }
+
+    /** ── MANTENIMIENTO OPERATIVO MODULE ── **/
+    async renderMantenimientoSection(container) {
+        container.innerHTML = `<div style="padding: 2rem; text-align: center;"><div class="spinner"></div><p>Cargando módulo de mantenimiento...</p></div>`;
+
+        let maquinarias = [];
+        try {
+            maquinarias = await ADMIN_MODELS['admin-maquinaria'].getAll(true);
+        } catch (e) {
+            console.warn('Error cargando maquinarias para mantenimiento:', e);
+        }
+
+        container.innerHTML = renderMantenimientoOperativoView(maquinarias);
+        this.bindMantenimientoEvents(container, maquinarias);
+    }
+
+    /**
+     * Collects maintenance history from all machines, sorted by date descending.
+     */
+    getAllMaquinariaHistory(maquinarias) {
+        const allHistory = [];
+        maquinarias.forEach(m => {
+            const stored = JSON.parse(localStorage.getItem(`maq_history_${m.id}`) || '[]');
+            stored.forEach(entry => {
+                allHistory.push({
+                    ...entry,
+                    maquinaria_id: m.id,
+                    maquinaria_nombre: m.nombre
+                });
+            });
+        });
+        // Sort by date descending, limit to 50 most recent
+        allHistory.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        return allHistory.slice(0, 50);
+    }
+
+    bindMantenimientoEvents(container, maquinarias) {
+        // Machine selector -> show info card
+        const selectMaq = document.getElementById('mant-maquinaria-id');
+        const infoCard = document.getElementById('mant-machine-info');
+
+        if (selectMaq && infoCard) {
+            selectMaq.addEventListener('change', () => {
+                const selectedId = selectMaq.value;
+                if (!selectedId) {
+                    infoCard.style.display = 'none';
+                    return;
+                }
+                const machine = maquinarias.find(m => m.id == selectedId);
+                if (machine) {
+                    infoCard.style.display = 'block';
+                    infoCard.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: var(--text-primary);">${machine.nombre}</strong>
+                                <span style="opacity: 0.7; margin-left: 6px;">${machine.marca_modelo || ''}</span>
+                            </div>
+                            <span style="font-size: 0.8em; padding: 2px 8px; border-radius: 99px; background: ${machine.estado === 'Operativa' ? '#10b98115' : '#f59e0b15'}; color: ${machine.estado === 'Operativa' ? '#10b981' : '#f59e0b'}; font-weight: 700;">
+                                ${machine.estado}
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: var(--space-4); margin-top: 6px; font-size: 0.85em; color: var(--text-tertiary);">
+                            <span>⏱️ ${machine.horas_uso || 0} hs</span>
+                            <span>📅 Últ. servicio: ${machine.ultimo_servicio ? new Date(machine.ultimo_servicio).toLocaleDateString() : 'N/A'}</span>
+                            <span>💰 Mant. acum: $${(parseFloat(machine.costo_mantenimiento_acumulado) || 0).toLocaleString()}</span>
+                        </div>
+                    `;
+                    // Pre-fill hourmeter
+                    const horomInput = document.getElementById('mant-horometro');
+                    if (horomInput && machine.horas_uso) horomInput.placeholder = `Actual: ${machine.horas_uso}`;
+                }
+            });
+        }
+
+        // Radio button visual highlight
+        container.querySelectorAll('.mant-type-option').forEach(label => {
+            const radio = label.querySelector('input[type="radio"]');
+            if (radio) {
+                const updateStyles = () => {
+                    container.querySelectorAll('.mant-type-option').forEach(l => {
+                        const r = l.querySelector('input[type="radio"]');
+                        l.style.borderColor = r && r.checked ? r.style.accentColor || '#10b981' : 'var(--border-subtle)';
+                        l.style.background = r && r.checked ? `${r.style.accentColor || '#10b981'}10` : 'var(--bg-primary)';
+                    });
+                };
+                radio.addEventListener('change', updateStyles);
+                // Init
+                updateStyles();
+            }
+        });
+
+        // Save button
+        document.getElementById('btn-mant-guardar')?.addEventListener('click', async () => {
+            const maqId = document.getElementById('mant-maquinaria-id')?.value;
+            const tipo = document.querySelector('input[name="mant_tipo"]:checked')?.value;
+            const fecha = document.getElementById('mant-fecha')?.value;
+            const descripcion = document.getElementById('mant-descripcion')?.value;
+            const repuestos = document.getElementById('mant-repuestos')?.value || '';
+            const tecnico = document.getElementById('mant-tecnico')?.value || '';
+            const costo = parseFloat(document.getElementById('mant-costo')?.value) || 0;
+            const estadoPost = document.getElementById('mant-estado-post')?.value || 'Operativa';
+            const horometro = document.getElementById('mant-horometro')?.value || '';
+
+            // Validation
+            if (!maqId) {
+                this.showToast('Seleccione una maquinaria', 'warning');
+                return;
+            }
+            if (!descripcion || !descripcion.trim()) {
+                this.showToast('Ingrese una descripción del trabajo realizado', 'warning');
+                return;
+            }
+            if (!fecha) {
+                this.showToast('Ingrese la fecha de la intervención', 'warning');
+                return;
+            }
+
+            const machine = maquinarias.find(m => m.id == maqId);
+            if (!machine) {
+                this.showToast('Maquinaria no encontrada', 'error');
+                return;
+            }
+
+            // Build history entry
+            const entry = {
+                id: Date.now(),
+                fecha,
+                tipo,
+                descripcion: descripcion.trim(),
+                repuestos,
+                tecnico,
+                costo,
+                estado_final: estadoPost,
+                horometro: horometro ? parseInt(horometro) : null,
+                usuario: 'Campo',
+                maquinaria_nombre: machine.nombre
+            };
+
+            // Save to localStorage history (shared with admin ficha)
+            let history = JSON.parse(localStorage.getItem(`maq_history_${machine.id}`) || '[]');
+            history.unshift(entry);
+            localStorage.setItem(`maq_history_${machine.id}`, JSON.stringify(history));
+
+            // Update machine state in the backend
+            try {
+                const model = ADMIN_MODELS['admin-maquinaria'];
+                const updateData = {
+                    ...machine,
+                    estado: estadoPost,
+                    costo_mantenimiento_acumulado: (parseFloat(machine.costo_mantenimiento_acumulado) || 0) + costo,
+                };
+                if (tipo.includes('Servicio') || tipo.includes('Aceite')) {
+                    updateData.ultimo_servicio = fecha;
+                }
+                if (horometro) {
+                    updateData.horas_uso = parseInt(horometro);
+                }
+                await model.update(machine.id, updateData);
+            } catch (e) {
+                console.warn('No se pudo actualizar la maquinaria en el servidor:', e);
+            }
+
+            // Budget integration
+            if (costo > 0) {
+                try {
+                    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                    const d = new Date(fecha);
+                    const monthLabel = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+                    await PresupuestoModel.addExecuted('Maquinaria', costo, monthLabel);
+                } catch (e) {
+                    console.warn('No se pudo registrar el costo en presupuesto:', e);
+                }
+            }
+
+            this.showToast(`✅ Mantenimiento registrado para "${machine.nombre}"`, 'success');
+
+            // Re-render the section to update history list
+            const formObj = document.getElementById('form-mant-operativo');
+            const successMsg = document.getElementById('mant-success-msg');
+            const detailMsg = document.getElementById('mant-success-detail');
+            
+            if (formObj && successMsg && detailMsg) {
+                formObj.style.display = 'none';
+                detailMsg.innerHTML = `<strong>${machine.nombre}</strong><br>${tipo}<br>$${costo.toLocaleString()}`;
+                successMsg.style.display = 'block';
+                
+                document.getElementById('btn-mant-otro')?.addEventListener('click', () => {
+                    successMsg.style.display = 'none';
+                    formObj.reset();
+                    document.getElementById('mant-fecha').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('mant-machine-info').style.display = 'none';
+                    formObj.style.display = 'block';
+                });
+            } else {
+                this.renderMantenimientoSection(container);
+            }
+        });
+    }
+
+    async renderInformeMantenimientoSection(container) {
+        container.innerHTML = `<div style="padding: 2rem; text-align: center;"><div class="spinner"></div><p>Cargando informe de mantenimiento...</p></div>`;
+
+        let maquinarias = [];
+        try { maquinarias = await ADMIN_MODELS['admin-maquinaria'].getAll(true); } catch (e) { }
+
+        const historial = this.getAllMaquinariaHistory(maquinarias);
+
+        container.innerHTML = renderInformeMantenimientoView(maquinarias, historial);
+
+        // Export CSV Event
+        document.getElementById('btn-export-mant-csv')?.addEventListener('click', () => {
+            const csvRows = ['Fecha,Maquinaria,Tipo,Descripción,Repuestos,Técnico,Estado,Costo'];
+            historial.forEach(h => {
+                const values = [
+                    h.fecha, `"${h.maquinaria_nombre}"`, `"${h.tipo}"`, `"${h.descripcion}"`, 
+                    `"${h.repuestos || ''}"`, `"${h.tecnico || ''}"`, `"${h.estado_final || ''}"`, h.costo || 0
+                ];
+                csvRows.push(values.join(','));
+            });
+            const blob = new Blob([csvRows.join('\\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `informe_mantenimiento_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+
+        // Filter events
+        const filterMaq = document.getElementById('mant-filter-maq');
+        const filterType = document.getElementById('mant-filter-type');
+        const filterRows = () => {
+            const maq = filterMaq.value.toLowerCase();
+            const type = filterType.value.toLowerCase();
+            container.querySelectorAll('.mant-row').forEach(row => {
+                const rowMaq = row.dataset.maq.toLowerCase();
+                const rowType = row.dataset.type.toLowerCase();
+                const matchMaq = !maq || rowMaq.includes(maq);
+                const matchType = !type || rowType.includes(type);
+                row.style.display = matchMaq && matchType ? '' : 'none';
+            });
+        };
+
+        filterMaq?.addEventListener('change', filterRows);
+        filterType?.addEventListener('change', filterRows);
+    }
+
 
     async renderCargaTrabajoSection(container) {
         container.innerHTML = `<div style="padding: 2rem; text-align: center;">⌛ Cargando sistema de operativa...</div>`;

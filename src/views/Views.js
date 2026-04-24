@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ═══════════════════════════════════════════════════════════
  * NATURALFOOD - Views Layer
  * Renders all HTML templates for the application
@@ -6267,3 +6267,272 @@ export function renderMaquinariaFicha(machine, history = []) {
         </div>
     `;
 }
+
+/**
+ * Renders the Operative Maintenance module for field workers.
+ * Simplified interface for quickly logging services and repairs on registered machines.
+ */
+export function renderMantenimientoOperativoView(maquinarias = [], historialReciente = []) {
+    const hoy = new Date().toISOString().split('T')[0];
+    const inputStyle = 'width:100%;padding:14px 12px;background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:8px;color:#e2e8f0;font-size:16px;-webkit-appearance:none;';
+    const labelStyle = 'display:block;font-size:0.72em;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:8px;font-weight:700;';
+
+    return `
+        <div class="fade-in" style="max-width: 540px; margin: 0 auto;">
+            <!-- Header -->
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="font-size: 2.5rem; margin-bottom: 8px;">🔧</div>
+                <h2 style="margin: 0; font-weight: 800; font-size: 1.3em; color: #e2e8f0;">Registrar Mantenimiento</h2>
+                <p style="margin: 4px 0 0; color: #64748b; font-size: 0.85em;">Servicios, reparaciones e inspecciones</p>
+            </div>
+
+            <form id="form-mant-operativo">
+                <!-- Machine Selector -->
+                <div style="margin-bottom: 20px;">
+                    <label style="${labelStyle}">Maquinaria *</label>
+                    <select id="mant-maquinaria-id" required style="${inputStyle}">
+                        <option value="">— Seleccionar equipo —</option>
+                        ${maquinarias.map(m => {
+                            let icon = '🟢';
+                            if (m.estado === 'En Reparación') icon = '🟡';
+                            if (m.estado === 'Fuera de Servicio' || m.estado === 'Dada de Baja') icon = '🔴';
+                            return `<option value="${m.id}">${icon} ${m.nombre} (${m.categoria || ''})</option>`;
+                        }).join('')}
+                    </select>
+                </div>
+
+                <!-- Machine Info (dynamic) -->
+                <div id="mant-machine-info" style="display:none; padding:12px 14px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); border-radius:8px; margin-bottom:20px; color:#e2e8f0; font-size:0.88em;"></div>
+
+                <!-- Tipo de Intervención - Large touch cards -->
+                <div style="margin-bottom: 20px;">
+                    <label style="${labelStyle}">Tipo de intervención *</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <label class="mant-type-option" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px;background:var(--bg-primary);border:2px solid var(--border-subtle);border-radius:12px;cursor:pointer;transition:all 0.2s;text-align:center;min-height:70px;color:#e2e8f0;">
+                            <input type="radio" name="mant_tipo" value="Servicio Preventivo" checked style="display:none;">
+                            <span style="font-size:1.5rem;margin-bottom:4px;">🛡️</span>
+                            <span style="font-size:0.78em;font-weight:700;">Servicio</span>
+                        </label>
+                        <label class="mant-type-option" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px;background:var(--bg-primary);border:2px solid var(--border-subtle);border-radius:12px;cursor:pointer;transition:all 0.2s;text-align:center;min-height:70px;color:#e2e8f0;">
+                            <input type="radio" name="mant_tipo" value="Reparación Correctiva" style="display:none;">
+                            <span style="font-size:1.5rem;margin-bottom:4px;">🔧</span>
+                            <span style="font-size:0.78em;font-weight:700;">Reparación</span>
+                        </label>
+                        <label class="mant-type-option" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px;background:var(--bg-primary);border:2px solid var(--border-subtle);border-radius:12px;cursor:pointer;transition:all 0.2s;text-align:center;min-height:70px;color:#e2e8f0;">
+                            <input type="radio" name="mant_tipo" value="Inspección / Auditoría" style="display:none;">
+                            <span style="font-size:1.5rem;margin-bottom:4px;">🔍</span>
+                            <span style="font-size:0.78em;font-weight:700;">Inspección</span>
+                        </label>
+                        <label class="mant-type-option" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px;background:var(--bg-primary);border:2px solid var(--border-subtle);border-radius:12px;cursor:pointer;transition:all 0.2s;text-align:center;min-height:70px;color:#e2e8f0;">
+                            <input type="radio" name="mant_tipo" value="Cambio de Aceite/Filtros" style="display:none;">
+                            <span style="font-size:1.5rem;margin-bottom:4px;">🛢️</span>
+                            <span style="font-size:0.78em;font-weight:700;">Aceite/Filtros</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Date -->
+                <div style="margin-bottom: 16px;">
+                    <label style="${labelStyle}">Fecha *</label>
+                    <input type="date" id="mant-fecha" value="${hoy}" required style="${inputStyle}">
+                </div>
+
+                <!-- Description -->
+                <div style="margin-bottom: 16px;">
+                    <label style="${labelStyle}">¿Qué se hizo? *</label>
+                    <textarea id="mant-descripcion" rows="3" placeholder="Describir el trabajo realizado..." required style="${inputStyle} resize:vertical;"></textarea>
+                </div>
+
+                <!-- Parts -->
+                <div style="margin-bottom: 16px;">
+                    <label style="${labelStyle}">Repuestos usados</label>
+                    <input type="text" id="mant-repuestos" placeholder="Ej: Filtro aceite, Correa..." style="${inputStyle}">
+                </div>
+
+                <!-- Technician -->
+                <div style="margin-bottom: 16px;">
+                    <label style="${labelStyle}">Mecánico / Responsable</label>
+                    <input type="text" id="mant-tecnico" placeholder="Nombre..." style="${inputStyle}">
+                </div>
+
+                <!-- Cost + Hours row -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                    <div>
+                        <label style="${labelStyle}">Costo ($)</label>
+                        <input type="number" id="mant-costo" placeholder="0" min="0" inputmode="numeric" style="${inputStyle}">
+                    </div>
+                    <div>
+                        <label style="${labelStyle}">Horómetro (hs)</label>
+                        <input type="number" id="mant-horometro" placeholder="Actual" inputmode="numeric" style="${inputStyle}">
+                    </div>
+                </div>
+
+                <!-- Post-status -->
+                <div style="margin-bottom: 24px;">
+                    <label style="${labelStyle}">Estado después del trabajo</label>
+                    <select id="mant-estado-post" style="${inputStyle}">
+                        <option value="Operativa">✅ Operativa</option>
+                        <option value="En Reparación">🟡 Sigue en reparación</option>
+                        <option value="Fuera de Servicio">🔴 Fuera de servicio</option>
+                    </select>
+                </div>
+
+                <!-- Submit -->
+                <button type="button" id="btn-mant-guardar" style="width:100%;padding:16px;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:12px;font-size:1.1em;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform 0.1s;-webkit-tap-highlight-color:transparent;">
+                    💾 Guardar Registro
+                </button>
+            </form>
+
+            <!-- Success feedback (hidden by default) -->
+            <div id="mant-success-msg" style="display:none;text-align:center;padding:40px 20px;">
+                <div style="font-size:3rem;margin-bottom:12px;">✅</div>
+                <h3 style="color:#10b981;font-weight:800;margin:0 0 8px;">¡Registrado!</h3>
+                <p style="color:#94a3b8;font-size:0.9em;" id="mant-success-detail"></p>
+                <button type="button" id="btn-mant-otro" style="margin-top:20px;padding:14px 28px;background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:12px;color:#e2e8f0;font-weight:700;cursor:pointer;font-size:1em;">
+                    ➕ Registrar otro
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * INFORMES: Maintenance report dashboard with stats, history table, cost analysis.
+ */
+export function renderInformeMantenimientoView(maquinarias = [], historial = []) {
+    const costoTotal = historial.reduce((s, h) => s + (parseFloat(h.costo) || 0), 0);
+    const servicios = historial.filter(h => h.tipo && (h.tipo.includes('Servicio') || h.tipo.includes('Aceite'))).length;
+    const reparaciones = historial.filter(h => h.tipo && h.tipo.includes('Reparación')).length;
+    const enReparacion = maquinarias.filter(m => m.estado === 'En Reparación').length;
+
+    const costoPorMaq = {};
+    historial.forEach(h => {
+        const key = h.maquinaria_nombre || 'Desconocido';
+        costoPorMaq[key] = (costoPorMaq[key] || 0) + (parseFloat(h.costo) || 0);
+    });
+    const topCostos = Object.entries(costoPorMaq).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const maxCosto = topCostos.length > 0 ? topCostos[0][1] : 1;
+
+    return `
+        <div class="fade-in">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-6);">
+                <div>
+                    <h2 style="margin:0;font-weight:800;font-size:1.3em;">🔧 Informe de Mantenimiento</h2>
+                    <p style="margin:4px 0 0;color:var(--text-tertiary);font-size:0.85em;">Resumen de intervenciones, costos y estado del parque</p>
+                </div>
+                <button id="btn-export-mant-csv" class="btn btn-sm btn-ghost">📥 Exportar CSV</button>
+            </div>
+
+            <!-- KPI Cards -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-3);margin-bottom:var(--space-6);">
+                <div class="card" style="padding:var(--space-4);border-left:4px solid var(--color-primary-500);">
+                    <div style="font-size:0.68em;text-transform:uppercase;color:var(--text-tertiary);font-weight:700;margin-bottom:4px;">Total Intervenciones</div>
+                    <div style="font-size:1.8em;font-weight:800;color:var(--text-primary);">${historial.length}</div>
+                </div>
+                <div class="card" style="padding:var(--space-4);border-left:4px solid #10b981;">
+                    <div style="font-size:0.68em;text-transform:uppercase;color:var(--text-tertiary);font-weight:700;margin-bottom:4px;">Servicios</div>
+                    <div style="font-size:1.8em;font-weight:800;color:#10b981;">${servicios}</div>
+                </div>
+                <div class="card" style="padding:var(--space-4);border-left:4px solid #ef4444;">
+                    <div style="font-size:0.68em;text-transform:uppercase;color:var(--text-tertiary);font-weight:700;margin-bottom:4px;">Reparaciones</div>
+                    <div style="font-size:1.8em;font-weight:800;color:#ef4444;">${reparaciones}</div>
+                </div>
+                <div class="card" style="padding:var(--space-4);border-left:4px solid #f59e0b;">
+                    <div style="font-size:0.68em;text-transform:uppercase;color:var(--text-tertiary);font-weight:700;margin-bottom:4px;">En Reparación</div>
+                    <div style="font-size:1.8em;font-weight:800;color:#f59e0b;">${enReparacion}</div>
+                </div>
+                <div class="card" style="padding:var(--space-4);border-left:4px solid #8b5cf6;">
+                    <div style="font-size:0.68em;text-transform:uppercase;color:var(--text-tertiary);font-weight:700;margin-bottom:4px;">Gasto Total</div>
+                    <div style="font-size:1.6em;font-weight:800;color:#8b5cf6;">$${costoTotal.toLocaleString()}</div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-6);">
+                <!-- History Table -->
+                <div class="card" style="border:1px solid var(--border-subtle);">
+                    <div class="card-header d-flex justify-content-between align-items-center" style="padding:var(--space-4) var(--space-6);">
+                        <h3 style="margin:0;font-size:1em;font-weight:800;">📜 Historial</h3>
+                        <div class="d-flex gap-2" style="font-size:0.85em;">
+                            <select id="mant-filter-maq" style="padding:6px 10px;background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:6px;color:#e2e8f0;font-size:0.85em;">
+                                <option value="">Todas</option>
+                                ${maquinarias.map(m => `<option value="${m.nombre}">${m.nombre}</option>`).join('')}
+                            </select>
+                            <select id="mant-filter-type" style="padding:6px 10px;background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:6px;color:#e2e8f0;font-size:0.85em;">
+                                <option value="">Todos</option>
+                                <option value="Servicio">Servicios</option>
+                                <option value="Reparación">Reparaciones</option>
+                                <option value="Inspección">Inspecciones</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive" style="max-height:500px;overflow-y:auto;">
+                        <table class="table table-hover mb-0" style="font-size:0.85em;">
+                            <thead style="background:rgba(0,0,0,0.15);position:sticky;top:0;">
+                                <tr>
+                                    <th style="padding:10px 16px;">Fecha</th>
+                                    <th>Maquinaria</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Técnico</th>
+                                    <th style="text-align:right;">Costo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mant-history-tbody">
+                                ${historial.length === 0 ? `
+                                    <tr><td colspan="6" style="padding:3rem;text-align:center;color:var(--text-tertiary);">Sin registros.</td></tr>
+                                ` : historial.map(h => {
+                                    let tc = '#10b981';
+                                    if (h.tipo && h.tipo.includes('Reparación')) tc = '#ef4444';
+                                    else if (h.tipo && h.tipo.includes('Inspección')) tc = '#f59e0b';
+                                    return `
+                                        <tr class="mant-row" data-maq="${h.maquinaria_nombre || ''}" data-type="${h.tipo || ''}">
+                                            <td style="padding:10px 16px;white-space:nowrap;">${h.fecha ? new Date(h.fecha).toLocaleDateString() : '—'}</td>
+                                            <td style="font-weight:700;">${h.maquinaria_nombre || '—'}</td>
+                                            <td><span style="color:${tc};font-weight:700;">${h.tipo || '—'}</span></td>
+                                            <td>${h.descripcion || ''}${h.repuestos ? `<div style="font-size:0.8em;color:var(--text-tertiary);">📦 ${h.repuestos}</div>` : ''}</td>
+                                            <td>${h.tecnico || '—'}</td>
+                                            <td style="text-align:right;font-weight:700;color:var(--color-primary-400);">${(parseFloat(h.costo)||0) > 0 ? '$'+parseFloat(h.costo).toLocaleString() : '—'}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right: Cost + Fleet -->
+                <div>
+                    <div class="card" style="padding:var(--space-4);margin-bottom:var(--space-4);">
+                        <h4 style="margin:0 0 var(--space-4);font-weight:800;font-size:0.9em;">💰 Costo por Máquina</h4>
+                        ${topCostos.length === 0 ? `<p style="color:var(--text-tertiary);font-size:0.85em;">Sin datos.</p>` :
+                        topCostos.map(([name, cost]) => `
+                            <div style="margin-bottom:12px;">
+                                <div style="display:flex;justify-content:space-between;font-size:0.82em;margin-bottom:4px;">
+                                    <span style="font-weight:600;color:var(--text-primary);">${name}</span>
+                                    <span style="font-weight:800;color:#8b5cf6;">$${cost.toLocaleString()}</span>
+                                </div>
+                                <div style="height:8px;background:rgba(139,92,246,0.1);border-radius:99px;overflow:hidden;">
+                                    <div style="height:100%;width:${(cost/maxCosto*100)}%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);border-radius:99px;"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="card" style="padding:var(--space-4);">
+                        <h4 style="margin:0 0 var(--space-4);font-weight:800;font-size:0.9em;">🚜 Estado del Parque</h4>
+                        ${maquinarias.length === 0 ? `<p style="color:var(--text-tertiary);font-size:0.85em;">Sin maquinarias.</p>` :
+                        maquinarias.map(m => {
+                            let c='#10b981',i='🟢';
+                            if(m.estado==='En Reparación'){c='#f59e0b';i='🟡';}
+                            if(m.estado==='Fuera de Servicio'||m.estado==='Dada de Baja'){c='#ef4444';i='🔴';}
+                            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.85em;">
+                                <span style="font-weight:600;color:var(--text-primary);">${i} ${m.nombre}</span>
+                                <span style="color:${c};font-weight:700;font-size:0.8em;">${m.estado}</span>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
