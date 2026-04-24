@@ -5928,9 +5928,9 @@ renderJornadasChart(comparison) {
     if (!ctx) return;
 
     // Take top 8 labors for clarity
-    const labels = comparison.labels.slice(0, 8);
-    const realData = comparison.real.slice(0, 8);
-    const budgetData = comparison.budget.slice(0, 8);
+    const labels = (comparison.labels || []).slice(0, 8);
+    const realData = (comparison.real || comparison.datasets?.find(d => d.label.includes('Real'))?.data || []).slice(0, 8);
+    const budgetData = (comparison.budget || comparison.datasets?.find(d => d.label.includes('Presupuesto'))?.data || []).slice(0, 8);
 
     if (this.charts['jornadas']) {
         this.charts['jornadas'].destroy();
@@ -7885,9 +7885,9 @@ renderFertUnidadesChart() {
 
         // 1. Jornales chart
         const canvasJ = document.getElementById('chart-ejecucion-jornales');
-        if (canvasJ && comparison.jornales.length > 0) {
+        if (canvasJ && (comparison.jornales || []).length > 0) {
             if (this._chartEjecJornales) this._chartEjecJornales.destroy();
-            const top10 = comparison.jornales.slice(0, 10);
+            const top10 = (comparison.jornales || []).slice(0, 10);
             this._chartEjecJornales = new Chart(canvasJ, {
                 type: 'bar',
                 data: {
@@ -8429,7 +8429,7 @@ renderFertUnidadesChart() {
         });
 
         // 1. Jornales por Labor (top 10)
-        const topLabors = jornalesSummary.byLabor.slice(0, 10);
+        const topLabors = (jornalesSummary.byLabor || []).slice(0, 10);
         const ctx1 = document.getElementById('chart-ppto-jornales-labor');
         if (ctx1 && topLabors.length > 0) {
             const projValues = topLabors.map(r => {
@@ -8450,7 +8450,7 @@ renderFertUnidadesChart() {
         }
 
         // 2. Jornales por Predio
-        const topPredios = jornalesSummary.byPredio.slice(0, 10);
+        const topPredios = (jornalesSummary.byPredio || []).slice(0, 10);
         const ctx2 = document.getElementById('chart-ppto-jornales-predio');
         if (ctx2 && topPredios.length > 0) {
             this.charts['chart-ppto-jornales-predio'] = new Chart(ctx2, {
@@ -8492,7 +8492,7 @@ renderFertUnidadesChart() {
         }
 
         // 4. Top Productos por Cantidad
-        const topProds = gastosData.byProducto.slice(0, 10);
+        const topProds = (gastosData.byProducto || []).slice(0, 10);
         const ctx4 = document.getElementById('chart-ppto-gastos-prod');
         if (ctx4 && topProds.length > 0) {
             const projProds = topProds.map(r => {

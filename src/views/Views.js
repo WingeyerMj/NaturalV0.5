@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ═══════════════════════════════════════════════════════════
  * NATURALFOOD - Views Layer
  * Renders all HTML templates for the application
@@ -1141,7 +1141,7 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
     <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-6);">🚜 Eficiencia Laboral por Finca</h3>
 
     <div class="dashboard-grid animate-fade-in animate-delay-1" style="margin-bottom: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-        ${efficiencyStats.groups.map(g => `
+        ${(efficiencyStats?.groups || []).map(g => `
             <div class="metric-card" style="border-left: 4px solid ${g.name === 'Fincas Viejas' ? 'var(--color-primary-500)' : 'var(--color-accent-500)'}; padding: var(--space-6);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
                     <div class="metric-label" style="font-size: 1.1em; color: var(--text-primary);">${g.name}</div>
@@ -1162,7 +1162,7 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
                 </div>
                 <p style="color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4); padding-top: var(--space-2); border-top: 1px solid var(--border-subtle);">Total Jornadas: ${fmt(g.jornales)}</p>
                 <div style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
-                    ${efficiencyStats.predios.filter(p => p.group === g.name).map(p => `
+                    ${(efficiencyStats?.predios || []).filter(p => p.group === g.name).map(p => `
                         <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2); font-size: 0.9em;">
                             <span>${p.name}</span>
                             <span style="font-weight: 600;">${fmtDec(p.efficiency)} <span style="font-size: 0.8em; opacity: 0.7;">J/Ha</span></span>
@@ -1207,7 +1207,7 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
           </tr>
         </thead>
         <tbody>
-          ${efficiencyStats.predios.slice().sort((a, b) => b.costoArs - a.costoArs).map(p => `
+          ${(efficiencyStats?.predios || []).slice().sort((a, b) => b.costoArs - a.costoArs).map(p => `
               <tr>
                 <td><span style="font-size: 0.9em; color: var(--text-tertiary);">${p.group}</span></td>
                 <td><strong>${p.name}</strong></td>
@@ -1220,9 +1220,9 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
         <tfoot style="background: var(--bg-glass); font-weight: 700;">
           <tr>
             <td colspan="2">TOTAL</td>
-            <td style="text-align: right; color: var(--color-primary-600);">${fmtMoney(efficiencyStats.predios.reduce((acc, p) => acc + p.costoArs, 0))}</td>
-            <td style="text-align: right; color: #16a34a;">US${fmtMoney(efficiencyStats.predios.reduce((acc, p) => acc + (p.costoUsd || 0), 0))}</td>
-            <td style="text-align: right;">${fmt(efficiencyStats.predios.reduce((acc, p) => acc + p.jornales, 0))}</td>
+            <td style="text-align: right; color: var(--color-primary-600);">${fmtMoney((efficiencyStats?.predios || []).reduce((acc, p) => acc + p.costoArs, 0))}</td>
+            <td style="text-align: right; color: #16a34a;">US${fmtMoney((efficiencyStats?.predios || []).reduce((acc, p) => acc + (p.costoUsd || 0), 0))}</td>
+            <td style="text-align: right;">${fmt((efficiencyStats?.predios || []).reduce((acc, p) => acc + p.jornales, 0))}</td>
           </tr>
         </tfoot>
       </table>
@@ -1266,7 +1266,7 @@ export function renderHectareasPorPredio(hectareasData) {
 
     <!-- Detail Table per Finca Group -->
     <div class="dashboard-grid animate-fade-in animate-delay-1" style="grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-8);">
-      ${hectareasData.groups.map(g => {
+      ${(hectareasData?.groups || []).map(g => {
     const colors = groupColors[g.name] || groupColors['El Espejo'];
     return `
         <div class="data-table-container" style="padding: var(--space-6); border-left: 4px solid ${colors.accent};">
@@ -1342,8 +1342,8 @@ export function renderHectareasPorPredio(hectareasData) {
             </tr>
           </thead>
           <tbody>
-            ${hectareasData.groups.flatMap(g =>
-    g.predios.flatMap(p =>
+            ${(hectareasData?.groups || []).flatMap(g =>
+    (g.predios || []).flatMap(p =>
       (p.cuartelesList || []).map(c => `
                   <tr>
                     <td><span style="font-size: 0.85em; color: var(--text-tertiary);">${g.name}</span></td>
@@ -1367,7 +1367,7 @@ export function renderHectareasPorPredio(hectareasData) {
 
 export function renderEficienciaChartSection(hectareasData) {
   // Build list of all predios for the filter
-  const allPredios = hectareasData.groups.flatMap(g => g.predios.map(p => p.name));
+  const allPredios = (hectareasData?.groups || []).flatMap(g => (g.predios || []).map(p => p.name));
 
   return `
     <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
