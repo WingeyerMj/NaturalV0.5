@@ -370,7 +370,11 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
             <button class="mobile-menu-toggle" id="btn-mobile-menu">☰</button>
             <h1 class="page-title" id="page-title">Dashboard</h1>
           </div>
-          <div class="main-header-right">
+          <div class="main-header-right" style="display: flex; align-items: center; gap: 1rem;">
+            <div id="global-sync-indicator" style="display: none; align-items: center; gap: 0.5rem; background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); cursor: pointer;">
+                <span class="sync-icon" style="font-size: 0.9rem; animation: spin 2s linear infinite; display: inline-block;">🔄</span>
+                <span class="sync-count" style="font-size: 0.8rem; font-weight: 700; color: #10b981;">0</span>
+            </div>
             <button class="notification-bell" title="Notificaciones">
               🔔
               <span class="notification-count">3</span>
@@ -387,7 +391,13 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
                 `}
                 <span style="font-weight:600; color:white; font-size: 0.95rem;">${user.name}</span>
             </div>
-            <button id="btn-mobile-logout" style="background:transparent; border:none; color:var(--color-error); font-weight:600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">🚪 Salir</button>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div id="global-sync-indicator" style="display: none; align-items: center; gap: 0.4rem; background: rgba(16, 185, 129, 0.15); padding: 4px 10px; border-radius: 99px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                    <span style="font-size: 0.8rem;">🔄</span>
+                    <span class="sync-count" style="font-size: 0.75rem; font-weight: 800; color: #10b981;">0</span>
+                </div>
+                <button id="btn-mobile-logout" style="background:transparent; border:none; color:var(--color-error); font-weight:600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">🚪 Salir</button>
+            </div>
         </header>
         `}
 
@@ -557,6 +567,13 @@ export function renderCargaHome() {
                 <div class="carga-task-info">
                     <h3>Movimientos Stock</h3>
                     <p>Traslados y remitos externos</p>
+                </div>
+            </button>
+            <button class="carga-task-card" data-section="mantenimiento-maquinaria">
+                <div class="carga-task-icon">🔧</div>
+                <div class="carga-task-info">
+                    <h3>Mantenimiento</h3>
+                    <p>Servicios de maquinaria</p>
                 </div>
             </button>
         </div>

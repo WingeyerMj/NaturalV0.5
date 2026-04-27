@@ -413,7 +413,7 @@ export class AppController {
                 };
 
                 try {
-                    await withTimeout(Promise.all([
+                    const catalogs = await withTimeout(Promise.all([
                         UserModel.sync(),
                         FincaModel.sync(),
                         PredioModel.sync(),
@@ -421,8 +421,23 @@ export class AppController {
                         EmpleadoModel.sync(),
                         LaborModel.sync(),
                         PresupuestoModel.sync(),
-                        AplicacionModel.sync()
-                    ]), 5000); // 5 second timeout for sync
+                        AplicacionModel.sync(),
+                        ADMIN_MODELS['admin-maquinaria'].getAll(true),
+                        ADMIN_MODELS['admin-productos'].getAll()
+                    ]), 8000); // Increased timeout for full catalog sync
+
+                    // Guardar para uso offline (PWA-like)
+                    const { OfflineSyncModel } = await import('../models/OfflineSyncModel.js');
+                    OfflineSyncModel.saveCatalogsLocally({
+                        fincas: catalogs[1],
+                        predios: catalogs[2],
+                        variedades: catalogs[3],
+                        empleados: catalogs[4],
+                        labores: catalogs[5],
+                        maquinarias: catalogs[8],
+                        productos: catalogs[9]
+                    });
+
                 } catch (syncError) {
                     console.warn("Sync failed or timed out, using local cache:", syncError);
                     if (progressDetails) progressDetails.textContent = 'Usando datos locales (asíncrono)...';
@@ -2593,15 +2608,142 @@ export class AppController {
     async renderMantenimientoSection(container) {
         container.innerHTML = `<div style="padding: 2rem; text-align: center;"><div class="spinner"></div><p>Cargando módulo de mantenimiento...</p></div>`;
 
-        let maquinarias = [];
         try {
-            maquinarias = await ADMIN_MODELS['admin-maquinaria'].getAll(true);
+            const { OfflineSyncModel } = await import('../models/OfflineSyncModel.js');
+            const { renderMobileMaintenanceView } = await import('../views/MobileMaintenanceView.js');
+
+            const isMobile = window.innerWidth <= 768;
+            let maquinarias = [];
+            
+            try {
+                maquinarias = await ADMIN_MODELS['admin-maquinaria'].getAll(true);
+            } catch (e) {
+                const cats = OfflineSyncModel.getLocalCatalogs();
+                maquinarias = cats?.maquinarias || [];
+            }
+
+            if (isMobile) {
+                container.innerHTML = renderMobileMaintenanceView({ maquinarias });
+                this.bindMobileMaintenanceEvents(container);
+                return;
+            }
+
+            container.innerHTML = renderMantenimientoOperativoView(maquinarias);
+            this.bindMantenimientoEvents(container, maquinarias);
         } catch (e) {
-            console.warn('Error cargando maquinarias para mantenimiento:', e);
+            console.error('Mantenimiento load error:', e);
+            container.innerHTML = `<div class="alert alert-error">Error al cargar mantenimiento.</div>`;
+        }
+    }
+
+    bindMobileMaintenanceEvents(container) {
+        const { OfflineSyncModel } = import('../models/OfflineSyncModel.js').then ? null : null; // preload
+        const form = document.getElementById('mobile-mant-form');
+        const successDiv = document.getElementById('m-mant-success');
+        const detailP = document.getElementById('m-mant-detail');
+
+        // Card-type selector visual highlight
+        container.querySelectorAll('.mant-type-option').forEach(label => {
+            const radio = label.querySelector('input[type="radio"]');
+            if (radio) {
+                const updateStyles = () => {
+                    container.querySelectorAll('.mant-type-option').forEach(l => {
+                        const r = l.querySelector('input[type="radio"]');
+                        l.style.borderColor = r && r.checked ? '#10b981' : 'var(--border-subtle)';
+                        l.style.background = r && r.checked ? 'rgba(16,185,129,0.08)' : 'var(--bg-primary)';
+                    });
+                };
+                radio.addEventListener('change', updateStyles);
+                updateStyles();
+            }
+        });
+
+        // Machine selector -> show info card
+        const selectMaq = document.getElementById('m-maq-id');
+        const infoCard = document.getElementById('m-maq-info');
+        if (selectMaq && infoCard) {
+            selectMaq.addEventListener('change', async () => {
+                const selectedId = selectMaq.value;
+                if (!selectedId) { infoCard.style.display = 'none'; return; }
+                try {
+                    const { OfflineSyncModel } = await import('../models/OfflineSyncModel.js');
+                    const cats = OfflineSyncModel.getLocalCatalogs();
+                    const machine = (cats?.maquinarias || []).find(m => m.id == selectedId);
+                    if (machine) {
+                        infoCard.style.display = 'block';
+                        infoCard.innerHTML = `
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <strong>${machine.nombre}</strong>
+                                <span style="font-size:0.8em;padding:2px 8px;border-radius:99px;background:${machine.estado === 'Operativa' ? '#10b98115' : '#f59e0b15'};color:${machine.estado === 'Operativa' ? '#10b981' : '#f59e0b'};font-weight:700;">${machine.estado}</span>
+                            </div>
+                            <div style="display:flex;gap:12px;margin-top:6px;font-size:0.85em;color:#94a3b8;">
+                                <span>⏱️ ${machine.horas_uso || 0} hs</span>
+                                <span>📅 ${machine.ultimo_servicio ? new Date(machine.ultimo_servicio).toLocaleDateString() : 'N/A'}</span>
+                            </div>`;
+                        const horomInput = document.getElementById('m-mant-horometro');
+                        if (horomInput && machine.horas_uso) horomInput.placeholder = `Actual: ${machine.horas_uso}`;
+                    }
+                } catch(e) { console.warn(e); }
+            });
         }
 
-        container.innerHTML = renderMantenimientoOperativoView(maquinarias);
-        this.bindMantenimientoEvents(container, maquinarias);
+        // Sync button
+        document.getElementById('btn-mobile-sync')?.addEventListener('click', () => this.handleMobileSync(container));
+
+        // Queue updates
+        window.addEventListener('nf-sync-queue-updated', (e) => {
+            const badge = document.getElementById('mobile-queue-count');
+            if (badge) badge.textContent = (e.detail?.count || 0) + ' pendientes';
+        });
+
+        // Form submit
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const { OfflineSyncModel } = await import('../models/OfflineSyncModel.js');
+                
+                const maqSelect = document.getElementById('m-maq-id');
+                const maqName = maqSelect.options[maqSelect.selectedIndex]?.text || '';
+
+                const data = {
+                    maquinaria_id: maqSelect.value,
+                    tipo: document.querySelector('input[name="m_mant_tipo"]:checked')?.value,
+                    fecha: document.getElementById('m-mant-fecha').value,
+                    descripcion: document.getElementById('m-mant-desc').value,
+                    repuestos: document.getElementById('m-mant-repuestos').value,
+                    tecnico: document.getElementById('m-mant-tecnico').value,
+                    costo: parseFloat(document.getElementById('m-mant-costo').value) || 0,
+                    horometro: document.getElementById('m-mant-horometro').value,
+                    estado_post: document.getElementById('m-mant-estado-post').value
+                };
+
+                if (!data.maquinaria_id || !data.descripcion?.trim()) {
+                    this.showToast('Complete los campos obligatorios', 'warning');
+                    return;
+                }
+
+                OfflineSyncModel.enqueue('maintenance', data);
+
+                // Show success
+                form.style.display = 'none';
+                successDiv.style.display = 'block';
+                detailP.textContent = `${data.tipo} en ${maqName} — ${data.fecha}`;
+            });
+        }
+
+        // "Registrar otro" button
+        document.getElementById('btn-mant-otro')?.addEventListener('click', () => {
+            successDiv.style.display = 'none';
+            form.style.display = 'block';
+            form.reset();
+            // Re-check default radio
+            container.querySelectorAll('.mant-type-option').forEach(l => {
+                const r = l.querySelector('input[type="radio"]');
+                l.style.borderColor = r && r.checked ? '#10b981' : 'var(--border-subtle)';
+                l.style.background = r && r.checked ? 'rgba(16,185,129,0.08)' : 'var(--bg-primary)';
+            });
+            if (infoCard) infoCard.style.display = 'none';
+        });
     }
 
     /**
@@ -2872,57 +3014,63 @@ export class AppController {
                 // Bind Mobile Events
                 setTimeout(() => {
                     const form = document.getElementById('mobile-worklog-form');
-                    const btnSync = document.getElementById('btn-mobile-sync');
-                    
-                    if (form) form.addEventListener('submit', (e) => {
-                        e.preventDefault();
-                        const logData = {
-                            fecha: new Date().toISOString().split('T')[0],
-                            hora_inicio: '08:00', hora_fin: '17:00', // Hardcodeds temporales para campo
-                            finca_id: document.getElementById('m-finca').value,
-                            cuartel_id: document.getElementById('m-cuartel').value || null,
-                            empleado_id: document.getElementById('m-empleado').value,
-                            labor_id: document.getElementById('m-labor').value,
-                            cantidad: parseFloat(document.getElementById('m-cantidad').value),
-                            unidad: document.getElementById('m-unidad').value,
-                            total_jornadas: document.getElementById('m-unidad').value === 'Jornadas' ? parseFloat(document.getElementById('m-cantidad').value) : 0,
-                            usuario_cargo_id: UserModel.getCurrentUser().id
-                        };
-                        OfflineSyncModel.enqueueWorkLog(logData);
-                        document.getElementById('m-save-msg').textContent = '✅ Guardado. Queda en cola.';
-                        document.getElementById('m-cantidad').value = '';
-                        setTimeout(() => document.getElementById('m-save-msg').textContent='', 2000);
-                        
-                        // Actualizar UI
-                        const queueBadge = document.getElementById('mobile-queue-count');
-                        if (queueBadge) queueBadge.textContent = OfflineSyncModel.getSyncQueue().length + ' pendientes';
+                    const successDiv = document.getElementById('m-save-success');
+                    const detailP = document.getElementById('m-save-detail');
+
+                    // Sync button
+                    document.getElementById('btn-mobile-sync')?.addEventListener('click', () => this.handleMobileSync(container));
+
+                    // Queue updates
+                    window.addEventListener('nf-sync-queue-updated', (e) => {
+                        const badge = document.getElementById('mobile-queue-count');
+                        if (badge) badge.textContent = (e.detail?.count || 0) + ' pendientes';
                     });
 
-                    if (btnSync) btnSync.addEventListener('click', async () => {
-                        btnSync.textContent = 'Subiendo...';
-                        const queue = OfflineSyncModel.getSyncQueue();
-                        let successCount = 0;
-                        for (const item of queue) {
-                            try {
-                                const response = await fetch(`${VITE_API_URL}/trabajo-campo`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ log: item, insumos: [], herramientas: [] })
-                                });
-                                if (response.ok) {
-                                    OfflineSyncModel.dequeueWorkLog(item._offlineId);
-                                    successCount++;
-                                }
-                            } catch (e) {
-                                console.error('Error subiendo', item, e);
-                            }
+                    if (form) form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const fincaSelect = document.getElementById('m-finca');
+                        const empleadoSelect = document.getElementById('m-empleado');
+                        const laborSelect = document.getElementById('m-labor');
+                        const fincaName = fincaSelect.options[fincaSelect.selectedIndex]?.text || '';
+                        const empleadoName = empleadoSelect.options[empleadoSelect.selectedIndex]?.text || '';
+
+                        const logData = {
+                            fecha: document.getElementById('m-fecha').value,
+                            finca_id: fincaSelect.value,
+                            cuartel_id: document.getElementById('m-cuartel').value || null,
+                            empleado_id: empleadoSelect.value,
+                            labor_id: laborSelect.value,
+                            cantidad: parseFloat(document.getElementById('m-cantidad').value),
+                            unidad: document.getElementById('m-unidad').value,
+                            notas: document.getElementById('m-notas')?.value || '',
+                            usuario_cargo_id: UserModel.getCurrentUser().id
+                        };
+
+                        if (!logData.finca_id || !logData.empleado_id || !logData.labor_id || !logData.cantidad) {
+                            this.showToast('Complete los campos obligatorios', 'warning');
+                            return;
                         }
-                        alert(`Sincronización finalizada. Éxito: ${successCount}`);
-                        this.renderCargaTrabajoSection(container);
+
+                        OfflineSyncModel.enqueue('worklog', logData);
+
+                        // Show success feedback
+                        form.style.display = 'none';
+                        successDiv.style.display = 'block';
+                        detailP.textContent = `${empleadoName} — ${fincaName} — ${logData.fecha}`;
+                    });
+
+                    // "Registrar otro" button
+                    document.getElementById('btn-worklog-otro')?.addEventListener('click', () => {
+                        successDiv.style.display = 'none';
+                        form.style.display = 'block';
+                        form.reset();
+                        // Keep today's date
+                        const fechaInput = document.getElementById('m-fecha');
+                        if (fechaInput) fechaInput.value = new Date().toISOString().split('T')[0];
                     });
 
                 }, 100);
-                return; // FIN MOBILE
+                return; 
             }
 
             // Desktop View Normal
@@ -5332,6 +5480,85 @@ async syncFaenasFromCSV() {
 }
 
 /**
+ * Sincronización global para dispositivos móviles (Campo)
+ */
+async handleMobileSync(container) {
+    const { OfflineSyncModel } = await import('../models/OfflineSyncModel.js');
+    const queue = OfflineSyncModel.getSyncQueue();
+    if (queue.length === 0) {
+        this.showToast('No hay datos pendientes de sincronización', 'info');
+        return;
+    }
+
+    const btn = document.getElementById('btn-mobile-sync');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Sincronizando...';
+    }
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const item of queue) {
+        try {
+            let endpoint = '';
+            let payload = {};
+
+            switch (item._type) {
+                case 'worklog':
+                    endpoint = `${VITE_API_URL}/trabajo-campo`;
+                    payload = { log: item, insumos: [], herramientas: [] };
+                    break;
+                case 'stock':
+                    endpoint = item.type === 'recepcion' ? `${VITE_API_URL}/recepcion-stock` : `${VITE_API_URL}/transferencia-stock`;
+                    payload = item;
+                    break;
+                case 'maintenance':
+                    endpoint = `${VITE_API_URL}/maquinaria-mantenimiento`;
+                    payload = item;
+                    break;
+            }
+
+            if (!endpoint) {
+                console.warn('Unknown sync type:', item._type);
+                continue;
+            }
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                OfflineSyncModel.dequeue(item._offlineId);
+                successCount++;
+            } else {
+                failCount++;
+            }
+        } catch (e) {
+            console.error('Sync error for item:', item, e);
+            failCount++;
+        }
+    }
+
+    if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Sincronizar';
+    }
+
+    if (successCount > 0) {
+        this.showToast(`Sincronización exitosa: ${successCount} registros subidos`, 'success');
+    }
+    if (failCount > 0) {
+        this.showToast(`Error en ${failCount} registros. Reintente luego.`, 'error');
+    }
+
+    // Refrescar la vista actual
+    this.loadSection(this.currentSection, this.currentUser);
+}
+
+/**
  * Updates ADMIN_TABLE_CONFIG labels dynamically from the CSV headers.
  * Ensures the UI titles match the source file as requested.
  */
@@ -6928,23 +7155,131 @@ renderFertUnidadesChart() {
     async renderInventarioSection(container) {
         container.innerHTML = `<div style="padding: 2rem; text-align: center;">⌛ Cargando movimientos de inventario...</div>`;
         try {
-            // Load from model (Persistence)
-            const remitosExt = DocumentacionModel.getRemitosExt();
-            const transfers = DocumentacionModel.getTransfers();
+            const { OfflineSyncModel } = await import('../models/OfflineSyncModel.js');
+            const { renderMobileInventoryView } = await import('../views/MobileInventoryView.js');
             
-            // Render the main structure
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                const catalogs = OfflineSyncModel.getLocalCatalogs();
+                container.innerHTML = renderMobileInventoryView(catalogs);
+                this.bindMobileInventoryEvents(container);
+                return;
+            }
+
+            // Desktop View (Existing)
             container.innerHTML = renderStockMovementView([], { productos: [] }, this.currentUser);
-            
-            // Populate tables
             this.updateInventarioTables();
-            
-            // Bind events
             this.bindInventarioEvents(container);
-            this.bindDocumentacionEvents(); // Ensure save buttons in modals are bound
+            this.bindDocumentacionEvents(); 
         } catch (e) {
             console.error('Inventario load error:', e);
             container.innerHTML = `<div class="alert alert-error">Error al cargar datos de inventario.</div>`;
         }
+    }
+
+    bindMobileInventoryEvents(container) {
+        const form = document.getElementById('mobile-stock-form');
+        const typeInput = document.getElementById('m-stock-type');
+        const secIn = document.getElementById('m-stock-section-in');
+        const secTransfer = document.getElementById('m-stock-section-transfer');
+        const secDespacho = document.getElementById('m-stock-section-despacho');
+        const successDiv = document.getElementById('m-stock-success');
+        const detailP = document.getElementById('m-stock-detail');
+
+        // Card-type selector visual highlight + section toggle
+        container.querySelectorAll('.stock-type-option').forEach(label => {
+            const radio = label.querySelector('input[type="radio"]');
+            if (radio) {
+                const updateStyles = () => {
+                    container.querySelectorAll('.stock-type-option').forEach(l => {
+                        const r = l.querySelector('input[type="radio"]');
+                        l.style.borderColor = r && r.checked ? '#3b82f6' : 'var(--border-subtle)';
+                        l.style.background = r && r.checked ? 'rgba(59,130,246,0.08)' : 'var(--bg-primary)';
+                    });
+                    // Toggle sections
+                    const val = document.querySelector('input[name="stock_tipo"]:checked')?.value;
+                    typeInput.value = val;
+                    if (secIn) secIn.style.display = val === 'recepcion' ? 'block' : 'none';
+                    if (secTransfer) secTransfer.style.display = val === 'transferencia' ? 'block' : 'none';
+                    if (secDespacho) secDespacho.style.display = val === 'despacho' ? 'block' : 'none';
+                };
+                radio.addEventListener('change', updateStyles);
+                updateStyles();
+            }
+        });
+
+        // Sync button
+        document.getElementById('btn-mobile-sync')?.addEventListener('click', () => this.handleMobileSync(container));
+
+        // Queue updates
+        window.addEventListener('nf-sync-queue-updated', (e) => {
+            const badge = document.getElementById('mobile-queue-count');
+            if (badge) badge.textContent = (e.detail?.count || 0) + ' pendientes';
+        });
+
+        // Form submit
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const { OfflineSyncModel } = await import('../models/OfflineSyncModel.js');
+                
+                const tipo = typeInput.value;
+                const productoSelect = document.getElementById('m-producto');
+                const productoName = productoSelect.options[productoSelect.selectedIndex]?.text || '';
+
+                const data = {
+                    type: tipo,
+                    producto_id: productoSelect.value,
+                    cantidad: parseFloat(document.getElementById('m-stock-cantidad').value),
+                    fecha: document.getElementById('m-stock-fecha').value,
+                    remito: document.getElementById('m-stock-remito').value,
+                    notas: document.getElementById('m-stock-notas')?.value || ''
+                };
+
+                // Set finca fields based on type
+                if (tipo === 'recepcion') {
+                    data.finca_destino_id = document.getElementById('m-stock-finca-dest').value;
+                } else if (tipo === 'transferencia') {
+                    data.finca_origen_id = document.getElementById('m-stock-finca-orig').value;
+                    data.finca_destino_id = document.getElementById('m-stock-finca-dest-t').value;
+                } else if (tipo === 'despacho') {
+                    data.finca_origen_id = document.getElementById('m-stock-finca-salida').value;
+                }
+
+                if (!data.producto_id || !data.cantidad) {
+                    this.showToast('Complete los campos obligatorios', 'warning');
+                    return;
+                }
+
+                OfflineSyncModel.enqueue('stock', data);
+
+                // Show success
+                form.style.display = 'none';
+                successDiv.style.display = 'block';
+                detailP.textContent = `${productoName} — ${data.cantidad} ud — ${data.fecha}`;
+            });
+        }
+
+        // "Registrar otro" button
+        document.getElementById('btn-stock-otro')?.addEventListener('click', () => {
+            successDiv.style.display = 'none';
+            form.style.display = 'block';
+            form.reset();
+            // Reset type selector
+            container.querySelectorAll('.stock-type-option').forEach(l => {
+                const r = l.querySelector('input[type="radio"]');
+                l.style.borderColor = r && r.checked ? '#3b82f6' : 'var(--border-subtle)';
+                l.style.background = r && r.checked ? 'rgba(59,130,246,0.08)' : 'var(--bg-primary)';
+            });
+            if (secIn) secIn.style.display = 'block';
+            if (secTransfer) secTransfer.style.display = 'none';
+            if (secDespacho) secDespacho.style.display = 'none';
+            typeInput.value = 'recepcion';
+            // Keep today's date
+            const fechaInput = document.getElementById('m-stock-fecha');
+            if (fechaInput) fechaInput.value = new Date().toISOString().split('T')[0];
+        });
     }
 
     updateInventarioTables() {
